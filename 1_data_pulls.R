@@ -21,3 +21,28 @@ if(!require("dplyr"))   install.packages("dplyr")
 drive_find(n_max = 25)
 # the output is simply named files in your google drive
 
+#############################################
+### DOWNLOAD DATA FILES FROM GOOGLE DRIVE ###
+#############################################
+# IMPORTANT: ADD DOWNLOADS BELOW FOR FUTURE DATA PULLS
+# to download data from google drive, specify the file name
+  # it might be easier to use drive_find to see the name of the file
+# FOSS Exports, split by ~10 years
+drive_download('foss_exports_15-24.csv')
+drive_download('foss_exports_04-14.csv')
+drive_download('foss_imports_15-24.csv')
+drive_download('foss_imports_04-14.csv')
+
+
+##################################
+### READ DOWNLOADED DATA FILES ###
+##################################
+# The csv's are downloaded staright from FOSS without any prior modification
+# I.e., their headers are setup improperly and need adjustment
+
+# read csv
+foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
+  # use setNames from 'stats' to assign first row values as column names
+  setNames(.[1,]) %>%
+  # remove first row
+  .[-1, ]
