@@ -18,10 +18,9 @@ if(!require("dplyr"))   install.packages("dplyr")
 ####################################
 # The googledrive package comes from tidyverse and enables R users to connect
   # directly to google drive for access to files.
-# We can run drive_find(n_max = XX) to obtain access credentials and link
-  # the R session to a google drive account
-drive_find(n_max = 25)
-# the output is simply named files in your google drive
+# We can run drive_auth() to obtain access credentials and link the R session to 
+  # a google drive account
+drive_auth()
 
 #############################################
 ### DOWNLOAD DATA FILES FROM GOOGLE DRIVE ###
