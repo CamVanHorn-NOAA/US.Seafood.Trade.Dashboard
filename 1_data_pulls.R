@@ -69,3 +69,8 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
 # combine data (stack)
 foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
+#####################
+### SAVE THE DATA ###
+#####################
+save(list = c('foss_exports', 'foss_imports'),
+     file = '')
