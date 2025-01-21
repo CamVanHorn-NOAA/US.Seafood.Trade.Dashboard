@@ -72,5 +72,19 @@ foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 #####################
 ### SAVE THE DATA ###
 #####################
+# create the save file name
+# preserve the date of data creation for reference between data files
+file_name <- paste0('seafood_trade_data_pull_', 
+                    format(Sys.Date(), '%m_%d_%y'), 
+                    '.RData')
+
+# create the file
 save(list = c('foss_exports', 'foss_imports'),
-     file = '')
+     file = file_name)
+
+# upload to google drive
+drive_upload(file_name,
+             # IMPORTANT: change path below to match your personal Drive
+              # NOTE: no path results in save to Drive location specified
+              #       above
+             path = 'Seafood Trade Dashboard Project/Seafood Trade Data/')
