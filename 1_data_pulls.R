@@ -57,3 +57,15 @@ foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
 foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
 
 # Imports ----------------------------------------------------------------------
+# read csv's
+foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
+  setNames(.[1, ]) %>%
+  .[-1, ]
+
+foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
+  setNames(.[1, ]) %>%
+  .[-1, ]
+
+# combine data (stack)
+foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
+
