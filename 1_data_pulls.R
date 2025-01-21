@@ -47,13 +47,13 @@ drive_auth()
 foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
   # use setNames from 'stats' to assign first row values as column names
   setNames(.[1, ]) %>%
-  rename_with(toupper) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   # remove first row
   .[-1, ]
 
 foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
   setNames(.[1, ]) %>%
-  rename_with(toupper) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   .[-1, ]
 
 # combine data (stack)
@@ -63,12 +63,12 @@ foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
 # read csv's
 foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
   setNames(.[1, ]) %>%
-  rename_with(toupper) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   .[-1, ]
 
 foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
   setNames(.[1, ]) %>%
-  rename_with(toupper) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   .[-1, ]
 
 # combine data (stack)
