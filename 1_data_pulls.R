@@ -28,10 +28,11 @@ drive_find(n_max = 25)
 # to download data from google drive, specify the file name
   # it might be easier to use drive_find to see the name of the file
 # FOSS Exports, split by ~10 years
-drive_download('foss_exports_15-24.csv')
-drive_download('foss_exports_04-14.csv')
-drive_download('foss_imports_15-24.csv')
-drive_download('foss_imports_04-14.csv')
+  # UNCOMMENT IF DATA IS UPDATED
+# drive_download('foss_exports_15-24.csv')
+# drive_download('foss_exports_04-14.csv')
+# drive_download('foss_imports_15-24.csv')
+# drive_download('foss_imports_04-14.csv')
 
 
 ##################################
