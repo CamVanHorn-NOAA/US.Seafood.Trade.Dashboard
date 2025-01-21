@@ -30,3 +30,12 @@ data_file <- drive_find(pattern = 'seafood_trade_data_pull')[, 1:2] %>%
   # filter for most recent date (max)
   filter(DATE == max(DATE)) %>%
   select(NAME)
+  
+# Download the data
+drive_download(data_file$NAME,
+               overwrite = T)
+
+# Load the data
+load(data_file$NAME)
+# clean environment
+rm(data_file)
