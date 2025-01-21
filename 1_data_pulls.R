@@ -92,4 +92,5 @@ drive_upload(file_name,
              # IMPORTANT: change path below to match your personal Drive
               # NOTE: no path results in save to Drive location specified
               #       above
-             path = 'Seafood Trade Dashboard Project/Seafood Trade Data/')
+             path = 'Seafood Trade Dashboard Project/Seafood Trade Data/',
+             overwrite = T)
