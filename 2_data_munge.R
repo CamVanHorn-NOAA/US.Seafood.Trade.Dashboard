@@ -6,3 +6,10 @@
 
 
 
+#########################
+### PACKAGES AND DATA ###
+#########################
+# Packages
+if(!require("googledrive")) install.packages("googledrive")
+if(!require("tidyverse")) install.packages("tidyverse")
+
