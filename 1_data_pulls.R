@@ -36,14 +36,24 @@ drive_find(n_max = 25)
 
 
 ##################################
-### READ DOWNLOADED DATA FILES ###
+### LOAD DOWNLOADED DATA FILES ###
 ##################################
 # The csv's are downloaded staright from FOSS without any prior modification
 # I.e., their headers are setup improperly and need adjustment
 
-# read csv
+# Exports ----------------------------------------------------------------------
+# read csv's
 foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
   # use setNames from 'stats' to assign first row values as column names
-  setNames(.[1,]) %>%
+  setNames(.[1, ]) %>%
   # remove first row
   .[-1, ]
+
+foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
+  setNames(.[1, ]) %>%
+  .[-1, ]
+
+# combine data (stack)
+foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
+
+# Imports ----------------------------------------------------------------------
