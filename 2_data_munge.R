@@ -39,3 +39,11 @@ drive_download(data_file$NAME,
 load(data_file$NAME)
 # clean environment
 rm(data_file)
+
+##########################
+### DATA SUMMARIZATION ###
+##########################
+# TODO: summarize export & import volumes 
+# TODO: summarize export & import values
+# TODO: summarize export & import prices (value/volume)
+# TODO: extract species from product information
