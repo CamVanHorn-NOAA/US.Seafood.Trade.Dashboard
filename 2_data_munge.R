@@ -153,8 +153,10 @@ trade_data <- full_join(exports_smry, imports_smry)
 pp_data <- foss_pp %>%
   mutate(YEAR = as.numeric(YEAR),
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
-         DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
+         # convert pounds to kilograms in separate column
+         KG = POUNDS * 0.45359237) %>%
   arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
   # reorder columns so species is left of product_name for ease of viewing
-  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS)
-  
+  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS, KG)
+
