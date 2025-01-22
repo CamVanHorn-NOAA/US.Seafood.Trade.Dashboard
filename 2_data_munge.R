@@ -61,8 +61,21 @@ foss_exports <- foss_exports %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME)
 
-# Data summarization
-exports_summary <- foss_exports %>%
+# Data summarizing
+# Must do piece-wise due to two summarise() calls
+# First piece: summarise # of product types exported by year, 
+  # country name (exported to), customs district (exported from)
+exports_products_smry <- foss_exports %>%
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+         PRODUCT_NAME) %>%
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+           FAO_COUNTRY_CODE) %>%
+  summarise(PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
+            .groups = 'drop')
+
+# Second piece: summarise value and volume of exports by year, 
+  # country name (exported to), customs district (exported from)
+exports_price_smry <- foss_exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
@@ -70,6 +83,9 @@ exports_summary <- foss_exports %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
+
+# Now combine to form one summary sheet
+exports_smry <- full_join(exports_products_smry, exports_price_smry)
 
 
 # Imports ----------------------------------------------------------------------
@@ -84,8 +100,16 @@ foss_imports <- foss_imports %>%
          YEAR = as.numeric(YEAR)) %>%
   arrange(YEAR, COUNTRY_NAME)
 
-# Data summarization
-imports_summary <- foss_imports %>%
+# Data summarizing
+imports_products_smry <- foss_imports %>%
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+         PRODUCT_NAME) %>%
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
+           FAO_COUNTRY_CODE) %>%
+  summarise(PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
+            .groups = 'drop')
+
+imports_price_smry <- foss_imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG, CALCULATED_DUTY_USD) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
@@ -93,3 +117,7 @@ imports_summary <- foss_imports %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
+
+# Now combine to form one summary sheet
+imports_smry <- full_join(imports_products_smry, imports_price_smry)
+
