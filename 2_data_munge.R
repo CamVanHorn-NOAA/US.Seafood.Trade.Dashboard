@@ -61,6 +61,17 @@ foss_exports <- foss_exports %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME)
 
+# Data summarization
+exports_summary <- foss_exports %>%
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+         VALUE_USD, VOLUME_KG) %>%
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+           FAO_COUNTRY_CODE) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
+
+
 # Imports ----------------------------------------------------------------------
 # Data formatting
 foss_imports <- foss_imports %>%
@@ -72,3 +83,13 @@ foss_imports <- foss_imports %>%
          CALCULATED_DUTY_USD = as.numeric(gsub(',', '', CALCULATED_DUTY_USD)),
          YEAR = as.numeric(YEAR)) %>%
   arrange(YEAR, COUNTRY_NAME)
+
+# Data summarization
+imports_summary <- foss_imports %>%
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+         VALUE_USD, VOLUME_KG, CALCULATED_DUTY_USD) %>%
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+           FAO_COUNTRY_CODE) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
