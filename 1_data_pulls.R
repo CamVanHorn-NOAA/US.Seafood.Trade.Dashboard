@@ -30,10 +30,14 @@ drive_auth()
   # it might be easier to use drive_find to see the name of the file
 # FOSS Exports, split by ~10 years
   # UNCOMMENT IF DATA IS UPDATED
-# drive_download('foss_exports_15-24.csv')
-# drive_download('foss_exports_04-14.csv')
-# drive_download('foss_imports_15-24.csv')
-# drive_download('foss_imports_04-14.csv')
+# drive_download('foss_exports_15-24.csv',
+#                overwrite = T)
+# drive_download('foss_exports_04-14.csv',
+#                overwrite = T)
+# drive_download('foss_imports_15-24.csv',
+#                overwrite = T)
+# drive_download('foss_imports_04-14.csv',
+#                overwrite = T)
 
 
 ##################################
