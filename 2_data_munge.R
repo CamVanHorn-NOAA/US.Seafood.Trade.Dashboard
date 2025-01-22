@@ -9,10 +9,11 @@
 #########################
 ### PACKAGES AND DATA ###
 #########################
-# Packages
+# Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
 
+# Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
 drive_auth()
 
