@@ -47,3 +47,28 @@ rm(data_file)
 # TODO: summarize export & import values
 # TODO: summarize export & import prices (value/volume)
 # TODO: extract species from product information
+# Exports ----------------------------------------------------------------------
+# Data formatting
+foss_exports <- foss_exports %>%
+  # set necessary columns to numeric
+  # value and volume need commas removed for coercion
+  mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
+         VOLUME_KG = as.numeric(gsub(',', '', VOLUME_KG)),
+         CENSUS_COUNTRY_CODE = as.numeric(CENSUS_COUNTRY_CODE),
+         CENSUS_DISTRICT_CODE = as.numeric(CENSUS_DISTRICT_CODE),
+         FAO_COUNTRY_CODE = as.numeric(FAO_COUNTRY_CODE),
+         YEAR = as.numeric(YEAR)) %>%
+  # arrange by year then country name 
+  arrange(YEAR, COUNTRY_NAME)
+
+# Imports ----------------------------------------------------------------------
+# Data formatting
+foss_imports <- foss_imports %>%
+  mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
+         VOLUME_KG = as.numeric(gsub(',', '', VOLUME_KG)),
+         CENSUS_COUNTRY_CODE = as.numeric(CENSUS_COUNTRY_CODE),
+         CENSUS_DISTRICT_CODE = as.numeric(CENSUS_DISTRICT_CODE),
+         FAO_COUNTRY_CODE = as.numeric(FAO_COUNTRY_CODE),
+         CALCULATED_DUTY_USD = as.numeric(gsub(',', '', CALCULATED_DUTY_USD)),
+         YEAR = as.numeric(YEAR)) %>%
+  arrange(YEAR, COUNTRY_NAME)
