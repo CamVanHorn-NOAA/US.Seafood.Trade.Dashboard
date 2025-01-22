@@ -147,3 +147,14 @@ trade_data <- full_join(exports_smry, imports_smry)
   # US Custom's District and Country of Origin or Export for every year from 
   # 2004 - 2024
 
+
+# Processed Products -----------------------------------------------------------
+# Data formatting
+pp_data <- foss_pp %>%
+  mutate(YEAR = as.numeric(YEAR),
+         POUNDS = as.numeric(gsub(',', '', POUNDS)),
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
+  arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
+  # reorder columns so species is left of product_name for ease of viewing
+  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS)
+  
