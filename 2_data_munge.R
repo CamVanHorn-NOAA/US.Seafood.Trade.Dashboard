@@ -43,10 +43,8 @@ rm(data_file)
 ##########################
 ### DATA SUMMARIZATION ###
 ##########################
-# TODO: summarize export & import volumes 
-# TODO: summarize export & import values
-# TODO: summarize export & import prices (value/volume)
 # TODO: extract species from product information
+# TODO: standardize prices with a given year's real dollar value
 # Exports ----------------------------------------------------------------------
 # Data formatting
 foss_exports <- foss_exports %>%
