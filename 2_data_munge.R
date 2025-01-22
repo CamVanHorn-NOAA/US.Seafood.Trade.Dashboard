@@ -121,3 +121,30 @@ imports_price_smry <- foss_imports %>%
 # Now combine to form one summary sheet
 imports_smry <- full_join(imports_products_smry, imports_price_smry)
 
+# Combine exports and imports --------------------------------------------------
+# By combining exports and imports into one sheet, we can compare trade data
+  # by continent, country, and us customs district and calculate surplus/deficit
+# Eventually, once we parse out species IDs from product data, we can determine
+# which species drive trends
+
+# We need to change column names to coerce their join properly
+exports_smry <- exports_smry %>%
+  rename(EXP_PRODUCT_DIVERSITY = PRODUCT_DIVERSITY,
+         EXP_VALUE_USD = VALUE_USD,
+         EXP_VOLUME_KG = VOLUME_KG,
+         EXP_AVERAGE_PRICE_PER_KG = AVERAGE_PRICE_PER_KG)
+
+imports_smry <- imports_smry %>%
+  rename(IMP_PRODUCT_DIVERSITY = PRODUCT_DIVERSITY,
+         IMP_VALUE_USD = VALUE_USD,
+         IMP_VOLUME_KG = VOLUME_KG,
+         IMP_AVERAGE_PRICE_PER_KG = AVERAGE_PRICE_PER_KG) 
+# calculated_duty_usd is unique to imports, so no need to change name
+
+# full_join the tables to account for countries or customs districts that 
+  # exclusively import or export
+trade_data <- full_join(exports_smry, imports_smry)
+# The resulting data frame includes import and export data attached to each
+  # US Custom's District and Country of Origin or Export for every year from 
+  # 2004 - 2024
+
