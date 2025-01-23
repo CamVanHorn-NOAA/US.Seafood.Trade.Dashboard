@@ -106,6 +106,12 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 # combine data (stack)
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
+# GDPDEF Index -----------------------------------------------------------------
+# read csv's
+def_index <- read.csv('GDPDEF_index.csv') %>%
+  rename_with( ~ toupper(.x)) %>%
+  rename(INDEX = GDPDEF_NBD20230101)
+
 #####################
 ### SAVE THE DATA ###
 #####################
