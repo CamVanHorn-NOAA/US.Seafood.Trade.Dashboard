@@ -42,6 +42,8 @@ drive_auth()
 #                overwrite = T)
 # drive_download('foss_pp_04-14.csv',
 #                overwrite = T)
+# drive_download('GDPDEF_index.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
@@ -104,6 +106,16 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 # combine data (stack)
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
+# GDPDEF Index -----------------------------------------------------------------
+# read csv's
+def_index <- read.csv('GDPDEF_index.csv') %>%
+  rename_with( ~ toupper(.x)) %>%
+  rename(DEFLATOR_VALUE = GDPDEF_NBD20230101,
+         YEAR = OBSERVATION_DATE) %>%
+  # remove -01-01 from year as it is negligible (the index is averaged per year)
+  mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
+         INDEX = (100/DEFLATOR_VALUE))
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -115,7 +127,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 
 # create the file
   # NOTE: add new data to this list upon creation in this script
-save(list = c('foss_exports', 'foss_imports', 'foss_pp'),
+save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index'),
      file = file_name)
 
 # upload to google drive
