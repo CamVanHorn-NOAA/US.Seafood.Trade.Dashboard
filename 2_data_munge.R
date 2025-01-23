@@ -193,3 +193,25 @@ pp_data <- foss_pp %>%
          DOLLARS_2023_PER_KG = DOLLARS_2023 / KG) %>%
   select(-INDEX)
 
+
+#####################
+### SAVE THE DATA ###
+#####################
+# create the save file name
+# preserve the date of data creation for reference between data files
+file_name <- paste0('seafood_trade_data_munge_', 
+                    format(Sys.Date(), '%m_%d_%y'), 
+                    '.RData')
+
+# create the file
+# NOTE: add new data to this list upon creation in this script
+save(list = c('trade_data', 'pp_data'),
+     file = file_name)
+
+# upload to google drive
+drive_upload(file_name,
+             # IMPORTANT: change path below to match your personal Drive
+             # NOTE: no path results in save to Drive location specified
+             #       above
+             path = 'Seafood Trade Dashboard Project/Seafood Trade Data/',
+             overwrite = T)
