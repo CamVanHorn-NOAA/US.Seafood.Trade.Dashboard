@@ -45,7 +45,6 @@ rm(data_file)
 ### DATA SUMMARIZATION ###
 ##########################
 # TODO: extract species from product information
-# TODO: standardize prices with a given year's real dollar value
 # Exports ----------------------------------------------------------------------
 # Data formatting
 foss_exports <- foss_exports %>%
@@ -72,7 +71,7 @@ foss_exports <- foss_exports %>%
   # We calculated the Index value in script 1
 foss_exports <- foss_exports %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(VALUE_2023USD = VALUE_USD * INDEX) %>%
+  mutate(EXP_VALUE_2023USD = VALUE_USD * INDEX) %>%
   select(-INDEX)
 
 
@@ -85,20 +84,20 @@ exports_products_smry <- foss_exports %>%
          PRODUCT_NAME) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
            FAO_COUNTRY_CODE) %>%
-  summarise(PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
+  summarise(EXP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 # Second piece: summarise value and volume of exports by year, 
   # country name (exported to), customs district (exported from)
 exports_price_smry <- foss_exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         VALUE_USD, VALUE_2023USD, VOLUME_KG) %>%
+         VALUE_USD, EXP_VALUE_2023USD, VOLUME_KG) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
            FAO_COUNTRY_CODE) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
-  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
-         AVERAGE_2023PRICE_PER_KG = VALUE_2023USD / VOLUME_KG)
+  mutate(EXP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
+         EXP_AVERAGE_2023PRICE_PER_KG = EXP_VALUE_2023USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 exports_smry <- full_join(exports_products_smry, exports_price_smry)
@@ -118,8 +117,8 @@ foss_imports <- foss_imports %>%
 
 foss_imports <- foss_imports %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(VALUE_2023USD = VALUE_USD * INDEX,
-         CALCULATED_DUTY_2023USD = CALCULATED_DUTY_USD * INDEX) %>%
+  mutate(IMP_VALUE_2023USD = VALUE_USD * INDEX,
+         IMP_CALCULATED_DUTY_2023USD = CALCULATED_DUTY_USD * INDEX) %>%
   select(-INDEX)
   
 
@@ -129,19 +128,19 @@ imports_products_smry <- foss_imports %>%
          PRODUCT_NAME) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
            FAO_COUNTRY_CODE) %>%
-  summarise(PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
+  summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 imports_price_smry <- foss_imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         VALUE_USD, VOLUME_KG, VALUE_2023USD, CALCULATED_DUTY_USD,
-         CALCULATED_DUTY_2023USD) %>%
+         VALUE_USD, VOLUME_KG, IMP_VALUE_2023USD, CALCULATED_DUTY_USD,
+         IMP_CALCULATED_DUTY_2023USD) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
            FAO_COUNTRY_CODE) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
-  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
-         AVERAGE_2023PRICE_PER_KG = VALUE_2023USD / VOLUME_KG)
+  mutate(IMP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
+         IMP_AVERAGE_2023PRICE_PER_KG = IMP_VALUE_2023USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 imports_smry <- full_join(imports_products_smry, imports_price_smry)
@@ -154,16 +153,12 @@ imports_smry <- full_join(imports_products_smry, imports_price_smry)
 
 # We need to change column names to coerce their join properly
 exports_smry <- exports_smry %>%
-  rename(EXP_PRODUCT_DIVERSITY = PRODUCT_DIVERSITY,
-         EXP_VALUE_USD = VALUE_USD,
-         EXP_VOLUME_KG = VOLUME_KG,
-         EXP_AVERAGE_PRICE_PER_KG = AVERAGE_PRICE_PER_KG)
+  rename(EXP_VALUE_USD = VALUE_USD,
+         EXP_VOLUME_KG = VOLUME_KG)
 
 imports_smry <- imports_smry %>%
-  rename(IMP_PRODUCT_DIVERSITY = PRODUCT_DIVERSITY,
-         IMP_VALUE_USD = VALUE_USD,
-         IMP_VOLUME_KG = VOLUME_KG,
-         IMP_AVERAGE_PRICE_PER_KG = AVERAGE_PRICE_PER_KG) 
+  rename(IMP_VALUE_USD = VALUE_USD,
+         IMP_VOLUME_KG = VOLUME_KG) 
 # calculated_duty_usd is unique to imports, so no need to change name
 
 # full_join the tables to account for countries or customs districts that 
