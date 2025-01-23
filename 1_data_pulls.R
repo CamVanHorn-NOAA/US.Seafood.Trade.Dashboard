@@ -38,7 +38,10 @@ drive_auth()
 #                overwrite = T)
 # drive_download('foss_imports_04-14.csv',
 #                overwrite = T)
-
+# drive_download('foss_pp_15-23.csv',
+#                overwrite = T)
+# drive_download('foss_pp_04-14.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
@@ -86,6 +89,21 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
 # combine data (stack)
 foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
+# Processed Products -----------------------------------------------------------
+# read csv's
+foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+# combine data (stack)
+foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -96,7 +114,8 @@ file_name <- paste0('seafood_trade_data_pull_',
                     '.RData')
 
 # create the file
-save(list = c('foss_exports', 'foss_imports'),
+  # NOTE: add new data to this list upon creation in this script
+save(list = c('foss_exports', 'foss_imports', 'foss_pp'),
      file = file_name)
 
 # upload to google drive

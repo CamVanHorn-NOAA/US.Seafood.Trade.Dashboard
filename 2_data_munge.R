@@ -9,10 +9,11 @@
 #########################
 ### PACKAGES AND DATA ###
 #########################
-# Packages
+# Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
 
+# Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
 drive_auth()
 
@@ -43,10 +44,8 @@ rm(data_file)
 ##########################
 ### DATA SUMMARIZATION ###
 ##########################
-# TODO: summarize export & import volumes 
-# TODO: summarize export & import values
-# TODO: summarize export & import prices (value/volume)
 # TODO: extract species from product information
+# TODO: standardize prices with a given year's real dollar value
 # Exports ----------------------------------------------------------------------
 # Data formatting
 foss_exports <- foss_exports %>%
@@ -147,4 +146,17 @@ trade_data <- full_join(exports_smry, imports_smry)
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export for every year from 
   # 2004 - 2024
+
+
+# Processed Products -----------------------------------------------------------
+# Data formatting
+pp_data <- foss_pp %>%
+  mutate(YEAR = as.numeric(YEAR),
+         POUNDS = as.numeric(gsub(',', '', POUNDS)),
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
+         # convert pounds to kilograms in separate column
+         KG = POUNDS * 0.45359237) %>%
+  arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
+  # reorder columns so species is left of product_name for ease of viewing
+  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS, KG)
 
