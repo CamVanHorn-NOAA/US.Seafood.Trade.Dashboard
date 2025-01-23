@@ -60,6 +60,22 @@ foss_exports <- foss_exports %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME)
 
+# Calculate standard prices with 2023 index
+# We standardize prices by setting a year as a reference for inflation indexing
+  # Effectively, by setting 2023 as our reference year, we can calculate what
+  # prices from prior years would be in 2023 dollars
+  # This is accounts for price fluctuations exclusively due to inflation
+# To standardize, we set the reference year's index (2023) as the numerator 
+  # and a given year's index (e.g., 2020) as the denominator
+  # Then multiply this value by the price of the good in the given year to 
+  # determine it's value in real 2023 dollars
+  # We calculated the Index value in script 1
+foss_exports <- foss_exports %>%
+  left_join(def_index %>% select(YEAR, INDEX)) %>%
+  mutate(VALUE_2023USD = VALUE_USD * INDEX) %>%
+  select(-INDEX)
+
+
 # Data summarizing
 # Must do piece-wise due to two summarise() calls
 # First piece: summarise # of product types exported by year, 
@@ -76,12 +92,13 @@ exports_products_smry <- foss_exports %>%
   # country name (exported to), customs district (exported from)
 exports_price_smry <- foss_exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         VALUE_USD, VOLUME_KG) %>%
+         VALUE_USD, VALUE_2023USD, VOLUME_KG) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
            FAO_COUNTRY_CODE) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
-  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
+  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
+         AVERAGE_2023PRICE_PER_KG = VALUE_2023USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 exports_smry <- full_join(exports_products_smry, exports_price_smry)
@@ -99,6 +116,13 @@ foss_imports <- foss_imports %>%
          YEAR = as.numeric(YEAR)) %>%
   arrange(YEAR, COUNTRY_NAME)
 
+foss_imports <- foss_imports %>%
+  left_join(def_index %>% select(YEAR, INDEX)) %>%
+  mutate(VALUE_2023USD = VALUE_USD * INDEX,
+         CALCULATED_DUTY_2023USD = CALCULATED_DUTY_USD * INDEX) %>%
+  select(-INDEX)
+  
+
 # Data summarizing
 imports_products_smry <- foss_imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
@@ -110,12 +134,14 @@ imports_products_smry <- foss_imports %>%
 
 imports_price_smry <- foss_imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         VALUE_USD, VOLUME_KG, CALCULATED_DUTY_USD) %>%
+         VALUE_USD, VOLUME_KG, VALUE_2023USD, CALCULATED_DUTY_USD,
+         CALCULATED_DUTY_2023USD) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
            FAO_COUNTRY_CODE) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
-  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG)
+  mutate(AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
+         AVERAGE_2023PRICE_PER_KG = VALUE_2023USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 imports_smry <- full_join(imports_products_smry, imports_price_smry)
@@ -158,5 +184,12 @@ pp_data <- foss_pp %>%
          KG = POUNDS * 0.45359237) %>%
   arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
   # reorder columns so species is left of product_name for ease of viewing
-  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS, KG)
+  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS, KG) %>%
+  left_join(def_index %>% select(YEAR, INDEX)) %>%
+  mutate(DOLLARS_2023 = DOLLARS * INDEX,
+         DOLLARS_PER_LB = DOLLARS / POUNDS,
+         DOLLARS_PER_KG = DOLLARS / KG,
+         DOLLARS_2023_PER_LB = DOLLARS_2023 / POUNDS,
+         DOLLARS_2023_PER_KG = DOLLARS_2023 / KG) %>%
+  select(-INDEX)
 
