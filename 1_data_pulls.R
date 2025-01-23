@@ -110,10 +110,11 @@ foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 # read csv's
 def_index <- read.csv('GDPDEF_index.csv') %>%
   rename_with( ~ toupper(.x)) %>%
-  rename(INDEX = GDPDEF_NBD20230101,
+  rename(DEFLATOR_VALUE = GDPDEF_NBD20230101,
          YEAR = OBSERVATION_DATE) %>%
   # remove -01-01 from year as it is negligible (the index is averaged per year)
-  mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)))
+  mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
+         INDEX = (100/DEFLATOR_VALUE))
 
 #####################
 ### SAVE THE DATA ###
