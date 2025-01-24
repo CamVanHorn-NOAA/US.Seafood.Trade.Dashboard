@@ -70,6 +70,31 @@ ggplot(data = exp_value_yr,
   theme_bw() +
   theme(axis.text = element_text(size = 10))
   
+  # Comparing Export Volume through time
+  # Comparing Export Price (Real 2023 USD/KG) through time
+  # Comparing export value/volume/price by customs district
+  # Comparing export value/volume/price by country
+  
 # Imports ----------------------------------------------------------------------
+  # Comparing Import value through time (Real 2023 USD)
+  # Comparing Import volume through time 
+  # Comparing Import price (Real 2023 USD/KG) through time
+  # comparing import value/volume/price by customs district
+  # Comparing import value/volume/price by country
+
 # Trade Balances ---------------------------------------------------------------
+  # Comparing Value balance through time (Real 2023 USD)
+  # comparing volume balance through time 
+  # comparing price (Real 2023 USD/KG) balance through time
+  # comparing value/volume/price balance by customs district
+  # comparing value/volume/price balance by customs district
+
 # Processed Products ----------------------------------------------------------- 
+  # Compare Value of domestic processed products through time
+  # compare volume of domestic processed products through time
+  # compare price of domestic processed products through time
+  # compare top prices of species/product types through time
+  # compare top species sold by volume through time
+  # compare top species sold by value through time
+  # compare top product types sold by volume through time
+  # compare top product types sold by value through time
