@@ -10,6 +10,7 @@
 # Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("scales")) install.packages("scales")
 
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
