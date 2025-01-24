@@ -40,10 +40,21 @@ load(data_file$NAME)
 # clean environment
 rm(data_file)
 
-####################
-### SIMPLE PLOTS ###
-####################
-# Exports ----------------------------------------------------------------------
+###############
+### EXPORTS ###
+###############
+# Comparing Export Value through time (Real 2023 USD) --------------------------
+# Format Data
+exp_value_yr <- trade_data %>%
+  # we only need two columns, aggregate based on these columns
+  select(YEAR, EXP_VALUE_2023USD) %>%
+  mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0, 
+                                    EXP_VALUE_2023USD)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000)
+
 # Imports ----------------------------------------------------------------------
 # Trade Balances ---------------------------------------------------------------
 # Processed Products ----------------------------------------------------------- 
