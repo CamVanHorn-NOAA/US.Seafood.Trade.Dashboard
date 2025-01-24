@@ -55,6 +55,21 @@ exp_value_yr <- trade_data %>%
             .groups = 'drop') %>%
   mutate(EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000)
 
+# Plot the data
+ggplot(data = exp_value_yr,
+       aes(x = factor(YEAR),
+           y = EXP_VALUE_2023USD_MILLIONS)) +
+  geom_col(fill = 'black') +
+  coord_cartesian(ylim = c(4000, 8000)) +
+  scale_x_discrete(breaks = c(2004, 2008, 2012, 2016, 2020, 2023),
+                   limits = factor(2004:2023)) +
+  scale_y_continuous(breaks = c(4000, 5000, 6000, 7000, 8000),
+                     labels = label_currency(suffix = 'M')) +
+  labs(x = 'Year',
+       y = 'Total Exports (Real 2023 USD)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+  
 # Imports ----------------------------------------------------------------------
 # Trade Balances ---------------------------------------------------------------
 # Processed Products ----------------------------------------------------------- 
