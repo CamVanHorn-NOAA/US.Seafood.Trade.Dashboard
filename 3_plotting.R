@@ -48,25 +48,39 @@ save_plot <- function(plot) {
          height = 6)
 }
 
+# Data formatting --------------------------------------------------------------
+# Aggregate trade data by year
+trade_data_yr <- trade_data %>%
+  # select only columns that we need to compare trade data across years
+  select(YEAR, EXP_VALUE_2023USD, EXP_VOLUME_KG, 
+         IMP_VALUE_2023USD, IMP_VOLUME_KG) %>%
+  # replace NAs with 0s for summation
+  mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
+                                    EXP_VALUE_2023USD),
+         IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
+                                    IMP_VALUE_2023USD),
+         EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                EXP_VOLUME_KG),
+         IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                IMP_VOLUME_KG)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  # calculate price and convert value to millions, kg to metric tons
+  mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG,
+         IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
+         EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
+         IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
+         EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+         IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+  
 ###############
 ### EXPORTS ###
 ###############
 # Comparing Export Value through time (Real 2023 USD) --------------------------
-# Format Data
-exp_value_yr_data <- trade_data %>%
-  # we only need two columns, aggregate based on these columns
-  select(YEAR, EXP_VALUE_2023USD) %>%
-  mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0, 
-                                    EXP_VALUE_2023USD)) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  # convert USD to Million USD
-  mutate(EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000)
-
-# Plot the data
+# Make the plot
 exp_value_yr <- 
-  ggplot(data = exp_value_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = EXP_VALUE_2023USD_MILLIONS)) +
     geom_col(fill = 'black') +
@@ -88,20 +102,9 @@ save_plot(exp_value_yr)
 
 
 # Comparing Export Volume through time -----------------------------------------
-# Format the data
-exp_volume_yr_data <- trade_data %>%
-  select(YEAR, EXP_VOLUME_KG) %>%
-  mutate(EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                EXP_VOLUME_KG)) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  # convert kg to metric tons
-  mutate(EXP_VOLUME_MT = EXP_VOLUME_KG / 1000)
-  
-# Plot the data
+# Make the plot
 exp_volume_yr <- 
-  ggplot(data = exp_volume_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = EXP_VOLUME_MT)) + 
   geom_col(fill = 'black') +
@@ -119,21 +122,9 @@ exp_volume_yr
 save_plot(exp_volume_yr)
 
 # Comparing Export Price (Real 2023 USD/KG) through time -----------------------
-# Format the data
-exp_price_yr_data <- trade_data %>%
-  select(YEAR, EXP_VALUE_2023USD, EXP_VOLUME_KG) %>%
-  mutate(EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                EXP_VOLUME_KG),
-         EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
-                                    EXP_VALUE_2023USD)) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG )
-
-# Plot the data
+# Make the plot
 exp_price_yr <- 
-  ggplot(data = exp_price_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = EXP_PRICE_USD_PER_KG)) +
   geom_col(fill = 'black') +
@@ -160,19 +151,9 @@ save_plot(exp_price_yr)
 ### IMPORTS ###
 ###############
 # Comparing Import value through time (Real 2023 USD) --------------------------
-# Format the Data
-imp_value_yr_data <- trade_data %>%
-  select(YEAR, IMP_VALUE_2023USD) %>%
-  mutate(IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
-                                    IMP_VALUE_2023USD)) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  mutate(IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000)
-
-# Plot the data
+# Make the plot
 imp_value_yr <- 
-  ggplot(data = imp_value_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = IMP_VALUE_2023USD_MILLIONS)) +
   geom_col(fill = 'black') +
@@ -191,19 +172,9 @@ imp_value_yr
 save_plot(imp_value_yr)
 
 # Comparing Import volume through time -----------------------------------------
-# Format the data
-imp_volume_yr_data <- trade_data %>%
-  select(YEAR, IMP_VOLUME_KG) %>%
-  mutate(IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                IMP_VOLUME_KG)) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  mutate(IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
-
-# Plot the data
+# Make the plot
 imp_volume_yr <- 
-  ggplot(data = imp_volume_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = IMP_VOLUME_MT)) +
   geom_col(fill = 'black') +
@@ -222,13 +193,9 @@ imp_volume_yr
 save_plot(imp_volume_yr)
 
 # Comparing Import price (Real 2023 USD/KG) through time -----------------------
-# Format the data
-imp_price_yr_data <- full_join(imp_value_yr_data, imp_volume_yr_data) %>%
-  mutate(IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG)
-
-# Plot the data
+# Make the plot
 imp_price_yr <- 
-  ggplot(data = imp_price_yr_data,
+  ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = IMP_PRICE_USD_PER_KG)) +
   geom_col(fill = 'black') +
