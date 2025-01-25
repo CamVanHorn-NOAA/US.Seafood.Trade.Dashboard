@@ -53,7 +53,7 @@ save_plot <- function(plot) {
 ###############
 # Comparing Export Value through time (Real 2023 USD) --------------------------
 # Format Data
-exp_value_yr <- trade_data %>%
+exp_value_yr_data <- trade_data %>%
   # we only need two columns, aggregate based on these columns
   select(YEAR, EXP_VALUE_2023USD) %>%
   mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0, 
@@ -61,25 +61,98 @@ exp_value_yr <- trade_data %>%
   group_by(YEAR) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
+  # convert USD to Million USD
   mutate(EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000)
 
 # Plot the data
-ggplot(data = exp_value_yr,
-       aes(x = factor(YEAR),
-           y = EXP_VALUE_2023USD_MILLIONS)) +
+exp_value_yr <- 
+  ggplot(data = exp_value_yr_data,
+         aes(x = factor(YEAR),
+             y = EXP_VALUE_2023USD_MILLIONS)) +
+    geom_col(fill = 'black') +
+    coord_cartesian(ylim = c(4000, 8000)) +
+    scale_x_discrete(breaks = c(2004, 2008, 2012, 2016, 2020, 2023),
+                     limits = factor(2004:2023)) +
+    scale_y_continuous(breaks = c(4000, 5000, 6000, 7000, 8000),
+                       labels = label_currency(suffix = 'M')) +
+    labs(x = 'Year',
+         y = 'Total Export Value (Real 2023 USD)') +
+    theme_bw() +
+    theme(axis.text = element_text(size = 10))
+
+# View the plot
+exp_value_yr
+
+# Save the plot
+save_plot(exp_value_yr)
+
+
+# Comparing Export Volume through time -----------------------------------------
+# Format the data
+exp_volume_yr_data <- trade_data %>%
+  select(YEAR, EXP_VOLUME_KG) %>%
+  mutate(EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                EXP_VOLUME_KG)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  # convert kg to metric tons
+  mutate(EXP_VOLUME_MT = EXP_VOLUME_KG / 1000)
+  
+# Plot the data
+exp_volume_yr <- 
+  ggplot(data = exp_volume_yr_data,
+         aes(x = factor(YEAR),
+             y = EXP_VOLUME_MT)) + 
   geom_col(fill = 'black') +
-  coord_cartesian(ylim = c(4000, 8000)) +
-  scale_x_discrete(breaks = c(2004, 2008, 2012, 2016, 2020, 2023),
-                   limits = factor(2004:2023)) +
-  scale_y_continuous(breaks = c(4000, 5000, 6000, 7000, 8000),
-                     labels = label_currency(suffix = 'M')) +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+  scale_y_continuous(label = comma) +
   labs(x = 'Year',
-       y = 'Total Exports (Real 2023 USD)') +
+       y = 'Total Export Volume (Metric Tons)') +
   theme_bw() +
   theme(axis.text = element_text(size = 10))
+
+# View the plot
+exp_volume_yr
+
+# Save the plot
+save_plot(exp_volume_yr)
+
+# Comparing Export Price (Real 2023 USD/KG) through time -----------------------
+# Format the data
+exp_price_yr_data <- trade_data %>%
+  select(YEAR, EXP_VALUE_2023USD, EXP_VOLUME_KG) %>%
+  mutate(EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                EXP_VOLUME_KG),
+         EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
+                                    EXP_VALUE_2023USD)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG )
+
+# Plot the data
+exp_price_yr <- 
+  ggplot(data = exp_price_yr_data,
+         aes(x = factor(YEAR),
+             y = EXP_PRICE_USD_PER_KG)) +
+  geom_col(fill = 'black') +
+  coord_cartesian(ylim = c(3, 4.75)) +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(suffix = '/kg'),
+                     breaks = c(3, 3.50, 4, 4.50)) +
+  labs(x = 'Year',
+       y = 'Average Price') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+exp_price_yr
+
+# Save the plot
+save_plot(exp_price_yr)
   
-  # Comparing Export Volume through time
-  # Comparing Export Price (Real 2023 USD/KG) through time
   # Comparing export value/volume/price by customs district
   # Comparing export value/volume/price by country
   
