@@ -156,10 +156,97 @@ save_plot(exp_price_yr)
   # Comparing export value/volume/price by customs district
   # Comparing export value/volume/price by country
   
-# Imports ----------------------------------------------------------------------
-  # Comparing Import value through time (Real 2023 USD)
-  # Comparing Import volume through time 
-  # Comparing Import price (Real 2023 USD/KG) through time
+###############
+### IMPORTS ###
+###############
+# Comparing Import value through time (Real 2023 USD) --------------------------
+# Format the Data
+imp_value_yr_data <- trade_data %>%
+  select(YEAR, IMP_VALUE_2023USD) %>%
+  mutate(IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
+                                    IMP_VALUE_2023USD)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000)
+
+# Plot the data
+imp_value_yr <- 
+  ggplot(data = imp_value_yr_data,
+         aes(x = factor(YEAR),
+             y = IMP_VALUE_2023USD_MILLIONS)) +
+  geom_col(fill = 'black') +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(suffix = 'M')) +
+  labs(x = 'Year',
+       y = 'Total Import Value (Real 2023 USD)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+imp_value_yr
+
+# Save the plot
+save_plot(imp_value_yr)
+
+# Comparing Import volume through time -----------------------------------------
+# Format the data
+imp_volume_yr_data <- trade_data %>%
+  select(YEAR, IMP_VOLUME_KG) %>%
+  mutate(IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                IMP_VOLUME_KG)) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+
+# Plot the data
+imp_volume_yr <- 
+  ggplot(data = imp_volume_yr_data,
+         aes(x = factor(YEAR),
+             y = IMP_VOLUME_MT)) +
+  geom_col(fill = 'black') +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2024)) +
+  scale_y_continuous(labels = comma) +
+  labs(x = 'Year',
+       y = 'Total Import Volume (Metric Tons)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+imp_volume_yr
+
+# Save the plot
+save_plot(imp_volume_yr)
+
+# Comparing Import price (Real 2023 USD/KG) through time -----------------------
+# Format the data
+imp_price_yr_data <- full_join(imp_value_yr_data, imp_volume_yr_data) %>%
+  mutate(IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG)
+
+# Plot the data
+imp_price_yr <- 
+  ggplot(data = imp_price_yr_data,
+         aes(x = factor(YEAR),
+             y = IMP_PRICE_USD_PER_KG)) +
+  geom_col(fill = 'black') +
+  coord_cartesian(ylim = c(6.50, 10)) +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(suffix = '/kg'),
+                     breaks = c(6.50, 7, 7.50, 8, 8.50, 9, 9.50, 10)) +
+  labs(x = 'Year',
+       y = 'Average Price') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+imp_price_yr
+
+# Save the plot
+save_plot(imp_price_yr)
   # comparing import value/volume/price by customs district
   # Comparing import value/volume/price by country
 
