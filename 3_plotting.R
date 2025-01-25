@@ -40,6 +40,14 @@ load(data_file$NAME)
 # clean environment
 rm(data_file)
 
+# Plot Save Function -----------------------------------------------------------
+save_plot <- function(plot) {
+  ggsave(filename = paste0('Plots/', as.character(substitute(plot)), '.png'),
+         plot = plot,
+         width = 9,
+         height = 6)
+}
+
 ###############
 ### EXPORTS ###
 ###############
