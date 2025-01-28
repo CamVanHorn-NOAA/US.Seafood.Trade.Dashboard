@@ -49,7 +49,7 @@ save_plot <- function(plot) {
          height = 6)
 }
 
-# Data formatting --------------------------------------------------------------
+# Data formatting (Trade data) -------------------------------------------------
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
   # select only columns that we need to compare trade data across years
@@ -74,6 +74,17 @@ trade_data_yr <- trade_data %>%
          IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
          EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
          IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+
+# Data formatting (Processed products) -----------------------------------------
+# Aggregate processed products by year
+pp_data_yr <- pp_data %>%
+  select(YEAR, KG, DOLLARS_2023, DOLLARS_2023_PER_KG) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(MT = KG / 1000,
+         DOLLARS_2023_BILLIONS = DOLLARS_2023 / 1000000000,
+         DOLLARS_2023_PER_KG = DOLLARS_2023 / KG)
   
 ###################
 ##### EXPORTS #####
