@@ -2,10 +2,11 @@
 # Data sources include the fisheries one-stop shop (FOSS, 
   # https://www.fisheries.noaa.gov/foss/f?p=215:2:742090237412:::::) and SQL
   # databases. 
-  # TODO: ingest processed products data
   # TODO: link to SQL database for processed product download
+  # TODO: get new GDPDEF reference that can calculate real 2024 USD
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
+
 
 
 
@@ -43,6 +44,8 @@ drive_auth()
 # drive_download('foss_pp_04-14.csv',
 #                overwrite = T)
 # drive_download('GDPDEF_index.csv',
+#                overwrite = T)
+# drive_download('FTS_PRODUCTS.csv',
 #                overwrite = T)
 
 ##################################
