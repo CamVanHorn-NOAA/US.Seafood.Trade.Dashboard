@@ -51,7 +51,7 @@ drive_auth()
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
 ##################################
-# The csv's are downloaded staright from FOSS without any prior modification
+# Some csv's are downloaded staright from FOSS without any prior modification
 # I.e., their headers are setup improperly and need adjustment
 
 # Exports ----------------------------------------------------------------------
@@ -119,6 +119,15 @@ def_index <- read.csv('GDPDEF_index.csv') %>%
   mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
          INDEX = (100/DEFLATOR_VALUE))
 
+# Species Reference Data -------------------------------------------------------
+# Imports and Exports in FOSS provide detailed descriptions of the products
+  # However, these descriptions are cumbersome strings that are difficult
+    # to parse for species names without a brute force method
+# Thankfully, FOSS includes HTS (Harmonized Tariff Schedule) numbers which,
+  # through the use of FTS reference tables
+# We will import the reference table here to munge into the tables later
+species_ref <- read.csv('FTS_PRODUCTS.csv')
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -130,7 +139,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 
 # create the file
   # NOTE: add new data to this list upon creation in this script
-save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index'),
+save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
+              'species_ref'),
      file = file_name)
 
 # upload to google drive
