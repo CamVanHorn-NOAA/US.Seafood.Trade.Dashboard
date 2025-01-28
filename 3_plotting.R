@@ -218,12 +218,147 @@ save_plot(imp_price_yr)
   # comparing import value/volume/price by customs district
   # Comparing import value/volume/price by country
 
-# Trade Balances ---------------------------------------------------------------
-  # Comparing Value balance through time (Real 2023 USD)
-  # comparing volume balance through time 
-  # comparing price (Real 2023 USD/KG) balance through time
+##########################
+##### TRADE BALANCES #####
+##########################
+# Comparing value balance through time (Real 2023 USD) -------------------------
+# Format the data
+# We need the data formatted such that there are factored groups of imports,
+  # exports, and trade balance
+# This will involve pivoting the data to be long, using the column headers
+  # as a guide for factor names
+value_balance_yr_data <- trade_data_yr %>%
+  mutate(EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD_MILLIONS / 1000,
+         IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD_MILLIONS / 1000,
+         TRADE_BALANCE = 
+           EXP_VALUE_2023USD_BILLIONS - IMP_VALUE_2023USD_BILLIONS) %>%
+  select(YEAR, EXP_VALUE_2023USD_BILLIONS, IMP_VALUE_2023USD_BILLIONS,
+         TRADE_BALANCE) %>%
+  rename(EXPORTS = EXP_VALUE_2023USD_BILLIONS,
+         IMPORTS = IMP_VALUE_2023USD_BILLIONS) %>%
+  pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+  mutate(name = as.factor(name))
+
+# Plot the data
+value_balance_yr <- 
+  ggplot(data = value_balance_yr_data,
+         aes(x = as.factor(YEAR),
+             y = value)) +
+  geom_bar(aes(fill = name), 
+           stat = 'identity',
+           position = 'dodge') +
+  labs(x = '',
+       y = 'Billions (2023 Dollars)',
+       fill = '') +
+  scale_fill_discrete(labels = c('Exports',
+                                 'Imports',
+                                 'Trade Balance')) +
+  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(),
+                     breaks = seq(-30, 35, by = 5)) +
+  geom_hline(yintercept = 0, color = 'black') +
+  theme_minimal() +
+  theme(legend.position = 'top',
+        axis.line.y = element_line(color = 'black'),
+        axis.text.x = element_text(vjust = 13.9, 
+                                   angle = 45,
+                                   hjust = 5.3),
+        plot.background = element_rect(fill = 'white'),
+        panel.grid = element_blank())
+
+# View the plot
+value_balance_yr
+
+# Save the plot
+save_plot(value_balance_yr)
+  
+# Comparing volume balance through time ----------------------------------------
+# Format the data
+volume_balance_yr_data <- trade_data_yr %>%
+  mutate(TRADE_BALANCE = EXP_VOLUME_MT - IMP_VOLUME_MT) %>%
+  rename(EXPORTS = EXP_VOLUME_MT, 
+         IMPORTS = IMP_VOLUME_MT) %>%
+  select(YEAR, EXPORTS, IMPORTS, TRADE_BALANCE) %>%
+  pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+  mutate(name = as.factor(name))
+
+# Plot the data
+volume_balance_yr <- 
+  ggplot(data = volume_balance_yr_data,
+         aes(x = as.factor(YEAR),
+             y = value)) +
+  geom_bar(aes(fill = name),
+           stat = 'identity',
+           position = 'dodge') +
+  labs(x = '',
+       y = 'Metric Tons',
+       fill = '') +
+  scale_fill_discrete(labels = c('Exports',
+                                 'Imports',
+                                 'Trade Balance')) +
+  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_y_continuous(labels = comma,
+                     breaks = seq(-2000000, 3500000, by = 500000)) +
+  geom_hline(yintercept = 0, color = 'black') +
+  theme_minimal() +
+  theme(legend.position = 'top',
+        axis.line.y = element_line(color = 'black'),
+        axis.text.x = element_text(vjust = 12.45,
+                                   angle = 45,
+                                   hjust = 4.8),
+        plot.background = element_rect(fill = 'white'),
+        panel.grid = element_blank())
+
+# View the plot
+volume_balance_yr
+
+# Save the plot
+save_plot(volume_balance_yr)
+
+# Comparing price (Real 2023 USD/KG) balance through time ----------------------
+# Format the data
+price_balance_yr_data <- trade_data_yr %>%
+  mutate(TRADE_BALANCE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG) %>%
+  rename(EXPORTS = EXP_PRICE_USD_PER_KG,
+         IMPORTS = IMP_PRICE_USD_PER_KG) %>%
+  select(YEAR, EXPORTS, IMPORTS, TRADE_BALANCE) %>%
+  pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+  mutate(name = as.factor(name))
+
+# Plot the data
+price_balance_yr <- 
+  ggplot(data = price_balance_yr_data,
+         aes(x = as.factor(YEAR),
+             y = value)) + 
+  geom_bar(aes(fill = name),
+           stat = 'identity',
+           position = 'dodge') +
+  labs(x = '',
+       y = 'Metric Tons',
+       fill = '') +
+  scale_fill_discrete(labels = c('Exports',
+                                 'Imports',
+                                 'Trade Balance')) +
+  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(suffix = '/kg'),
+                     breaks = seq(-6, 10, by = 2)) +
+  geom_hline(yintercept = 0, color = 'black') +
+  theme_minimal() + 
+  theme(legend.position = 'top',
+        axis.line.y = element_line(color = 'black'),
+        axis.text.x = element_text(vjust = 12,
+                                   angle = 45,
+                                   hjust = 4.65),
+        plot.background = element_rect(fill = 'white'),
+        panel.grid = element_blank())
+
+# View the plot
+price_balance_yr
+
+# Save the plot
+save_plot(price_balance_yr)
   # comparing value/volume/price balance by customs district
-  # comparing value/volume/price balance by customs district
+  # comparing value/volume/price balance by country 
 
 # Processed Products ----------------------------------------------------------- 
   # Compare Value of domestic processed products through time
