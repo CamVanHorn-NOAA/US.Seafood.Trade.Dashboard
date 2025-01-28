@@ -371,10 +371,74 @@ save_plot(price_balance_yr)
   # comparing value/volume/price balance by customs district
   # comparing value/volume/price balance by country 
 
-# Processed Products ----------------------------------------------------------- 
-  # Compare Value of domestic processed products through time
-  # compare volume of domestic processed products through time
-  # compare price of domestic processed products through time
+###############################
+###### PROCESSED PRODUCTS #####
+###############################
+# Compare Value of domestic processed products through time --------------------
+# Make the plot
+pp_value_yr <- 
+  ggplot(data = pp_data_yr,
+         aes(x = factor(YEAR),
+             y = DOLLARS_2023_BILLIONS)) +
+  geom_col(fill = 'black') +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  coord_cartesian(ylim = c(7.5, 17.5)) +
+  scale_y_continuous(labels = label_currency(suffix = 'B')) +
+  labs(x = 'Year',
+       y = 'Total Value (Real 2023 USD)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+pp_value_yr
+
+# Save the plot
+save_plot(pp_value_yr)
+
+# Compare volume of domestic processed products through time -------------------
+# Make the plot
+pp_volume_yr <- 
+  ggplot(data = pp_data_yr,
+         aes(x = factor(YEAR),
+             y = MT)) +
+  geom_col(fill = 'black') +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  coord_cartesian(ylim = c(1500000, 3000000)) +
+  scale_y_continuous(labels = comma) +
+  labs(x = 'Year',
+       y = 'Total Volume (MT)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+pp_volume_yr
+
+# Save the plot
+save_plot(pp_volume_yr)
+
+# Compare price of domestic processed products through time --------------------
+pp_price_yr <- 
+  ggplot(data = pp_data_yr,
+         aes(x = factor(YEAR),
+             y = DOLLARS_2023_PER_KG)) +
+  geom_col(fill = 'black') +
+  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                   limits = factor(2004:2023)) +
+  scale_y_continuous(labels = label_currency(suffix = '/kg')) +
+  coord_cartesian(ylim = c(3, 6)) +
+  labs(x = 'Year',
+       y = 'Average Price (Real 2023 USD)') +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10))
+
+# View the plot
+pp_price_yr
+
+# Save the plot
+save_plot(pp_price_yr)
+
   # compare top prices of species/product types through time
   # compare top species sold by volume through time
   # compare top species sold by value through time
