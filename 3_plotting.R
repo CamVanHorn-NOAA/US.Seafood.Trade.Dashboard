@@ -124,6 +124,7 @@ exp_volume_yr <-
   geom_col(fill = 'black') +
   scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
   scale_y_continuous(label = comma) +
+  coord_cartesian(ylim = c(750000, 2000000)) +
   labs(x = 'Year',
        y = 'Total Export Volume (Metric Tons)') +
   theme_bw() +
@@ -196,6 +197,7 @@ imp_volume_yr <-
   scale_x_discrete(breaks = seq(2004, 2024, by = 4),
                    limits = factor(2004:2024)) +
   scale_y_continuous(labels = comma) +
+  coord_cartesian(ylim = c(1750000, 3500000)) +
   labs(x = 'Year',
        y = 'Total Import Volume (Metric Tons)') +
   theme_bw() +
