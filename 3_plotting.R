@@ -4,9 +4,10 @@
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
 
-#########################
-### PACKAGES AND DATA ###
-#########################
+# TODO: get nmfspalette package installed (must be on govt machine)
+#############################
+##### PACKAGES AND DATA #####
+#############################
 # Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
@@ -74,9 +75,9 @@ trade_data_yr <- trade_data %>%
          EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
          IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
   
-###############
-### EXPORTS ###
-###############
+###################
+##### EXPORTS #####
+###################
 # Comparing Export Value through time (Real 2023 USD) --------------------------
 # Make the plot
 exp_value_yr <- 
@@ -147,9 +148,9 @@ save_plot(exp_price_yr)
   # Comparing export value/volume/price by customs district
   # Comparing export value/volume/price by country
   
-###############
-### IMPORTS ###
-###############
+###################
+##### IMPORTS #####
+###################
 # Comparing Import value through time (Real 2023 USD) --------------------------
 # Make the plot
 imp_value_yr <- 
