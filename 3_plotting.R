@@ -72,6 +72,8 @@ trade_data_yr <- trade_data %>%
          IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
          EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
          IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
+         EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD / 1000000000,
+         IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD / 1000000000,
          EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
          IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
 
@@ -94,13 +96,13 @@ pp_data_yr <- pp_data %>%
 exp_value_yr <- 
   ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
-             y = EXP_VALUE_2023USD_MILLIONS)) +
+             y = EXP_VALUE_2023USD_BILLIONS)) +
     geom_col(fill = 'black') +
-    coord_cartesian(ylim = c(4000, 8000)) +
-    scale_x_discrete(breaks = c(2004, 2008, 2012, 2016, 2020, 2023),
+    coord_cartesian(ylim = c(4, 8)) +
+    scale_x_discrete(breaks = seq(2004, 2024, by = 4),
                      limits = factor(2004:2023)) +
-    scale_y_continuous(breaks = c(4000, 5000, 6000, 7000, 8000),
-                       labels = label_currency(suffix = 'M')) +
+    scale_y_continuous(breaks = seq(4, 8, by = 1),
+                       labels = label_currency(suffix = 'B')) +
     labs(x = 'Year',
          y = 'Total Export Value (Real 2023 USD)') +
     theme_bw() +
@@ -167,11 +169,12 @@ save_plot(exp_price_yr)
 imp_value_yr <- 
   ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
-             y = IMP_VALUE_2023USD_MILLIONS)) +
+             y = IMP_VALUE_2023USD_BILLIONS)) +
   geom_col(fill = 'black') +
   scale_x_discrete(breaks = seq(2004, 2024, by = 4),
                    limits = factor(2004:2023)) +
-  scale_y_continuous(labels = label_currency(suffix = 'M')) +
+  scale_y_continuous(labels = label_currency(suffix = 'B')) +
+  coord_cartesian(ylim = c(10, 35)) +
   labs(x = 'Year',
        y = 'Total Import Value (Real 2023 USD)') +
   theme_bw() +
