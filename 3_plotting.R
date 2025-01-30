@@ -512,3 +512,71 @@ filter_species <- function(trade_table, species_name) {
   
   return(filtered_data)
 }
+# Data summarizing function ----------------------------------------------------
+# The below function works in tandem with the filter_species fxn above
+# These functions are separate in case of interest in viewing the data filtered
+  # but not summarized
+# The function summarizes data grouped by year and species group, and requires
+  # the input data to be trade_data, or formatted similarly to such
+summarize_yr_spp <- function(trade_table, species_name) {
+  # trade_table is a data frame, either trade_data provided in script 2 or
+    # another data frame with comparable nomenclature and purpose
+  # species_name is a vector of class character and should not be specific
+  
+  # set species_name to upper case
+  species_name <- toupper(species_name)
+  
+  # we must specify which group we want to summarize the data around
+  # this effort is similar to that done in filter_species
+  # To coerce the group to operate in dplyr pipe, first we must designate the
+    # object returned in the ifelse() fxn as type symbol (or 'name')
+    # NOTE: there is no error output here if the species provided is unavailable
+    # because it would be redundant with that provided in filter_species
+  which_group <- as.symbol(ifelse(species_name %in% unique(trade_table$GROUP_TS),
+                                  'GROUP_TS', 'GROUP_NAME'))
+  
+  # Because we are using a dplyr pipe in a custom function, using our objects
+    # in dplyr functions can become tricky. Effectively, because we need to 
+    # define a field (i.e. 'GROUP_TS') with which to index a table inside this 
+    # function, we must make this object of type 'quosure' (see rlang)
+      # NOTE: later, we call these objects using the bang-bang (!!) in dplyr
+      # pipes and functions
+  which_group <- rlang::enquo(which_group)
+  
+  # dplyr pipe to summarize the data grouped by year and species
+  summarized_data <- trade_table %>%
+    # use the filter_species fxn created above
+    filter_species(species_name) %>%
+    # select only columns that we need to compare trade data across years
+      # NOTE: we coerce which_group to class symbol with sym() to operate in
+      # the dplyr pipe
+    select(YEAR, !!which_group, EXP_VALUE_2023USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2023USD, IMP_VOLUME_KG) %>%
+    # replace NAs with 0s for summation
+    mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
+                                      EXP_VALUE_2023USD),
+           IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
+                                      IMP_VALUE_2023USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG)) %>%
+    # group by year and the field specified prior
+    group_by(YEAR, !!which_group) %>%
+    # sum all columns of numeric type, drop groups
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # calculate price and convert value to millions and billions, 
+      # kg to metric tons
+    mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG,
+           IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
+           EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
+           IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
+           EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD / 1000000000,
+           IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD / 1000000000,
+           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+  
+  return(summarized_data)
+}
+
