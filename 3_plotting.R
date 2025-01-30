@@ -716,53 +716,12 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 # Format the data
 salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
 
-# Plot value
-salmon_value_yr <- 
-  ggplot(data = salmon_data,
-         aes(x = factor(YEAR),
-             y = EXP_VALUE_2023USD_BILLIONS)) +
-  geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
-  scale_y_continuous(labels = label_currency(suffix = 'B')) +
-  labs(x = 'Year',
-       y = 'Total Export Value (Real 2023 USD)') +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10))
+# Exports
+# Plot Value
+salmon_exp_value_yr <- plot_trade(salmon_data, 'value', export = T)
 
-# Value plot
-salmon_value_yr
+# View plot
+salmon_exp_value_yr
 
-# Plot volume
-salmon_volume_yr <- 
-  ggplot(data = salmon_data,
-         aes(x = factor(YEAR),
-             y = EXP_VOLUME_MT)) +
-  geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
-  scale_y_continuous(labels = comma) +
-  labs(x = 'Year',
-       y = 'Total Export Volume (Metric Tons)') +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10))
-
-# Volume plot
-salmon_volume_yr
-
-# Plot price
-salmon_price_yr <- 
-  ggplot(data = salmon_data,
-         aes(x = factor(YEAR),
-             y = EXP_PRICE_USD_PER_KG)) +
-  geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
-  scale_y_continuous(labels = label_currency(suffix = '/kg')) +
-  labs(x = 'Year',
-       y = 'Average Export Price (Real 2023 USD)') +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10))
-
-# Price plot
-salmon_price_yr
+# Save plot
+save_plot(salmon_exp_value_yr)
