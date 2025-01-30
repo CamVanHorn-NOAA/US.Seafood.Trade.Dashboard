@@ -458,3 +458,57 @@ save_plot(pp_price_yr)
 # Due to many species being available in our trade data, it is best to 
   # create generic functions to filter the data for a given species and 
   # plot the species-specific data
+# Data filtering function ------------------------------------------------------
+# The below function is meant to work within dplyr pipes, specifically those
+  # used in this script that incorporate our trade data, not processed products
+# The output of this function is the trade_table filtered for the specified
+  # species of interest
+# The function accounts for the complex structure of our data as there are
+  # three columns that contain species information
+# GROUP_NAME contains more specific species information, but also relies on
+  # species groups provided in GROUP_TS (for example, atlantic salmon are 
+  # listed as 'ATLANTIC' in GROUP_NAME and 'SALMON' in GROUP_TS)
+  # These kinds of distinctions can make indexing difficult
+# Therefore, this function searches both columns for the species term provided
+# If the species name is not found, the user is directed via error message to
+  # provide a more generic species name or search the data for acceptable
+  # species names to call in the function
+filter_species <- function(trade_table, species_name) {
+  # provide trade_table as a data_frame with GROUP_NAME and GROUP_TS as fields
+  # provide species_name as a vector of class character
+  
+  # store unique species names for each field that contains species names in 
+    # separate vectors
+  group_name <- unique(trade_table$GROUP_NAME)
+  group_ts <- unique(trade_table$GROUP_TS)
+  
+  # if species_name is provided in lower case, coerces to upper case
+  species_name <- toupper(species_name)
+  
+  # create flags for the function to filter properly
+  use_group_name <- ifelse(species_name %in% group_name, 'Y', 'N')
+  use_group_ts <- ifelse(species_name %in% group_ts, 'Y', 'N')
+  
+  # if the provied species_name is not found in either field, give error
+  if (use_group_name == 'N' & use_group_ts == 'N') {
+    stop("The species you provided is either too specific or not available.
+         Try 'unique(your_data$your_column)' to find acceptable calls")
+  }
+  
+  # if the provided species_name is found in the more generic field (TS),
+    # regardless of it being in the more specific field, use the generic field
+    # as a filter
+  if (use_group_ts == 'Y') {
+    filtered_data <- trade_table %>%
+      filter(GROUP_TS == species_name)
+  } 
+  
+  # if the provided species_name is only found in the more specific field,
+    # use the specific field as a filter
+  else if (use_group_ts == 'N' & use_group_name == 'Y') {
+    filtered_data <- trade_table %>%
+      filter(GROUP_NAME == species_name)
+  }
+  
+  return(filtered_data)
+}
