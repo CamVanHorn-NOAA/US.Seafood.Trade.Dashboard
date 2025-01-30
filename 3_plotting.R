@@ -449,3 +449,12 @@ save_plot(pp_price_yr)
   # compare top species sold by value through time
   # compare top product types sold by volume through time
   # compare top product types sold by value through time
+
+###############################
+##### SPECIES GROUP TRADE #####
+###############################
+# We are interested in evaluating some of the metrics calculated above with 
+  # respect to specific species of interest
+# Due to many species being available in our trade data, it is best to 
+  # create generic functions to filter the data for a given species and 
+  # plot the species-specific data
