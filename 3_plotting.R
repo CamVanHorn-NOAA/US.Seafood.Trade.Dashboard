@@ -49,7 +49,7 @@ save_plot <- function(plot) {
          height = 6)
 }
 
-# Data formatting (Trade data) -------------------------------------------------
+# Data formatting (Trade data by year) -----------------------------------------
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
   # select only columns that we need to compare trade data across years
@@ -512,6 +512,8 @@ filter_species <- function(trade_table, species_name) {
   
   return(filtered_data)
 }
+
+
 # Data summarizing function ----------------------------------------------------
 # The below function works in tandem with the filter_species fxn above
 # These functions are separate in case of interest in viewing the data filtered
@@ -709,7 +711,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   return(plot)
 }
 
-# Salmon (exports) -------------------------------------------------------------
+
+# Salmon (all) -----------------------------------------------------------------
 # Format the data
 salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
 
