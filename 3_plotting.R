@@ -590,7 +590,27 @@ summarize_yr_spp <- function(trade_table, species_name) {
 # data requires summarized data by year, 
 # plot_format requires one of four inputs, and outputs an error if other input
   # is provided
-plot_trade <- function(data, plot_format) {
+plot_trade <- function(data, plot_format, export = F, import = F) {
+  
+  # to make calling for balance output easier, give error if both exports and
+    # imports are set to T that directs to set each to F
+  if (export == T & import == T) {
+    stop('Export and import cannot both be true, set one to false. If interested in balance, leave both as false.')
+  }
+  
+  # set terms for export
+  if (export == T) {
+    # we need two values: a shortform embedded in column names, and a long form
+      # that will be used in labels
+    shortform <- 'EXP'
+    longform <- 'Export'
+  }
+  
+  # set terms for import
+  if (import == T) {
+    shortform <- 'IMP'
+    longform <- 'Import'
+  }
   
   # set plot_format to upper case to be flexible for user input
   plot_format <- toupper(plot_format)
@@ -603,29 +623,29 @@ plot_trade <- function(data, plot_format) {
   # set vectors and objects for 'value' input
   if (plot_format == 'VALUE') {
     # set column header for value as object of type quosure to operate in ggplot
-    y <- as.symbol('EXP_VALUE_2023USD_BILLIONS')
+    y <- as.symbol(paste0(shortform, '_VALUE_2023USD_BILLIONS'))
     y <- rlang::enquo(y)
     # set y-axis tick labels to be of type currency (prefix = $) labeled in bil. 
     label <- label_currency(suffix = 'B')
     # set y-axis label to reflect 'Value' input
-    ylab <- 'Total Export Value (Real 2023 USD)'
+    ylab <- paste0('Total ', longform, ' Value (Real 2023 USD)')
   }
   
   # set vectors and objects for 'volume' input
   if (plot_format == 'VOLUME') {
-    y <- as.symbol('EXP_VOLUME_MT')
+    y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
     y <- rlang::enquo(y)
     # comma adds commas to values in thousands, etc.
     label <- comma
-    ylab <- 'Total Export Volume (Metric Tons)'
+    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
   }
   
   # set vectors and objects for 'price' input
   if (plot_format == 'PRICE') {
-    y <- as.symbol('EXP_PRICE_USD_PER_KG')
+    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
     y <- rlang::enquo(y)
     label <- label_currency(suffix = '/kg')
-    ylab <- 'Average Export Price (Real 2023 USD)'
+    ylab <- paste0('Average ', longform, ' Price (Real 2023 USD)')
   }
   
   # the plots for value, volume, and price are similar enough to use one plot
