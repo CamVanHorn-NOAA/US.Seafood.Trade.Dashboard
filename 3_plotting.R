@@ -376,9 +376,9 @@ save_plot(price_balance_yr)
   # comparing value/volume/price balance by customs district
   # comparing value/volume/price balance by country 
 
-###############################
-###### PROCESSED PRODUCTS #####
-###############################
+##############################
+##### PROCESSED PRODUCTS #####
+##############################
 # Compare Value of domestic processed products through time --------------------
 # Make the plot
 pp_value_yr <- 
