@@ -580,7 +580,116 @@ summarize_yr_spp <- function(trade_table, species_name) {
   return(summarized_data)
 }
 
-# Salmon (all) -----------------------------------------------------------------
+# Plot function ----------------------------------------------------------------
+# Because there are several species that the U.S. imports and exports, it is
+  # useful to automate visualizing these trade metrics
+# The plot_trade function provided below creates simple visualizations of 
+  # export value, volume, price, and trade balances through time of 
+  # provided data
+
+# data requires summarized data by year, 
+# plot_format requires one of four inputs, and outputs an error if other input
+  # is provided
+plot_trade <- function(data, plot_format) {
+  
+  # set plot_format to upper case to be flexible for user input
+  plot_format <- toupper(plot_format)
+  
+  # stop function if plot_format is provided incorrectly
+  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE'))) {
+    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\", and \"Balance\"')
+  }
+  
+  # set vectors and objects for 'value' input
+  if (plot_format == 'VALUE') {
+    # set column header for value as object of type quosure to operate in ggplot
+    y <- as.symbol('EXP_VALUE_2023USD_BILLIONS')
+    y <- rlang::enquo(y)
+    # set y-axis tick labels to be of type currency (prefix = $) labeled in bil. 
+    label <- label_currency(suffix = 'B')
+    # set y-axis label to reflect 'Value' input
+    ylab <- 'Total Export Value (Real 2023 USD)'
+  }
+  
+  # set vectors and objects for 'volume' input
+  if (plot_format == 'VOLUME') {
+    y <- as.symbol('EXP_VOLUME_MT')
+    y <- rlang::enquo(y)
+    # comma adds commas to values in thousands, etc.
+    label <- comma
+    ylab <- 'Total Export Volume (Metric Tons)'
+  }
+  
+  # set vectors and objects for 'price' input
+  if (plot_format == 'PRICE') {
+    y <- as.symbol('EXP_PRICE_USD_PER_KG')
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = '/kg')
+    ylab <- 'Average Export Price (Real 2023 USD)'
+  }
+  
+  # the plots for value, volume, and price are similar enough to use one plot
+    # format for each and interchange necessary values, specified above
+  if (plot_format %in% c('VALUE', 'VOLUME', 'PRICE')) {
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = !!y)) + 
+      geom_col(fill = 'black') +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label) +
+      labs(x = 'Year',
+           y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else {
+    # plotting trade balance data requires a different type of plot and 
+      # reformatting of the data
+    balance_data <- data %>%
+      rename(EXPORTS = EXP_VALUE_2023USD_BILLIONS,
+             IMPORTS = IMP_VALUE_2023USD_BILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      # calculate trade balance
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      # pivot longer creates a column of 'names' that we factor to create
+        # a plot of several bars for each year (export, import, balances)
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      mutate(name = as.factor(name))
+    
+    plot <- 
+      ggplot(data = balance_data,
+             aes(x = factor(YEAR),
+                 y = value)) +
+      geom_bar(aes(fill = name),
+               stat = 'identity',
+               position = 'dodge') +
+      labs(x = '',
+           y = 'Billions (2023 Dollars)',
+           fill = '') +
+      scale_fill_discrete(labels = c('Exports',
+                                     'Imports',
+                                     'Trade Balance')) +
+      scale_x_discrete(limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label_currency()) +
+      geom_hline(yintercept = 0, color = 'black') +
+      theme_minimal() +
+      theme(legend.position = 'top',
+            axis.line.y = element_line(color = 'black'),
+            # the placing of the years is finnicky, adjust as needed
+            # best to use a standardized plot save output (size-wise) so these
+              # can be static
+            axis.text.x = element_text(vjust = 13.9, 
+                                       angle = 45,
+                                       hjust = 5.3),
+            plot.background = element_rect(fill = 'white'),
+            panel.grid = element_blank())
+  }
+  
+  return(plot)
+}
+
+# Salmon (exports) -------------------------------------------------------------
 # Format the data
 salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
 
