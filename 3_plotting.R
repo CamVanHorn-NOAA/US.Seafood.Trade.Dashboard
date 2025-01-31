@@ -54,13 +54,13 @@ save_plot <- function(plot) {
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
   # select only columns that we need to compare trade data across years
-  select(YEAR, EXP_VALUE_2023USD, EXP_VOLUME_KG, 
-         IMP_VALUE_2023USD, IMP_VOLUME_KG) %>%
+  select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+         IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
   # replace NAs with 0s for summation
-  mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
-                                    EXP_VALUE_2023USD),
-         IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
-                                    IMP_VALUE_2023USD),
+  mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                    EXP_VALUE_2024USD),
+         IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                    IMP_VALUE_2024USD),
          EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
                                 EXP_VOLUME_KG),
          IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
@@ -69,43 +69,43 @@ trade_data_yr <- trade_data %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   # calculate price and convert value to millions, kg to metric tons
-  mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG,
-         IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
-         EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
-         IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
-         EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD / 1000000000,
-         IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD / 1000000000,
+  mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
+         IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
+         EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+         IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+         EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+         IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
          EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
          IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
 
 # Data formatting (Processed products) -----------------------------------------
 # Aggregate processed products by year
 pp_data_yr <- pp_data %>%
-  select(YEAR, KG, DOLLARS_2023, DOLLARS_2023_PER_KG) %>%
+  select(YEAR, KG, DOLLARS_2024, DOLLARS_2024_PER_KG) %>%
   group_by(YEAR) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(MT = KG / 1000,
-         DOLLARS_2023_BILLIONS = DOLLARS_2023 / 1000000000,
-         DOLLARS_2023_PER_KG = DOLLARS_2023 / KG)
+         DOLLARS_2024_BILLIONS = DOLLARS_2024 / 1000000000,
+         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG)
   
 ###################
 ##### EXPORTS #####
 ###################
-# Comparing Export Value through time (Real 2023 USD) --------------------------
+# Comparing Export Value through time (Real 2024 USD) --------------------------
 # Make the plot
 exp_value_yr <- 
   ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
-             y = EXP_VALUE_2023USD_BILLIONS)) +
+             y = EXP_VALUE_2024USD_BILLIONS)) +
     geom_col(fill = 'black') +
     coord_cartesian(ylim = c(4, 8)) +
     scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                     limits = factor(2004:2023)) +
+                     limits = factor(2004:2024)) +
     scale_y_continuous(breaks = seq(4, 8, by = 1),
                        labels = label_currency(suffix = 'B')) +
     labs(x = 'Year',
-         y = 'Total Export Value (Real 2023 USD)') +
+         y = 'Total Export Value (Real 2024 USD)') +
     theme_bw() +
     theme(axis.text = element_text(size = 10))
 
@@ -137,7 +137,7 @@ exp_volume_yr
 # Save the plot
 save_plot(exp_volume_yr)
 
-# Comparing Export Price (Real 2023 USD/KG) through time -----------------------
+# Comparing Export Price (Real 2024 USD/KG) through time -----------------------
 # Make the plot
 exp_price_yr <- 
   ggplot(data = trade_data_yr,
@@ -146,7 +146,7 @@ exp_price_yr <-
   geom_col(fill = 'black') +
   coord_cartesian(ylim = c(3, 4.75)) +
   scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
+                   limits = factor(2004:2024)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg'),
                      breaks = c(3, 3.50, 4, 4.50)) +
   labs(x = 'Year',
@@ -166,19 +166,19 @@ save_plot(exp_price_yr)
 ###################
 ##### IMPORTS #####
 ###################
-# Comparing Import value through time (Real 2023 USD) --------------------------
+# Comparing Import value through time (Real 2024 USD) --------------------------
 # Make the plot
 imp_value_yr <- 
   ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
-             y = IMP_VALUE_2023USD_BILLIONS)) +
+             y = IMP_VALUE_2024USD_BILLIONS)) +
   geom_col(fill = 'black') +
   scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
+                   limits = factor(2004:2024)) +
   scale_y_continuous(labels = label_currency(suffix = 'B')) +
   coord_cartesian(ylim = c(10, 35)) +
   labs(x = 'Year',
-       y = 'Total Import Value (Real 2023 USD)') +
+       y = 'Total Import Value (Real 2024 USD)') +
   theme_bw() +
   theme(axis.text = element_text(size = 10))
 
@@ -210,18 +210,18 @@ imp_volume_yr
 # Save the plot
 save_plot(imp_volume_yr)
 
-# Comparing Import price (Real 2023 USD/KG) through time -----------------------
+# Comparing Import price (Real 2024 USD/KG) through time -----------------------
 # Make the plot
 imp_price_yr <- 
   ggplot(data = trade_data_yr,
          aes(x = factor(YEAR),
              y = IMP_PRICE_USD_PER_KG)) +
   geom_col(fill = 'black') +
-  coord_cartesian(ylim = c(6.50, 10)) +
+  coord_cartesian(ylim = c(6.50, 10.50)) +
   scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                   limits = factor(2004:2023)) +
+                   limits = factor(2004:2024)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg'),
-                     breaks = c(6.50, 7, 7.50, 8, 8.50, 9, 9.50, 10)) +
+                     breaks = c(6.50, 7, 7.50, 8, 8.50, 9, 9.50, 10, 10.50)) +
   labs(x = 'Year',
        y = 'Average Price') +
   theme_bw() +
@@ -238,21 +238,21 @@ save_plot(imp_price_yr)
 ##########################
 ##### TRADE BALANCES #####
 ##########################
-# Comparing value balance through time (Real 2023 USD) -------------------------
+# Comparing value balance through time (Real 2024 USD) -------------------------
 # Format the data
 # We need the data formatted such that there are factored groups of imports,
   # exports, and trade balance
 # This will involve pivoting the data to be long, using the column headers
   # as a guide for factor names
 value_balance_yr_data <- trade_data_yr %>%
-  mutate(EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD_MILLIONS / 1000,
-         IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD_MILLIONS / 1000,
+  mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD_MILLIONS / 1000,
+         IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD_MILLIONS / 1000,
          TRADE_BALANCE = 
-           EXP_VALUE_2023USD_BILLIONS - IMP_VALUE_2023USD_BILLIONS) %>%
-  select(YEAR, EXP_VALUE_2023USD_BILLIONS, IMP_VALUE_2023USD_BILLIONS,
+           EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS) %>%
+  select(YEAR, EXP_VALUE_2024USD_BILLIONS, IMP_VALUE_2024USD_BILLIONS,
          TRADE_BALANCE) %>%
-  rename(EXPORTS = EXP_VALUE_2023USD_BILLIONS,
-         IMPORTS = IMP_VALUE_2023USD_BILLIONS) %>%
+  rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
+         IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
   pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
   mutate(name = as.factor(name))
 
@@ -265,13 +265,13 @@ value_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Billions (Real 2023 Dollars)',
+       y = 'Billions (Real 2024 Dollars)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
   coord_axes_inside(labels_inside = T) +
-  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_x_discrete(limits = factor(2004:2024)) +
   scale_y_continuous(labels = label_currency(),
                      breaks = seq(-30, 35, by = 5)) +
   geom_hline(yintercept = 0, color = 'black') +
@@ -317,7 +317,7 @@ volume_balance_yr <-
                                  'Imports',
                                  'Trade Balance')) +
   coord_axes_inside(labels_inside = T) +
-  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_x_discrete(limits = factor(2004:2024)) +
   scale_y_continuous(labels = comma,
                      breaks = seq(-2000000, 3500000, by = 500000)) +
   geom_hline(yintercept = 0, color = 'black') +
@@ -338,7 +338,7 @@ volume_balance_yr
 # Save the plot
 save_plot(volume_balance_yr)
 
-# Comparing price (Real 2023 USD/KG) balance through time ----------------------
+# Comparing price (Real 2024 USD/KG) balance through time ----------------------
 # Format the data
 price_balance_yr_data <- trade_data_yr %>%
   mutate(TRADE_BALANCE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG) %>%
@@ -357,12 +357,12 @@ price_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Average Price (Real 2023 USD)',
+       y = 'Average Price (Real 2024 USD)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
-  scale_x_discrete(limits = factor(2004:2023)) +
+  scale_x_discrete(limits = factor(2004:2024)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg'),
                      breaks = seq(-6, 10, by = 2)) +
   coord_axes_inside(labels_inside = T) +
@@ -394,14 +394,14 @@ save_plot(price_balance_yr)
 pp_value_yr <- 
   ggplot(data = pp_data_yr,
          aes(x = factor(YEAR),
-             y = DOLLARS_2023_BILLIONS)) +
+             y = DOLLARS_2024_BILLIONS)) +
   geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+  scale_x_discrete(breaks = seq(2004, 2023, by = 4),
                    limits = factor(2004:2023)) +
   coord_cartesian(ylim = c(7.5, 17.5)) +
   scale_y_continuous(labels = label_currency(suffix = 'B')) +
   labs(x = 'Year',
-       y = 'Total Value (Real 2023 USD)') +
+       y = 'Total Value (Real 2024 USD)') +
   theme_bw() +
   theme(axis.text = element_text(size = 10))
 
@@ -418,7 +418,7 @@ pp_volume_yr <-
          aes(x = factor(YEAR),
              y = MT)) +
   geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+  scale_x_discrete(breaks = seq(2004, 2023, by = 4),
                    limits = factor(2004:2023)) +
   coord_cartesian(ylim = c(1500000, 3000000)) +
   scale_y_continuous(labels = comma) +
@@ -437,14 +437,14 @@ save_plot(pp_volume_yr)
 pp_price_yr <- 
   ggplot(data = pp_data_yr,
          aes(x = factor(YEAR),
-             y = DOLLARS_2023_PER_KG)) +
+             y = DOLLARS_2024_PER_KG)) +
   geom_col(fill = 'black') +
-  scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+  scale_x_discrete(breaks = seq(2004, 2023, by = 4),
                    limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg')) +
   coord_cartesian(ylim = c(3, 6)) +
   labs(x = 'Year',
-       y = 'Average Price (Real 2023 USD)') +
+       y = 'Average Price (Real 2024 USD)') +
   theme_bw() +
   theme(axis.text = element_text(size = 10))
 
@@ -562,13 +562,13 @@ summarize_yr_spp <- function(trade_table, species_name) {
     # select only columns that we need to compare trade data across years
       # NOTE: we coerce which_group to class symbol with sym() to operate in
       # the dplyr pipe
-    select(YEAR, !!which_group, EXP_VALUE_2023USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2023USD, IMP_VOLUME_KG) %>%
+    select(YEAR, !!which_group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
     # replace NAs with 0s for summation
-    mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
-                                      EXP_VALUE_2023USD),
-           IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
-                                      IMP_VALUE_2023USD),
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                      EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                      IMP_VALUE_2024USD),
            EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
@@ -580,12 +580,12 @@ summarize_yr_spp <- function(trade_table, species_name) {
               .groups = 'drop') %>%
     # calculate price and convert value to millions and billions, 
       # kg to metric tons
-    mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG,
-           IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
-           EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
-           IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
-           EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD / 1000000000,
-           IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD / 1000000000,
+    mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
+           IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
+           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+           EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
            IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
   
@@ -635,12 +635,12 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   # set vectors and objects for 'value' input
   if (plot_format == 'VALUE') {
     # set column header for value as object of type quosure to operate in ggplot
-    y <- as.symbol(paste0(shortform, '_VALUE_2023USD_BILLIONS'))
+    y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
     y <- rlang::enquo(y)
     # set y-axis tick labels to be of type currency (prefix = $) labeled in bil. 
     label <- label_currency(suffix = 'B')
     # set y-axis label to reflect 'Value' input
-    ylab <- paste0('Total ', longform, ' Value (Real 2023 USD)')
+    ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
   }
   
   # set vectors and objects for 'volume' input
@@ -657,7 +657,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
     y <- rlang::enquo(y)
     label <- label_currency(suffix = '/kg')
-    ylab <- paste0('Average ', longform, ' Price (Real 2023 USD)')
+    ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
   }
   
   # the plots for value, volume, and price are similar enough to use one plot
@@ -669,7 +669,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                  y = !!y)) + 
       geom_col(fill = 'black') +
       scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                       limits = factor(2004:2023)) +
+                       limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
       labs(x = 'Year',
            y = ylab) +
@@ -679,8 +679,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     # plotting trade balance data requires a different type of plot and 
       # reformatting of the data
     balance_data <- data %>%
-      rename(EXPORTS = EXP_VALUE_2023USD_BILLIONS,
-             IMPORTS = IMP_VALUE_2023USD_BILLIONS) %>%
+      rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
+             IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
       select(YEAR, EXPORTS, IMPORTS) %>%
       # calculate trade balance
       mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
@@ -697,7 +697,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                stat = 'identity',
                position = 'dodge') +
       labs(x = '',
-           y = 'Billions (Real 2023 USD)',
+           y = 'Billions (Real 2024 USD)',
            fill = '') +
       scale_fill_discrete(labels = c('Exports',
                                      'Imports',
@@ -708,7 +708,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
         # so we must manually set plot margins to coerce standardized plots and
         # shift the y-axis title to the left
       coord_axes_inside(labels_inside = T) +
-      scale_x_discrete(limits = factor(2004:2023)) +
+      scale_x_discrete(limits = factor(2004:2024)) +
       scale_y_continuous(labels = label_currency()) +
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
