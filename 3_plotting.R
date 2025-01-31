@@ -1224,3 +1224,73 @@ lobster_balance_yr
 save_plot(lobster_balance_yr)
 
 
+# Crabs (all) ------------------------------------------------------------------
+# Format the data
+crab_data <- summarize_yr_spp(trade_data, 'CRABS')
+
+### Exports
+# Plot Value
+crab_exp_value_yr <- plot_trade(crab_data, 'value', export = T)
+
+# View plot
+crab_exp_value_yr
+
+# Save plot
+save_plot(crab_exp_value_yr)
+
+# Plot Volume
+crab_exp_volume_yr <- plot_trade(crab_data, 'volume', export = T)
+
+# View plot
+crab_exp_volume_yr
+
+# Save plot
+save_plot(crab_exp_volume_yr)
+
+# Plot Price
+crab_exp_price_yr <- plot_trade(crab_data, 'price', export = T)
+
+# View plot
+crab_exp_price_yr
+
+# Save plot
+save_plot(crab_exp_price_yr)
+
+### Imports
+# Plot Value
+crab_imp_value_yr <- plot_trade(crab_data, 'value', import = T)
+
+# View plot
+crab_imp_value_yr
+
+# Save plot
+save_plot(crab_imp_value_yr)
+
+# Plot Volume
+crab_imp_volume_yr <- plot_trade(crab_data, 'volume', import = T)
+
+# View plot
+crab_imp_volume_yr
+
+# Save plot
+save_plot(crab_imp_volume_yr)
+
+# Plot Price
+crab_imp_price_yr <- plot_trade(crab_data, 'price', import = T)
+
+# View plot
+crab_imp_price_yr
+
+# Save plot
+save_plot(crab_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+crab_balance_yr <- plot_trade(crab_data, 'balance')
+
+# View plot
+crab_balance_yr
+
+# Save plot
+save_plot(crab_balance_yr)
+
