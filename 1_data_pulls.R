@@ -176,7 +176,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref'),
+              'species_ref', 'foss_com_landings'),
      file = file_name)
 
 # upload to google drive
