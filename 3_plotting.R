@@ -852,7 +852,7 @@ tuna_balance_yr
 # Save plot
 save_plot(tuna_balance_yr)
 
-# Cod --------------------------------------------------------------------------
+# Cod (all) --------------------------------------------------------------------
 # Format the data
 cod_data <- summarize_yr_spp(trade_data, 'COD')
 
@@ -921,3 +921,73 @@ cod_balance_yr
 
 # Save plot
 save_plot(cod_balance_yr)
+
+# Pollock (all) ----------------------------------------------------------------
+# Format the data
+pollock_data <- summarize_yr_spp(trade_data, 'POLLOCK')
+
+### Exports
+# Plot Value
+pollock_exp_value_yr <- plot_trade(pollock_data, 'value', export = T)
+
+# View plot
+pollock_exp_value_yr
+
+# Save plot
+save_plot(pollock_exp_value_yr)
+
+# Plot Volume
+pollock_exp_volume_yr <- plot_trade(pollock_data, 'volume', export = T)
+
+# View plot
+pollock_exp_volume_yr
+
+# Save plot
+save_plot(pollock_exp_volume_yr)
+
+# Plot Price
+pollock_exp_price_yr <- plot_trade(pollock_data, 'price', export = T)
+
+# View plot
+pollock_exp_price_yr
+
+# Save plot
+save_plot(pollock_exp_price_yr)
+
+### Imports
+# Plot Value
+pollock_imp_value_yr <- plot_trade(pollock_data, 'value', import = T)
+
+# View plot
+pollock_imp_value_yr
+
+# Save plot
+save_plot(pollock_imp_value_yr)
+
+# Plot Volume
+pollock_imp_volume_yr <- plot_trade(pollock_data, 'volume', import = T)
+
+# View plot
+pollock_imp_volume_yr
+
+# Save plot
+save_plot(pollock_imp_volume_yr)
+
+# Plot Price
+pollock_imp_price_yr <- plot_trade(pollock_data, 'price', import = T)
+
+# View plot
+pollock_imp_price_yr
+
+# Save plot
+save_plot(pollock_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+pollock_balance_yr <- plot_trade(pollock_data, 'balance')
+
+# View plot
+pollock_balance_yr
+
+# Save plot
+save_plot(pollock_balance_yr)
