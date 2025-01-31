@@ -853,3 +853,71 @@ tuna_balance_yr
 save_plot(tuna_balance_yr)
 
 # Cod --------------------------------------------------------------------------
+# Format the data
+cod_data <- summarize_yr_spp(trade_data, 'COD')
+
+### Exports
+# Plot Value
+cod_exp_value_yr <- plot_trade(cod_data, 'value', export = T)
+
+# View plot
+cod_exp_value_yr
+
+# Save plot
+save_plot(cod_exp_value_yr)
+
+# Plot Volume
+cod_exp_volume_yr <- plot_trade(cod_data, 'volume', export = T)
+
+# View plot
+cod_exp_volume_yr
+
+# Save plot
+save_plot(cod_exp_volume_yr)
+
+# Plot Price
+cod_exp_price_yr <- plot_trade(cod_data, 'price', export = T)
+
+# View plot
+cod_exp_price_yr
+
+# Save plot
+save_plot(cod_exp_price_yr)
+
+### Imports
+# Plot Value
+cod_imp_value_yr <- plot_trade(cod_data, 'value', import = T)
+
+# View plot
+cod_imp_value_yr
+
+# Save plot
+save_plot(cod_imp_value_yr)
+
+# Plot Volume
+cod_imp_volume_yr <- plot_trade(cod_data, 'volume', import = T)
+
+# View plot
+cod_imp_volume_yr
+
+# Save plot
+save_plot(cod_imp_volume_yr)
+
+# Plot Price
+cod_imp_price_yr <- plot_trade(cod_data, 'price', import = T)
+
+# View plot
+cod_imp_price_yr
+
+# Save plot
+save_plot(cod_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+cod_balance_yr <- plot_trade(cod_data, 'balance')
+
+# View plot
+cod_balance_yr
+
+# Save plot
+save_plot(cod_balance_yr)
