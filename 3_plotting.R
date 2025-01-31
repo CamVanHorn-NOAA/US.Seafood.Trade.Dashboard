@@ -1150,3 +1150,77 @@ scallop_balance_yr
 # Save plot
 save_plot(scallop_balance_yr)
 
+# Lobsters (all) ---------------------------------------------------------------
+# For now, this in inclusive of ALL lobster imports/exports, not just American
+# Format the data
+# NOTE: 'LOBSTER' yields an unspecified subset of lobster data
+#       'LOBSTERS' includes all lobster trade data
+lobster_data <- summarize_yr_spp(trade_data, 'LOBSTERS') 
+
+### Exports
+# Plot Value
+lobster_exp_value_yr <- plot_trade(lobster_data, 'value', export = T)
+
+# View plot
+lobster_exp_value_yr
+
+# Save plot
+save_plot(lobster_exp_value_yr)
+
+# Plot Volume
+lobster_exp_volume_yr <- plot_trade(lobster_data, 'volume', export = T)
+
+# View plot
+lobster_exp_volume_yr
+
+# Save plot
+save_plot(lobster_exp_volume_yr)
+
+# Plot Price
+lobster_exp_price_yr <- plot_trade(lobster_data, 'price', export = T)
+
+# View plot
+lobster_exp_price_yr
+
+# Save plot
+save_plot(lobster_exp_price_yr)
+
+### Imports
+# Plot Value
+lobster_imp_value_yr <- plot_trade(lobster_data, 'value', import = T)
+
+# View plot
+lobster_imp_value_yr
+
+# Save plot
+save_plot(lobster_imp_value_yr)
+
+# Plot Volume
+lobster_imp_volume_yr <- plot_trade(lobster_data, 'volume', import = T)
+
+# View plot
+lobster_imp_volume_yr
+
+# Save plot
+save_plot(lobster_imp_volume_yr)
+
+# Plot Price
+lobster_imp_price_yr <- plot_trade(lobster_data, 'price', import = T)
+
+# View plot
+lobster_imp_price_yr
+
+# Save plot
+save_plot(lobster_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+lobster_balance_yr <- plot_trade(lobster_data, 'balance')
+
+# View plot
+lobster_balance_yr
+
+# Save plot
+save_plot(lobster_balance_yr)
+
+
