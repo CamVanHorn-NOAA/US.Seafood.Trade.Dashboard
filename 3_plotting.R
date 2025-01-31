@@ -783,3 +783,73 @@ salmon_balance_yr
 save_plot(salmon_balance_yr)
 
 # Tuna (all) -------------------------------------------------------------------
+# Format the data
+tuna_data <- summarize_yr_spp(trade_data, 'TUNA')
+
+### Exports
+# Plot Value
+tuna_exp_value_yr <- plot_trade(tuna_data, 'value', export = T)
+
+# View plot
+tuna_exp_value_yr
+
+# Save plot
+save_plot(tuna_exp_value_yr)
+
+# Plot Volume
+tuna_exp_volume_yr <- plot_trade(tuna_data, 'volume', export = T)
+
+# View plot
+tuna_exp_volume_yr
+
+# Save plot
+save_plot(tuna_exp_volume_yr)
+
+# Plot Price
+tuna_exp_price_yr <- plot_trade(tuna_data, 'price', export = T)
+
+# View plot
+tuna_exp_price_yr
+
+# Save plot
+save_plot(tuna_exp_price_yr)
+
+### Imports
+# Plot Value
+tuna_imp_value_yr <- plot_trade(tuna_data, 'value', import = T)
+
+# View plot
+tuna_imp_value_yr
+
+# Save plot
+save_plot(tuna_imp_value_yr)
+
+# Plot Volume
+tuna_imp_volume_yr <- plot_trade(tuna_data, 'volume', import = T)
+
+# View plot
+tuna_imp_volume_yr
+
+# Save plot
+save_plot(tuna_imp_volume_yr)
+
+# Plot Price
+tuna_imp_price_yr <- plot_trade(tuna_data, 'price', import = T)
+
+# View plot
+tuna_imp_price_yr
+
+# Save plot
+save_plot(tuna_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+tuna_balance_yr <- plot_trade(tuna_data, 'balance')
+
+# View plot
+tuna_balance_yr
+
+# Save plot
+save_plot(tuna_balance_yr)
+
+# Cod --------------------------------------------------------------------------
