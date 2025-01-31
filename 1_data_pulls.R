@@ -130,6 +130,21 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 # combine data (stack)
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
+# Commercial Landings ----------------------------------------------------------
+# read csv's
+foss_com_1523 <- read.csv('foss_com_landings_15-23.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+# combine data (stack)
+foss_com_landings <- bind_rows(foss_com_0414, foss_com_1523)
+
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
 def_index <- read.csv('GDPDEF_2024_index.csv') %>%
