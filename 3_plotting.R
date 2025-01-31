@@ -1009,3 +1009,74 @@ pollock_balance_yr
 # Save plot
 save_plot(pollock_balance_yr)
 
+
+# Shrimp (all) -----------------------------------------------------------------
+# Format the data
+shrimp_data <- summarize_yr_spp(trade_data, 'SHRIMP')
+
+### Exports
+# Plot Value
+shrimp_exp_value_yr <- plot_trade(shrimp_data, 'value', export = T)
+
+# View plot
+shrimp_exp_value_yr
+
+# Save plot
+save_plot(shrimp_exp_value_yr)
+
+# Plot Volume
+shrimp_exp_volume_yr <- plot_trade(shrimp_data, 'volume', export = T)
+
+# View plot
+shrimp_exp_volume_yr
+
+# Save plot
+save_plot(shrimp_exp_volume_yr)
+
+# Plot Price
+shrimp_exp_price_yr <- plot_trade(shrimp_data, 'price', export = T)
+
+# View plot
+shrimp_exp_price_yr
+
+# Save plot
+save_plot(shrimp_exp_price_yr)
+
+### Imports
+# Plot Value
+shrimp_imp_value_yr <- plot_trade(shrimp_data, 'value', import = T)
+
+# View plot
+shrimp_imp_value_yr
+
+# Save plot
+save_plot(shrimp_imp_value_yr)
+
+# Plot Volume
+shrimp_imp_volume_yr <- plot_trade(shrimp_data, 'volume', import = T)
+
+# View plot
+shrimp_imp_volume_yr
+
+# Save plot
+save_plot(shrimp_imp_volume_yr)
+
+# Plot Price
+shrimp_imp_price_yr <- plot_trade(shrimp_data, 'price', import = T)
+
+# View plot
+shrimp_imp_price_yr
+
+# Save plot
+save_plot(shrimp_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+shrimp_balance_yr <- plot_trade(shrimp_data, 'balance')
+
+# View plot
+shrimp_balance_yr
+
+# Save plot
+save_plot(shrimp_balance_yr)
+
