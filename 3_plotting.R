@@ -12,6 +12,7 @@
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
 if(!require("scales")) install.packages("scales")
+if(!require("ggh4x")) install.packages("ggh4x")
 
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
@@ -49,7 +50,7 @@ save_plot <- function(plot) {
          height = 6)
 }
 
-# Data formatting (Trade data) -------------------------------------------------
+# Data formatting (Trade data by year) -----------------------------------------
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
   # select only columns that we need to compare trade data across years
@@ -264,11 +265,12 @@ value_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Billions (2023 Dollars)',
+       y = 'Billions (Real 2023 Dollars)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
+  coord_axes_inside(labels_inside = T) +
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(),
                      breaks = seq(-30, 35, by = 5)) +
@@ -276,11 +278,13 @@ value_balance_yr <-
   theme_minimal() +
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 13.9, 
-                                   angle = 45,
-                                   hjust = 5.3),
-        plot.background = element_rect(fill = 'white'),
-        panel.grid = element_blank())
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 13),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 value_balance_yr
@@ -312,6 +316,7 @@ volume_balance_yr <-
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
+  coord_axes_inside(labels_inside = T) +
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = comma,
                      breaks = seq(-2000000, 3500000, by = 500000)) +
@@ -319,11 +324,13 @@ volume_balance_yr <-
   theme_minimal() +
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 12.45,
-                                   angle = 45,
-                                   hjust = 4.8),
-        plot.background = element_rect(fill = 'white'),
-        panel.grid = element_blank())
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 23),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 volume_balance_yr
@@ -350,7 +357,7 @@ price_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Metric Tons',
+       y = 'Average Price (Real 2023 USD)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
@@ -358,15 +365,18 @@ price_balance_yr <-
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg'),
                      breaks = seq(-6, 10, by = 2)) +
+  coord_axes_inside(labels_inside = T) +
   geom_hline(yintercept = 0, color = 'black') +
   theme_minimal() + 
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 12,
-                                   angle = 45,
-                                   hjust = 4.65),
-        plot.background = element_rect(fill = 'white'),
-        panel.grid = element_blank())
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 17),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 price_balance_yr
@@ -376,9 +386,9 @@ save_plot(price_balance_yr)
   # comparing value/volume/price balance by customs district
   # comparing value/volume/price balance by country 
 
-###############################
-###### PROCESSED PRODUCTS #####
-###############################
+##############################
+##### PROCESSED PRODUCTS #####
+##############################
 # Compare Value of domestic processed products through time --------------------
 # Make the plot
 pp_value_yr <- 
@@ -449,3 +459,838 @@ save_plot(pp_price_yr)
   # compare top species sold by value through time
   # compare top product types sold by volume through time
   # compare top product types sold by value through time
+
+###############################
+##### SPECIES GROUP TRADE #####
+###############################
+# We are interested in evaluating some of the metrics calculated above with 
+  # respect to specific species of interest
+# Due to many species being available in our trade data, it is best to 
+  # create generic functions to filter the data for a given species and 
+  # plot the species-specific data
+# Data filtering function ------------------------------------------------------
+# The below function is meant to work within dplyr pipes, specifically those
+  # used in this script that incorporate our trade data, not processed products
+# The output of this function is the trade_table filtered for the specified
+  # species of interest
+# The function accounts for the complex structure of our data as there are
+  # three columns that contain species information
+# GROUP_NAME contains more specific species information, but also relies on
+  # species groups provided in GROUP_TS (for example, atlantic salmon are 
+  # listed as 'ATLANTIC' in GROUP_NAME and 'SALMON' in GROUP_TS)
+  # These kinds of distinctions can make indexing difficult
+# Therefore, this function searches both columns for the species term provided
+# If the species name is not found, the user is directed via error message to
+  # provide a more generic species name or search the data for acceptable
+  # species names to call in the function
+filter_species <- function(trade_table, species_name) {
+  # provide trade_table as a data_frame with GROUP_NAME and GROUP_TS as fields
+  # provide species_name as a vector of class character
+  
+  # store unique species names for each field that contains species names in 
+    # separate vectors
+  group_name <- unique(trade_table$GROUP_NAME)
+  group_ts <- unique(trade_table$GROUP_TS)
+  
+  # if species_name is provided in lower case, coerces to upper case
+  species_name <- toupper(species_name)
+  
+  # create flags for the function to filter properly
+  use_group_name <- ifelse(species_name %in% group_name, 'Y', 'N')
+  use_group_ts <- ifelse(species_name %in% group_ts, 'Y', 'N')
+  
+  # if the provied species_name is not found in either field, give error
+  if (use_group_name == 'N' & use_group_ts == 'N') {
+    stop("The species you provided is either too specific or not available.
+         Try 'unique(your_data$your_column)' to find acceptable calls")
+  }
+  
+  # if the provided species_name is found in the more generic field (TS),
+    # regardless of it being in the more specific field, use the generic field
+    # as a filter
+  if (use_group_ts == 'Y') {
+    filtered_data <- trade_table %>%
+      filter(GROUP_TS == species_name)
+  } 
+  
+  # if the provided species_name is only found in the more specific field,
+    # use the specific field as a filter
+  else if (use_group_ts == 'N' & use_group_name == 'Y') {
+    filtered_data <- trade_table %>%
+      filter(GROUP_NAME == species_name)
+  }
+  
+  return(filtered_data)
+}
+
+
+# Data summarizing function ----------------------------------------------------
+# The below function works in tandem with the filter_species fxn above
+# These functions are separate in case of interest in viewing the data filtered
+  # but not summarized
+# The function summarizes data grouped by year and species group, and requires
+  # the input data to be trade_data, or formatted similarly to such
+summarize_yr_spp <- function(trade_table, species_name) {
+  # trade_table is a data frame, either trade_data provided in script 2 or
+    # another data frame with comparable nomenclature and purpose
+  # species_name is a vector of class character and should not be specific
+  
+  # set species_name to upper case
+  species_name <- toupper(species_name)
+  
+  # we must specify which group we want to summarize the data around
+  # this effort is similar to that done in filter_species
+  # To coerce the group to operate in dplyr pipe, first we must designate the
+    # object returned in the ifelse() fxn as type symbol (or 'name')
+    # NOTE: there is no error output here if the species provided is unavailable
+    # because it would be redundant with that provided in filter_species
+  which_group <- as.symbol(ifelse(species_name %in% unique(trade_table$GROUP_TS),
+                                  'GROUP_TS', 'GROUP_NAME'))
+  
+  # Because we are using a dplyr pipe in a custom function, using our objects
+    # in dplyr functions can become tricky. Effectively, because we need to 
+    # define a field (i.e. 'GROUP_TS') with which to index a table inside this 
+    # function, we must make this object of type 'quosure' (see rlang)
+      # NOTE: later, we call these objects using the bang-bang (!!) in dplyr
+      # pipes and functions
+  which_group <- rlang::enquo(which_group)
+  
+  # dplyr pipe to summarize the data grouped by year and species
+  summarized_data <- trade_table %>%
+    # use the filter_species fxn created above
+    filter_species(species_name) %>%
+    # select only columns that we need to compare trade data across years
+      # NOTE: we coerce which_group to class symbol with sym() to operate in
+      # the dplyr pipe
+    select(YEAR, !!which_group, EXP_VALUE_2023USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2023USD, IMP_VOLUME_KG) %>%
+    # replace NAs with 0s for summation
+    mutate(EXP_VALUE_2023USD = ifelse(is.na(EXP_VALUE_2023USD), 0,
+                                      EXP_VALUE_2023USD),
+           IMP_VALUE_2023USD = ifelse(is.na(IMP_VALUE_2023USD), 0,
+                                      IMP_VALUE_2023USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG)) %>%
+    # group by year and the field specified prior
+    group_by(YEAR, !!which_group) %>%
+    # sum all columns of numeric type, drop groups
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # calculate price and convert value to millions and billions, 
+      # kg to metric tons
+    mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2023USD / EXP_VOLUME_KG,
+           IMP_PRICE_USD_PER_KG = IMP_VALUE_2023USD / IMP_VOLUME_KG,
+           EXP_VALUE_2023USD_MILLIONS = EXP_VALUE_2023USD / 1000000,
+           IMP_VALUE_2023USD_MILLIONS = IMP_VALUE_2023USD / 1000000,
+           EXP_VALUE_2023USD_BILLIONS = EXP_VALUE_2023USD / 1000000000,
+           IMP_VALUE_2023USD_BILLIONS = IMP_VALUE_2023USD / 1000000000,
+           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+  
+  return(summarized_data)
+}
+
+# Plot function ----------------------------------------------------------------
+# Because there are several species that the U.S. imports and exports, it is
+  # useful to automate visualizing these trade metrics
+# The plot_trade function provided below creates simple visualizations of 
+  # export value, volume, price, and trade balances through time of 
+  # provided data
+
+# data requires summarized data by year, 
+# plot_format requires one of four inputs, and outputs an error if other input
+  # is provided
+plot_trade <- function(data, plot_format, export = F, import = F) {
+  
+  # to make calling for balance output easier, give error if both exports and
+    # imports are set to T that directs to set each to F
+  if (export == T & import == T) {
+    stop('Export and import cannot both be true, set one to false. If interested in balance, leave both as false.')
+  }
+  
+  # set terms for export
+  if (export == T) {
+    # we need two values: a shortform embedded in column names, and a long form
+      # that will be used in labels
+    shortform <- 'EXP'
+    longform <- 'Export'
+  }
+  
+  # set terms for import
+  if (import == T) {
+    shortform <- 'IMP'
+    longform <- 'Import'
+  }
+  
+  # set plot_format to upper case to be flexible for user input
+  plot_format <- toupper(plot_format)
+  
+  # stop function if plot_format is provided incorrectly
+  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE'))) {
+    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\", and \"Balance\"')
+  }
+  
+  # set vectors and objects for 'value' input
+  if (plot_format == 'VALUE') {
+    # set column header for value as object of type quosure to operate in ggplot
+    y <- as.symbol(paste0(shortform, '_VALUE_2023USD_BILLIONS'))
+    y <- rlang::enquo(y)
+    # set y-axis tick labels to be of type currency (prefix = $) labeled in bil. 
+    label <- label_currency(suffix = 'B')
+    # set y-axis label to reflect 'Value' input
+    ylab <- paste0('Total ', longform, ' Value (Real 2023 USD)')
+  }
+  
+  # set vectors and objects for 'volume' input
+  if (plot_format == 'VOLUME') {
+    y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
+    y <- rlang::enquo(y)
+    # comma adds commas to values in thousands, etc.
+    label <- comma
+    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+  }
+  
+  # set vectors and objects for 'price' input
+  if (plot_format == 'PRICE') {
+    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = '/kg')
+    ylab <- paste0('Average ', longform, ' Price (Real 2023 USD)')
+  }
+  
+  # the plots for value, volume, and price are similar enough to use one plot
+    # format for each and interchange necessary values, specified above
+  if (plot_format %in% c('VALUE', 'VOLUME', 'PRICE')) {
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = !!y)) + 
+      geom_col(fill = 'black') +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label) +
+      labs(x = 'Year',
+           y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else {
+    # plotting trade balance data requires a different type of plot and 
+      # reformatting of the data
+    balance_data <- data %>%
+      rename(EXPORTS = EXP_VALUE_2023USD_BILLIONS,
+             IMPORTS = IMP_VALUE_2023USD_BILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      # calculate trade balance
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      # pivot longer creates a column of 'names' that we factor to create
+        # a plot of several bars for each year (export, import, balances)
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      mutate(name = as.factor(name))
+    
+    plot <- 
+      ggplot(data = balance_data,
+             aes(x = factor(YEAR),
+                 y = value)) +
+      geom_bar(aes(fill = name),
+               stat = 'identity',
+               position = 'dodge') +
+      labs(x = '',
+           y = 'Billions (Real 2023 USD)',
+           fill = '') +
+      scale_fill_discrete(labels = c('Exports',
+                                     'Imports',
+                                     'Trade Balance')) +
+      # coord_axes_inside from ggh4x moves the axis tick labels so that they
+        # reflect a prototypical coordinate plane (x-axis tick labels on y = 0)
+      # this creates an issue where the y-axis title overlaps with y-axis ticks,
+        # so we must manually set plot margins to coerce standardized plots and
+        # shift the y-axis title to the left
+      coord_axes_inside(labels_inside = T) +
+      scale_x_discrete(limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label_currency()) +
+      geom_hline(yintercept = 0, color = 'black') +
+      theme_minimal() +
+      theme(legend.position = 'top',
+            axis.line.y = element_line(color = 'black'),
+            axis.text.x = element_text(hjust = 0.8,
+                                       size = 8),
+            # shift y-axis title to the left
+            axis.title.y = element_text(vjust = 14),
+            plot.background = element_rect(fill = 'white',
+                                           color = 'white'),
+            panel.grid = element_blank(),
+            # standardize plot size 
+            plot.margin = margin(5.5, 5.5, 5.5, 30.5, 'points'))
+  }
+  
+  return(plot)
+}
+
+
+# Salmon (all) -----------------------------------------------------------------
+# Format the data
+salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
+
+### Exports
+# Plot Value
+salmon_exp_value_yr <- plot_trade(salmon_data, 'value', export = T)
+
+# View plot
+salmon_exp_value_yr
+
+# Save plot
+save_plot(salmon_exp_value_yr)
+
+# Plot Volume
+salmon_exp_volume_yr <- plot_trade(salmon_data, 'volume', export = T)
+
+# View plot
+salmon_exp_volume_yr
+
+# Save plot
+save_plot(salmon_exp_volume_yr)
+
+# Plot Price
+salmon_exp_price_yr <- plot_trade(salmon_data, 'price', export = T)
+
+# View plot
+salmon_exp_price_yr
+
+# Save plot
+save_plot(salmon_exp_price_yr)
+
+### Imports
+# Plot Value
+salmon_imp_value_yr <- plot_trade(salmon_data, 'value', import = T)
+
+# View plot
+salmon_imp_value_yr
+
+# Save plot
+save_plot(salmon_imp_value_yr)
+
+# Plot Volume
+salmon_imp_volume_yr <- plot_trade(salmon_data, 'volume', import = T)
+
+# View plot
+salmon_imp_volume_yr
+
+# Save plot
+save_plot(salmon_imp_volume_yr)
+
+# Plot Price
+salmon_imp_price_yr <- plot_trade(salmon_data, 'price', import = T)
+
+# View plot
+salmon_imp_price_yr
+
+# Save plot
+save_plot(salmon_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+salmon_balance_yr <- plot_trade(salmon_data, 'balance')
+
+# View plot
+salmon_balance_yr
+
+# Save plot
+save_plot(salmon_balance_yr)
+
+# Tuna (all) -------------------------------------------------------------------
+# Format the data
+tuna_data <- summarize_yr_spp(trade_data, 'TUNA')
+
+### Exports
+# Plot Value
+tuna_exp_value_yr <- plot_trade(tuna_data, 'value', export = T)
+
+# View plot
+tuna_exp_value_yr
+
+# Save plot
+save_plot(tuna_exp_value_yr)
+
+# Plot Volume
+tuna_exp_volume_yr <- plot_trade(tuna_data, 'volume', export = T)
+
+# View plot
+tuna_exp_volume_yr
+
+# Save plot
+save_plot(tuna_exp_volume_yr)
+
+# Plot Price
+tuna_exp_price_yr <- plot_trade(tuna_data, 'price', export = T)
+
+# View plot
+tuna_exp_price_yr
+
+# Save plot
+save_plot(tuna_exp_price_yr)
+
+### Imports
+# Plot Value
+tuna_imp_value_yr <- plot_trade(tuna_data, 'value', import = T)
+
+# View plot
+tuna_imp_value_yr
+
+# Save plot
+save_plot(tuna_imp_value_yr)
+
+# Plot Volume
+tuna_imp_volume_yr <- plot_trade(tuna_data, 'volume', import = T)
+
+# View plot
+tuna_imp_volume_yr
+
+# Save plot
+save_plot(tuna_imp_volume_yr)
+
+# Plot Price
+tuna_imp_price_yr <- plot_trade(tuna_data, 'price', import = T)
+
+# View plot
+tuna_imp_price_yr
+
+# Save plot
+save_plot(tuna_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+tuna_balance_yr <- plot_trade(tuna_data, 'balance')
+
+# View plot
+tuna_balance_yr
+
+# Save plot
+save_plot(tuna_balance_yr)
+
+# Cod (all) --------------------------------------------------------------------
+# Format the data
+cod_data <- summarize_yr_spp(trade_data, 'COD')
+
+### Exports
+# Plot Value
+cod_exp_value_yr <- plot_trade(cod_data, 'value', export = T)
+
+# View plot
+cod_exp_value_yr
+
+# Save plot
+save_plot(cod_exp_value_yr)
+
+# Plot Volume
+cod_exp_volume_yr <- plot_trade(cod_data, 'volume', export = T)
+
+# View plot
+cod_exp_volume_yr
+
+# Save plot
+save_plot(cod_exp_volume_yr)
+
+# Plot Price
+cod_exp_price_yr <- plot_trade(cod_data, 'price', export = T)
+
+# View plot
+cod_exp_price_yr
+
+# Save plot
+save_plot(cod_exp_price_yr)
+
+### Imports
+# Plot Value
+cod_imp_value_yr <- plot_trade(cod_data, 'value', import = T)
+
+# View plot
+cod_imp_value_yr
+
+# Save plot
+save_plot(cod_imp_value_yr)
+
+# Plot Volume
+cod_imp_volume_yr <- plot_trade(cod_data, 'volume', import = T)
+
+# View plot
+cod_imp_volume_yr
+
+# Save plot
+save_plot(cod_imp_volume_yr)
+
+# Plot Price
+cod_imp_price_yr <- plot_trade(cod_data, 'price', import = T)
+
+# View plot
+cod_imp_price_yr
+
+# Save plot
+save_plot(cod_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+cod_balance_yr <- plot_trade(cod_data, 'balance')
+
+# View plot
+cod_balance_yr
+
+# Save plot
+save_plot(cod_balance_yr)
+
+# Pollock (all) ----------------------------------------------------------------
+# Format the data
+pollock_data <- summarize_yr_spp(trade_data, 'POLLOCK')
+
+### Exports
+# Plot Value
+pollock_exp_value_yr <- plot_trade(pollock_data, 'value', export = T)
+
+# View plot
+pollock_exp_value_yr
+
+# Save plot
+save_plot(pollock_exp_value_yr)
+
+# Plot Volume
+pollock_exp_volume_yr <- plot_trade(pollock_data, 'volume', export = T)
+
+# View plot
+pollock_exp_volume_yr
+
+# Save plot
+save_plot(pollock_exp_volume_yr)
+
+# Plot Price
+pollock_exp_price_yr <- plot_trade(pollock_data, 'price', export = T)
+
+# View plot
+pollock_exp_price_yr
+
+# Save plot
+save_plot(pollock_exp_price_yr)
+
+### Imports
+# Plot Value
+pollock_imp_value_yr <- plot_trade(pollock_data, 'value', import = T)
+
+# View plot
+pollock_imp_value_yr
+
+# Save plot
+save_plot(pollock_imp_value_yr)
+
+# Plot Volume
+pollock_imp_volume_yr <- plot_trade(pollock_data, 'volume', import = T)
+
+# View plot
+pollock_imp_volume_yr
+
+# Save plot
+save_plot(pollock_imp_volume_yr)
+
+# Plot Price
+pollock_imp_price_yr <- plot_trade(pollock_data, 'price', import = T)
+
+# View plot
+pollock_imp_price_yr
+
+# Save plot
+save_plot(pollock_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+pollock_balance_yr <- plot_trade(pollock_data, 'balance')
+
+# View plot
+pollock_balance_yr
+
+# Save plot
+save_plot(pollock_balance_yr)
+
+
+# Shrimp (all) -----------------------------------------------------------------
+# Format the data
+shrimp_data <- summarize_yr_spp(trade_data, 'SHRIMP')
+
+### Exports
+# Plot Value
+shrimp_exp_value_yr <- plot_trade(shrimp_data, 'value', export = T)
+
+# View plot
+shrimp_exp_value_yr
+
+# Save plot
+save_plot(shrimp_exp_value_yr)
+
+# Plot Volume
+shrimp_exp_volume_yr <- plot_trade(shrimp_data, 'volume', export = T)
+
+# View plot
+shrimp_exp_volume_yr
+
+# Save plot
+save_plot(shrimp_exp_volume_yr)
+
+# Plot Price
+shrimp_exp_price_yr <- plot_trade(shrimp_data, 'price', export = T)
+
+# View plot
+shrimp_exp_price_yr
+
+# Save plot
+save_plot(shrimp_exp_price_yr)
+
+### Imports
+# Plot Value
+shrimp_imp_value_yr <- plot_trade(shrimp_data, 'value', import = T)
+
+# View plot
+shrimp_imp_value_yr
+
+# Save plot
+save_plot(shrimp_imp_value_yr)
+
+# Plot Volume
+shrimp_imp_volume_yr <- plot_trade(shrimp_data, 'volume', import = T)
+
+# View plot
+shrimp_imp_volume_yr
+
+# Save plot
+save_plot(shrimp_imp_volume_yr)
+
+# Plot Price
+shrimp_imp_price_yr <- plot_trade(shrimp_data, 'price', import = T)
+
+# View plot
+shrimp_imp_price_yr
+
+# Save plot
+save_plot(shrimp_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+shrimp_balance_yr <- plot_trade(shrimp_data, 'balance')
+
+# View plot
+shrimp_balance_yr
+
+# Save plot
+save_plot(shrimp_balance_yr)
+
+# Scallops (all) ---------------------------------------------------------------
+# Format the data
+scallop_data <- summarize_yr_spp(trade_data, 'SCALLOPS')
+
+### Exports
+# Plot Value
+scallop_exp_value_yr <- plot_trade(scallop_data, 'value', export = T)
+
+# View plot
+scallop_exp_value_yr
+
+# Save plot
+save_plot(scallop_exp_value_yr)
+
+# Plot Volume
+scallop_exp_volume_yr <- plot_trade(scallop_data, 'volume', export = T)
+
+# View plot
+scallop_exp_volume_yr
+
+# Save plot
+save_plot(scallop_exp_volume_yr)
+
+# Plot Price
+scallop_exp_price_yr <- plot_trade(scallop_data, 'price', export = T)
+
+# View plot
+scallop_exp_price_yr
+
+# Save plot
+save_plot(scallop_exp_price_yr)
+
+### Imports
+# Plot Value
+scallop_imp_value_yr <- plot_trade(scallop_data, 'value', import = T)
+
+# View plot
+scallop_imp_value_yr
+
+# Save plot
+save_plot(scallop_imp_value_yr)
+
+# Plot Volume
+scallop_imp_volume_yr <- plot_trade(scallop_data, 'volume', import = T)
+
+# View plot
+scallop_imp_volume_yr
+
+# Save plot
+save_plot(scallop_imp_volume_yr)
+
+# Plot Price
+scallop_imp_price_yr <- plot_trade(scallop_data, 'price', import = T)
+
+# View plot
+scallop_imp_price_yr
+
+# Save plot
+save_plot(scallop_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+scallop_balance_yr <- plot_trade(scallop_data, 'balance')
+
+# View plot
+scallop_balance_yr
+
+# Save plot
+save_plot(scallop_balance_yr)
+
+# Lobsters (all) ---------------------------------------------------------------
+# For now, this in inclusive of ALL lobster imports/exports, not just American
+# Format the data
+# NOTE: 'LOBSTER' yields an unspecified subset of lobster data
+#       'LOBSTERS' includes all lobster trade data
+lobster_data <- summarize_yr_spp(trade_data, 'LOBSTERS') 
+
+### Exports
+# Plot Value
+lobster_exp_value_yr <- plot_trade(lobster_data, 'value', export = T)
+
+# View plot
+lobster_exp_value_yr
+
+# Save plot
+save_plot(lobster_exp_value_yr)
+
+# Plot Volume
+lobster_exp_volume_yr <- plot_trade(lobster_data, 'volume', export = T)
+
+# View plot
+lobster_exp_volume_yr
+
+# Save plot
+save_plot(lobster_exp_volume_yr)
+
+# Plot Price
+lobster_exp_price_yr <- plot_trade(lobster_data, 'price', export = T)
+
+# View plot
+lobster_exp_price_yr
+
+# Save plot
+save_plot(lobster_exp_price_yr)
+
+### Imports
+# Plot Value
+lobster_imp_value_yr <- plot_trade(lobster_data, 'value', import = T)
+
+# View plot
+lobster_imp_value_yr
+
+# Save plot
+save_plot(lobster_imp_value_yr)
+
+# Plot Volume
+lobster_imp_volume_yr <- plot_trade(lobster_data, 'volume', import = T)
+
+# View plot
+lobster_imp_volume_yr
+
+# Save plot
+save_plot(lobster_imp_volume_yr)
+
+# Plot Price
+lobster_imp_price_yr <- plot_trade(lobster_data, 'price', import = T)
+
+# View plot
+lobster_imp_price_yr
+
+# Save plot
+save_plot(lobster_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+lobster_balance_yr <- plot_trade(lobster_data, 'balance')
+
+# View plot
+lobster_balance_yr
+
+# Save plot
+save_plot(lobster_balance_yr)
+
+
+# Crabs (all) ------------------------------------------------------------------
+# Format the data
+crab_data <- summarize_yr_spp(trade_data, 'CRABS')
+
+### Exports
+# Plot Value
+crab_exp_value_yr <- plot_trade(crab_data, 'value', export = T)
+
+# View plot
+crab_exp_value_yr
+
+# Save plot
+save_plot(crab_exp_value_yr)
+
+# Plot Volume
+crab_exp_volume_yr <- plot_trade(crab_data, 'volume', export = T)
+
+# View plot
+crab_exp_volume_yr
+
+# Save plot
+save_plot(crab_exp_volume_yr)
+
+# Plot Price
+crab_exp_price_yr <- plot_trade(crab_data, 'price', export = T)
+
+# View plot
+crab_exp_price_yr
+
+# Save plot
+save_plot(crab_exp_price_yr)
+
+### Imports
+# Plot Value
+crab_imp_value_yr <- plot_trade(crab_data, 'value', import = T)
+
+# View plot
+crab_imp_value_yr
+
+# Save plot
+save_plot(crab_imp_value_yr)
+
+# Plot Volume
+crab_imp_volume_yr <- plot_trade(crab_data, 'volume', import = T)
+
+# View plot
+crab_imp_volume_yr
+
+# Save plot
+save_plot(crab_imp_volume_yr)
+
+# Plot Price
+crab_imp_price_yr <- plot_trade(crab_data, 'price', import = T)
+
+# View plot
+crab_imp_price_yr
+
+# Save plot
+save_plot(crab_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+crab_balance_yr <- plot_trade(crab_data, 'balance')
+
+# View plot
+crab_balance_yr
+
+# Save plot
+save_plot(crab_balance_yr)
+
