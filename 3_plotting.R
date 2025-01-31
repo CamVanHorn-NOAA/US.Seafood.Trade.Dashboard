@@ -716,7 +716,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 # Format the data
 salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
 
-# Exports
+### Exports
 # Plot Value
 salmon_exp_value_yr <- plot_trade(salmon_data, 'value', export = T)
 
@@ -725,3 +725,61 @@ salmon_exp_value_yr
 
 # Save plot
 save_plot(salmon_exp_value_yr)
+
+# Plot Volume
+salmon_exp_volume_yr <- plot_trade(salmon_data, 'volume', export = T)
+
+# View plot
+salmon_exp_volume_yr
+
+# Save plot
+save_plot(salmon_exp_volume_yr)
+
+# Plot Price
+salmon_exp_price_yr <- plot_trade(salmon_data, 'price', export = T)
+
+# View plot
+salmon_exp_price_yr
+
+# Save plot
+save_plot(salmon_exp_price_yr)
+
+### Imports
+# Plot Value
+salmon_imp_value_yr <- plot_trade(salmon_data, 'value', import = T)
+
+# View plot
+salmon_imp_value_yr
+
+# Save plot
+save_plot(salmon_imp_value_yr)
+
+# Plot Volume
+salmon_imp_volume_yr <- plot_trade(salmon_data, 'volume', import = T)
+
+# View plot
+salmon_imp_volume_yr
+
+# Save plot
+save_plot(salmon_imp_volume_yr)
+
+# Plot Price
+salmon_imp_price_yr <- plot_trade(salmon_data, 'price', import = T)
+
+# View plot
+salmon_imp_price_yr
+
+# Save plot
+save_plot(salmon_imp_price_yr)
+
+### Trade Balance
+# Plot Balance
+salmon_balance_yr <- plot_trade(salmon_data, 'balance')
+
+# View plot
+salmon_balance_yr
+
+# Save plot
+save_plot(salmon_balance_yr)
+
+# Tuna (all) -------------------------------------------------------------------
