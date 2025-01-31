@@ -47,6 +47,10 @@ drive_auth()
 #                overwrite = T)
 # drive_download('FTS_PRODUCTS.csv',
 #                overwrite = T)
+# drive_download('foss_com_landings_04-14.csv',
+#                overwrite = T)
+# drive_download('foss_com_landings_15-23.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
