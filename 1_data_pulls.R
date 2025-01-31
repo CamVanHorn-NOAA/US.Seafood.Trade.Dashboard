@@ -43,7 +43,7 @@ drive_auth()
 #                overwrite = T)
 # drive_download('foss_pp_04-14.csv',
 #                overwrite = T)
-# drive_download('GDPDEF_index.csv',
+# drive_download('GDPDEF_2024_index.csv',
 #                overwrite = T)
 # drive_download('FTS_PRODUCTS.csv',
 #                overwrite = T)
@@ -128,9 +128,9 @@ foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
-def_index <- read.csv('GDPDEF_index.csv') %>%
+def_index <- read.csv('GDPDEF_2024_index.csv') %>%
   rename_with( ~ toupper(.x)) %>%
-  rename(DEFLATOR_VALUE = GDPDEF_NBD20230101,
+  rename(DEFLATOR_VALUE = GDPDEF_NBD20240101,
          YEAR = OBSERVATION_DATE) %>%
   # remove -01-01 from year as it is negligible (the index is averaged per year)
   mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
