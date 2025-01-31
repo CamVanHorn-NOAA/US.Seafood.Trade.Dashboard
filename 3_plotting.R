@@ -12,6 +12,7 @@
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
 if(!require("scales")) install.packages("scales")
+if(!require("ggh4x")) install.packages("ggh4x")
 
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
@@ -264,11 +265,12 @@ value_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Billions (2023 Dollars)',
+       y = 'Billions (Real 2023 Dollars)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
+  coord_axes_inside(labels_inside = T, ratio = 0.2) +
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(),
                      breaks = seq(-30, 35, by = 5)) +
@@ -276,10 +278,11 @@ value_balance_yr <-
   theme_minimal() +
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 13.9, 
-                                   angle = 45,
-                                   hjust = 5.3),
-        plot.background = element_rect(fill = 'white'),
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 11),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
         panel.grid = element_blank())
 
 # View the plot
