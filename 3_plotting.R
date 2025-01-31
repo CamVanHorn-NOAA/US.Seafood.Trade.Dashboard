@@ -697,25 +697,32 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                stat = 'identity',
                position = 'dodge') +
       labs(x = '',
-           y = 'Billions (2023 Dollars)',
+           y = 'Billions (Real 2023 USD)',
            fill = '') +
       scale_fill_discrete(labels = c('Exports',
                                      'Imports',
                                      'Trade Balance')) +
+      # coord_axes_inside from ggh4x moves the axis tick labels so that they
+        # reflect a prototypical coordinate plane (x-axis tick labels on y = 0)
+      # this creates an issue where the y-axis title overlaps with y-axis ticks,
+        # so we must manually set plot margins to coerce standardized plots and
+        # shift the y-axis title to the left
+      coord_axes_inside(labels_inside = T) +
       scale_x_discrete(limits = factor(2004:2023)) +
       scale_y_continuous(labels = label_currency()) +
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
       theme(legend.position = 'top',
             axis.line.y = element_line(color = 'black'),
-            # the placing of the years is finnicky, adjust as needed
-            # best to use a standardized plot save output (size-wise) so these
-              # can be static
-            axis.text.x = element_text(vjust = 13.9, 
-                                       angle = 45,
-                                       hjust = 5.3),
-            plot.background = element_rect(fill = 'white'),
-            panel.grid = element_blank())
+            axis.text.x = element_text(hjust = 0.8,
+                                       size = 8),
+            # shift y-axis title to the left
+            axis.title.y = element_text(vjust = 14),
+            plot.background = element_rect(fill = 'white',
+                                           color = 'white'),
+            panel.grid = element_blank(),
+            # standardize plot size 
+            plot.margin = margin(5.5, 5.5, 5.5, 30.5, 'points'))
   }
   
   return(plot)
@@ -1001,3 +1008,4 @@ pollock_balance_yr
 
 # Save plot
 save_plot(pollock_balance_yr)
+
