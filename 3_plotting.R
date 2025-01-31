@@ -270,7 +270,7 @@ value_balance_yr <-
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
-  coord_axes_inside(labels_inside = T, ratio = 0.2) +
+  coord_axes_inside(labels_inside = T) +
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(),
                      breaks = seq(-30, 35, by = 5)) +
@@ -280,10 +280,11 @@ value_balance_yr <-
         axis.line.y = element_line(color = 'black'),
         axis.text.x = element_text(hjust = 0.8,
                                    size = 8),
-        axis.title.y = element_text(vjust = 11),
+        axis.title.y = element_text(vjust = 13),
         plot.background = element_rect(fill = 'white',
                                        color = 'white'),
-        panel.grid = element_blank())
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 value_balance_yr
@@ -315,6 +316,7 @@ volume_balance_yr <-
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
                                  'Trade Balance')) +
+  coord_axes_inside(labels_inside = T) +
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = comma,
                      breaks = seq(-2000000, 3500000, by = 500000)) +
@@ -322,11 +324,13 @@ volume_balance_yr <-
   theme_minimal() +
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 12.45,
-                                   angle = 45,
-                                   hjust = 4.8),
-        plot.background = element_rect(fill = 'white'),
-        panel.grid = element_blank())
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 23),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 volume_balance_yr
@@ -353,7 +357,7 @@ price_balance_yr <-
            stat = 'identity',
            position = 'dodge') +
   labs(x = '',
-       y = 'Metric Tons',
+       y = 'Average Price (Real 2023 USD)',
        fill = '') +
   scale_fill_discrete(labels = c('Exports',
                                  'Imports',
@@ -361,15 +365,18 @@ price_balance_yr <-
   scale_x_discrete(limits = factor(2004:2023)) +
   scale_y_continuous(labels = label_currency(suffix = '/kg'),
                      breaks = seq(-6, 10, by = 2)) +
+  coord_axes_inside(labels_inside = T) +
   geom_hline(yintercept = 0, color = 'black') +
   theme_minimal() + 
   theme(legend.position = 'top',
         axis.line.y = element_line(color = 'black'),
-        axis.text.x = element_text(vjust = 12,
-                                   angle = 45,
-                                   hjust = 4.65),
-        plot.background = element_rect(fill = 'white'),
-        panel.grid = element_blank())
+        axis.text.x = element_text(hjust = 0.8,
+                                   size = 8),
+        axis.title.y = element_text(vjust = 17),
+        plot.background = element_rect(fill = 'white',
+                                       color = 'white'),
+        panel.grid = element_blank(),
+        plot.margin = margin(5.5, 5.5, 5.5, 50.5, 'points'))
 
 # View the plot
 price_balance_yr
