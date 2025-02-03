@@ -47,6 +47,12 @@ drive_auth()
 #                overwrite = T)
 # drive_download('FTS_PRODUCTS.csv',
 #                overwrite = T)
+# drive_download('foss_com_landings_04-14.csv',
+#                overwrite = T)
+# drive_download('foss_com_landings_15-23.csv',
+#                overwrite = T)
+# drive_download('Assessment_Summary_Data.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
@@ -111,7 +117,7 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
 # combine data (stack)
 foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
-# Processed Products -----------------------------------------------------------
+# Processed Products & Species Metadata ----------------------------------------
 # read csv's
 foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
   setNames(.[1, ]) %>%
@@ -125,6 +131,27 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 
 # combine data (stack)
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
+
+# read csv of Species metadata
+species_metadata <- read.csv('Assessment_Summary_Data.csv') %>%
+  rename_with( ~ toupper(gsub('.', '_', .x, fixed = T))) %>%
+  rename(TSN = ITIS_TAXON_SERIAL_NUMBER) %>%
+  mutate(COMMON_NAME = toupper(COMMON_NAME))
+
+# Commercial Landings ----------------------------------------------------------
+# read csv's
+foss_com_1523 <- read.csv('foss_com_landings_15-23.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
+  setNames(.[1, ]) %>%
+  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+  .[-1, ]
+
+# combine data (stack)
+foss_com_landings <- bind_rows(foss_com_0414, foss_com_1523)
 
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
@@ -157,7 +184,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref'),
+              'species_ref', 'foss_com_landings', 'species_metadata'),
      file = file_name)
 
 # upload to google drive
