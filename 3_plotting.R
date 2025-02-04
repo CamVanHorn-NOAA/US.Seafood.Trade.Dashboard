@@ -1294,3 +1294,21 @@ crab_balance_yr
 # Save plot
 save_plot(crab_balance_yr)
 
+
+##################################
+##### ADVANCED TRADE METRICS #####
+##################################
+# TODO: Multilateral Lowe Trade Indices (Exports and Imports)
+# TODO: Production Volume
+# TODO: Export/Import Volume Ratio
+# TODO: Net Exports
+# TODO: Net exports to top 5 countries
+# TODO: Concentration indices of trade with other countries (Herfinidahl Index)
+# TODO: Real Export Effective Exchange Rate Index (foreign currency per dollar)
+  # IMPORTANT: Cannot achieve since dataset available in Fissel et al. 2023 is
+  # no longer available online
+# TODO: US Share of global trade value activity
+# TODO: Export and import value growth of the US and rest of the world
+# TODO: US Apparent Consumption
+# TODO: Apparent consumption relative to US production
+# TODO: Unexported US production relative to apparent consumption
