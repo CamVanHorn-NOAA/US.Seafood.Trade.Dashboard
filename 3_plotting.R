@@ -1443,6 +1443,15 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
                                     color = 'white'),
           strip.background = element_rect(fill = 'black'))
 }
+
+# Function to save MLTI plots --------------------------------------------------
+save_mlti_plot <- function(plot) {
+  ggsave(filename = paste0('Plots/', as.character(substitute(plot)), '.png'),
+         plot = plot,
+         width = 12,
+         height = 11)
+}
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
