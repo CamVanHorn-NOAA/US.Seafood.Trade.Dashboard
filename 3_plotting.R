@@ -1295,10 +1295,123 @@ crab_balance_yr
 save_plot(crab_balance_yr)
 
 
-##################################
-##### ADVANCED TRADE METRICS #####
-##################################
-# TODO: Multilateral Lowe Trade Indices (Exports and Imports)
+#########################################
+##### MULTILATERAL LOWE TRADE INDEX #####
+#########################################
+# Function to calculate MLTI ---------------------------------------------------
+calculate_mlti <- function(species, exports = F, imports = F) {
+  # This function calculates the Multilateral Lowe Trade Index, which serves to
+    # compare year by year changes in trade among top trading nations
+    # The nations selected for reference has no effect on comparisons among
+    # nations or across years (Fissel et al. 2023)
+  # The function inputs are a given species and whether the user seeks the index
+    # for exports or imports
+  # The function relies on the 'filter_species' function to operate
+  
+  # First, set value and volume variables to be for exports or imports
+  # We use symbols and quosures to embed these terms for use in dplyr
+    # see prior functions and rlang for details
+  which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
+                                  'IMP_VALUE_2024USD'))
+  which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
+                                   'IMP_VOLUME_KG'))
+  which_value <- rlang::enquo(which_value)
+  which_volume <- rlang::enquo(which_volume)
+  
+  # filter the data for the target species AND for imports or exports
+  spp_data <- trade_data %>%
+    filter_species(species) %>%
+    filter(is.na(!!which_value) == F)
+  
+  # Because filtering for species depends upon values in two columns,
+    # we must specify which column we are to keep for data curation 
+  # this does not impact calculations, but simply how the data is presented
+  which_group <- as.symbol(ifelse(species %in% unique(spp_data$GROUP_TS),
+                                  'GROUP_TS', 'GROUP_NAME'))
+  which_group <- rlang::enquo(which_group)
+  
+  # To calculate the MLTI, we need to calculate the simple average price
+  # We must summarize the value and volume of the given species' products
+    # within all countries for each year. Then we calculate the price per
+    # country per year
+  summary_spp_data <- spp_data %>%
+    select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+           !!which_volume) %>%
+    group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(PRICE = !!which_value / !!which_volume)
+  
+  # Part of the equation for calculating simple average price involves counting
+    # the number of countries and the number of years 
+  total_years <- length(unique(summary_spp_data$YEAR))
+  total_countries <- length(unique(summary_spp_data$COUNTRY_NAME))
+  
+  
+  # Now we can calculate the simple average price
+  # First, sum prices across time for all countries (one value per country)
+  # Then sum all of these prices
+  average_price <- summary_spp_data %>%
+    select(!c(YEAR, !!which_value, !!which_volume)) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    summarise(across(where(is.numeric), sum)) 
+  
+  # divide this calculated sum by the product of total years and total countries
+  average_price <- average_price$PRICE / (total_years * total_countries)
+  
+  # We are only interested in the MLTI for the top 9 trading nations for either
+    # imports or exports
+  # Extract the top 9 trading countries of the most recent year (since we are
+    # interested in temporal comparisons for presently relevant nations) by
+    # summarizing value within each nation that traded for the most recent year
+    # and subsetting for the top 9 summed values
+  top9 <- summary_spp_data %>%
+    filter(YEAR == 2024) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    arrange(-!!which_value) %>%
+    top_n(9, !!which_value)
+  
+  # The MLTI calculation requires a base nation to compare other countries 
+    # against; it makes sense, therefore, for this base nation to be somewhere
+    # in the middle of the distribution.
+  # We also want the base nation's value to be of the first year of the dataset
+    # so that our comparisons flow chronologically
+  # Because we are interested in the top 9 nations, the fifth nation in the list
+    # is conveniently the middle nation and will be our base
+  base_country <- top9$COUNTRY_NAME[5]
+  base_country_q <- summary_spp_data %>%
+    filter(YEAR == 2004,
+           COUNTRY_NAME == base_country) %>%
+    # We choose a base country exclusively to calculate a q_index, which is the
+      # foundation for calculating MLTI
+    # Q is the product of a nation's trading volume for a given year by the 
+      # simple average price for that product by all trading nations
+    # In other words, Q standardizes the value of a nations trade such that
+      # we compare fluctuations in VOLUME over time 
+    mutate(Q_INDEX = !!which_volume * average_price)
+  
+  # All calculations of MLTI for each country in each year will be a ratio
+    # of the given country's given year's volume of trading to the index base
+  index_base <- base_country_q$Q_INDEX
+  
+  # calculate MLTI for each top 9 country for all years
+  # the output will be a dataframe of the MLTI value for the top 9 countries
+    # from 2004-2024
+  mlti_data <- summary_spp_data %>%
+    filter(COUNTRY_NAME %in% top9$COUNTRY_NAME) %>%
+    mutate(Q_INDEX = !!which_volume * average_price) %>%
+    select(YEAR, COUNTRY_NAME, Q_INDEX) %>%
+    mutate(MLTI = Q_INDEX / index_base)
+  
+  return(mlti_data)
+}
+
+# Function to plot MLTI --------------------------------------------------------
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
