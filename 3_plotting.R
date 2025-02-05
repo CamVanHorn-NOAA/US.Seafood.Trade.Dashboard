@@ -1392,6 +1392,25 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   # Because we are interested in the top 9 nations, the fifth nation in the list
     # is conveniently the middle nation and will be our base
   base_country <- top9$COUNTRY_NAME[5]
+  # in some cases, this selected country may not have been a trading partner
+    # in 2004, thus we must check to confirm before proceeding
+  # create a list of trading nations in 2004
+  trade_nations <- summary_spp_data %>%
+    filter(YEAR == 2004) %>%
+    select(COUNTRY_NAME) %>%
+    distinct() 
+  
+  # if the selected country was not a trading partner, select the next highest
+    # value trading partner as it is more likely they were a trading partner
+    # than a lower value trading partner
+  if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
+    base_country <- top9$COUNTRY_NAME[4]
+    # in case this is also not present, take next country
+    if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
+      base_country <- top9$COUNTRY_NAME[3]
+    }
+  } 
+  
   base_country_q <- summary_spp_data %>%
     filter(YEAR == 2004,
            COUNTRY_NAME == base_country) %>%
