@@ -1497,6 +1497,28 @@ salmon_import_mlti <- plot_mlti(salmon_import_mlti_data, imports = T)
 # View the plot
 salmon_import_mlti
 
+# Tuna (all) -------------------------------------------------------------------
+### Exports
+# Make the data
+tuna_export_mlti_data <- calculate_mlti('TUNA', exports = T)
+
+# Plot the data
+tuna_export_mlti <- plot_mlti(tuna_export_mlti_data, exports = T)
+
+# View the plot
+tuna_export_mlti
+
+
+### Imports
+# Make the data
+tuna_import_mlti_data <- calculate_mlti('TUNA', imports = T)
+
+# Plot the data
+tuna_import_mlti <- plot_mlti(tuna_import_mlti_data, imports = T)
+
+# View the plot
+tuna_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
