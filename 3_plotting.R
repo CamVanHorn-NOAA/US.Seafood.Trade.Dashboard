@@ -1651,12 +1651,69 @@ crabs_import_mlti <- plot_mlti(crabs_import_mlti_data, imports = T)
 # View the plot
 crabs_import_mlti
 
+############################
+##### HERFINDAHL INDEX #####
+############################
+# To calculate the herfindahl index, we must calculate the share of both import
+  # and export value for each trading country with the U.S.
+# So, for example, if Germany traded $50M of scallops in value with the U.S., 
+  # and Canada traded $50M of scallops, and no one else traded scallops, 
+  # each country's share of trade value is 50%. The Index takes the square of 
+  # this share for each country, sums the squares, and divides by 10,000 all for
+  # a given year. 
+# Function to calculate HI -----------------------------------------------------
+calculate_hi <- function(species) {
+  # the function is very simple in execution as it is mainly simple calculations
+  # To make plotting the data easier (so that exports could be compared to 
+    # imports), the function outputs both export and import data in one df
+  # This makes the only necessary input the species of interest
+  
+  hi_data <- trade_data %>%
+    # relies on filter_species function created above
+    filter_species(species) %>%
+    # retain only year, country, and value fields 
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
+    # we cannot sum properly if there are NAs, so coerce NAs to be 0
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
+                                      0, EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
+                                      0, IMP_VALUE_2024USD)) %>%
+    # the Index relies on share of value for each trading nation, so we must
+      # group by year and the trading country
+    group_by(YEAR, COUNTRY_NAME) %>%
+    # sums both import and export values for each country in each year
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # now we don't need the country specification anymore for these calculations
+      # so only group by year
+    group_by(YEAR) %>%
+    # the following mutations are sequential calculations necessary to calculate
+      # HI; we only retain the final produced columns EXP_HI and IMP_HI
+    # Step 1: Sum export and import values of all nations in each year
+    mutate(TOTAL_EXP_VALUE_YR = sum(EXP_VALUE_2024USD),
+           TOTAL_IMP_VALUE_YR = sum(IMP_VALUE_2024USD),
+           # Step 2: Calculate each nation's share of trade value in each year
+           PROPORT_EXP_VALUE = EXP_VALUE_2024USD / TOTAL_EXP_VALUE_YR,
+           PROPORT_IMP_VALUE = IMP_VALUE_2024USD / TOTAL_IMP_VALUE_YR,
+           # Step 3: Square the proportions generated in step 2
+           PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
+           PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
+           # Step 4: sum the squared proportions for each year so that there is
+            # one value per year
+           EXP_HI = sum(PROPORT_EXP_SQUARED),
+           IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
+    select(YEAR, EXP_HI, IMP_HI) %>%
+    # retains the one value per year
+    distinct()
+  
+}
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
 # TODO: Net exports to top 5 countries
-# TODO: Concentration indices of trade with other countries (Herfinidahl Index)
+# TODO: Concentration indices of trade with other countries (Herfindahl Index)
 # TODO: Real Export Effective Exchange Rate Index (foreign currency per dollar)
   # IMPORTANT: Cannot achieve since dataset available in Fissel et al. 2023 is
   # no longer available online
