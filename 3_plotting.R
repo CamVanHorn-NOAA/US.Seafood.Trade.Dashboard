@@ -1708,6 +1708,52 @@ calculate_hi <- function(species) {
   
 }
 
+# Function to plot HI ----------------------------------------------------------
+plot_hi <- function(hi_data) {
+  # the function operates similarly to other plot functions created here
+  # the input is the data created by the calculate_hi function
+  
+  # To plot both exports and imports for comparison of HI, we must format
+    # the provided data by pivoting it longer
+  format_hi_data <- hi_data %>%
+    # rename the columns so that the labels created in pivot_longer are correct
+    rename(EXPORTS = EXP_HI,
+           IMPORTS = IMP_HI) %>%
+    pivot_longer(cols = c(EXPORTS, IMPORTS))
+  # the product of pivot_longer is 3 columns
+    # YEAR
+    # name, or the labels 'EXPORTS' and 'IMPORTS'
+    # value, or the HI values assigned to either 'EXPORTS' or 'IMPORTS'
+  
+  ggplot(data = test,
+         aes(x = as.factor(YEAR),
+             y = value)) +
+    geom_line(aes(group = name, 
+                  colour = name),
+              linewidth = 1.5) +
+    # add points for clarity in plot
+    geom_point(size = 2,
+               color = 'black') +
+    # rename terms for plot cleanliness
+    scale_color_discrete(name = '',
+                         labels = c('Exports', 'Imports')) +
+    labs(x = '',
+         y = 'Herfindahl Index (HI)',
+         # title the plot with the species presented, scrub the info from the
+          # name of the data provided to reduce function inputs
+         title = toupper(as.character(gsub('_hi_data', 
+                                           '', 
+                                           substitute(salmon_hi_data))))) +
+    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 15),
+          legend.position = 'bottom',
+          plot.title = element_text(size = 18))
+  
+}
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
