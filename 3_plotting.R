@@ -1475,6 +1475,28 @@ save_mlti_plot <- function(plot) {
          height = 11)
 }
 
+# Salmon (all) -----------------------------------------------------------------
+### Exports
+# Make the data
+salmon_export_mlti_data <- calculate_mlti('SALMON', exports = T)
+
+# Plot the data
+salmon_export_mlti <- plot_mlti(salmon_export_mlti_data, exports = T)
+
+# View the plot
+salmon_export_mlti
+
+
+### Imports
+# Make the data
+salmon_import_mlti_data <- calculate_mlti('SALMON', imports = T)
+
+# Plot the data
+salmon_import_mlti <- plot_mlti(salmon_import_mlti_data, imports = T)
+
+# View the plot
+salmon_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
