@@ -1629,6 +1629,29 @@ lobsters_import_mlti <- plot_mlti(lobsters_import_mlti_data, imports = T)
 # View the plot
 lobsters_import_mlti
 
+# Crabs (all) ------------------------------------------------------------------
+### Exports
+# Make the data
+crabs_export_mlti_data <- calculate_mlti('CRABS', exports = T)
+
+# Plot the data
+crabs_export_mlti <- plot_mlti(crabs_export_mlti_data, exports = T)
+
+# View the plot
+crabs_export_mlti
+
+
+### Imports
+# Make the data
+crabs_import_mlti_data <- calculate_mlti('CRABS', imports = T)
+
+# Plot the data
+crabs_import_mlti <- plot_mlti(crabs_import_mlti_data, imports = T)
+
+# View the plot
+crabs_import_mlti
+
+# TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
