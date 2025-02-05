@@ -1541,6 +1541,28 @@ cod_import_mlti <- plot_mlti(cod_import_mlti_data, imports = T)
 # View the plot
 cod_import_mlti
 
+# Pollock (all) ----------------------------------------------------------------
+### Exports
+# Make the data
+pollock_export_mlti_data <- calculate_mlti('POLLOCK', exports = T)
+
+# Plot the data
+pollock_export_mlti <- plot_mlti(pollock_export_mlti_data, exports = T)
+
+# View the plot
+pollock_export_mlti
+
+
+### Imports
+# Make the data
+pollock_import_mlti_data <- calculate_mlti('POLLOCK', imports = T)
+
+# Plot the data
+pollock_import_mlti <- plot_mlti(pollock_import_mlti_data, imports = T)
+
+# View the plot
+pollock_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
