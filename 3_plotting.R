@@ -1563,6 +1563,28 @@ pollock_import_mlti <- plot_mlti(pollock_import_mlti_data, imports = T)
 # View the plot
 pollock_import_mlti
 
+# Shrimp (all) -----------------------------------------------------------------
+### Exports
+# Make the data
+shrimp_export_mlti_data <- calculate_mlti('SHRIMP', exports = T)
+
+# Plot the data
+shrimp_export_mlti <- plot_mlti(shrimp_export_mlti_data, exports = T)
+
+# View the plot
+shrimp_export_mlti
+
+
+### Imports
+# Make the data
+shrimp_import_mlti_data <- calculate_mlti('SHRIMP', imports = T)
+
+# Plot the data
+shrimp_import_mlti <- plot_mlti(shrimp_import_mlti_data, imports = T)
+
+# View the plot
+shrimp_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
