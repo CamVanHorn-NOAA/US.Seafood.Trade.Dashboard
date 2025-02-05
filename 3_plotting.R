@@ -1585,6 +1585,28 @@ shrimp_import_mlti <- plot_mlti(shrimp_import_mlti_data, imports = T)
 # View the plot
 shrimp_import_mlti
 
+# Scallops (all) ---------------------------------------------------------------
+### Exports
+# Make the data
+scallops_export_mlti_data <- calculate_mlti('SCALLOPS', exports = T)
+
+# Plot the data
+scallops_export_mlti <- plot_mlti(scallops_export_mlti_data, exports = T)
+
+# View the plot
+scallops_export_mlti
+
+
+### Imports
+# Make the data
+scallops_import_mlti_data <- calculate_mlti('SCALLOPS', imports = T)
+
+# Plot the data
+scallops_import_mlti <- plot_mlti(scallops_import_mlti_data, imports = T)
+
+# View the plot
+scallops_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
