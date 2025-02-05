@@ -1345,6 +1345,10 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
+    # If, for whatever reason, there is a volume of 0, filter out to preserve
+      # calculations (can't have a 0 in denominator)
+      # SEE: Netherlands, 2023, Tuna, Imports
+    filter(!!which_volume > 0) %>%
     mutate(PRICE = !!which_value / !!which_volume)
   
   # Part of the equation for calculating simple average price involves counting
