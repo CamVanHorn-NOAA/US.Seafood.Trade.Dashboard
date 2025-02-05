@@ -1519,6 +1519,28 @@ tuna_import_mlti <- plot_mlti(tuna_import_mlti_data, imports = T)
 # View the plot
 tuna_import_mlti
 
+# Cod (all) --------------------------------------------------------------------
+### Exports
+# Make the data
+cod_export_mlti_data <- calculate_mlti('COD', exports = T)
+
+# Plot the data
+cod_export_mlti <- plot_mlti(cod_export_mlti_data, exports = T)
+
+# View the plot
+cod_export_mlti
+
+
+### Imports
+# Make the data
+cod_import_mlti_data <- calculate_mlti('COD', imports = T)
+
+# Plot the data
+cod_import_mlti <- plot_mlti(cod_import_mlti_data, imports = T)
+
+# View the plot
+cod_import_mlti
+
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
