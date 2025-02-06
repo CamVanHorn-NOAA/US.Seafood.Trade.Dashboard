@@ -1784,6 +1784,16 @@ cod_hi <- plot_hi(cod_hi_data)
 # View the plot
 cod_hi
 
+# Pollock (all) ----------------------------------------------------------------
+# Make the data
+pollock_hi_data <- calculate_hi('POLLOCK')
+
+# Plot the data
+pollock_hi <- plot_hi(pollock_hi_data)
+
+# View the plot
+pollock_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
