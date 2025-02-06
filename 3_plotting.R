@@ -1774,6 +1774,16 @@ tuna_hi <- plot_hi(tuna_hi_data)
 # View the plot
 tuna_hi
 
+# Cod (all) --------------------------------------------------------------------
+# Make the data
+cod_hi_data <- calculate_hi('COD')
+
+# Plot the data
+cod_hi <- plot_hi(cod_hi_data)
+
+# View the plot
+cod_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
