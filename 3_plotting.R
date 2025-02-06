@@ -1804,6 +1804,16 @@ shrimp_hi <- plot_hi(shrimp_hi_data)
 # View the plot
 shrimp_hi
 
+# Scallops (all) ---------------------------------------------------------------
+# Make the data
+scallop_hi_data <- calculate_hi('SCALLOPS')
+
+# Plot the data
+scallop_hi <- plot_hi(scallop_hi_data)
+
+# View the plot
+scallop_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
