@@ -1824,6 +1824,16 @@ lobster_hi <- plot_hi(lobster_hi_data)
 # View the plot
 lobster_hi
 
+# Crabs (all) ------------------------------------------------------------------
+# Make the data
+crab_hi_data <- calculate_hi('CRABS')
+
+# Plot the data
+crab_hi <- plot_hi(crab_hi_data)
+
+# View the plot
+crab_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
