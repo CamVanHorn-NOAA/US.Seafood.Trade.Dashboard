@@ -1725,7 +1725,7 @@ plot_hi <- function(hi_data) {
     # name, or the labels 'EXPORTS' and 'IMPORTS'
     # value, or the HI values assigned to either 'EXPORTS' or 'IMPORTS'
   
-  ggplot(data = test,
+  ggplot(data = format_hi_data,
          aes(x = as.factor(YEAR),
              y = value)) +
     geom_line(aes(group = name, 
@@ -1743,7 +1743,7 @@ plot_hi <- function(hi_data) {
           # name of the data provided to reduce function inputs
          title = toupper(as.character(gsub('_hi_data', 
                                            '', 
-                                           substitute(salmon_hi_data))))) +
+                                           substitute(hi_data))))) +
     scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
