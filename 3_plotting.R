@@ -1794,6 +1794,16 @@ pollock_hi <- plot_hi(pollock_hi_data)
 # View the plot
 pollock_hi
 
+# Shrimp (all) -----------------------------------------------------------------
+# Make the data
+shrimp_hi_data <- calculate_hi('SHRIMP')
+
+# Plot the data
+shrimp_hi <- plot_hi(shrimp_hi_data)
+
+# View the plot
+shrimp_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
