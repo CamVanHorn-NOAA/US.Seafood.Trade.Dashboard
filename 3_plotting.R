@@ -1764,6 +1764,16 @@ salmon_hi <- plot_hi(salmon_hi_data)
 # View the plot
 salmon_hi
 
+# Tuna (all) -------------------------------------------------------------------
+# Make the data
+tuna_hi_data <- calculate_hi('TUNA')
+
+# Plot the data
+tuna_hi <- plot_hi(tuna_hi_data)
+
+# View the plot
+tuna_hi
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
