@@ -1764,6 +1764,7 @@ salmon_hi <- plot_hi(salmon_hi_data)
 # View the plot
 salmon_hi
 
+
 # Tuna (all) -------------------------------------------------------------------
 # Make the data
 tuna_hi_data <- calculate_hi('TUNA')
@@ -1834,12 +1835,14 @@ crab_hi <- plot_hi(crab_hi_data)
 # View the plot
 crab_hi
 
+##########################################
+##### NET EXPORTS TO TOP 5 COUNTRIES #####
+##########################################
 # TODOS ------------------------------------------------------------------------
 # TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
 # TODO: Net exports to top 5 countries
-# TODO: Concentration indices of trade with other countries (Herfindahl Index)
 # TODO: Real Export Effective Exchange Rate Index (foreign currency per dollar)
   # IMPORTANT: Cannot achieve since dataset available in Fissel et al. 2023 is
   # no longer available online
