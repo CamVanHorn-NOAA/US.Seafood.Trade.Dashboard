@@ -1294,3 +1294,560 @@ crab_balance_yr
 # Save plot
 save_plot(crab_balance_yr)
 
+
+#########################################
+##### MULTILATERAL LOWE TRADE INDEX #####
+#########################################
+# Function to calculate MLTI ---------------------------------------------------
+calculate_mlti <- function(species, exports = F, imports = F) {
+  # This function calculates the Multilateral Lowe Trade Index, which serves to
+    # compare year by year changes in trade among top trading nations
+    # The nations selected for reference has no effect on comparisons among
+    # nations or across years (Fissel et al. 2023)
+  # The function inputs are a given species and whether the user seeks the index
+    # for exports or imports
+  # The function relies on the 'filter_species' function to operate
+  
+  # First, set value and volume variables to be for exports or imports
+  # We use symbols and quosures to embed these terms for use in dplyr
+    # see prior functions and rlang for details
+  
+  if (exports == F & imports == F) {
+    stop('Please set either "exports" or "imports" to "T"')
+  }
+  
+  which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
+                                  'IMP_VALUE_2024USD'))
+  which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
+                                   'IMP_VOLUME_KG'))
+  which_value <- rlang::enquo(which_value)
+  which_volume <- rlang::enquo(which_volume)
+  
+  # filter the data for the target species AND for imports or exports
+  spp_data <- trade_data %>%
+    filter_species(species) %>%
+    filter(is.na(!!which_value) == F)
+  
+  # Because filtering for species depends upon values in two columns,
+    # we must specify which column we are to keep for data curation 
+  # this does not impact calculations, but simply how the data is presented
+  which_group <- as.symbol(ifelse(species %in% unique(spp_data$GROUP_TS),
+                                  'GROUP_TS', 'GROUP_NAME'))
+  which_group <- rlang::enquo(which_group)
+  
+  # To calculate the MLTI, we need to calculate the simple average price
+  # We must summarize the value and volume of the given species' products
+    # within all countries for each year. Then we calculate the price per
+    # country per year
+  summary_spp_data <- spp_data %>%
+    select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+           !!which_volume) %>%
+    group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # If, for whatever reason, there is a volume of 0, filter out to preserve
+      # calculations (can't have a 0 in denominator)
+      # SEE: Netherlands, 2023, Tuna, Imports
+    filter(!!which_volume > 0) %>%
+    mutate(PRICE = !!which_value / !!which_volume)
+  
+  # Part of the equation for calculating simple average price involves counting
+    # the number of countries and the number of years 
+  total_years <- length(unique(summary_spp_data$YEAR))
+  total_countries <- length(unique(summary_spp_data$COUNTRY_NAME))
+  
+  
+  # Now we can calculate the simple average price
+  # First, sum prices across time for all countries (one value per country)
+  # Then sum all of these prices
+  average_price <- summary_spp_data %>%
+    select(!c(YEAR, !!which_value, !!which_volume)) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    summarise(across(where(is.numeric), sum)) 
+  
+  # divide this calculated sum by the product of total years and total countries
+  average_price <- average_price$PRICE / (total_years * total_countries)
+  
+  # We are only interested in the MLTI for the top 9 trading nations for either
+    # imports or exports
+  # Extract the top 9 trading countries of the most recent year (since we are
+    # interested in temporal comparisons for presently relevant nations) by
+    # summarizing value within each nation that traded for the most recent year
+    # and subsetting for the top 9 summed values
+  top9 <- summary_spp_data %>%
+    filter(YEAR == 2024) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    arrange(-!!which_value) %>%
+    top_n(9, !!which_value)
+  
+  # The MLTI calculation requires a base nation to compare other countries 
+    # against; it makes sense, therefore, for this base nation to be somewhere
+    # in the middle of the distribution.
+  # We also want the base nation's value to be of the first year of the dataset
+    # so that our comparisons flow chronologically
+  # Because we are interested in the top 9 nations, the fifth nation in the list
+    # is conveniently the middle nation and will be our base
+  base_country <- top9$COUNTRY_NAME[5]
+  # in some cases, this selected country may not have been a trading partner
+    # in 2004, thus we must check to confirm before proceeding
+  # create a list of trading nations in 2004
+  trade_nations <- summary_spp_data %>%
+    filter(YEAR == 2004) %>%
+    select(COUNTRY_NAME) %>%
+    distinct() 
+  
+  # if the selected country was not a trading partner, select the next highest
+    # value trading partner as it is more likely they were a trading partner
+    # than a lower value trading partner
+  if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
+    base_country <- top9$COUNTRY_NAME[4]
+    # in case this is also not present, take next country
+    if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
+      base_country <- top9$COUNTRY_NAME[3]
+    }
+  } 
+  
+  base_country_q <- summary_spp_data %>%
+    filter(YEAR == 2004,
+           COUNTRY_NAME == base_country) %>%
+    # We choose a base country exclusively to calculate a q_index, which is the
+      # foundation for calculating MLTI
+    # Q is the product of a nation's trading volume for a given year by the 
+      # simple average price for that product by all trading nations
+    # In other words, Q standardizes the value of a nations trade such that
+      # we compare fluctuations in VOLUME over time 
+    mutate(Q_INDEX = !!which_volume * average_price)
+  
+  # All calculations of MLTI for each country in each year will be a ratio
+    # of the given country's given year's volume of trading to the index base
+  index_base <- base_country_q$Q_INDEX
+  
+  # calculate MLTI for each top 9 country for all years
+  # the output will be a dataframe of the MLTI value for the top 9 countries
+    # from 2004-2024
+  mlti_data <- summary_spp_data %>%
+    filter(COUNTRY_NAME %in% top9$COUNTRY_NAME) %>%
+    mutate(Q_INDEX = !!which_volume * average_price) %>%
+    select(YEAR, COUNTRY_NAME, Q_INDEX) %>%
+    mutate(MLTI = Q_INDEX / index_base)
+  
+  return(mlti_data)
+}
+
+# Function to plot MLTI --------------------------------------------------------
+plot_mlti <- function(mlti_data, exports = F, imports = F) {
+  # this function creates facet wrapped plots of MLTI indices generated by the
+    # calculate_mlti function described above
+  # the operation of this function is simple and does not require much 
+    # explanation
+  if (exports == F & imports == F) {
+    stop('Please set "exports" or "imports" to "T"')
+  }
+  
+  label <- ifelse(exports == T, 'Export', 'Import')
+  
+  ggplot(data = mlti_data,
+         aes(x = factor(YEAR),
+             y = MLTI)) +
+    geom_point() +
+    facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
+    scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
+    geom_hline(yintercept = 1, color = 'black') +
+    labs(x = '',
+         y = paste0('Multilateral ', label, ' Quantity Index')) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 15),
+          axis.title.y = element_text(size = 20),
+          strip.text = element_text(size = 15,
+                                    color = 'white'),
+          strip.background = element_rect(fill = 'black'))
+}
+
+# Function to save MLTI plots --------------------------------------------------
+save_mlti_plot <- function(plot) {
+  ggsave(filename = paste0('Plots/', as.character(substitute(plot)), '.png'),
+         plot = plot,
+         width = 12,
+         height = 11)
+}
+
+# Salmon (all) -----------------------------------------------------------------
+### Exports
+# Make the data
+salmon_export_mlti_data <- calculate_mlti('SALMON', exports = T)
+
+# Plot the data
+salmon_export_mlti <- plot_mlti(salmon_export_mlti_data, exports = T)
+
+# View the plot
+salmon_export_mlti
+
+
+### Imports
+# Make the data
+salmon_import_mlti_data <- calculate_mlti('SALMON', imports = T)
+
+# Plot the data
+salmon_import_mlti <- plot_mlti(salmon_import_mlti_data, imports = T)
+
+# View the plot
+salmon_import_mlti
+
+# Tuna (all) -------------------------------------------------------------------
+### Exports
+# Make the data
+tuna_export_mlti_data <- calculate_mlti('TUNA', exports = T)
+
+# Plot the data
+tuna_export_mlti <- plot_mlti(tuna_export_mlti_data, exports = T)
+
+# View the plot
+tuna_export_mlti
+
+
+### Imports
+# Make the data
+tuna_import_mlti_data <- calculate_mlti('TUNA', imports = T)
+
+# Plot the data
+tuna_import_mlti <- plot_mlti(tuna_import_mlti_data, imports = T)
+
+# View the plot
+tuna_import_mlti
+
+# Cod (all) --------------------------------------------------------------------
+### Exports
+# Make the data
+cod_export_mlti_data <- calculate_mlti('COD', exports = T)
+
+# Plot the data
+cod_export_mlti <- plot_mlti(cod_export_mlti_data, exports = T)
+
+# View the plot
+cod_export_mlti
+
+
+### Imports
+# Make the data
+cod_import_mlti_data <- calculate_mlti('COD', imports = T)
+
+# Plot the data
+cod_import_mlti <- plot_mlti(cod_import_mlti_data, imports = T)
+
+# View the plot
+cod_import_mlti
+
+# Pollock (all) ----------------------------------------------------------------
+### Exports
+# Make the data
+pollock_export_mlti_data <- calculate_mlti('POLLOCK', exports = T)
+
+# Plot the data
+pollock_export_mlti <- plot_mlti(pollock_export_mlti_data, exports = T)
+
+# View the plot
+pollock_export_mlti
+
+
+### Imports
+# Make the data
+pollock_import_mlti_data <- calculate_mlti('POLLOCK', imports = T)
+
+# Plot the data
+pollock_import_mlti <- plot_mlti(pollock_import_mlti_data, imports = T)
+
+# View the plot
+pollock_import_mlti
+
+# Shrimp (all) -----------------------------------------------------------------
+### Exports
+# Make the data
+shrimp_export_mlti_data <- calculate_mlti('SHRIMP', exports = T)
+
+# Plot the data
+shrimp_export_mlti <- plot_mlti(shrimp_export_mlti_data, exports = T)
+
+# View the plot
+shrimp_export_mlti
+
+
+### Imports
+# Make the data
+shrimp_import_mlti_data <- calculate_mlti('SHRIMP', imports = T)
+
+# Plot the data
+shrimp_import_mlti <- plot_mlti(shrimp_import_mlti_data, imports = T)
+
+# View the plot
+shrimp_import_mlti
+
+# Scallops (all) ---------------------------------------------------------------
+### Exports
+# Make the data
+scallops_export_mlti_data <- calculate_mlti('SCALLOPS', exports = T)
+
+# Plot the data
+scallops_export_mlti <- plot_mlti(scallops_export_mlti_data, exports = T)
+
+# View the plot
+scallops_export_mlti
+
+
+### Imports
+# Make the data
+scallops_import_mlti_data <- calculate_mlti('SCALLOPS', imports = T)
+
+# Plot the data
+scallops_import_mlti <- plot_mlti(scallops_import_mlti_data, imports = T)
+
+# View the plot
+scallops_import_mlti
+
+# Lobsters (all) ---------------------------------------------------------------
+### Exports
+# Make the data
+lobsters_export_mlti_data <- calculate_mlti('LOBSTERS', exports = T)
+
+# Plot the data
+lobsters_export_mlti <- plot_mlti(lobsters_export_mlti_data, exports = T)
+
+# View the plot
+lobsters_export_mlti
+
+
+### Imports
+# Make the data
+lobsters_import_mlti_data <- calculate_mlti('LOBSTERS', imports = T)
+
+# Plot the data
+lobsters_import_mlti <- plot_mlti(lobsters_import_mlti_data, imports = T)
+
+# View the plot
+lobsters_import_mlti
+
+# Crabs (all) ------------------------------------------------------------------
+### Exports
+# Make the data
+crabs_export_mlti_data <- calculate_mlti('CRABS', exports = T)
+
+# Plot the data
+crabs_export_mlti <- plot_mlti(crabs_export_mlti_data, exports = T)
+
+# View the plot
+crabs_export_mlti
+
+
+### Imports
+# Make the data
+crabs_import_mlti_data <- calculate_mlti('CRABS', imports = T)
+
+# Plot the data
+crabs_import_mlti <- plot_mlti(crabs_import_mlti_data, imports = T)
+
+# View the plot
+crabs_import_mlti
+
+############################
+##### HERFINDAHL INDEX #####
+############################
+# To calculate the herfindahl index, we must calculate the share of both import
+  # and export value for each trading country with the U.S.
+# So, for example, if Germany traded $50M of scallops in value with the U.S., 
+  # and Canada traded $50M of scallops, and no one else traded scallops, 
+  # each country's share of trade value is 50%. The Index takes the square of 
+  # this share for each country, sums the squares, and divides by 10,000 all for
+  # a given year. 
+# Function to calculate HI -----------------------------------------------------
+calculate_hi <- function(species) {
+  # the function is very simple in execution as it is mainly simple calculations
+  # To make plotting the data easier (so that exports could be compared to 
+    # imports), the function outputs both export and import data in one df
+  # This makes the only necessary input the species of interest
+  
+  hi_data <- trade_data %>%
+    # relies on filter_species function created above
+    filter_species(species) %>%
+    # retain only year, country, and value fields 
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
+    # we cannot sum properly if there are NAs, so coerce NAs to be 0
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
+                                      0, EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
+                                      0, IMP_VALUE_2024USD)) %>%
+    # the Index relies on share of value for each trading nation, so we must
+      # group by year and the trading country
+    group_by(YEAR, COUNTRY_NAME) %>%
+    # sums both import and export values for each country in each year
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # now we don't need the country specification anymore for these calculations
+      # so only group by year
+    group_by(YEAR) %>%
+    # the following mutations are sequential calculations necessary to calculate
+      # HI; we only retain the final produced columns EXP_HI and IMP_HI
+    # Step 1: Sum export and import values of all nations in each year
+    mutate(TOTAL_EXP_VALUE_YR = sum(EXP_VALUE_2024USD),
+           TOTAL_IMP_VALUE_YR = sum(IMP_VALUE_2024USD),
+           # Step 2: Calculate each nation's share of trade value in each year
+           PROPORT_EXP_VALUE = EXP_VALUE_2024USD / TOTAL_EXP_VALUE_YR,
+           PROPORT_IMP_VALUE = IMP_VALUE_2024USD / TOTAL_IMP_VALUE_YR,
+           # Step 3: Square the proportions generated in step 2
+           PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
+           PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
+           # Step 4: sum the squared proportions for each year so that there is
+            # one value per year
+           EXP_HI = sum(PROPORT_EXP_SQUARED),
+           IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
+    select(YEAR, EXP_HI, IMP_HI) %>%
+    # retains the one value per year
+    distinct()
+  
+}
+
+# Function to plot HI ----------------------------------------------------------
+plot_hi <- function(hi_data) {
+  # the function operates similarly to other plot functions created here
+  # the input is the data created by the calculate_hi function
+  
+  # To plot both exports and imports for comparison of HI, we must format
+    # the provided data by pivoting it longer
+  format_hi_data <- hi_data %>%
+    # rename the columns so that the labels created in pivot_longer are correct
+    rename(EXPORTS = EXP_HI,
+           IMPORTS = IMP_HI) %>%
+    pivot_longer(cols = c(EXPORTS, IMPORTS))
+  # the product of pivot_longer is 3 columns
+    # YEAR
+    # name, or the labels 'EXPORTS' and 'IMPORTS'
+    # value, or the HI values assigned to either 'EXPORTS' or 'IMPORTS'
+  
+  ggplot(data = format_hi_data,
+         aes(x = as.factor(YEAR),
+             y = value)) +
+    geom_line(aes(group = name, 
+                  colour = name),
+              linewidth = 1.5) +
+    # add points for clarity in plot
+    geom_point(size = 2,
+               color = 'black') +
+    # rename terms for plot cleanliness
+    scale_color_discrete(name = '',
+                         labels = c('Exports', 'Imports')) +
+    labs(x = '',
+         y = 'Herfindahl Index (HI)',
+         # title the plot with the species presented, scrub the info from the
+          # name of the data provided to reduce function inputs
+         title = toupper(as.character(gsub('_hi_data', 
+                                           '', 
+                                           substitute(hi_data))))) +
+    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 15),
+          legend.position = 'bottom',
+          plot.title = element_text(size = 18))
+  
+}
+
+# Salmon (all) -----------------------------------------------------------------
+# Make the data
+salmon_hi_data <- calculate_hi('SALMON')
+
+# Plot the data
+salmon_hi <- plot_hi(salmon_hi_data)
+
+# View the plot
+salmon_hi
+
+
+# Tuna (all) -------------------------------------------------------------------
+# Make the data
+tuna_hi_data <- calculate_hi('TUNA')
+
+# Plot the data
+tuna_hi <- plot_hi(tuna_hi_data)
+
+# View the plot
+tuna_hi
+
+# Cod (all) --------------------------------------------------------------------
+# Make the data
+cod_hi_data <- calculate_hi('COD')
+
+# Plot the data
+cod_hi <- plot_hi(cod_hi_data)
+
+# View the plot
+cod_hi
+
+# Pollock (all) ----------------------------------------------------------------
+# Make the data
+pollock_hi_data <- calculate_hi('POLLOCK')
+
+# Plot the data
+pollock_hi <- plot_hi(pollock_hi_data)
+
+# View the plot
+pollock_hi
+
+# Shrimp (all) -----------------------------------------------------------------
+# Make the data
+shrimp_hi_data <- calculate_hi('SHRIMP')
+
+# Plot the data
+shrimp_hi <- plot_hi(shrimp_hi_data)
+
+# View the plot
+shrimp_hi
+
+# Scallops (all) ---------------------------------------------------------------
+# Make the data
+scallop_hi_data <- calculate_hi('SCALLOPS')
+
+# Plot the data
+scallop_hi <- plot_hi(scallop_hi_data)
+
+# View the plot
+scallop_hi
+
+# Lobsters (all) ---------------------------------------------------------------
+# Make the data
+lobster_hi_data <- calculate_hi('LOBSTERS')
+
+# Plot the data
+lobster_hi <- plot_hi(lobster_hi_data)
+
+# View the plot
+lobster_hi
+
+# Crabs (all) ------------------------------------------------------------------
+# Make the data
+crab_hi_data <- calculate_hi('CRABS')
+
+# Plot the data
+crab_hi <- plot_hi(crab_hi_data)
+
+# View the plot
+crab_hi
+
+##########################################
+##### NET EXPORTS TO TOP 5 COUNTRIES #####
+##########################################
+# TODOS ------------------------------------------------------------------------
+# TODO: Production Volume
+# TODO: Export/Import Volume Ratio
+# TODO: Net Exports
+# TODO: Net exports to top 5 countries
+# TODO: Real Export Effective Exchange Rate Index (foreign currency per dollar)
+  # IMPORTANT: Cannot achieve since dataset available in Fissel et al. 2023 is
+  # no longer available online
+# TODO: US Share of global trade value activity
+# TODO: Export and import value growth of the US and rest of the world
+# TODO: US Apparent Consumption
+# TODO: Apparent consumption relative to US production
+# TODO: Unexported US production relative to apparent consumption
