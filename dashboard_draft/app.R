@@ -177,24 +177,25 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 }
 
 # Define UI 
-ui <- page_sidebar(
-  sidebar = sidebar(
-    selectInput(
-      'species',
-      label = 'Select species group',
-      choices = c('', 'Cod', 'Crabs', 'Lobsters', 'Pollock', 
-                  'Salmon', 'Scallops', 'Shrimp', 'Tuna'))
-    ),
-  fluidRow(
-    plotOutput('balance')
-  ),
-  fluidRow(
-    column(6,
-           plotOutput('exp_volume')),
-    column(6,
-           plotOutput('imp_volume'))
-  )
-  )
+ui <- fluidPage(
+  selectInput(
+             'species',
+             label = 'Select species group',
+             choices = c('', 'Cod', 'Crabs', 'Lobsters', 'Pollock', 
+                         'Salmon', 'Scallops', 'Shrimp', 'Tuna')
+           ),
+  tabsetPanel(
+             tabPanel('Trade Balance',
+                      plotOutput('balance')
+                      ),
+             tabPanel('Export Volume',
+                      plotOutput('exp_volume')
+                      ),
+             tabPanel('Import Volume',
+                      plotOutput('imp_volume')
+                      )
+             )
+           )
 
 # Define server logic 
 server <- function(input, output, session) {
