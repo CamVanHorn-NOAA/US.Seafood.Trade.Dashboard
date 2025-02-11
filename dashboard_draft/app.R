@@ -185,15 +185,16 @@ ui <- fluidPage(
                          'Salmon', 'Scallops', 'Shrimp', 'Tuna')
            ),
   tabsetPanel(
-             tabPanel('Trade Balance',
+             tabPanel('Trade Balance (Value)',
                       plotOutput('balance')
                       ),
-             tabPanel('Export Volume',
-                      plotOutput('exp_volume')
+             tabPanel('Trade Volume',
+                      fluidRow(
+                        plotOutput('exp_volume')
                       ),
-             tabPanel('Import Volume',
-                      plotOutput('imp_volume')
-                      )
+                      fluidRow(
+                        plotOutput('imp_volume')
+                      )),
              )
            )
 
@@ -201,15 +202,18 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   output$balance <- renderPlot({
+    req(input$species != '')
     plot_trade(summarize_yr_spp(trade_data, input$species), 'BALANCE')
   })
   
   output$exp_volume <- renderPlot({
+    req(input$species != '')
     plot_trade(summarize_yr_spp(trade_data, input$species), 'VOLUME', 
                export = T)
   })
   
   output$imp_volume <- renderPlot({
+    req(input$species != '')
     plot_trade(summarize_yr_spp(trade_data, input$species), 'VOLUME',
                import = T)
   })
