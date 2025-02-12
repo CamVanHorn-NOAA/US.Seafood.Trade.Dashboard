@@ -133,10 +133,8 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
 # read csv of Species metadata
-species_metadata <- read.csv('Assessment_Summary_Data.csv') %>%
-  rename_with( ~ toupper(gsub('.', '_', .x, fixed = T))) %>%
-  rename(TSN = ITIS_TAXON_SERIAL_NUMBER) %>%
-  mutate(COMMON_NAME = toupper(COMMON_NAME))
+pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
+  select(!X)
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
