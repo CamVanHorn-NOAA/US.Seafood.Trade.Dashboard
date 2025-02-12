@@ -12,7 +12,7 @@
 
 # Load Packages ----------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
-if(!require("dplyr"))   install.packages("dplyr")
+if(!require("tidyverse"))   install.packages("tidyverse")
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
@@ -182,7 +182,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref', 'foss_com_landings', 'species_metadata'),
+              'species_ref', 'foss_com_landings', 'pp_landings_map'),
      file = file_name)
 
 # upload to google drive
