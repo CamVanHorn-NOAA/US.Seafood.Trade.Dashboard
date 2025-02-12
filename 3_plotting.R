@@ -1835,11 +1835,21 @@ crab_hi <- plot_hi(crab_hi_data)
 # View the plot
 crab_hi
 
-##########################################
-##### NET EXPORTS TO TOP 5 COUNTRIES #####
-##########################################
+#############################
+##### PRODUCTION VOLUME #####
+#############################
+# Data filtering function ------------------------------------------------------
+summarize_pp_yr_spp <- function(product_data, species) {
+  product_data %>%
+    filter(str_detect(SPECIES, species)) %>%
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    group_by(YEAR, PRODUCT_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(MT = KG / 1000,
+           BILLIONS_2024USD = DOLLARS_2024 / 1000000000)
+}
 # TODOS ------------------------------------------------------------------------
-# TODO: Production Volume
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
 # TODO: Net exports to top 5 countries
