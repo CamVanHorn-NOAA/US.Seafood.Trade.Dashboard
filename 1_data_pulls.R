@@ -12,7 +12,7 @@
 
 # Load Packages ----------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
-if(!require("dplyr"))   install.packages("dplyr")
+if(!require("tidyverse"))   install.packages("tidyverse")
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
@@ -51,7 +51,7 @@ drive_auth()
 #                overwrite = T)
 # drive_download('foss_com_landings_15-23.csv',
 #                overwrite = T)
-# drive_download('Assessment_Summary_Data.csv',
+# drive_download('pp_com_landings_mapping.csv',
 #                overwrite = T)
 
 ##################################
@@ -133,10 +133,8 @@ foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
 foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
 
 # read csv of Species metadata
-species_metadata <- read.csv('Assessment_Summary_Data.csv') %>%
-  rename_with( ~ toupper(gsub('.', '_', .x, fixed = T))) %>%
-  rename(TSN = ITIS_TAXON_SERIAL_NUMBER) %>%
-  mutate(COMMON_NAME = toupper(COMMON_NAME))
+pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
+  select(!X)
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
@@ -184,7 +182,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref', 'foss_com_landings', 'species_metadata'),
+              'species_ref', 'foss_com_landings', 'pp_landings_map'),
      file = file_name)
 
 # upload to google drive

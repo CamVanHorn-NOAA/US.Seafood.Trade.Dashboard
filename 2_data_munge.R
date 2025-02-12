@@ -194,6 +194,16 @@ pp_data <- foss_pp %>%
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
   select(-INDEX)
 
+# Commercial Landings ----------------------------------------------------------
+# Data formatting
+com_landings <- foss_com_landings %>%
+  mutate(YEAR = as.numeric(YEAR),
+         POUNDS = as.numeric(gsub(',', '', POUNDS)),
+         METRIC_TONS = as.numeric(gsub(',', '', METRIC_TONS)),
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
+         TSN = as.numeric(TSN)) %>%
+  # connect only SPECIES from processed products data to enable later joining
+  left_join(pp_landings_map)
 
 #####################
 ### SAVE THE DATA ###
@@ -206,7 +216,7 @@ file_name <- paste0('seafood_trade_data_munge_',
 
 # create the file
 # NOTE: add new data to this list upon creation in this script
-save(list = c('trade_data', 'pp_data'),
+save(list = c('trade_data', 'pp_data', 'com_landings'),
      file = file_name)
 
 # upload to google drive
