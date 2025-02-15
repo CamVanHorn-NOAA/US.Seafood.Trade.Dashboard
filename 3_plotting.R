@@ -1953,6 +1953,16 @@ salmon_pp <- plot_spp_pp(salmon_pp_data, 'Salmon')
 # View the plot
 salmon_pp
 
+# Tuna (all) -------------------------------------------------------------------
+# Make the data
+tuna_pp_data <- summarize_pp_yr_spp(pp_data, 'TUNA')
+
+# Plot the data
+tuna_pp <- plot_spp_pp(tuna_pp_data, 'Tuna')
+
+# View the plot
+tuna_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
