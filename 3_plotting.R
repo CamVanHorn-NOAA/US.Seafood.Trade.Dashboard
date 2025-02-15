@@ -1876,6 +1876,73 @@ names(colors) <- levels(factor(levels = c(
   'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
   'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
 
+# Plot function ----------------------------------------------------------------
+# the function operates in parts
+  # first: identify product conditions that are rare 
+    # the purpose here is to condense them into the already present condition
+      # 'other' (which we relabel with an asterisk) to reduce clutter in plot
+  # second: apply this nomenclature change to rare product conditions in a 
+    # new dataset 
+  # third: calculate aggregate volume processed per year per species so that
+    # we can have species-specific ylimits embedded in the function
+  # fourth: create the plot
+plot_spp_pp <- function(processed_product_data, species) {
+  # processed_product_data is the dataset created by summarize_pp_yr_spp
+  # species is a string of the species we are visualizing
+  
+  low_prop_types <- processed_product_data %>%
+    select(MT, PRODUCT_NAME) %>%
+    group_by(PRODUCT_NAME) %>%
+    # aggregate the total volume per product condition
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # calculate the proportion of total volume for each product condition
+    mutate(TOTAL_VOLUME = sum(MT),
+           VOLUME_SHARE = MT / TOTAL_VOLUME) %>%
+    # retain production conditions who occupy less than 2% of total production
+    filter(VOLUME_SHARE < 0.02) %>%
+    # pull() returns the values as a vector
+    pull(PRODUCT_NAME)
+  
+  new_data <- processed_product_data %>%
+    # rename low proportion conditions and 'OTHER' as 'OTHER*'
+    # the * denotes that these are special conditions
+    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                 'OTHER*', PRODUCT_NAME)) %>%
+    # set PRODUCT_NAME as a factor for the plot
+    # convert to thousand metric tons 
+    mutate(PRODUCT_NAME = factor(PRODUCT_NAME),
+           THOUSAND_MT = MT / 1000)
+  
+  # find max production volume for any given year
+  yr_volume <- new_data %>%
+    select(YEAR, THOUSAND_MT) %>%
+    group_by(YEAR) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') 
+  
+  plot <- ggplot(data = new_data,
+                 aes(x = factor(YEAR),
+                     y = THOUSAND_MT,
+                     fill = PRODUCT_NAME)) +
+    geom_col(position = 'stack') +
+    scale_fill_manual(values = colors,
+                      name = 'Product Condition') +
+    labs(x = '',
+         y = 'Volume (Thousand Metric Tons)',
+         fill = 'Product Condition',
+         title = paste0('Domestic Processed ', species, ' Products')) +
+    # set the max y-limit as 10 more than the greatest volume per year
+    scale_y_continuous(limits = c(0, max(yr_volume$THOUSAND_MT) + 10), 
+                       expand = c(0, 0)) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
+          legend.title = element_text(size = 15))
+  
+}
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
