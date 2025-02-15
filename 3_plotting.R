@@ -1993,6 +1993,16 @@ shrimp_pp <- plot_spp_pp(shrimp_pp_data, 'Shrimp')
 # View the plot
 shrimp_pp
 
+# Scallops (all) ---------------------------------------------------------------
+# Make the data
+scallop_pp_data <- summarize_pp_yr_spp(pp_data, 'SCALLOPS')
+
+# Plot the data
+scallop_pp <- plot_spp_pp(scallop_pp_data, 'Scallop')
+
+# View the plot
+scallop_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
