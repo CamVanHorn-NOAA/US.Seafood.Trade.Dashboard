@@ -13,6 +13,8 @@ if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
 if(!require("scales")) install.packages("scales")
 if(!require("ggh4x")) install.packages("ggh4x")
+if(!require("RColorBrewer")) install.packages("RColorBrewer")
+if(!require("nmfspalette")) install.packages("nmfspalette")
 
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
