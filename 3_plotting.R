@@ -1860,6 +1860,22 @@ summarize_pp_yr_spp <- function(product_data, species) {
     mutate(MT = KG / 1000,
            BILLIONS_2024USD = DOLLARS_2024 / 1000000000)
 }
+
+# Set Colors for Plot ----------------------------------------------------------
+# use colors provided by packages 'nmfspalettes'
+colors <- c(nmfs_palettes[['coral']][6:3], 
+            nmfs_palettes[['waves']][6:2], 
+            nmfs_palettes[['crustacean']][c(6, 4, 2)],
+            nmfs_colors[42:39])
+
+# the names specified below will track to PRODUCT_NAME in data
+# They are organized here in the same order and line as 'colors' above
+names(colors) <- levels(factor(levels = c(
+  'FILLETS', 'STEAKS', 'SURIMI', 'SHUCKED MEATS',
+  'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
+  'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
+  'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
