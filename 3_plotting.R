@@ -1943,6 +1943,16 @@ plot_spp_pp <- function(processed_product_data, species) {
   
 }
 
+# Salmon (all) -----------------------------------------------------------------
+# Make the data
+salmon_pp_data <- summarize_pp_yr_spp(pp_data, 'SALMON')
+
+# Plot the data
+salmon_pp <- plot_spp_pp(salmon_pp_data, 'Salmon')
+
+# View the plot
+salmon_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
