@@ -1963,6 +1963,16 @@ tuna_pp <- plot_spp_pp(tuna_pp_data, 'Tuna')
 # View the plot
 tuna_pp
 
+# Cod (all) --------------------------------------------------------------------
+# Make the data
+cod_pp_data <- summarize_pp_yr_spp(pp_data, 'COD')
+
+# Plot the data
+cod_pp <- plot_spp_pp(cod_pp_data, 'Cod')
+
+# View the plot
+cod_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
