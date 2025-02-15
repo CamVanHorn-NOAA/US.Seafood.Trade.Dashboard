@@ -1983,6 +1983,16 @@ pollock_pp <- plot_spp_pp(pollock_pp_data, 'Pollock')
 # View the plot
 pollock_pp
 
+# Shrimp (all) -----------------------------------------------------------------
+# Make the data
+shrimp_pp_data <- summarize_pp_yr_spp(pp_data, 'SHRIMP')
+
+# Plot the data
+shrimp_pp <- plot_spp_pp(shrimp_pp_data, 'Shrimp')
+
+# View the plot
+shrimp_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
