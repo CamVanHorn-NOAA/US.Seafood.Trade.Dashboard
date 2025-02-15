@@ -2003,6 +2003,16 @@ scallop_pp <- plot_spp_pp(scallop_pp_data, 'Scallop')
 # View the plot
 scallop_pp
 
+# Lobsters (all) ---------------------------------------------------------------
+# Make the data
+lobster_pp_data <- summarize_pp_yr_spp(pp_data, 'LOBSTER')
+
+# Plot the data
+lobster_pp <- plot_spp_pp(lobster_pp_data, 'Lobster')
+
+# View the plot
+lobster_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
