@@ -2013,6 +2013,16 @@ lobster_pp <- plot_spp_pp(lobster_pp_data, 'Lobster')
 # View the plot
 lobster_pp
 
+# Crabs (all) ------------------------------------------------------------------
+# Make the data
+crab_pp_data <- summarize_pp_yr_spp(pp_data, 'CRAB')
+
+# Plot the data
+crab_pp <- plot_spp_pp(crab_pp_data, 'Crab')
+
+# View the plot
+crab_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
