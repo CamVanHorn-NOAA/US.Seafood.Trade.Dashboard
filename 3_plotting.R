@@ -1973,6 +1973,16 @@ cod_pp <- plot_spp_pp(cod_pp_data, 'Cod')
 # View the plot
 cod_pp
 
+# Pollock (all) ----------------------------------------------------------------
+# Make the data
+pollock_pp_data <- summarize_pp_yr_spp(pp_data, 'POLLOCK')
+
+# Plot the data
+pollock_pp <- plot_spp_pp(pollock_pp_data, 'Pollock')
+
+# View the plot
+pollock_pp
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
