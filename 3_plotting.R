@@ -1856,27 +1856,6 @@ crab_hi
 #############################
 ##### PRODUCTION VOLUME #####
 #############################
-# Data filtering function ------------------------------------------------------
-# The function's purpose is to simply summarize data from FOSS's Processed 
-  # Products dataset by year
-summarize_pp_yr_spp <- function(product_data, species) {
-  # product_data is FOSS Processed Products data formatted in script 2
-  # species is a string for the species of interest
-  product_data %>%
-    # because processed product 'SPECIES' can be specific, only extract rows
-      # whose SPECIES string includes that specified in 'species' call
-    filter(str_detect(SPECIES, species)) %>%
-    # retain only columns of interest
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
-    # sum volume and value by product condition (PRODUCT_NAME) through time
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    # format value and volume to a higher magnitude value 
-    mutate(MT = KG / 1000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000)
-}
-
 # Set Colors for Plot ----------------------------------------------------------
 # use colors provided by packages 'nmfspalettes'
 colors <- c(nmfs_palette('coral')(6)[6:3], 
