@@ -5,9 +5,9 @@
 #          cameron.vanhorn@noaa.gov
 
 # TODO: get nmfspalette package installed (must be on govt machine)
-#############################
-##### PACKAGES AND DATA #####
-#############################
+############################
+###' *PACKAGES AND DATA* ###
+############################
 # Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
@@ -52,9 +52,9 @@ save_plot <- function(plot) {
          height = 6)
 }
 
-#############################
-##### GENERAL SUMMARIES #####
-#############################
+############################
+###' *GENERAL SUMMARIES* ###
+############################
 # Data formatting (Trade data by year) -----------------------------------------
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
@@ -453,9 +453,9 @@ save_plot(pp_price_yr)
   # compare top product types sold by volume through time
   # compare top product types sold by value through time
 
-###############################
-##### SPECIES GROUP TRADE #####
-###############################
+############################
+###' *SUMMARY FUNCTIONS* ###
+############################
 # We are interested in evaluating some of the metrics calculated above with 
   # respect to specific species of interest
 # Due to many species being available in our trade data, it is best to 
