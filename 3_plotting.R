@@ -523,7 +523,7 @@ filter_species <- function(trade_table, species_name) {
   # but not summarized
 # The function summarizes data grouped by year and species group, and requires
   # the input data to be trade_data, or formatted similarly to such
-summarize_yr_spp <- function(trade_table, species_name) {
+summarize_trade_yr_spp <- function(trade_table, species_name) {
   # trade_table is a data frame, either trade_data provided in script 2 or
     # another data frame with comparable nomenclature and purpose
   # species_name is a vector of class character and should not be specific
@@ -724,7 +724,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 
 # Salmon (all) -----------------------------------------------------------------
 # Format the data
-salmon_data <- summarize_yr_spp(trade_data, 'SALMON')
+salmon_data <- summarize_trade_yr_spp(trade_data, 'SALMON')
 
 ### Exports
 # Plot Value
@@ -794,7 +794,7 @@ save_plot(salmon_balance_yr)
 
 # Tuna (all) -------------------------------------------------------------------
 # Format the data
-tuna_data <- summarize_yr_spp(trade_data, 'TUNA')
+tuna_data <- summarize_trade_yr_spp(trade_data, 'TUNA')
 
 ### Exports
 # Plot Value
@@ -864,7 +864,7 @@ save_plot(tuna_balance_yr)
 
 # Cod (all) --------------------------------------------------------------------
 # Format the data
-cod_data <- summarize_yr_spp(trade_data, 'COD')
+cod_data <- summarize_trade_yr_spp(trade_data, 'COD')
 
 ### Exports
 # Plot Value
@@ -934,7 +934,7 @@ save_plot(cod_balance_yr)
 
 # Pollock (all) ----------------------------------------------------------------
 # Format the data
-pollock_data <- summarize_yr_spp(trade_data, 'POLLOCK')
+pollock_data <- summarize_trade_yr_spp(trade_data, 'POLLOCK')
 
 ### Exports
 # Plot Value
@@ -1005,7 +1005,7 @@ save_plot(pollock_balance_yr)
 
 # Shrimp (all) -----------------------------------------------------------------
 # Format the data
-shrimp_data <- summarize_yr_spp(trade_data, 'SHRIMP')
+shrimp_data <- summarize_trade_yr_spp(trade_data, 'SHRIMP')
 
 ### Exports
 # Plot Value
@@ -1075,7 +1075,7 @@ save_plot(shrimp_balance_yr)
 
 # Scallops (all) ---------------------------------------------------------------
 # Format the data
-scallop_data <- summarize_yr_spp(trade_data, 'SCALLOPS')
+scallop_data <- summarize_trade_yr_spp(trade_data, 'SCALLOPS')
 
 ### Exports
 # Plot Value
@@ -1148,7 +1148,6 @@ save_plot(scallop_balance_yr)
 # Format the data
 # NOTE: 'LOBSTER' yields an unspecified subset of lobster data
 #       'LOBSTERS' includes all lobster trade data
-lobster_data <- summarize_yr_spp(trade_data, 'LOBSTERS') 
 
 ### Exports
 # Plot Value
@@ -1219,7 +1218,7 @@ save_plot(lobster_balance_yr)
 
 # Crabs (all) ------------------------------------------------------------------
 # Format the data
-crab_data <- summarize_yr_spp(trade_data, 'CRABS')
+crab_data <- summarize_trade_yr_spp(trade_data, 'CRABS')
 
 ### Exports
 # Plot Value
