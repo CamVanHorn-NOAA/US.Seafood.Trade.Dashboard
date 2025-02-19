@@ -580,7 +580,9 @@ summarize_trade_yr_spp <- function(trade_table, species_name) {
            EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000) %>%
+    # rename group column to species for ease of joining
+    rename(SPECIES = !!which_group)
   
   return(summarized_data)
 }
@@ -596,14 +598,15 @@ summarize_pp_yr_spp <- function(product_data, species) {
     # whose SPECIES string includes that specified in 'species' call
     filter(str_detect(SPECIES, species)) %>%
     # retain only columns of interest
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    select(YEAR, SPECIES, PRODUCT_NAME, KG, DOLLARS_2024) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     # sum volume and value by product condition (PRODUCT_NAME) through time
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     # format value and volume to a higher magnitude value 
     mutate(MT = KG / 1000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
+           BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
+           SPECIES = species) %>%
     # rename columns for data type
     rename(PP_VOLUME_MT = MT,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
