@@ -52,6 +52,9 @@ save_plot <- function(plot) {
          height = 6)
 }
 
+#############################
+##### GENERAL SUMMARIES #####
+#############################
 # Data formatting (Trade data by year) -----------------------------------------
 # Aggregate trade data by year
 trade_data_yr <- trade_data %>%
@@ -80,20 +83,6 @@ trade_data_yr <- trade_data %>%
          EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
          IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
 
-# Data formatting (Processed products) -----------------------------------------
-# Aggregate processed products by year
-pp_data_yr <- pp_data %>%
-  select(YEAR, KG, DOLLARS_2024, DOLLARS_2024_PER_KG) %>%
-  group_by(YEAR) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups = 'drop') %>%
-  mutate(MT = KG / 1000,
-         DOLLARS_2024_BILLIONS = DOLLARS_2024 / 1000000000,
-         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG)
-  
-###################
-##### EXPORTS #####
-###################
 # Comparing Export Value through time (Real 2024 USD) --------------------------
 # Make the plot
 exp_value_yr <- 
@@ -165,9 +154,6 @@ save_plot(exp_price_yr)
   # Comparing export value/volume/price by customs district
   # Comparing export value/volume/price by country
   
-###################
-##### IMPORTS #####
-###################
 # Comparing Import value through time (Real 2024 USD) --------------------------
 # Make the plot
 imp_value_yr <- 
@@ -237,9 +223,6 @@ save_plot(imp_price_yr)
   # comparing import value/volume/price by customs district
   # Comparing import value/volume/price by country
 
-##########################
-##### TRADE BALANCES #####
-##########################
 # Comparing value balance through time (Real 2024 USD) -------------------------
 # Format the data
 # We need the data formatted such that there are factored groups of imports,
@@ -388,9 +371,17 @@ save_plot(price_balance_yr)
   # comparing value/volume/price balance by customs district
   # comparing value/volume/price balance by country 
 
-##############################
-##### PROCESSED PRODUCTS #####
-##############################
+# Data formatting (Processed products) -----------------------------------------
+# Aggregate processed products by year
+pp_data_yr <- pp_data %>%
+  select(YEAR, KG, DOLLARS_2024, DOLLARS_2024_PER_KG) %>%
+  group_by(YEAR) %>%
+  summarise(across(where(is.numeric), sum),
+            .groups = 'drop') %>%
+  mutate(MT = KG / 1000,
+         DOLLARS_2024_BILLIONS = DOLLARS_2024 / 1000000000,
+         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG)
+
 # Compare Value of domestic processed products through time --------------------
 # Make the plot
 pp_value_yr <- 
