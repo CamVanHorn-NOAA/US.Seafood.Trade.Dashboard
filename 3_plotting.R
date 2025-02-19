@@ -461,7 +461,7 @@ save_plot(pp_price_yr)
 # Due to many species being available in our trade data, it is best to 
   # create generic functions to filter the data for a given species and 
   # plot the species-specific data
-# Data filtering function ------------------------------------------------------
+# Species filtering function ---------------------------------------------------
 # The below function is meant to work within dplyr pipes, specifically those
   # used in this script that incorporate our trade data, not processed products
 # The output of this function is the trade_table filtered for the specified
@@ -517,7 +517,7 @@ filter_species <- function(trade_table, species_name) {
 }
 
 
-# Data summarizing function ----------------------------------------------------
+# Trade data summarizing function ----------------------------------------------
 # The below function works in tandem with the filter_species fxn above
 # These functions are separate in case of interest in viewing the data filtered
   # but not summarized
@@ -584,6 +584,32 @@ summarize_trade_yr_spp <- function(trade_table, species_name) {
   
   return(summarized_data)
 }
+
+# Processed Product Data summarizing function ----------------------------------
+# The function's purpose is to simply summarize data from FOSS's Processed 
+# Products dataset by year
+summarize_pp_yr_spp <- function(product_data, species) {
+  # product_data is FOSS Processed Products data formatted in script 2
+  # species is a string for the species of interest
+  product_data %>%
+    # because processed product 'SPECIES' can be specific, only extract rows
+    # whose SPECIES string includes that specified in 'species' call
+    filter(str_detect(SPECIES, species)) %>%
+    # retain only columns of interest
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    group_by(YEAR, PRODUCT_NAME) %>%
+    # sum volume and value by product condition (PRODUCT_NAME) through time
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    # format value and volume to a higher magnitude value 
+    mutate(MT = KG / 1000,
+           BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
+    # rename columns for data type
+    rename(PP_VOLUME_MT = MT,
+           PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
+}
+
+# Commercial Landings Data filtering function ----------------------------------
 
 # Plot function ----------------------------------------------------------------
 # Because there are several species that the U.S. imports and exports, it is
