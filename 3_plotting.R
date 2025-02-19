@@ -1174,6 +1174,7 @@ save_plot(scallop_balance_yr)
 # Format the data
 # NOTE: 'LOBSTER' yields an unspecified subset of lobster data
 #       'LOBSTERS' includes all lobster trade data
+lobster_data <- summarize_trade_yr_spp(trade_data, 'LOBSTERS') 
 
 ### Exports
 # Plot Value
