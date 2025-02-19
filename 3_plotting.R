@@ -1854,10 +1854,10 @@ summarize_pp_yr_spp <- function(product_data, species) {
 
 # Set Colors for Plot ----------------------------------------------------------
 # use colors provided by packages 'nmfspalettes'
-colors <- c(nmfs_palettes[['coral']][6:3], 
-            nmfs_palettes[['waves']][6:2], 
-            nmfs_palettes[['crustacean']][c(6, 4, 2)],
-            nmfs_colors[42:39])
+colors <- c(nmfs_palette('coral')(6)[6:3], 
+            nmfs_palette('waves')(6)[6:2], 
+            nmfs_palette('crustacean')(6)[c(6, 4, 2)],
+            nmfs_cols()[42:39])
 
 # the names specified below will track to PRODUCT_NAME in data
 # They are organized here in the same order and line as 'colors' above
