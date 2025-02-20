@@ -652,6 +652,9 @@ summarize_yr_spp <- function(species) {
   return(combined_data)
 }
 
+##########################
+###' *PLOT TRADE DATA* ###
+##########################
 # Plot function ----------------------------------------------------------------
 # Because there are several species that the U.S. imports and exports, it is
   # useful to automate visualizing these trade metrics
@@ -791,11 +794,11 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 
 # Salmon (all) -----------------------------------------------------------------
 # Format the data
-salmon_data <- summarize_trade_yr_spp(trade_data, 'SALMON')
+salmon_trade_data <- summarize_trade_yr_spp(trade_data, 'SALMON')
 
 ### Exports
 # Plot Value
-salmon_exp_value_yr <- plot_trade(salmon_data, 'value', export = T)
+salmon_exp_value_yr <- plot_trade(salmon_trade_data, 'value', export = T)
 
 # View plot
 salmon_exp_value_yr
@@ -804,7 +807,7 @@ salmon_exp_value_yr
 save_plot(salmon_exp_value_yr)
 
 # Plot Volume
-salmon_exp_volume_yr <- plot_trade(salmon_data, 'volume', export = T)
+salmon_exp_volume_yr <- plot_trade(salmon_trade_data, 'volume', export = T)
 
 # View plot
 salmon_exp_volume_yr
@@ -813,7 +816,7 @@ salmon_exp_volume_yr
 save_plot(salmon_exp_volume_yr)
 
 # Plot Price
-salmon_exp_price_yr <- plot_trade(salmon_data, 'price', export = T)
+salmon_exp_price_yr <- plot_trade(salmon_trade_data, 'price', export = T)
 
 # View plot
 salmon_exp_price_yr
@@ -823,7 +826,7 @@ save_plot(salmon_exp_price_yr)
 
 ### Imports
 # Plot Value
-salmon_imp_value_yr <- plot_trade(salmon_data, 'value', import = T)
+salmon_imp_value_yr <- plot_trade(salmon_trade_data, 'value', import = T)
 
 # View plot
 salmon_imp_value_yr
@@ -832,7 +835,7 @@ salmon_imp_value_yr
 save_plot(salmon_imp_value_yr)
 
 # Plot Volume
-salmon_imp_volume_yr <- plot_trade(salmon_data, 'volume', import = T)
+salmon_imp_volume_yr <- plot_trade(salmon_trade_data, 'volume', import = T)
 
 # View plot
 salmon_imp_volume_yr
@@ -841,7 +844,7 @@ salmon_imp_volume_yr
 save_plot(salmon_imp_volume_yr)
 
 # Plot Price
-salmon_imp_price_yr <- plot_trade(salmon_data, 'price', import = T)
+salmon_imp_price_yr <- plot_trade(salmon_trade_data, 'price', import = T)
 
 # View plot
 salmon_imp_price_yr
@@ -851,7 +854,7 @@ save_plot(salmon_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-salmon_balance_yr <- plot_trade(salmon_data, 'balance')
+salmon_balance_yr <- plot_trade(salmon_trade_data, 'balance')
 
 # View plot
 salmon_balance_yr
@@ -861,11 +864,11 @@ save_plot(salmon_balance_yr)
 
 # Tuna (all) -------------------------------------------------------------------
 # Format the data
-tuna_data <- summarize_trade_yr_spp(trade_data, 'TUNA')
+tuna_trade_data <- summarize_trade_yr_spp(trade_data, 'TUNA')
 
 ### Exports
 # Plot Value
-tuna_exp_value_yr <- plot_trade(tuna_data, 'value', export = T)
+tuna_exp_value_yr <- plot_trade(tuna_trade_data, 'value', export = T)
 
 # View plot
 tuna_exp_value_yr
@@ -874,7 +877,7 @@ tuna_exp_value_yr
 save_plot(tuna_exp_value_yr)
 
 # Plot Volume
-tuna_exp_volume_yr <- plot_trade(tuna_data, 'volume', export = T)
+tuna_exp_volume_yr <- plot_trade(tuna_trade_data, 'volume', export = T)
 
 # View plot
 tuna_exp_volume_yr
@@ -883,7 +886,7 @@ tuna_exp_volume_yr
 save_plot(tuna_exp_volume_yr)
 
 # Plot Price
-tuna_exp_price_yr <- plot_trade(tuna_data, 'price', export = T)
+tuna_exp_price_yr <- plot_trade(tuna_trade_data, 'price', export = T)
 
 # View plot
 tuna_exp_price_yr
@@ -893,7 +896,7 @@ save_plot(tuna_exp_price_yr)
 
 ### Imports
 # Plot Value
-tuna_imp_value_yr <- plot_trade(tuna_data, 'value', import = T)
+tuna_imp_value_yr <- plot_trade(tuna_trade_data, 'value', import = T)
 
 # View plot
 tuna_imp_value_yr
@@ -902,7 +905,7 @@ tuna_imp_value_yr
 save_plot(tuna_imp_value_yr)
 
 # Plot Volume
-tuna_imp_volume_yr <- plot_trade(tuna_data, 'volume', import = T)
+tuna_imp_volume_yr <- plot_trade(tuna_trade_data, 'volume', import = T)
 
 # View plot
 tuna_imp_volume_yr
@@ -911,7 +914,7 @@ tuna_imp_volume_yr
 save_plot(tuna_imp_volume_yr)
 
 # Plot Price
-tuna_imp_price_yr <- plot_trade(tuna_data, 'price', import = T)
+tuna_imp_price_yr <- plot_trade(tuna_trade_data, 'price', import = T)
 
 # View plot
 tuna_imp_price_yr
@@ -921,7 +924,7 @@ save_plot(tuna_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-tuna_balance_yr <- plot_trade(tuna_data, 'balance')
+tuna_balance_yr <- plot_trade(tuna_trade_data, 'balance')
 
 # View plot
 tuna_balance_yr
@@ -931,11 +934,11 @@ save_plot(tuna_balance_yr)
 
 # Cod (all) --------------------------------------------------------------------
 # Format the data
-cod_data <- summarize_trade_yr_spp(trade_data, 'COD')
+cod_trade_data <- summarize_trade_yr_spp(trade_data, 'COD')
 
 ### Exports
 # Plot Value
-cod_exp_value_yr <- plot_trade(cod_data, 'value', export = T)
+cod_exp_value_yr <- plot_trade(cod_trade_data, 'value', export = T)
 
 # View plot
 cod_exp_value_yr
@@ -944,7 +947,7 @@ cod_exp_value_yr
 save_plot(cod_exp_value_yr)
 
 # Plot Volume
-cod_exp_volume_yr <- plot_trade(cod_data, 'volume', export = T)
+cod_exp_volume_yr <- plot_trade(cod_trade_data, 'volume', export = T)
 
 # View plot
 cod_exp_volume_yr
@@ -953,7 +956,7 @@ cod_exp_volume_yr
 save_plot(cod_exp_volume_yr)
 
 # Plot Price
-cod_exp_price_yr <- plot_trade(cod_data, 'price', export = T)
+cod_exp_price_yr <- plot_trade(cod_trade_data, 'price', export = T)
 
 # View plot
 cod_exp_price_yr
@@ -963,7 +966,7 @@ save_plot(cod_exp_price_yr)
 
 ### Imports
 # Plot Value
-cod_imp_value_yr <- plot_trade(cod_data, 'value', import = T)
+cod_imp_value_yr <- plot_trade(cod_trade_data, 'value', import = T)
 
 # View plot
 cod_imp_value_yr
@@ -972,7 +975,7 @@ cod_imp_value_yr
 save_plot(cod_imp_value_yr)
 
 # Plot Volume
-cod_imp_volume_yr <- plot_trade(cod_data, 'volume', import = T)
+cod_imp_volume_yr <- plot_trade(cod_trade_data, 'volume', import = T)
 
 # View plot
 cod_imp_volume_yr
@@ -981,7 +984,7 @@ cod_imp_volume_yr
 save_plot(cod_imp_volume_yr)
 
 # Plot Price
-cod_imp_price_yr <- plot_trade(cod_data, 'price', import = T)
+cod_imp_price_yr <- plot_trade(cod_trade_data, 'price', import = T)
 
 # View plot
 cod_imp_price_yr
@@ -991,7 +994,7 @@ save_plot(cod_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-cod_balance_yr <- plot_trade(cod_data, 'balance')
+cod_balance_yr <- plot_trade(cod_trade_data, 'balance')
 
 # View plot
 cod_balance_yr
@@ -1001,11 +1004,11 @@ save_plot(cod_balance_yr)
 
 # Pollock (all) ----------------------------------------------------------------
 # Format the data
-pollock_data <- summarize_trade_yr_spp(trade_data, 'POLLOCK')
+pollock_trade_data <- summarize_trade_yr_spp(trade_data, 'POLLOCK')
 
 ### Exports
 # Plot Value
-pollock_exp_value_yr <- plot_trade(pollock_data, 'value', export = T)
+pollock_exp_value_yr <- plot_trade(pollock_trade_data, 'value', export = T)
 
 # View plot
 pollock_exp_value_yr
@@ -1014,7 +1017,7 @@ pollock_exp_value_yr
 save_plot(pollock_exp_value_yr)
 
 # Plot Volume
-pollock_exp_volume_yr <- plot_trade(pollock_data, 'volume', export = T)
+pollock_exp_volume_yr <- plot_trade(pollock_trade_data, 'volume', export = T)
 
 # View plot
 pollock_exp_volume_yr
@@ -1023,7 +1026,7 @@ pollock_exp_volume_yr
 save_plot(pollock_exp_volume_yr)
 
 # Plot Price
-pollock_exp_price_yr <- plot_trade(pollock_data, 'price', export = T)
+pollock_exp_price_yr <- plot_trade(pollock_trade_data, 'price', export = T)
 
 # View plot
 pollock_exp_price_yr
@@ -1033,7 +1036,7 @@ save_plot(pollock_exp_price_yr)
 
 ### Imports
 # Plot Value
-pollock_imp_value_yr <- plot_trade(pollock_data, 'value', import = T)
+pollock_imp_value_yr <- plot_trade(pollock_trade_data, 'value', import = T)
 
 # View plot
 pollock_imp_value_yr
@@ -1042,7 +1045,7 @@ pollock_imp_value_yr
 save_plot(pollock_imp_value_yr)
 
 # Plot Volume
-pollock_imp_volume_yr <- plot_trade(pollock_data, 'volume', import = T)
+pollock_imp_volume_yr <- plot_trade(pollock_trade_data, 'volume', import = T)
 
 # View plot
 pollock_imp_volume_yr
@@ -1051,7 +1054,7 @@ pollock_imp_volume_yr
 save_plot(pollock_imp_volume_yr)
 
 # Plot Price
-pollock_imp_price_yr <- plot_trade(pollock_data, 'price', import = T)
+pollock_imp_price_yr <- plot_trade(pollock_trade_data, 'price', import = T)
 
 # View plot
 pollock_imp_price_yr
@@ -1061,7 +1064,7 @@ save_plot(pollock_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-pollock_balance_yr <- plot_trade(pollock_data, 'balance')
+pollock_balance_yr <- plot_trade(pollock_trade_data, 'balance')
 
 # View plot
 pollock_balance_yr
@@ -1072,11 +1075,11 @@ save_plot(pollock_balance_yr)
 
 # Shrimp (all) -----------------------------------------------------------------
 # Format the data
-shrimp_data <- summarize_trade_yr_spp(trade_data, 'SHRIMP')
+shrimp_trade_data <- summarize_trade_yr_spp(trade_data, 'SHRIMP')
 
 ### Exports
 # Plot Value
-shrimp_exp_value_yr <- plot_trade(shrimp_data, 'value', export = T)
+shrimp_exp_value_yr <- plot_trade(shrimp_trade_data, 'value', export = T)
 
 # View plot
 shrimp_exp_value_yr
@@ -1085,7 +1088,7 @@ shrimp_exp_value_yr
 save_plot(shrimp_exp_value_yr)
 
 # Plot Volume
-shrimp_exp_volume_yr <- plot_trade(shrimp_data, 'volume', export = T)
+shrimp_exp_volume_yr <- plot_trade(shrimp_trade_data, 'volume', export = T)
 
 # View plot
 shrimp_exp_volume_yr
@@ -1094,7 +1097,7 @@ shrimp_exp_volume_yr
 save_plot(shrimp_exp_volume_yr)
 
 # Plot Price
-shrimp_exp_price_yr <- plot_trade(shrimp_data, 'price', export = T)
+shrimp_exp_price_yr <- plot_trade(shrimp_trade_data, 'price', export = T)
 
 # View plot
 shrimp_exp_price_yr
@@ -1104,7 +1107,7 @@ save_plot(shrimp_exp_price_yr)
 
 ### Imports
 # Plot Value
-shrimp_imp_value_yr <- plot_trade(shrimp_data, 'value', import = T)
+shrimp_imp_value_yr <- plot_trade(shrimp_trade_data, 'value', import = T)
 
 # View plot
 shrimp_imp_value_yr
@@ -1113,7 +1116,7 @@ shrimp_imp_value_yr
 save_plot(shrimp_imp_value_yr)
 
 # Plot Volume
-shrimp_imp_volume_yr <- plot_trade(shrimp_data, 'volume', import = T)
+shrimp_imp_volume_yr <- plot_trade(shrimp_trade_data, 'volume', import = T)
 
 # View plot
 shrimp_imp_volume_yr
@@ -1122,7 +1125,7 @@ shrimp_imp_volume_yr
 save_plot(shrimp_imp_volume_yr)
 
 # Plot Price
-shrimp_imp_price_yr <- plot_trade(shrimp_data, 'price', import = T)
+shrimp_imp_price_yr <- plot_trade(shrimp_trade_data, 'price', import = T)
 
 # View plot
 shrimp_imp_price_yr
@@ -1132,7 +1135,7 @@ save_plot(shrimp_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-shrimp_balance_yr <- plot_trade(shrimp_data, 'balance')
+shrimp_balance_yr <- plot_trade(shrimp_trade_data, 'balance')
 
 # View plot
 shrimp_balance_yr
@@ -1142,11 +1145,11 @@ save_plot(shrimp_balance_yr)
 
 # Scallops (all) ---------------------------------------------------------------
 # Format the data
-scallop_data <- summarize_trade_yr_spp(trade_data, 'SCALLOPS')
+scallop_trade_data <- summarize_trade_yr_spp(trade_data, 'SCALLOPS')
 
 ### Exports
 # Plot Value
-scallop_exp_value_yr <- plot_trade(scallop_data, 'value', export = T)
+scallop_exp_value_yr <- plot_trade(scallop_trade_data, 'value', export = T)
 
 # View plot
 scallop_exp_value_yr
@@ -1155,7 +1158,7 @@ scallop_exp_value_yr
 save_plot(scallop_exp_value_yr)
 
 # Plot Volume
-scallop_exp_volume_yr <- plot_trade(scallop_data, 'volume', export = T)
+scallop_exp_volume_yr <- plot_trade(scallop_trade_data, 'volume', export = T)
 
 # View plot
 scallop_exp_volume_yr
@@ -1164,7 +1167,7 @@ scallop_exp_volume_yr
 save_plot(scallop_exp_volume_yr)
 
 # Plot Price
-scallop_exp_price_yr <- plot_trade(scallop_data, 'price', export = T)
+scallop_exp_price_yr <- plot_trade(scallop_trade_data, 'price', export = T)
 
 # View plot
 scallop_exp_price_yr
@@ -1174,7 +1177,7 @@ save_plot(scallop_exp_price_yr)
 
 ### Imports
 # Plot Value
-scallop_imp_value_yr <- plot_trade(scallop_data, 'value', import = T)
+scallop_imp_value_yr <- plot_trade(scallop_trade_data, 'value', import = T)
 
 # View plot
 scallop_imp_value_yr
@@ -1183,7 +1186,7 @@ scallop_imp_value_yr
 save_plot(scallop_imp_value_yr)
 
 # Plot Volume
-scallop_imp_volume_yr <- plot_trade(scallop_data, 'volume', import = T)
+scallop_imp_volume_yr <- plot_trade(scallop_trade_data, 'volume', import = T)
 
 # View plot
 scallop_imp_volume_yr
@@ -1192,7 +1195,7 @@ scallop_imp_volume_yr
 save_plot(scallop_imp_volume_yr)
 
 # Plot Price
-scallop_imp_price_yr <- plot_trade(scallop_data, 'price', import = T)
+scallop_imp_price_yr <- plot_trade(scallop_trade_data, 'price', import = T)
 
 # View plot
 scallop_imp_price_yr
@@ -1202,7 +1205,7 @@ save_plot(scallop_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-scallop_balance_yr <- plot_trade(scallop_data, 'balance')
+scallop_balance_yr <- plot_trade(scallop_trade_data, 'balance')
 
 # View plot
 scallop_balance_yr
@@ -1215,11 +1218,11 @@ save_plot(scallop_balance_yr)
 # Format the data
 # NOTE: 'LOBSTER' yields an unspecified subset of lobster data
 #       'LOBSTERS' includes all lobster trade data
-lobster_data <- summarize_trade_yr_spp(trade_data, 'LOBSTERS') 
+lobster_trade_data <- summarize_trade_yr_spp(trade_data, 'LOBSTERS') 
 
 ### Exports
 # Plot Value
-lobster_exp_value_yr <- plot_trade(lobster_data, 'value', export = T)
+lobster_exp_value_yr <- plot_trade(lobster_trade_data, 'value', export = T)
 
 # View plot
 lobster_exp_value_yr
@@ -1228,7 +1231,7 @@ lobster_exp_value_yr
 save_plot(lobster_exp_value_yr)
 
 # Plot Volume
-lobster_exp_volume_yr <- plot_trade(lobster_data, 'volume', export = T)
+lobster_exp_volume_yr <- plot_trade(lobster_trade_data, 'volume', export = T)
 
 # View plot
 lobster_exp_volume_yr
@@ -1237,7 +1240,7 @@ lobster_exp_volume_yr
 save_plot(lobster_exp_volume_yr)
 
 # Plot Price
-lobster_exp_price_yr <- plot_trade(lobster_data, 'price', export = T)
+lobster_exp_price_yr <- plot_trade(lobster_trade_data, 'price', export = T)
 
 # View plot
 lobster_exp_price_yr
@@ -1247,7 +1250,7 @@ save_plot(lobster_exp_price_yr)
 
 ### Imports
 # Plot Value
-lobster_imp_value_yr <- plot_trade(lobster_data, 'value', import = T)
+lobster_imp_value_yr <- plot_trade(lobster_trade_data, 'value', import = T)
 
 # View plot
 lobster_imp_value_yr
@@ -1256,7 +1259,7 @@ lobster_imp_value_yr
 save_plot(lobster_imp_value_yr)
 
 # Plot Volume
-lobster_imp_volume_yr <- plot_trade(lobster_data, 'volume', import = T)
+lobster_imp_volume_yr <- plot_trade(lobster_trade_data, 'volume', import = T)
 
 # View plot
 lobster_imp_volume_yr
@@ -1265,7 +1268,7 @@ lobster_imp_volume_yr
 save_plot(lobster_imp_volume_yr)
 
 # Plot Price
-lobster_imp_price_yr <- plot_trade(lobster_data, 'price', import = T)
+lobster_imp_price_yr <- plot_trade(lobster_trade_data, 'price', import = T)
 
 # View plot
 lobster_imp_price_yr
@@ -1275,7 +1278,7 @@ save_plot(lobster_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-lobster_balance_yr <- plot_trade(lobster_data, 'balance')
+lobster_balance_yr <- plot_trade(lobster_trade_data, 'balance')
 
 # View plot
 lobster_balance_yr
@@ -1286,11 +1289,11 @@ save_plot(lobster_balance_yr)
 
 # Crabs (all) ------------------------------------------------------------------
 # Format the data
-crab_data <- summarize_trade_yr_spp(trade_data, 'CRABS')
+crab_trade_data <- summarize_trade_yr_spp(trade_data, 'CRABS')
 
 ### Exports
 # Plot Value
-crab_exp_value_yr <- plot_trade(crab_data, 'value', export = T)
+crab_exp_value_yr <- plot_trade(crab_trade_data, 'value', export = T)
 
 # View plot
 crab_exp_value_yr
@@ -1299,7 +1302,7 @@ crab_exp_value_yr
 save_plot(crab_exp_value_yr)
 
 # Plot Volume
-crab_exp_volume_yr <- plot_trade(crab_data, 'volume', export = T)
+crab_exp_volume_yr <- plot_trade(crab_trade_data, 'volume', export = T)
 
 # View plot
 crab_exp_volume_yr
@@ -1308,7 +1311,7 @@ crab_exp_volume_yr
 save_plot(crab_exp_volume_yr)
 
 # Plot Price
-crab_exp_price_yr <- plot_trade(crab_data, 'price', export = T)
+crab_exp_price_yr <- plot_trade(crab_trade_data, 'price', export = T)
 
 # View plot
 crab_exp_price_yr
@@ -1318,7 +1321,7 @@ save_plot(crab_exp_price_yr)
 
 ### Imports
 # Plot Value
-crab_imp_value_yr <- plot_trade(crab_data, 'value', import = T)
+crab_imp_value_yr <- plot_trade(crab_trade_data, 'value', import = T)
 
 # View plot
 crab_imp_value_yr
@@ -1327,7 +1330,7 @@ crab_imp_value_yr
 save_plot(crab_imp_value_yr)
 
 # Plot Volume
-crab_imp_volume_yr <- plot_trade(crab_data, 'volume', import = T)
+crab_imp_volume_yr <- plot_trade(crab_trade_data, 'volume', import = T)
 
 # View plot
 crab_imp_volume_yr
@@ -1336,7 +1339,7 @@ crab_imp_volume_yr
 save_plot(crab_imp_volume_yr)
 
 # Plot Price
-crab_imp_price_yr <- plot_trade(crab_data, 'price', import = T)
+crab_imp_price_yr <- plot_trade(crab_trade_data, 'price', import = T)
 
 # View plot
 crab_imp_price_yr
@@ -1346,7 +1349,7 @@ save_plot(crab_imp_price_yr)
 
 ### Trade Balance
 # Plot Balance
-crab_balance_yr <- plot_trade(crab_data, 'balance')
+crab_balance_yr <- plot_trade(crab_trade_data, 'balance')
 
 # View plot
 crab_balance_yr
