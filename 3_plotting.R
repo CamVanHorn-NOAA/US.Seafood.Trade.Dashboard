@@ -612,7 +612,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
 }
 
-# Commercial Landings Data filtering function ----------------------------------
+# Commercial Landings Data summarizing function --------------------------------
 # The function's purpose is to summarize data from FOSS's Commercial Landings
   # dataset by year and species
 summarize_landings_yr_spp <- function(landings_data, species) {
@@ -634,6 +634,22 @@ summarize_landings_yr_spp <- function(landings_data, species) {
            DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
     rename(COM_VOLUME_MT = KG,
            COM_VALUE_BILLIONS_2024USD = DOLLARS_2024) 
+}
+
+
+# Combine summaries function ---------------------------------------------------
+# the function is short as it simply joins the above summary functions
+summarize_yr_spp <- function(species) {
+  combined_data <- 
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species),
+                        summarize_pp_yr_spp(pp_data, species) %>%
+                          select(!PRODUCT_NAME) %>%
+                          group_by(YEAR, SPECIES) %>%
+                          summarise(across(where(is.numeric), sum),
+                                    .groups = 'drop')),
+              summarize_landings_yr_spp(com_landings, species))
+  
+  return(combined_data)
 }
 
 # Plot function ----------------------------------------------------------------
