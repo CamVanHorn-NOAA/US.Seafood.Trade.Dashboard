@@ -613,6 +613,28 @@ summarize_pp_yr_spp <- function(product_data, species) {
 }
 
 # Commercial Landings Data filtering function ----------------------------------
+# The function's purpose is to summarize data from FOSS's Commercial Landings
+  # dataset by year and species
+summarize_landings_yr_spp <- function(landings_data, species) {
+  # landings_data is FOSS Commercial Landings data formatted in script 2
+  # species is a string for the species of interest
+  landings_data %>%
+    filter(str_detect(NMFS_NAME, species),
+           CONFIDENTIALITY != 'Confidential',
+           !is.na(DOLLARS),
+           !is.na(KG),
+           # here because searching for scallops yields a scalloped hammerhead
+           !str_detect(NMFS_NAME, 'SHARK')) %>%
+    select(YEAR, NMFS_NAME, KG, DOLLARS_2024) %>%
+    mutate(NMFS_NAME = species) %>%
+    group_by(YEAR, NMFS_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(KG = KG / 1000,
+           DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
+    rename(COM_VOLUME_MT = KG,
+           COM_VALUE_BILLIONS_2024USD = DOLLARS_2024) 
+}
 
 # Plot function ----------------------------------------------------------------
 # Because there are several species that the U.S. imports and exports, it is
