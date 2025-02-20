@@ -1358,9 +1358,9 @@ crab_balance_yr
 save_plot(crab_balance_yr)
 
 
-#########################################
-##### MULTILATERAL LOWE TRADE INDEX #####
-#########################################
+########################################
+###' *MULTILATERAL LOWE TRADE INDEX* ###
+########################################
 # Function to calculate MLTI ---------------------------------------------------
 calculate_mlti <- function(species, exports = F, imports = F) {
   # This function calculates the Multilateral Lowe Trade Index, which serves to
@@ -1714,9 +1714,9 @@ crabs_import_mlti <- plot_mlti(crabs_import_mlti_data, imports = T)
 # View the plot
 crabs_import_mlti
 
-############################
-##### HERFINDAHL INDEX #####
-############################
+###########################
+###' *HERFINDAHL INDEX* ###
+###########################
 # To calculate the herfindahl index, we must calculate the share of both import
   # and export value for each trading country with the U.S.
 # So, for example, if Germany traded $50M of scallops in value with the U.S., 
@@ -1898,9 +1898,9 @@ crab_hi <- plot_hi(crab_hi_data)
 # View the plot
 crab_hi
 
-#############################
-##### PRODUCTION VOLUME #####
-#############################
+#################################
+###' *PLOT PRODUCTION VOLUME* ###
+#################################
 # Set Colors for Plot ----------------------------------------------------------
 # use colors provided by packages 'nmfspalettes'
 colors <- c(nmfs_palette('coral')(6)[6:3], 
