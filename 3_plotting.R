@@ -2158,6 +2158,157 @@ plot_supply_metrics <- function(supply_data, species, metric) {
   return(plot)
 }
 
+# Salmon (all) -----------------------------------------------------------------
+# Make data
+salmon_supply_data <- calculate_supply_metrics('SALMON')
+
+# Plot Apparent Supply
+salmon_supply <- plot_supply_metrics(salmon_supply_data, 'Salmon', 'SUPPLY')
+
+salmon_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+salmon_supply_ratio <- plot_supply_metrics(salmon_supply_data, 'Salmon', 'RATIO')
+
+salmon_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+salmon_unexported_share <- plot_supply_metrics(salmon_supply_data, 'Salmon', 'SHARE')
+
+salmon_unexported_share
+
+# Tuna (all) -----------------------------------------------------------------
+# Make data
+tuna_supply_data <- calculate_supply_metrics('TUNA')
+
+# Plot Apparent Supply
+tuna_supply <- plot_supply_metrics(tuna_supply_data, 'Tuna', 'SUPPLY')
+
+tuna_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+tuna_supply_ratio <- plot_supply_metrics(tuna_supply_data, 'Tuna', 'RATIO')
+
+tuna_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+tuna_unexported_share <- plot_supply_metrics(tuna_supply_data, 'Tuna', 'SHARE')
+
+tuna_unexported_share
+
+# Cod (all) -----------------------------------------------------------------
+# Make data
+cod_supply_data <- calculate_supply_metrics('COD')
+
+# Plot Apparent Supply
+cod_supply <- plot_supply_metrics(cod_supply_data, 'Cod', 'SUPPLY')
+
+cod_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+cod_supply_ratio <- plot_supply_metrics(cod_supply_data, 'Cod', 'RATIO')
+
+cod_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+cod_unexported_share <- plot_supply_metrics(cod_supply_data, 'Cod', 'SHARE')
+
+cod_unexported_share
+
+# Pollock (all) -----------------------------------------------------------------
+# Make data
+pollock_supply_data <- calculate_supply_metrics('POLLOCK')
+
+# Plot Apparent Supply
+pollock_supply <- plot_supply_metrics(pollock_supply_data, 'Pollock', 'SUPPLY')
+
+pollock_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+pollock_supply_ratio <- plot_supply_metrics(pollock_supply_data, 'Pollock', 'RATIO')
+
+pollock_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+pollock_unexported_share <- plot_supply_metrics(pollock_supply_data, 'Pollock', 'SHARE')
+
+pollock_unexported_share
+
+# Shrimp (all) -----------------------------------------------------------------
+# Make data
+shrimp_supply_data <- calculate_supply_metrics('SHRIMP')
+
+# Plot Apparent Supply
+shrimp_supply <- plot_supply_metrics(shrimp_supply_data, 'Shrimp', 'SUPPLY')
+
+shrimp_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+shrimp_supply_ratio <- plot_supply_metrics(shrimp_supply_data, 'Shrimp', 'RATIO')
+
+shrimp_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+shrimp_unexported_share <- plot_supply_metrics(shrimp_supply_data, 'Shrimp', 'SHARE')
+
+shrimp_unexported_share
+
+# Scallops (all) -----------------------------------------------------------------
+# Make data
+scallop_supply_data <- calculate_supply_metrics('SCALLOP')
+
+# Plot Apparent Supply
+scallop_supply <- plot_supply_metrics(scallop_supply_data, 'Scallops', 'SUPPLY')
+
+scallop_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+scallop_supply_ratio <- plot_supply_metrics(scallop_supply_data, 'Scallops', 'RATIO')
+
+scallop_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+scallop_unexported_share <- plot_supply_metrics(scallop_supply_data, 'Scallops', 'SHARE')
+
+scallop_unexported_share
+
+# Lobsters (all) -----------------------------------------------------------------
+# Make data
+lobster_supply_data <- calculate_supply_metrics(lobster_data, lobster_pp_data)
+
+# Plot Apparent Supply
+lobster_supply <- plot_supply_metrics(lobster_supply_data, 'Lobsters', 'SUPPLY')
+
+lobster_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+lobster_supply_ratio <- plot_supply_metrics(lobster_supply_data, 'Lobsters', 'RATIO')
+
+lobster_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+lobster_unexported_share <- plot_supply_metrics(lobster_supply_data, 'Lobsters', 'SHARE')
+
+lobster_unexported_share
+
+# Crab (all) -----------------------------------------------------------------
+# Make data
+crab_supply_data <- calculate_supply_metrics(crab_data, crab_pp_data)
+
+# Plot Apparent Supply
+crab_supply <- plot_supply_metrics(crab_supply_data, 'Crab', 'SUPPLY')
+
+crab_supply
+
+# Plot Apparent Supply Relative to Domestic Production
+crab_supply_ratio <- plot_supply_metrics(crab_supply_data, 'Crab', 'RATIO')
+
+crab_supply_ratio
+
+# Plot Unexported Domestic Production Relative to Apparent Supply
+crab_unexported_share <- plot_supply_metrics(crab_supply_data, 'Crab', 'SHARE')
+
+crab_unexported_share
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
