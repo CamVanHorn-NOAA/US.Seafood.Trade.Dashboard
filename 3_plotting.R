@@ -516,7 +516,6 @@ filter_species <- function(trade_table, species_name) {
   return(filtered_data)
 }
 
-
 # Trade data summarizing function ----------------------------------------------
 # The below function works in tandem with the filter_species fxn above
 # These functions are separate in case of interest in viewing the data filtered
@@ -2062,6 +2061,28 @@ crab_pp <- plot_spp_pp(crab_pp_data, 'Crab')
 
 # View the plot
 crab_pp
+
+##################################
+###' *APPARENT SUPPLY METRICS* ###
+##################################
+# Function to calculate supply metrics -----------------------------------------
+# This function creates data that will generate plots for APPARENT SUPPLY,
+  # APPARENT SUPPLY RELATIVE TO US PRODUCTION, and UNEXPORTED US PRODUCTION
+  # RELATIVE TO APPARENT SUPPLY
+calculate_supply_metrics <- function(species) {
+  # species is a string of the species of interest
+  
+  # we want to join the trade and pp data to calculate apparent supply
+  data <- summarize_yr_spp(species) %>%
+    # calculate apparent supply metrics
+    mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
+           # Apparent supply relative to US Production
+           APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
+           # Unexported US production relative to apparent supply
+           UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) %>%
+    # change column name for clarity
+    rename(SPECIES = 2)
+}
 
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
