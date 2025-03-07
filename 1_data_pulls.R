@@ -145,12 +145,25 @@ pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
 foss_com_1523 <- read.csv('foss_com_landings_15-23.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+  .[-1, ] %>%
+  # fix error where POLLOCK, WALLEYE and SEA HARES have extra space in string
+  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+                            'POLLOCK, WALLEYE',
+                            NMFS_NAME),
+         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+                            'SEA HARES', 
+                            NMFS_NAME))
 
 foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+  .[-1, ] %>%
+  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+                            'POLLOCK, WALLEYE',
+                            NMFS_NAME),
+         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+                            'SEA HARES', 
+                            NMFS_NAME))
 
 # combine data (stack)
 foss_com_landings <- bind_rows(foss_com_0414, foss_com_1523)
