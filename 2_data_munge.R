@@ -220,6 +220,10 @@ com_landings <- foss_com_landings %>%
          DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
   # connect only SPECIES from processed products data to enable later joining
   left_join(pp_landings_map) %>%
+  # connect groups from map
+  left_join(landings_map %>%
+              select(NMFS_NAME, TSN, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+              distinct()) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
          KG = POUNDS * 0.45359237,
