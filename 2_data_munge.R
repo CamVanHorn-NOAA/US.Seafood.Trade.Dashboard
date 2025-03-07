@@ -130,6 +130,10 @@ imports <- foss_imports %>%
   left_join(species_ref %>% 
               select(HTS_NUMBER, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
               distinct()) %>%
+  left_join(trade_map %>%
+              select(SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+                     ECOLOGICAL_CATEGORY, HTS_NUMBER) %>%
+              distinct()) %>%
   arrange(YEAR, COUNTRY_NAME) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(IMP_VALUE_2024USD = VALUE_USD * INDEX,
@@ -140,18 +144,22 @@ imports <- foss_imports %>%
 # Data summarizing
 imports_products_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME, 
+         SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 imports_price_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
-         IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP,
+         SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(IMP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
