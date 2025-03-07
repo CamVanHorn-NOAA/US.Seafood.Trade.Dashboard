@@ -62,6 +62,11 @@ exports <- foss_exports %>%
               # remove duplicates to not create many-to-many relationships for
                 # the join
               distinct()) %>%
+  # use trade_map to attach categories to products
+  left_join(trade_map %>%
+              select(SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+                     ECOLOGICAL_CATEGORY, HTS_NUMBER) %>%
+              distinct()) %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME) %>%
   # Calculate standard prices with 2024 index
@@ -85,9 +90,11 @@ exports <- foss_exports %>%
   # country name (exported to), customs district (exported from)
 exports_products_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+         SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(EXP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
@@ -96,9 +103,11 @@ exports_products_smry <- exports %>%
 exports_price_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, GROUP_NAME, GROUP_TS, 
-         GROUP_CBP) %>%
+         GROUP_CBP, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY,
+         ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(EXP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
