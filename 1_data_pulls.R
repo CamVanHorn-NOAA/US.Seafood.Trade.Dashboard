@@ -53,6 +53,10 @@ drive_auth()
 #                overwrite = T)
 # drive_download('pp_com_landings_mapping.csv',
 #                overwrite = T)
+# drive_download('com_landings_mapping_sheet.csv',
+#                overwrite = T)
+# drive_download('trade_data_mapping_sheet.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
@@ -161,7 +165,7 @@ def_index <- read.csv('GDPDEF_2024_index.csv') %>%
   mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
          INDEX = (100/DEFLATOR_VALUE))
 
-# Species Reference Data -------------------------------------------------------
+# Species Reference and Mapping Data -------------------------------------------
 # Imports and Exports in FOSS provide detailed descriptions of the products
   # However, these descriptions are cumbersome strings that are difficult
     # to parse for species names without a brute force method
@@ -169,6 +173,16 @@ def_index <- read.csv('GDPDEF_2024_index.csv') %>%
   # through the use of FTS reference tables
 # We will import the reference table here to munge into the tables later
 species_ref <- read.csv('FTS_PRODUCTS.csv')
+
+# this sheet was developed by hand to categorize species into three groups:
+  # species group, which groups like species by identifiers such as genera
+  # species category, which groups like generas by collections, such as all crabs
+  # ecological category, which groups like categories by shared traits, such as
+    # crustaceans, or small pelagic fish, etc.
+trade_map <- read.csv('trade_data_mapping_sheet.csv')
+
+# this sheet was developed by the same effort described above
+landings_map <- read.csv('com_landings_mapping_sheet.csv')
 
 #####################
 ### SAVE THE DATA ###
@@ -182,7 +196,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref', 'foss_com_landings', 'pp_landings_map'),
+              'species_ref', 'foss_com_landings', 'pp_landings_map',
+              'trade_map', 'landings_map'),
      file = file_name)
 
 # upload to google drive
