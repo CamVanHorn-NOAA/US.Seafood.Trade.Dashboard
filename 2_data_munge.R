@@ -217,8 +217,7 @@ com_landings <- foss_com_landings %>%
   mutate(YEAR = as.numeric(YEAR),
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
          METRIC_TONS = as.numeric(gsub(',', '', METRIC_TONS)),
-         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
-         TSN = as.numeric(TSN)) %>%
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
   # connect only SPECIES from processed products data to enable later joining
   left_join(pp_landings_map) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
