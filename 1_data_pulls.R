@@ -179,10 +179,12 @@ species_ref <- read.csv('FTS_PRODUCTS.csv')
   # species category, which groups like generas by collections, such as all crabs
   # ecological category, which groups like categories by shared traits, such as
     # crustaceans, or small pelagic fish, etc.
-trade_map <- read.csv('trade_data_mapping_sheet.csv')
+trade_map <- read.csv('trade_data_mapping_sheet.csv') %>%
+  mutate(HTS_NUMBER = as.character(HTS_NUMBER))
 
 # this sheet was developed by the same effort described above
-landings_map <- read.csv('com_landings_mapping_sheet.csv')
+landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
+  mutate(TSN = as.character(TSN))
 
 #####################
 ### SAVE THE DATA ###
