@@ -47,7 +47,7 @@ rm(data_file)
 # TODO: extract species from product information
 # Exports ----------------------------------------------------------------------
 # Data formatting
-foss_exports <- foss_exports %>%
+exports <- foss_exports %>%
   # set necessary columns to numeric
   # value and volume need commas removed for coercion
   mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
@@ -83,7 +83,7 @@ foss_exports <- foss_exports %>%
 # Must do piece-wise due to two summarise() calls
 # First piece: summarise # of product types exported by year, 
   # country name (exported to), customs district (exported from)
-exports_products_smry <- foss_exports %>%
+exports_products_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
@@ -93,7 +93,7 @@ exports_products_smry <- foss_exports %>%
 
 # Second piece: summarise value and volume of exports by year, 
   # country name (exported to), customs district (exported from)
-exports_price_smry <- foss_exports %>%
+exports_price_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, GROUP_NAME, GROUP_TS, 
          GROUP_CBP) %>%
@@ -110,7 +110,7 @@ exports_smry <- full_join(exports_products_smry, exports_price_smry)
 
 # Imports ----------------------------------------------------------------------
 # Data formatting
-foss_imports <- foss_imports %>%
+imports <- foss_imports %>%
   mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
          VOLUME_KG = as.numeric(gsub(',', '', VOLUME_KG)),
          CENSUS_COUNTRY_CODE = as.numeric(CENSUS_COUNTRY_CODE),
@@ -129,7 +129,7 @@ foss_imports <- foss_imports %>%
   
 
 # Data summarizing
-imports_products_smry <- foss_imports %>%
+imports_products_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
@@ -137,7 +137,7 @@ imports_products_smry <- foss_imports %>%
   summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
-imports_price_smry <- foss_imports %>%
+imports_price_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
          IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
