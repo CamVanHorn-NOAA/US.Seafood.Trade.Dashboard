@@ -526,13 +526,13 @@ filter_species <- function(data, species) {
   # but not summarized
 # The function summarizes data grouped by year and species group, and requires
   # the input data to be trade_data, or formatted similarly to such
-summarize_trade_yr_spp <- function(trade_table, species_name) {
+summarize_trade_yr_spp <- function(trade_table, species) {
   # trade_table is a data frame, either trade_data provided in script 2 or
     # another data frame with comparable nomenclature and purpose
-  # species_name is a vector of class character and should not be specific
+  # species is a vector of class character and should not be specific
   
-  # set species_name to upper case
-  species_name <- toupper(species_name)
+  # set species to upper case
+  species <- toupper(species)
   
   # we must specify which group we want to summarize the data around
   # this effort is similar to that done in filter_species
@@ -554,7 +554,7 @@ summarize_trade_yr_spp <- function(trade_table, species_name) {
   # dplyr pipe to summarize the data grouped by year and species
   summarized_data <- trade_table %>%
     # use the filter_species fxn created above
-    filter_species(species_name) %>%
+    filter_species(species) %>%
     # select only columns that we need to compare trade data across years
       # NOTE: we coerce which_group to class symbol with sym() to operate in
       # the dplyr pipe
