@@ -1226,8 +1226,6 @@ save_plot(scallop_balance_yr)
 # Lobsters (all) ---------------------------------------------------------------
 # For now, this in inclusive of ALL lobster imports/exports, not just American
 # Format the data
-# NOTE: 'LOBSTER' yields an unspecified subset of lobster data
-#       'LOBSTERS' includes all lobster trade data
 lobster_trade_data <- summarize_trade_yr_spp(trade_data, 'LOBSTERS') 
 
 ### Exports
