@@ -592,9 +592,7 @@ summarize_trade_yr_spp <- function(trade_table, species) {
            EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000) %>%
-    # rename group column to species for ease of joining
-    rename(SPECIES = !!which_group)
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
   
   return(summarized_data)
 }
