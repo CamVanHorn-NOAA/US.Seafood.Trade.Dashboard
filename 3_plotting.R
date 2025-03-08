@@ -874,7 +874,7 @@ save_plot(salmon_balance_yr)
 
 # Tuna (all) -------------------------------------------------------------------
 # Format the data
-tuna_trade_data <- summarize_trade_yr_spp(trade_data, 'TUNA')
+tuna_trade_data <- summarize_trade_yr_spp(trade_data, 'TUNAS')
 
 ### Exports
 # Plot Value
@@ -1155,7 +1155,7 @@ save_plot(shrimp_balance_yr)
 
 # Scallops (all) ---------------------------------------------------------------
 # Format the data
-scallop_trade_data <- summarize_trade_yr_spp(trade_data, 'SCALLOPS')
+scallop_trade_data <- summarize_trade_yr_spp(trade_data, 'SCALLOP')
 
 ### Exports
 # Plot Value
