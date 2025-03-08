@@ -549,16 +549,15 @@ summarize_trade_yr_spp <- function(trade_table, species) {
     # function, we must make this object of type 'quosure' (see rlang)
       # NOTE: later, we call these objects using the bang-bang (!!) in dplyr
       # pipes and functions
-  which_group <- rlang::enquo(which_group)
+  group <- rlang::enquo(which_group)
   
   # dplyr pipe to summarize the data grouped by year and species
   summarized_data <- trade_table %>%
     # use the filter_species fxn created above
     filter_species(species) %>%
     # select only columns that we need to compare trade data across years
-      # NOTE: we coerce which_group to class symbol with sym() to operate in
-      # the dplyr pipe
-    select(YEAR, !!which_group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+      # NOTE: we use a bang-bang (!!) to call group properly in the dplyr fxn
+    select(YEAR, !!group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
     # replace NAs with 0s for summation
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
@@ -570,7 +569,7 @@ summarize_trade_yr_spp <- function(trade_table, species) {
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                   IMP_VOLUME_KG)) %>%
     # group by year and the field specified prior
-    group_by(YEAR, !!which_group) %>%
+    group_by(YEAR, !!group) %>%
     # sum all columns of numeric type, drop groups
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
