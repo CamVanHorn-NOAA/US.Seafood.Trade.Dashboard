@@ -538,10 +538,20 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   # this effort is similar to that done in filter_species
   # To coerce the group to operate in dplyr pipe, first we must designate the
     # object returned in the ifelse() fxn as type symbol (or 'name')
-    # NOTE: there is no error output here if the species provided is unavailable
-    # because it would be redundant with that provided in filter_species
-  which_group <- as.symbol(ifelse(species_name %in% unique(trade_table$GROUP_TS),
-                                  'GROUP_TS', 'GROUP_NAME'))
+  which_group <- as.symbol(
+    ifelse(species %in% unique(trade_table$SPECIES_NAME), 
+           'SPECIES_NAME',
+           ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
+                  'SPECIES_GROUP',
+                  ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
+                         'SPECIES_CATEGORY',
+                         # NOTE: because filter_species will give us an error
+                         #       if the species is not found, we do not need
+                         #       to include it here, thus if the species was
+                         #       not found in the other groups it would have to
+                         #       be in ECOLOGICAL_CATEGORY or not exist
+                         'ECOLOGICAL_CATEGORY')))
+  )
   
   # Because we are using a dplyr pipe in a custom function, using our objects
     # in dplyr functions can become tricky. Effectively, because we need to 
