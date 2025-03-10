@@ -2550,6 +2550,22 @@ lobster_landings_volume <- plot_landings(lobster_landings, volume = T)
 # View volume plot
 lobster_landings_volume
 
+# Crab (all) -----------------------------------------------------------------
+# Make data
+crab_landings <- summarize_landings_yr_spp(com_landings, 'CRABS')
+
+# Plot value
+crab_landings_value <- plot_landings(crab_landings, value = T)
+
+# View value plot
+crab_landings_value
+
+# Plot volume
+crab_landings_volume <- plot_landings(crab_landings, volume = T)
+
+# View volume plot
+crab_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
