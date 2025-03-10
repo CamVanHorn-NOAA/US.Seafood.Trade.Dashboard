@@ -2486,6 +2486,22 @@ cod_landings_volume <- plot_landings(cod_landings, volume = T)
 # View volume plot
 cod_landings_volume
 
+# Pollock (all) -----------------------------------------------------------------
+# Make data
+pollock_landings <- summarize_landings_yr_spp(com_landings, 'POLLOCK')
+
+# Plot value
+pollock_landings_value <- plot_landings(pollock_landings, value = T)
+
+# View value plot
+pollock_landings_value
+
+# Plot volume
+pollock_landings_volume <- plot_landings(pollock_landings, volume = T)
+
+# View volume plot
+pollock_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
