@@ -641,8 +641,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
               .groups = 'drop') %>%
     # format value and volume to a higher magnitude value 
     mutate(MT = KG / 1000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
-           SPECIES = species) %>%
+           BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
     # rename columns for data type
     rename(PP_VOLUME_MT = MT,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
@@ -705,7 +704,7 @@ summarize_yr_spp <- function(species) {
     left_join(left_join(summarize_trade_yr_spp(trade_data, species),
                         summarize_pp_yr_spp(pp_data, species) %>%
                           select(!PRODUCT_NAME) %>%
-                          group_by(YEAR, SPECIES) %>%
+                          group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
               summarize_landings_yr_spp(com_landings, species))
