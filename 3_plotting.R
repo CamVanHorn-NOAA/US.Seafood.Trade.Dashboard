@@ -2518,6 +2518,22 @@ shrimp_landings_volume <- plot_landings(shrimp_landings, volume = T)
 # View volume plot
 shrimp_landings_volume
 
+# Scallop (all) -----------------------------------------------------------------
+# Make data
+scallop_landings <- summarize_landings_yr_spp(com_landings, 'SCALLOP')
+
+# Plot value
+scallop_landings_value <- plot_landings(scallop_landings, value = T)
+
+# View value plot
+scallop_landings_value
+
+# Plot volume
+scallop_landings_volume <- plot_landings(scallop_landings, volume = T)
+
+# View volume plot
+scallop_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
