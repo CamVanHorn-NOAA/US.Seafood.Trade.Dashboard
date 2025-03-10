@@ -2454,6 +2454,22 @@ salmon_landings_volume <- plot_landings(salmon_landings, volume = T)
 # View volume plot
 salmon_landings_volume
 
+# Tuna (all) -----------------------------------------------------------------
+# Make data
+tuna_landings <- summarize_landings_yr_spp(com_landings, 'TUNAS')
+
+# Plot value
+tuna_landings_value <- plot_landings(tuna_landings, value = T)
+
+# View value plot
+tuna_landings_value
+
+# Plot volume
+tuna_landings_volume <- plot_landings(tuna_landings, volume = T)
+
+# View volume plot
+tuna_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
