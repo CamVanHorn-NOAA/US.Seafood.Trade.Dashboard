@@ -2438,6 +2438,22 @@ plot_landings <- function(data, value = F, volume = F) {
   return(plot)
 }
 
+# Salmon (all) -----------------------------------------------------------------
+# Make data
+salmon_landings <- summarize_landings_yr_spp(com_landings, 'SALMON')
+
+# Plot value
+salmon_landings_value <- plot_landings(salmon_landings, value = T)
+
+# View value plot
+salmon_landings_value
+
+# Plot volume
+salmon_landings_volume <- plot_landings(salmon_landings, volume = T)
+
+# View volume plot
+salmon_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
