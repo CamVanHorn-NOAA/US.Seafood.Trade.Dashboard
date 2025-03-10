@@ -1953,14 +1953,14 @@ plot_spp_pp <- function(processed_product_data, species) {
   # species is a string of the species we are visualizing
   
   low_prop_types <- processed_product_data %>%
-    select(MT, PRODUCT_NAME) %>%
+    select(PP_VOLUME_MT, PRODUCT_NAME) %>%
     group_by(PRODUCT_NAME) %>%
     # aggregate the total volume per product condition
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     # calculate the proportion of total volume for each product condition
-    mutate(TOTAL_VOLUME = sum(MT),
-           VOLUME_SHARE = MT / TOTAL_VOLUME) %>%
+    mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+           VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
     # retain production conditions who occupy less than 2% of total production
     filter(VOLUME_SHARE < 0.02) %>%
     # pull() returns the values as a vector
@@ -1974,7 +1974,7 @@ plot_spp_pp <- function(processed_product_data, species) {
     # set PRODUCT_NAME as a factor for the plot
     # convert to thousand metric tons 
     mutate(PRODUCT_NAME = factor(PRODUCT_NAME),
-           THOUSAND_MT = MT / 1000)
+           THOUSAND_MT = PP_VOLUME_MT / 1000)
   
   # find max production volume for any given year
   yr_volume <- new_data %>%
