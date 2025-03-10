@@ -201,6 +201,11 @@ trade_map <- read.csv('trade_data_mapping_sheet.csv') %>%
 landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
   mutate(TSN = as.character(TSN))
 
+# this sheet was developed by the same effort described above
+  # however, with a lack of available scientific names and specified common
+  # names, this map contains more NAs and generic maps
+pp_map <- read.csv('pp_mapping_sheet.csv')
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -214,7 +219,7 @@ file_name <- paste0('seafood_trade_data_pull_',
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
               'species_ref', 'foss_com_landings', 'pp_landings_map',
-              'trade_map', 'landings_map'),
+              'trade_map', 'landings_map', 'pp_map'),
      file = file_name)
 
 # upload to google drive
