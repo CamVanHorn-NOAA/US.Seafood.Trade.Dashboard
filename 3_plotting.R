@@ -2067,7 +2067,7 @@ salmon_pp
 
 # Tuna (all) -------------------------------------------------------------------
 # Make the data
-tuna_pp_data <- summarize_pp_yr_spp(pp_data, 'TUNA')
+tuna_pp_data <- summarize_pp_yr_spp(pp_data, 'TUNAS')
 
 # Plot the data
 tuna_pp <- plot_spp_pp(tuna_pp_data, 'Tuna')
@@ -2107,7 +2107,7 @@ shrimp_pp
 
 # Scallops (all) ---------------------------------------------------------------
 # Make the data
-scallop_pp_data <- summarize_pp_yr_spp(pp_data, 'SCALLOPS')
+scallop_pp_data <- summarize_pp_yr_spp(pp_data, 'SCALLOP')
 
 # Plot the data
 scallop_pp <- plot_spp_pp(scallop_pp_data, 'Scallop')
@@ -2117,7 +2117,7 @@ scallop_pp
 
 # Lobsters (all) ---------------------------------------------------------------
 # Make the data
-lobster_pp_data <- summarize_pp_yr_spp(pp_data, 'LOBSTER')
+lobster_pp_data <- summarize_pp_yr_spp(pp_data, 'LOBSTERS')
 
 # Plot the data
 lobster_pp <- plot_spp_pp(lobster_pp_data, 'Lobster')
@@ -2127,7 +2127,7 @@ lobster_pp
 
 # Crabs (all) ------------------------------------------------------------------
 # Make the data
-crab_pp_data <- summarize_pp_yr_spp(pp_data, 'CRAB')
+crab_pp_data <- summarize_pp_yr_spp(pp_data, 'CRABS')
 
 # Plot the data
 crab_pp <- plot_spp_pp(crab_pp_data, 'Crab')
@@ -2252,7 +2252,7 @@ salmon_unexported_share
 
 # Tuna (all) -----------------------------------------------------------------
 # Make data
-tuna_supply_data <- calculate_supply_metrics('TUNA')
+tuna_supply_data <- calculate_supply_metrics('TUNAS')
 
 # Plot Apparent Supply
 tuna_supply <- plot_supply_metrics(tuna_supply_data, 'Tuna', 'SUPPLY')
@@ -2347,7 +2347,7 @@ scallop_unexported_share
 
 # Lobsters (all) -----------------------------------------------------------------
 # Make data
-lobster_supply_data <- calculate_supply_metrics(lobster_data, lobster_pp_data)
+lobster_supply_data <- calculate_supply_metrics('LOBSTERS')
 
 # Plot Apparent Supply
 lobster_supply <- plot_supply_metrics(lobster_supply_data, 'Lobsters', 'SUPPLY')
@@ -2366,7 +2366,7 @@ lobster_unexported_share
 
 # Crab (all) -----------------------------------------------------------------
 # Make data
-crab_supply_data <- calculate_supply_metrics(crab_data, crab_pp_data)
+crab_supply_data <- calculate_supply_metrics('CRABS')
 
 # Plot Apparent Supply
 crab_supply <- plot_supply_metrics(crab_supply_data, 'Crab', 'SUPPLY')
