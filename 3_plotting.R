@@ -1394,17 +1394,31 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   which_value <- rlang::enquo(which_value)
   which_volume <- rlang::enquo(which_volume)
   
+  # we must specify which group we want to summarize the data around
+  # this effort is similar to that done in filter_species
+  # To coerce the group to operate in dplyr pipe, first we must designate the
+  # object returned in the ifelse() fxn as type symbol (or 'name')
+  which_group <- as.symbol(
+    ifelse(species %in% unique(trade_data$SPECIES_NAME), 
+           'SPECIES_NAME',
+           ifelse(species %in% unique(trade_data$SPECIES_GROUP), 
+                  'SPECIES_GROUP',
+                  ifelse(species %in% unique(trade_data$SPECIES_CATEGORY), 
+                         'SPECIES_CATEGORY',
+                         # NOTE: because filter_species will give us an error
+                         #       if the species is not found, we do not need
+                         #       to include it here, thus if the species was
+                         #       not found in the other groups it would have to
+                         #       be in ECOLOGICAL_CATEGORY or not exist
+                         'ECOLOGICAL_CATEGORY')))
+  )
+  which_group <- rlang::enquo(which_group)
+  
+  
   # filter the data for the target species AND for imports or exports
   spp_data <- trade_data %>%
     filter_species(species) %>%
     filter(is.na(!!which_value) == F)
-  
-  # Because filtering for species depends upon values in two columns,
-    # we must specify which column we are to keep for data curation 
-  # this does not impact calculations, but simply how the data is presented
-  which_group <- as.symbol(ifelse(species %in% unique(spp_data$GROUP_TS),
-                                  'GROUP_TS', 'GROUP_NAME'))
-  which_group <- rlang::enquo(which_group)
   
   # To calculate the MLTI, we need to calculate the simple average price
   # We must summarize the value and volume of the given species' products
