@@ -2502,6 +2502,22 @@ pollock_landings_volume <- plot_landings(pollock_landings, volume = T)
 # View volume plot
 pollock_landings_volume
 
+# Shrimp (all) -----------------------------------------------------------------
+# Make data
+shrimp_landings <- summarize_landings_yr_spp(com_landings, 'SHRIMP')
+
+# Plot value
+shrimp_landings_value <- plot_landings(shrimp_landings, value = T)
+
+# View value plot
+shrimp_landings_value
+
+# Plot volume
+shrimp_landings_volume <- plot_landings(shrimp_landings, volume = T)
+
+# View volume plot
+shrimp_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
