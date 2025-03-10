@@ -1585,7 +1585,7 @@ salmon_import_mlti
 # Tuna (all) -------------------------------------------------------------------
 ### Exports
 # Make the data
-tuna_export_mlti_data <- calculate_mlti('TUNA', exports = T)
+tuna_export_mlti_data <- calculate_mlti('TUNAS', exports = T)
 
 # Plot the data
 tuna_export_mlti <- plot_mlti(tuna_export_mlti_data, exports = T)
@@ -1596,7 +1596,7 @@ tuna_export_mlti
 
 ### Imports
 # Make the data
-tuna_import_mlti_data <- calculate_mlti('TUNA', imports = T)
+tuna_import_mlti_data <- calculate_mlti('TUNAS', imports = T)
 
 # Plot the data
 tuna_import_mlti <- plot_mlti(tuna_import_mlti_data, imports = T)
@@ -1673,7 +1673,7 @@ shrimp_import_mlti
 # Scallops (all) ---------------------------------------------------------------
 ### Exports
 # Make the data
-scallops_export_mlti_data <- calculate_mlti('SCALLOPS', exports = T)
+scallops_export_mlti_data <- calculate_mlti('SCALLOP', exports = T)
 
 # Plot the data
 scallops_export_mlti <- plot_mlti(scallops_export_mlti_data, exports = T)
@@ -1684,7 +1684,7 @@ scallops_export_mlti
 
 ### Imports
 # Make the data
-scallops_import_mlti_data <- calculate_mlti('SCALLOPS', imports = T)
+scallops_import_mlti_data <- calculate_mlti('SCALLOP', imports = T)
 
 # Plot the data
 scallops_import_mlti <- plot_mlti(scallops_import_mlti_data, imports = T)
@@ -1852,7 +1852,7 @@ salmon_hi
 
 # Tuna (all) -------------------------------------------------------------------
 # Make the data
-tuna_hi_data <- calculate_hi('TUNA')
+tuna_hi_data <- calculate_hi('TUNAS')
 
 # Plot the data
 tuna_hi <- plot_hi(tuna_hi_data)
@@ -1892,7 +1892,7 @@ shrimp_hi
 
 # Scallops (all) ---------------------------------------------------------------
 # Make the data
-scallop_hi_data <- calculate_hi('SCALLOPS')
+scallop_hi_data <- calculate_hi('SCALLOP')
 
 # Plot the data
 scallop_hi <- plot_hi(scallop_hi_data)
