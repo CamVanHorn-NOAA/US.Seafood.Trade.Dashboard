@@ -690,7 +690,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     group_by(YEAR, !!group) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(KG = KG / 1000,
+    mutate(KG = KG / 1000, # will get named properly in rename call below
            DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
     rename(COM_VOLUME_MT = KG,
            COM_VALUE_BILLIONS_2024USD = DOLLARS_2024) 
