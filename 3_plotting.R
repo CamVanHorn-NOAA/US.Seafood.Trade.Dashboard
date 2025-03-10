@@ -2470,6 +2470,22 @@ tuna_landings_volume <- plot_landings(tuna_landings, volume = T)
 # View volume plot
 tuna_landings_volume
 
+# Cod (all) -----------------------------------------------------------------
+# Make data
+cod_landings <- summarize_landings_yr_spp(com_landings, 'COD')
+
+# Plot value
+cod_landings_value <- plot_landings(cod_landings, value = T)
+
+# View value plot
+cod_landings_value
+
+# Plot volume
+cod_landings_volume <- plot_landings(cod_landings, volume = T)
+
+# View volume plot
+cod_landings_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
