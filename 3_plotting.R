@@ -488,16 +488,16 @@ filter_species <- function(data, species) {
   
   # ifelse chain to locate the provided species
   locate_group <- 
-    ifelse(species %in% species_names, 
-           # if in species_names, output the name of the field
-           'SPECIES_NAME',
-           # if not in species_names, go to next most specific field
-           ifelse(species %in% species_groups, 
-                  'SPECIES_GROUP',
-                  ifelse(species %in% species_categories, 
-                         'SPECIES_CATEGORY',
-                         ifelse(species %in% ecology_categories, 
-                                'ECOLOGY_CATEGORY',
+    ifelse(species %in% ecology_categories, 
+           # if in ecological_category, output the name of the field
+           'ECOLOGICAL_CATEGORY',
+           # if not in species_names, go to next least specific field
+           ifelse(species %in% species_categories, 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% species_groups, 
+                         'SPECIES_GROUP',
+                         ifelse(species %in% species_names, 
+                                'SPECIES_NAME',
                                 # if the species cannot be found, output so
                                 'UNAVAILABLE'))))
   
@@ -539,18 +539,18 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   # To coerce the group to operate in dplyr pipe, first we must designate the
     # object returned in the ifelse() fxn as type symbol (or 'name')
   which_group <- as.symbol(
-    ifelse(species %in% unique(trade_table$SPECIES_NAME), 
-           'SPECIES_NAME',
-           ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
-                  'SPECIES_GROUP',
-                  ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
-                         'SPECIES_CATEGORY',
+    ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
+           'ECOLOGICAL_CATEGORY',
+           ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
+                         'SPECIES_GROUP',
                          # NOTE: because filter_species will give us an error
                          #       if the species is not found, we do not need
                          #       to include it here, thus if the species was
                          #       not found in the other groups it would have to
-                         #       be in ECOLOGICAL_CATEGORY or not exist
-                         'ECOLOGICAL_CATEGORY')))
+                         #       be in SPECIES_NAME or not exist
+                         'SPECIES_NAME')))
   )
   
   # Because we are using a dplyr pipe in a custom function, using our objects
