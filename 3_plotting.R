@@ -603,12 +603,38 @@ summarize_trade_yr_spp <- function(trade_table, species) {
 summarize_pp_yr_spp <- function(product_data, species) {
   # product_data is FOSS Processed Products data formatted in script 2
   # species is a string for the species of interest
+  
+  # we must specify which group we want to summarize the data around
+  # this effort is similar to that done in filter_species
+  # To coerce the group to operate in dplyr pipe, first we must designate the
+  # object returned in the ifelse() fxn as type symbol (or 'name')
+  which_group <- as.symbol(
+    ifelse(species %in% unique(product_data$ECOLOGICAL_CATEGORY), 
+           'ECOLOGICAL_CATEGORY',
+           ifelse(species %in% unique(product_data$SPECIES_CATEGORY), 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% unique(product_data$SPECIES_GROUP), 
+                         'SPECIES_GROUP',
+                         # NOTE: because filter_species will give us an error
+                         #       if the species is not found, we do not need
+                         #       to include it here, thus if the species was
+                         #       not found in the other groups it would have to
+                         #       be in SPECIES_NAME or not exist
+                         'SPECIES_NAME')))
+  )
+  
+  # Because we are using a dplyr pipe in a custom function, using our objects
+  # in dplyr functions can become tricky. Effectively, because we need to 
+  # define a field (i.e. 'GROUP_TS') with which to index a table inside this 
+  # function, we must make this object of type 'quosure' (see rlang)
+  # NOTE: later, we call these objects using the bang-bang (!!) in dplyr
+  # pipes and functions
+  group <- rlang::enquo(which_group)
+  
   product_data %>%
-    # because processed product 'SPECIES' can be specific, only extract rows
-    # whose SPECIES string includes that specified in 'species' call
-    filter(str_detect(SPECIES, species)) %>%
+    filter_species(species) %>%
     # retain only columns of interest
-    select(YEAR, SPECIES, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    select(YEAR, !!group, PRODUCT_NAME, KG, DOLLARS_2024) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     # sum volume and value by product condition (PRODUCT_NAME) through time
     summarise(across(where(is.numeric), sum),
@@ -628,16 +654,41 @@ summarize_pp_yr_spp <- function(product_data, species) {
 summarize_landings_yr_spp <- function(landings_data, species) {
   # landings_data is FOSS Commercial Landings data formatted in script 2
   # species is a string for the species of interest
+  
+  # we must specify which group we want to summarize the data around
+  # this effort is similar to that done in filter_species
+  # To coerce the group to operate in dplyr pipe, first we must designate the
+  # object returned in the ifelse() fxn as type symbol (or 'name')
+  which_group <- as.symbol(
+    ifelse(species %in% unique(landings_data$ECOLOGICAL_CATEGORY), 
+           'ECOLOGICAL_CATEGORY',
+           ifelse(species %in% unique(landings_data$SPECIES_CATEGORY), 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% unique(landings_data$SPECIES_GROUP), 
+                         'SPECIES_GROUP',
+                         # NOTE: because filter_species will give us an error
+                         #       if the species is not found, we do not need
+                         #       to include it here, thus if the species was
+                         #       not found in the other groups it would have to
+                         #       be in SPECIES_NAME or not exist
+                         'SPECIES_NAME')))
+  )
+  
+  # Because we are using a dplyr pipe in a custom function, using our objects
+  # in dplyr functions can become tricky. Effectively, because we need to 
+  # define a field (i.e. 'GROUP_TS') with which to index a table inside this 
+  # function, we must make this object of type 'quosure' (see rlang)
+  # NOTE: later, we call these objects using the bang-bang (!!) in dplyr
+  # pipes and functions
+  group <- rlang::enquo(which_group)
+  
   landings_data %>%
-    filter(str_detect(NMFS_NAME, species),
-           CONFIDENTIALITY != 'Confidential',
+    filter_species(species) %>%
+    filter(CONFIDENTIALITY != 'Confidential',
            !is.na(DOLLARS),
-           !is.na(KG),
-           # here because searching for scallops yields a scalloped hammerhead
-           !str_detect(NMFS_NAME, 'SHARK')) %>%
-    select(YEAR, NMFS_NAME, KG, DOLLARS_2024) %>%
-    mutate(NMFS_NAME = species) %>%
-    group_by(YEAR, NMFS_NAME) %>%
+           !is.na(KG)) %>%
+    select(YEAR, !!group, KG, DOLLARS_2024) %>%
+    group_by(YEAR, !!group) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(KG = KG / 1000,
