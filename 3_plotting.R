@@ -2382,6 +2382,62 @@ crab_supply_ratio
 crab_unexported_share <- plot_supply_metrics(crab_supply_data, 'Crab', 'SHARE')
 
 crab_unexported_share
+#############################
+###' *PLOT LANDINGS DATA* ###
+#############################
+# Function to plot landings data -----------------------------------------------
+
+# inputs for the function are data formatted by summarize_landings_data and
+  # logical calls to value and volume, which will specify the type of plot
+  # generated
+plot_landings <- function(data, value = F, volume = F) {
+  # stops function if no specification made for value or volume
+  if (value == F & volume == F) {
+    stop('Please set either value or volume to TRUE')
+  }
+  # stops function if both value and volume are set to T
+  if (value == T & volume == T) {
+    stop('Please set only value OR volume to TRUE, not both')
+  }
+  
+  # specify y term, ylabel, and y-axis format for value plots
+  if (value == T) {
+    y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    y <- rlang::enquo(y)
+    
+    label <- label_currency(suffix = 'B')
+    ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
+  }
+  
+  # specify y term, ylabel, and y-axis format for volume plots
+  if (volume == T) {
+    y <- as.symbol('COM_VOLUME_THOUSAND_MT')
+    y <- rlang::enquo(y)
+    
+    # create column for thousand metric tons
+    data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
+    
+    label <- comma
+    ylab <- 'Total Landed Volume (Thousand Metric Tons)'
+  }
+  
+  # create plot sourcing specified values above
+  plot <- 
+    ggplot(data = data,
+           aes(x = factor(YEAR),
+               y = !!y)) +
+    geom_col(fill = 'black') +
+    scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+                     limits = factor(2004:2023)) +
+    scale_y_continuous(labels = label) +
+    labs(x = '',
+         y = ylab) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 10))
+  
+  return(plot)
+}
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
