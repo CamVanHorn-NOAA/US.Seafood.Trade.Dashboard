@@ -1133,10 +1133,25 @@ save_plot(cod_balance_yr)
 
 ### Net Exports
 # Plot Value
-cod_net_value_yr <- plot_trade(cod_trade_data, 'value', export = T, import = T)
+cod_net_value_yr <- plot_trade(cod_trade_data, 'value', 
+                               export = T, import = T)
 
-# View Plot
+# View plot
 cod_net_value_yr
+
+# Plot Volume
+cod_net_volume_yr <- plot_trade(cod_trade_data, 'volume', 
+                                export = T, import = T)
+
+# View plot
+cod_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+cod_volume_ratio <- plot_trade(cod_trade_data, 'ratio')
+
+# View plot
+cod_volume_ratio
 
 # Pollock (all) ----------------------------------------------------------------
 # Format the data
