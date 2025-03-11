@@ -2973,6 +2973,3 @@ crab_trade_ctry_volume
   # no longer available online
 # TODO: US Share of global trade value activity
 # TODO: Export and import value growth of the US and rest of the world
-# TODO: US Apparent Consumption
-# TODO: Apparent consumption relative to US production
-# TODO: Unexported US production relative to apparent consumption
