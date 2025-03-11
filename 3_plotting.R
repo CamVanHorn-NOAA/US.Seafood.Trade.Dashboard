@@ -1594,10 +1594,26 @@ save_plot(crab_balance_yr)
 
 ### Net Exports
 # Plot Value
-crab_net_value_yr <- plot_trade(crab_trade_data, 'value', export = T, import = T)
+crab_net_value_yr <- plot_trade(crab_trade_data, 'value', 
+                                export = T, import = T)
 
-# View Plot
+# View plot
 crab_net_value_yr
+
+# Plot Volume
+crab_net_volume_yr <- plot_trade(crab_trade_data, 'volume', 
+                                 export = T, import = T)
+
+# View plot
+crab_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+crab_volume_ratio <- plot_trade(crab_trade_data, 'ratio')
+
+# View plot
+crab_volume_ratio
+
 ########################################
 ###' *MULTILATERAL LOWE TRADE INDEX* ###
 ########################################
