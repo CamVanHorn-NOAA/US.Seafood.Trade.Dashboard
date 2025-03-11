@@ -1409,10 +1409,25 @@ save_plot(scallop_balance_yr)
 
 ### Net Exports
 # Plot Value
-scallop_net_value_yr <- plot_trade(scallop_trade_data, 'value', export = T, import = T)
+scallop_net_value_yr <- plot_trade(scallop_trade_data, 'value', 
+                                   export = T, import = T)
 
-# View Plot
+# View plot
 scallop_net_value_yr
+
+# Plot Volume
+scallop_net_volume_yr <- plot_trade(scallop_trade_data, 'volume', 
+                                    export = T, import = T)
+
+# View plot
+scallop_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+scallop_volume_ratio <- plot_trade(scallop_trade_data, 'ratio')
+
+# View plot
+scallop_volume_ratio
 
 # Lobsters (all) ---------------------------------------------------------------
 # For now, this in inclusive of ALL lobster imports/exports, not just American
