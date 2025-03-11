@@ -2890,6 +2890,31 @@ shrimp_trade_ctry_volume <- plot_trade_ctry_yr_spp(shrimp_trade_top5_volume,
 # View plot
 shrimp_trade_ctry_volume
 
+# Scallop (all) -----------------------------------------------------------------
+### Value
+# Make data
+scallop_trade_top5_value <- summarize_trade_ctry_yr_spp(trade_data, 'SCALLOP',
+                                                        c(2020, 2024), value = T)
+
+# Plot data
+scallop_trade_ctry_value <- plot_trade_ctry_yr_spp(scallop_trade_top5_value,
+                                                   value = T)
+
+# View plot
+scallop_trade_ctry_value
+
+### Volume
+# Make data
+scallop_trade_top5_volume <- summarize_trade_ctry_yr_spp(trade_data, 'SCALLOP',
+                                                        c(2020, 2024), volume = T)
+
+# Plot data
+scallop_trade_ctry_volume <- plot_trade_ctry_yr_spp(scallop_trade_top5_volume,
+                                                   volume = T)
+
+# View plot
+scallop_trade_ctry_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
