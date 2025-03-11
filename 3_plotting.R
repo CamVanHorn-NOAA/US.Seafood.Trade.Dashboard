@@ -2706,7 +2706,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
              EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
            IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           NET_VOLUME_MT = EXP_VOLUME_MT - EXP_VOLUME_MT,
+           NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
            NET_PRICE_2024USD_PER_KG = 
              (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
              (EXP_VOLUME_KG - IMP_VOLUME_KG))
