@@ -2915,6 +2915,31 @@ scallop_trade_ctry_volume <- plot_trade_ctry_yr_spp(scallop_trade_top5_volume,
 # View plot
 scallop_trade_ctry_volume
 
+# Lobster (all) -----------------------------------------------------------------
+### Value
+# Make data
+lobster_trade_top5_value <- summarize_trade_ctry_yr_spp(trade_data, 'LOBSTERS',
+                                                        c(2020, 2024), value = T)
+
+# Plot data
+lobster_trade_ctry_value <- plot_trade_ctry_yr_spp(lobster_trade_top5_value,
+                                                   value = T)
+
+# View plot
+lobster_trade_ctry_value
+
+### Volume
+# Make data
+lobster_trade_top5_volume <- summarize_trade_ctry_yr_spp(trade_data, 'LOBSTERS',
+                                                         c(2020, 2024), volume = T)
+
+# Plot data
+lobster_trade_ctry_volume <- plot_trade_ctry_yr_spp(lobster_trade_top5_volume,
+                                                    volume = T)
+
+# View plot
+lobster_trade_ctry_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
