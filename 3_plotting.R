@@ -3107,7 +3107,6 @@ crab_trade_ctry_volume
 
 
 # TODOS ------------------------------------------------------------------------
-# TODO: Export/Import Volume Ratio
 # TODO: Real Export Effective Exchange Rate Index (foreign currency per dollar)
   # IMPORTANT: Cannot achieve since dataset available in Fissel et al. 2023 is
   # no longer available online
