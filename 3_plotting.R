@@ -719,8 +719,8 @@ summarize_yr_spp <- function(species) {
 # Because there are several species that the U.S. imports and exports, it is
   # useful to automate visualizing these trade metrics
 # The plot_trade function provided below creates simple visualizations of 
-  # export value, volume, price, and trade balances through time of 
-  # provided data
+  # export and import value, volume, price, trade balances, trade volume ratios, 
+  # and net exports through time of provided data
 
 # data requires summarized data by year, 
 # plot_format requires one of four inputs, and outputs an error if other input
@@ -757,8 +757,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   plot_format <- toupper(plot_format)
   
   # stop function if plot_format is provided incorrectly
-  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE'))) {
-    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\", and \"Balance\"')
+  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
+    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
   }
   
   # set vectors and objects for 'value' input
@@ -802,6 +802,26 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_y_continuous(labels = label) +
       labs(x = 'Year',
            y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else if (plot_format == 'RATIO') {
+    # quick and dirty method to create a group for geom_line to work
+    data$GROUP <- 'group'
+    
+    # plot ratio of export/import volumes
+    plot <- 
+      ggplot(data = data, 
+             aes(x = factor(YEAR),
+                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      labs(x = '', 
+           y = 'Export / Import Volume Ratio') +
       theme_bw() +
       theme(axis.text = element_text(size = 10))
   } else {
@@ -856,7 +876,6 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   
   return(plot)
 }
-
 
 # Salmon (all) -----------------------------------------------------------------
 # Format the data
