@@ -2815,6 +2815,31 @@ tuna_trade_ctry_volume <- plot_trade_ctry_yr_spp(tuna_trade_top5_volume,
 # View plot
 tuna_trade_ctry_volume
 
+# Cod (all) -----------------------------------------------------------------
+### Value
+# Make data
+cod_trade_top5_value <- summarize_trade_ctry_yr_spp(trade_data, 'COD',
+                                                    c(2020, 2024), value = T)
+
+# Plot data
+cod_trade_ctry_value <- plot_trade_ctry_yr_spp(cod_trade_top5_value,
+                                               value = T)
+
+# View plot
+cod_trade_ctry_value
+
+### Volume
+# Make data
+cod_trade_top5_volume <- summarize_trade_ctry_yr_spp(trade_data, 'COD',
+                                                     c(2020, 2024), volume = T)
+
+# Plot data
+cod_trade_ctry_volume <- plot_trade_ctry_yr_spp(cod_trade_top5_volume,
+                                                volume = T)
+
+# View plot
+cod_trade_ctry_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
