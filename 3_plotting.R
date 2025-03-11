@@ -1501,11 +1501,26 @@ lobster_balance_yr
 save_plot(lobster_balance_yr)
 
 ### Net Exports
-# Make Plot
-lobster_net_value_yr <- plot_trade(lobster_trade_data, 'value', export = T, import = T)
+# Plot Value
+lobster_net_value_yr <- plot_trade(lobster_trade_data, 'value', 
+                                   export = T, import = T)
 
-# View Plot
+# View plot
 lobster_net_value_yr
+
+# Plot Volume
+lobster_net_volume_yr <- plot_trade(lobster_trade_data, 'volume', 
+                                    export = T, import = T)
+
+# View plot
+lobster_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+lobster_volume_ratio <- plot_trade(lobster_trade_data, 'ratio')
+
+# View plot
+lobster_volume_ratio
 
 # Crabs (all) ------------------------------------------------------------------
 # Format the data
