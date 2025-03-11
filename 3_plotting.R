@@ -998,6 +998,13 @@ tuna_balance_yr
 # Save plot
 save_plot(tuna_balance_yr)
 
+### Net Exports
+# Plot Value
+tuna_net_value_yr <- plot_trade(tuna_trade_data, 'value', export = T, import = T)
+
+# View plot
+tuna_net_value_yr
+
 # Cod (all) --------------------------------------------------------------------
 # Format the data
 cod_trade_data <- summarize_trade_yr_spp(trade_data, 'COD')
@@ -1067,6 +1074,13 @@ cod_balance_yr
 
 # Save plot
 save_plot(cod_balance_yr)
+
+### Net Exports
+# Plot Value
+cod_net_value_yr <- plot_trade(cod_trade_data, 'value', export = T, import = T)
+
+# View Plot
+cod_net_value_yr
 
 # Pollock (all) ----------------------------------------------------------------
 # Format the data
@@ -1138,6 +1152,12 @@ pollock_balance_yr
 # Save plot
 save_plot(pollock_balance_yr)
 
+### Net Exports
+# Plot Value
+pollock_net_value_yr <- plot_trade(pollock_trade_data, 'value', export = T, import = T)
+
+# View plot
+pollock_net_value_yr
 
 # Shrimp (all) -----------------------------------------------------------------
 # Format the data
@@ -1209,6 +1229,13 @@ shrimp_balance_yr
 # Save plot
 save_plot(shrimp_balance_yr)
 
+### Net Exports
+# Plot Value
+shrimp_net_value_yr <- plot_trade(shrimp_trade_data, 'value', export = T, import = T)
+
+# View Plot
+shrimp_net_value_yr
+
 # Scallops (all) ---------------------------------------------------------------
 # Format the data
 scallop_trade_data <- summarize_trade_yr_spp(trade_data, 'SCALLOP')
@@ -1278,6 +1305,13 @@ scallop_balance_yr
 
 # Save plot
 save_plot(scallop_balance_yr)
+
+### Net Exports
+# Plot Value
+scallop_net_value_yr <- plot_trade(scallop_trade_data, 'value', export = T, import = T)
+
+# View Plot
+scallop_net_value_yr
 
 # Lobsters (all) ---------------------------------------------------------------
 # For now, this in inclusive of ALL lobster imports/exports, not just American
@@ -1350,6 +1384,12 @@ lobster_balance_yr
 # Save plot
 save_plot(lobster_balance_yr)
 
+### Net Exports
+# Make Plot
+lobster_net_value_yr <- plot_trade(lobster_trade_data, 'value', export = T, import = T)
+
+# View Plot
+lobster_net_value_yr
 
 # Crabs (all) ------------------------------------------------------------------
 # Format the data
@@ -1421,7 +1461,12 @@ crab_balance_yr
 # Save plot
 save_plot(crab_balance_yr)
 
+### Net Exports
+# Plot Value
+crab_net_value_yr <- plot_trade(crab_trade_data, 'value', export = T, import = T)
 
+# View Plot
+crab_net_value_yr
 ########################################
 ###' *MULTILATERAL LOWE TRADE INDEX* ###
 ########################################
