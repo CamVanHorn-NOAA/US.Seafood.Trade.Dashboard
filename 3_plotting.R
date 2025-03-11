@@ -1317,10 +1317,25 @@ save_plot(shrimp_balance_yr)
 
 ### Net Exports
 # Plot Value
-shrimp_net_value_yr <- plot_trade(shrimp_trade_data, 'value', export = T, import = T)
+shrimp_net_value_yr <- plot_trade(shrimp_trade_data, 'value', 
+                                  export = T, import = T)
 
-# View Plot
+# View plot
 shrimp_net_value_yr
+
+# Plot Volume
+shrimp_net_volume_yr <- plot_trade(shrimp_trade_data, 'volume', 
+                                   export = T, import = T)
+
+# View plot
+shrimp_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+shrimp_volume_ratio <- plot_trade(shrimp_trade_data, 'ratio')
+
+# View plot
+shrimp_volume_ratio
 
 # Scallops (all) ---------------------------------------------------------------
 # Format the data
