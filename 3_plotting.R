@@ -1225,10 +1225,25 @@ save_plot(pollock_balance_yr)
 
 ### Net Exports
 # Plot Value
-pollock_net_value_yr <- plot_trade(pollock_trade_data, 'value', export = T, import = T)
+pollock_net_value_yr <- plot_trade(pollock_trade_data, 'value', 
+                                   export = T, import = T)
 
 # View plot
 pollock_net_value_yr
+
+# Plot Volume
+pollock_net_volume_yr <- plot_trade(pollock_trade_data, 'volume', 
+                                    export = T, import = T)
+
+# View plot
+pollock_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+pollock_volume_ratio <- plot_trade(pollock_trade_data, 'ratio')
+
+# View plot
+pollock_volume_ratio
 
 # Shrimp (all) -----------------------------------------------------------------
 # Format the data
