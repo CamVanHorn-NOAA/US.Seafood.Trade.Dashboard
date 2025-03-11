@@ -727,14 +727,20 @@ summarize_yr_spp <- function(species) {
   # is provided
 plot_trade <- function(data, plot_format, export = F, import = F) {
   
-  # to make calling for balance output easier, give error if both exports and
-    # imports are set to T that directs to set each to F
+  # setting both to true outputs Net Exports
   if (export == T & import == T) {
-    stop('Export and import cannot both be true, set one to false. If interested in balance, leave both as false.')
+    data <- data %>%
+      mutate(NET_VALUE_2024USD_BILLIONS = 
+               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
+    
+    shortform <- 'NET'
+    longform <- 'Net Export'
   }
   
   # set terms for export
-  if (export == T) {
+  if (export == T & import == F) {
     # we need two values: a shortform embedded in column names, and a long form
       # that will be used in labels
     shortform <- 'EXP'
@@ -742,7 +748,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   }
   
   # set terms for import
-  if (import == T) {
+  if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Import'
   }
