@@ -949,10 +949,25 @@ save_plot(salmon_balance_yr)
 
 ### Net Exports
 # Plot Value
-salmon_net_value_yr <- plot_trade(salmon_trade_data, 'value', export = T, import = T)
+salmon_net_value_yr <- plot_trade(salmon_trade_data, 'value', 
+                                  export = T, import = T)
 
 # View plot
 salmon_net_value_yr
+
+# Plot Volume
+salmon_net_volume_yr <- plot_trade(salmon_trade_data, 'volume', 
+                                   export = T, import = T)
+
+# View plot
+salmon_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+salmon_volume_ratio <- plot_trade(salmon_trade_data, 'ratio')
+
+# View plot
+salmon_volume_ratio
 
 # Tuna (all) -------------------------------------------------------------------
 # Format the data
