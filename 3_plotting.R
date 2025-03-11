@@ -1041,10 +1041,25 @@ save_plot(tuna_balance_yr)
 
 ### Net Exports
 # Plot Value
-tuna_net_value_yr <- plot_trade(tuna_trade_data, 'value', export = T, import = T)
+tuna_net_value_yr <- plot_trade(tuna_trade_data, 'value', 
+                                export = T, import = T)
 
 # View plot
 tuna_net_value_yr
+
+# Plot Volume
+tuna_net_volume_yr <- plot_trade(tuna_trade_data, 'volume', 
+                                 export = T, import = T)
+
+# View plot
+tuna_net_volume_yr
+
+### Trade Volume Ratio
+# Plot ratio
+tuna_volume_ratio <- plot_trade(tuna_trade_data, 'ratio')
+
+# View plot
+tuna_volume_ratio
 
 # Cod (all) --------------------------------------------------------------------
 # Format the data
