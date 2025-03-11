@@ -928,6 +928,13 @@ salmon_balance_yr
 # Save plot
 save_plot(salmon_balance_yr)
 
+### Net Exports
+# Plot Value
+salmon_net_value_yr <- plot_trade(salmon_trade_data, 'value', export = T, import = T)
+
+# View plot
+salmon_net_value_yr
+
 # Tuna (all) -------------------------------------------------------------------
 # Format the data
 tuna_trade_data <- summarize_trade_yr_spp(trade_data, 'TUNAS')
