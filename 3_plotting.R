@@ -2765,6 +2765,31 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
           legend.text = element_text(size = 10))
 }
 
+# Salmon (all) -----------------------------------------------------------------
+### Value
+# Make data
+salmon_trade_top5_value <- summarize_trade_ctry_yr_spp(trade_data, 'SALMON',
+                                                       c(2020, 2024), value = T)
+
+# Plot data
+salmon_trade_ctry_value <- plot_trade_ctry_yr_spp(salmon_trade_top5_value,
+                                                  value = T)
+
+# View plot
+salmon_trade_ctry_value
+
+### Volume
+# Make data
+salmon_trade_top5_volume <- summarize_trade_ctry_yr_spp(trade_data, 'SALMON',
+                                                        c(2020, 2024), volume = T)
+
+# Plot data
+salmon_trade_ctry_volume <- plot_trade_ctry_yr_spp(salmon_trade_top5_volume,
+                                                   volume = T)
+
+# View plot
+salmon_trade_ctry_volume
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
