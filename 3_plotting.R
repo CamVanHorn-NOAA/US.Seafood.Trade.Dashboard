@@ -2713,6 +2713,58 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   
   return(final_data)
 }
+
+# Function to plot top five trading nations ------------------------------------
+
+# this function outputs plots of top 5 trading countries by value or volume
+# the plot presents the data grouped by country with time series within each
+# data is data formatted by the above function 'summarize_trade_ctry_yr_spp'
+# value and volume are logicals that specify which plot to output
+plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
+  
+  # stops function if no value or volume specified
+  if (value == F & volume == F) {
+    stop('Please specify which plot to create by setting either value or volume to T')
+  }
+  # stops function if both value and volume are selected
+  if (value == T & volume == T) {
+    stop('Please specify only one plot to create')
+  }
+  
+  # set y parameters for value or volume
+  if (value == T) {
+    y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = 'B')
+    ylab <- 'Net Export Value (Real 2024 USD, Billions)'
+  } else {
+    y <- as.symbol('NET_VOLUME_MT')
+    y <- rlang::enquo(y)
+    label <- comma
+    ylab <- 'Net Export Volume (Metric Tons)'
+  }
+  
+  # create plot
+  ggplot(data = data,
+         aes(x = factor(COUNTRY_NAME),
+             y = !!y, 
+             fill = factor(YEAR))) +
+    # set years adjacent to each other for time series look
+    geom_col(position = 'dodge') +
+    scale_fill_nmfs(palette = 'oceans') +
+    labs(x = '',
+         y = ylab,
+         fill = 'Year') +
+    scale_y_continuous(labels = label) +
+    theme_bw() +
+    geom_hline(yintercept = 0, 'black') +
+    theme(axis.text = element_text(color = 'black',
+                                   size = 10),
+          axis.title = element_text(size = 14),
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 10))
+}
+
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
