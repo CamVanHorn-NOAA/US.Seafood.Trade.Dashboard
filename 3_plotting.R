@@ -2624,6 +2624,95 @@ crab_landings_volume <- plot_landings(crab_landings, volume = T)
 # View volume plot
 crab_landings_volume
 
+##################################################################
+###' *NET EXPORTS TO TOP FIVE COUNTRIES OVER 5-YEAR TIME SPAN* ###
+##################################################################
+# Function to summarize data ---------------------------------------------------
+
+# the function outputs summarized trade for the top 5 trading countries over
+  # the desired time frame. The function first identifies the top 5 countries
+  # by summarizing trade value and volume across all countries during the 
+  # specified time frame. This creates sums of total trade, or the sum
+  # of exports and imports, value and volume. The "top 5" countries reflect
+  # those with the greatest total value or volume traded during the time period.
+# trade_table should be trade_data or a similarly formatted dataframe
+# species is the target species of interest as a string
+# time.frame is a vector of two years provided in temporal order 
+# value and volume are logicals where only one should be specified as TRUE
+summarize_trade_ctry_yr_spp <- function(trade_table, species, 
+                                        time.frame, value = F, volume = F) {
+  # stop function if value and volume are false
+  if (value == F & volume == F) {
+    stop('Please designate either value or volume as TRUE')
+  }
+  # stop function if value and volume are true
+  if (value == T & volume == T) {
+    stop('Please designate either value or volume as FALSE')
+  }
+  
+  # specify field to index top 5 countries by
+  if (value == T) {
+    field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
+    field <- rlang::enquo(field)
+  } else {
+    field <- as.symbol('TOTAL_TRADE_VOLUME')
+    field <- rlang::enquo(field)
+  }
+  # coerce species to upper case for user flexibility
+  species <- toupper(species)
+  
+  # summarize data by country during time period
+  summarized_data <- trade_table %>%
+    filter_species(species) %>%
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
+    # only include years between the designated time frame
+    filter(YEAR >= time.frame[1],
+           YEAR <= time.frame[2]) %>%
+    # convert NAs to 0s for summation to be accurate
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                      EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                      IMP_VALUE_2024USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG)) %>%
+    group_by(YEAR, COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  # identify top 5 countries during the time period
+  top5 <- summarized_data %>%
+    # remove year so it does not get subsequently summed
+    select(!YEAR) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
+           TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
+    # extract top 5 countries by the index designated prior
+    top_n(5, !!field) %>%
+    pull(COUNTRY_NAME)
+  
+  # create data output
+  final_data <- summarized_data %>%
+    # use prior summarized data and filter for top 5 countries
+    filter(COUNTRY_NAME %in% top5) %>%
+    # calculate metrics
+    mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+           NET_VALUE_2024USD_BILLIONS = 
+             EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+           NET_VOLUME_MT = EXP_VOLUME_MT - EXP_VOLUME_MT,
+           NET_PRICE_2024USD_PER_KG = 
+             (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
+             (EXP_VOLUME_KG - IMP_VOLUME_KG))
+  
+  return(final_data)
+}
 # TODOS ------------------------------------------------------------------------
 # TODO: Export/Import Volume Ratio
 # TODO: Net Exports
