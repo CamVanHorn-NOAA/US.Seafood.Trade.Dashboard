@@ -13,48 +13,58 @@ library(ggh4x)
 load('seafood_trade_data_munge_01_31_25.RData')
 
 # Store functions
-filter_species <- function(trade_table, species_name) {
-
-  group_name <- unique(trade_table$GROUP_NAME)
-  group_ts <- unique(trade_table$GROUP_TS)
+filter_species <- function(data, species) {
+  species_names <- unique(data$SPECIES_NAME)
+  species_groups <- unique(data$SPECIES_GROUP)
+  species_categories <- unique(data$SPECIES_CATEGORY)
+  ecology_categories <- unique(data$ECOLOGICAL_CATEGORY)
   
-  species_name <- toupper(species_name)
+  species <- toupper(species)
   
-  use_group_name <- ifelse(species_name %in% group_name, 'Y', 'N')
-  use_group_ts <- ifelse(species_name %in% group_ts, 'Y', 'N')
+  locate_group <- 
+    ifelse(species %in% ecology_categories, 
+           'ECOLOGICAL_CATEGORY',
+           ifelse(species %in% species_categories, 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% species_groups, 
+                         'SPECIES_GROUP',
+                         ifelse(species %in% species_names, 
+                                'SPECIES_NAME',
+                                'UNAVAILABLE'))))
   
-  if (use_group_name == 'N' & use_group_ts == 'N') {
+  if (locate_group == 'UNAVAILABLE') {
     stop("The species you provided is either too specific or not available.
-         Try 'unique(your_data$your_column)' to find acceptable calls")
-  }
-  
-  if (use_group_ts == 'Y') {
-    filtered_data <- trade_table %>%
-      filter(GROUP_TS == species_name)
+         Try 'unique(your_data$your_column) to find acceptable calls.")
   } 
   
-  else if (use_group_ts == 'N' & use_group_name == 'Y') {
-    filtered_data <- trade_table %>%
-      filter(GROUP_NAME == species_name)
-  }
+  group <- as.symbol(locate_group)
+  group <- rlang::enquo(group)
   
-  return(filtered_data)
+  new_data <- data %>%
+    filter(!!group == species)
+  
+  return(new_data)
+  
 }
-summarize_yr_spp <- function(trade_table, species_name) {
-  if (species_name == '') {
-    return(NULL)
-    stop()
-  }
-  species_name <- toupper(species_name)
-
-  which_group <- as.symbol(ifelse(species_name %in% unique(trade_table$GROUP_TS),
-                                  'GROUP_TS', 'GROUP_NAME'))
+summarize_trade_yr_spp <- function(trade_table, species) {
   
-  which_group <- rlang::enquo(which_group)
+  species <- toupper(species)
+  
+  which_group <- as.symbol(
+    ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
+           'ECOLOGICAL_CATEGORY',
+           ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
+                  'SPECIES_CATEGORY',
+                  ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
+                         'SPECIES_GROUP',
+                         'SPECIES_NAME')))
+  )
+  
+  group <- rlang::enquo(which_group)
   
   summarized_data <- trade_table %>%
-    filter_species(species_name) %>%
-    select(YEAR, !!which_group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+    filter_species(species) %>%
+    select(YEAR, !!group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
                                       EXP_VALUE_2024USD),
@@ -64,7 +74,7 @@ summarize_yr_spp <- function(trade_table, species_name) {
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                   IMP_VOLUME_KG)) %>%
-    group_by(YEAR, !!which_group) %>%
+    group_by(YEAR, !!group) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
@@ -79,24 +89,33 @@ summarize_yr_spp <- function(trade_table, species_name) {
   return(summarized_data)
 }
 plot_trade <- function(data, plot_format, export = F, import = F) {
-  if (is.null(data)) {
-    stop()
-  }
+  
   if (export == T & import == T) {
-    stop('Export and import cannot both be true, set one to false. If interested in balance, leave both as false.')
+    data <- data %>%
+      mutate(NET_VALUE_2024USD_BILLIONS = 
+               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
+    
+    shortform <- 'NET'
+    longform <- 'Net Export'
   }
   
-  if (export == T) {
+  if (export == T & import == F) {
     shortform <- 'EXP'
     longform <- 'Export'
   }
   
-  if (import == T) {
+  if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Import'
   }
   
   plot_format <- toupper(plot_format)
+  
+  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
+    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
+  }
   
   if (plot_format == 'VALUE') {
     y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
@@ -132,6 +151,24 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
            y = ylab) +
       theme_bw() +
       theme(axis.text = element_text(size = 10))
+  } else if (plot_format == 'RATIO') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data, 
+             aes(x = factor(YEAR),
+                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      labs(x = '', 
+           y = 'Export / Import Volume Ratio') +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
   } else {
     balance_data <- data %>%
       rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
@@ -160,17 +197,14 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
       theme(legend.position = 'top',
-            legend.text = element_text(size = 15),
             axis.line.y = element_line(color = 'black'),
             axis.text.x = element_text(hjust = 0.8,
-                                       size = 12),
-            axis.text.y = element_text(size = 12),
-            axis.title.y = element_text(vjust = 14,
-                                        size = 15),
+                                       size = 8),
+            axis.title.y = element_text(vjust = 14),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 40.5, 'points'))
+            plot.margin = margin(5.5, 5.5, 5.5, 30.5, 'points'))
   }
   
   return(plot)
