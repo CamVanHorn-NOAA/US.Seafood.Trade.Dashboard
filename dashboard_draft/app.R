@@ -8,6 +8,7 @@ library(bslib)
 library(tidyverse)
 library(scales)
 library(ggh4x)
+library(nmfspalette)
 
 # Pull Data 
 load('seafood_trade_data_munge_03_13_25.RData')
@@ -703,6 +704,19 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
           legend.text = element_text(size = 10))
 }
 
+# Colors -----------------------------------------------------------------------
+# colors designed primarily for processed products at the moment
+colors <- c(nmfs_palette('coral')(6)[6:3], 
+            nmfs_palette('waves')(6)[6:2], 
+            nmfs_palette('crustacean')(6)[c(6, 4, 2)],
+            nmfs_cols()[42:39])
+
+names(colors) <- levels(factor(levels = c(
+  'FILLETS', 'STEAKS', 'SURIMI', 'SHUCKED MEATS',
+  'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
+  'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
+  'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+# App --------------------------------------------------------------------------
 # Define UI 
 ui <- fluidPage(
   selectInput(
