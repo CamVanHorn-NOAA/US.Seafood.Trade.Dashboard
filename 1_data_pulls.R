@@ -53,6 +53,12 @@ drive_auth()
 #                overwrite = T)
 # drive_download('pp_com_landings_mapping.csv',
 #                overwrite = T)
+# drive_download('com_landings_mapping_sheet.csv',
+#                overwrite = T)
+# drive_download('trade_data_mapping_sheet.csv',
+#                overwrite = T)
+# drive_download('pp_mapping_sheet.csv',
+#                overwrite = T)
 
 ##################################
 ### LOAD DOWNLOADED DATA FILES ###
@@ -141,12 +147,25 @@ pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
 foss_com_1523 <- read.csv('foss_com_landings_15-23.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+  .[-1, ] %>%
+  # fix error where POLLOCK, WALLEYE and SEA HARES have extra space in string
+  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+                            'POLLOCK, WALLEYE',
+                            NMFS_NAME),
+         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+                            'SEA HARES', 
+                            NMFS_NAME))
 
 foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+  .[-1, ] %>%
+  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+                            'POLLOCK, WALLEYE',
+                            NMFS_NAME),
+         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+                            'SEA HARES', 
+                            NMFS_NAME))
 
 # combine data (stack)
 foss_com_landings <- bind_rows(foss_com_0414, foss_com_1523)
@@ -161,7 +180,7 @@ def_index <- read.csv('GDPDEF_2024_index.csv') %>%
   mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
          INDEX = (100/DEFLATOR_VALUE))
 
-# Species Reference Data -------------------------------------------------------
+# Species Reference and Mapping Data -------------------------------------------
 # Imports and Exports in FOSS provide detailed descriptions of the products
   # However, these descriptions are cumbersome strings that are difficult
     # to parse for species names without a brute force method
@@ -169,6 +188,23 @@ def_index <- read.csv('GDPDEF_2024_index.csv') %>%
   # through the use of FTS reference tables
 # We will import the reference table here to munge into the tables later
 species_ref <- read.csv('FTS_PRODUCTS.csv')
+
+# this sheet was developed by hand to categorize species into three groups:
+  # species group, which groups like species by identifiers such as genera
+  # species category, which groups like generas by collections, such as all crabs
+  # ecological category, which groups like categories by shared traits, such as
+    # crustaceans, or small pelagic fish, etc.
+trade_map <- read.csv('trade_data_mapping_sheet.csv') %>%
+  mutate(HTS_NUMBER = as.character(HTS_NUMBER))
+
+# this sheet was developed by the same effort described above
+landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
+  mutate(TSN = as.character(TSN))
+
+# this sheet was developed by the same effort described above
+  # however, with a lack of available scientific names and specified common
+  # names, this map contains more NAs and generic maps
+pp_map <- read.csv('pp_mapping_sheet.csv')
 
 #####################
 ### SAVE THE DATA ###
@@ -182,7 +218,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref', 'foss_com_landings', 'pp_landings_map'),
+              'species_ref', 'foss_com_landings', 'pp_landings_map',
+              'trade_map', 'landings_map', 'pp_map'),
      file = file_name)
 
 # upload to google drive

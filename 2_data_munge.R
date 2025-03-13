@@ -47,7 +47,7 @@ rm(data_file)
 # TODO: extract species from product information
 # Exports ----------------------------------------------------------------------
 # Data formatting
-foss_exports <- foss_exports %>%
+exports <- foss_exports %>%
   # set necessary columns to numeric
   # value and volume need commas removed for coercion
   mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
@@ -61,6 +61,11 @@ foss_exports <- foss_exports %>%
               select(HTS_NUMBER, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
               # remove duplicates to not create many-to-many relationships for
                 # the join
+              distinct()) %>%
+  # use trade_map to attach categories to products
+  left_join(trade_map %>%
+              select(SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+                     ECOLOGICAL_CATEGORY, HTS_NUMBER) %>%
               distinct()) %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME) %>%
@@ -83,22 +88,26 @@ foss_exports <- foss_exports %>%
 # Must do piece-wise due to two summarise() calls
 # First piece: summarise # of product types exported by year, 
   # country name (exported to), customs district (exported from)
-exports_products_smry <- foss_exports %>%
+exports_products_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+         SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(EXP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 # Second piece: summarise value and volume of exports by year, 
   # country name (exported to), customs district (exported from)
-exports_price_smry <- foss_exports %>%
+exports_price_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, GROUP_NAME, GROUP_TS, 
-         GROUP_CBP) %>%
+         GROUP_CBP, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY,
+         ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(EXP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
@@ -110,7 +119,7 @@ exports_smry <- full_join(exports_products_smry, exports_price_smry)
 
 # Imports ----------------------------------------------------------------------
 # Data formatting
-foss_imports <- foss_imports %>%
+imports <- foss_imports %>%
   mutate(VALUE_USD = as.numeric(gsub(',', '', VALUE_USD)),
          VOLUME_KG = as.numeric(gsub(',', '', VOLUME_KG)),
          CENSUS_COUNTRY_CODE = as.numeric(CENSUS_COUNTRY_CODE),
@@ -121,6 +130,10 @@ foss_imports <- foss_imports %>%
   left_join(species_ref %>% 
               select(HTS_NUMBER, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
               distinct()) %>%
+  left_join(trade_map %>%
+              select(SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+                     ECOLOGICAL_CATEGORY, HTS_NUMBER) %>%
+              distinct()) %>%
   arrange(YEAR, COUNTRY_NAME) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(IMP_VALUE_2024USD = VALUE_USD * INDEX,
@@ -129,20 +142,24 @@ foss_imports <- foss_imports %>%
   
 
 # Data summarizing
-imports_products_smry <- foss_imports %>%
+imports_products_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
-         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME, 
+         SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
-imports_price_smry <- foss_imports %>%
+imports_price_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
-         IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+         IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP,
+         SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
-           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
+           FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
+           SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(IMP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
@@ -178,6 +195,8 @@ trade_data <- full_join(exports_smry, imports_smry)
 # Processed Products -----------------------------------------------------------
 # Data formatting
 pp_data <- foss_pp %>%
+  # connect groups from map
+  left_join(pp_map) %>%
   mutate(YEAR = as.numeric(YEAR),
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
          DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
@@ -185,7 +204,8 @@ pp_data <- foss_pp %>%
          KG = POUNDS * 0.45359237) %>%
   arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
   # reorder columns so species is left of product_name for ease of viewing
-  select(YEAR, SPECIES, PRODUCT_NAME, POUNDS, DOLLARS, KG) %>%
+  select(YEAR, SPECIES, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+         ECOLOGICAL_CATEGORY, PRODUCT_NAME, POUNDS, DOLLARS, KG) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
          DOLLARS_PER_LB = DOLLARS / POUNDS,
@@ -200,10 +220,19 @@ com_landings <- foss_com_landings %>%
   mutate(YEAR = as.numeric(YEAR),
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
          METRIC_TONS = as.numeric(gsub(',', '', METRIC_TONS)),
-         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
-         TSN = as.numeric(TSN)) %>%
+         DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
   # connect only SPECIES from processed products data to enable later joining
-  left_join(pp_landings_map)
+  left_join(pp_landings_map) %>%
+  # connect groups from map
+  left_join(landings_map %>%
+              select(NMFS_NAME, TSN, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+              distinct()) %>%
+  left_join(def_index %>% select(YEAR, INDEX)) %>%
+  mutate(DOLLARS_2024 = DOLLARS * INDEX,
+         KG = POUNDS * 0.45359237,
+         DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
+         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
+  select(-INDEX)
 
 #####################
 ### SAVE THE DATA ###
