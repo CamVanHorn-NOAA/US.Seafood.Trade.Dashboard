@@ -777,17 +777,68 @@ ui <- page_sidebar(
 # Define server logic 
 server <- function(input, output, session) {
   
+  # creates input: species_cat
+  output$filter_2 <- renderUI({
+    req(input$ecol_cat != 'ALL')
+    species_cats <- c('ALL', com_landings %>%
+                        filter_species(input$ecol_cat) %>%
+                        select(SPECIES_CATEGORY) %>%
+                        distinct() %>%
+                        mutate(SPECIES_CATEGORY = 
+                                 str_to_title(SPECIES_CATEGORY)) %>%
+                        pull())
+    selectInput('species_cat', 'Choose a Secondary Category', species_cats)
+  })
+  
+  # creates input: species_grp
+  output$filter_3 <- renderUI({
+    req(input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    species_groups <- c('ALL', com_landings %>%
+                          filter_species(input$species_cat) %>%
+                          select(SPECIES_GROUP) %>%
+                          distinct() %>%
+                          mutate(SPECIES_GROUP = 
+                                   str_to_title(SPECIES_GROUP)) %>%
+                          pull())
+    selectInput('species_grp', 'Choose a Group', species_groups)
+  })
+  
+  # creates input: species_name
+  output$filter_4 <- renderUI ({
+    req(input$species_grp != 'ALL' & input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    species_names <- c('ALL', com_landings %>%
+                         filter_species(input$species_grp) %>%
+                         select(SPECIES_NAME) %>%
+                         distinct() %>%
+                         mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                         pull())
+    selectInput('species_name', 'Choose a Species', species_names)
+  })
+
   output$balance <- renderPlot({
-    req(input$species != '')
-    plot_trade(summarize_yr_spp(trade_data, input$species), 'BALANCE')
+    plot_trade(
+      summarize_trade_yr_spp(
+        trade_data, 
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))), 
+      'BALANCE')
   })
-  
+
   output$exp_volume <- renderPlot({
-    req(input$species != '')
-    plot_trade(summarize_yr_spp(trade_data, input$species), 'VOLUME', 
-               export = T)
+    plot_trade(
+      summarize_trade_yr_spp(
+        trade_data, 
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))), 
+      'VOLUME', export = T)
   })
-  
+
   output$imp_volume <- renderPlot({
     req(input$species != '')
     plot_trade(summarize_yr_spp(trade_data, input$species), 'VOLUME',
