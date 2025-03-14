@@ -840,9 +840,15 @@ server <- function(input, output, session) {
   })
 
   output$imp_volume <- renderPlot({
-    req(input$species != '')
-    plot_trade(summarize_yr_spp(trade_data, input$species), 'VOLUME',
-               import = T)
+    plot_trade(
+      summarize_trade_yr_spp(
+        trade_data, 
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))), 
+      'VOLUME', import = T)
   })
 
 }
