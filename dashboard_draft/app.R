@@ -744,13 +744,22 @@ names(colors) <- levels(factor(levels = c(
   'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
 # App --------------------------------------------------------------------------
 # Define UI 
-ui <- fluidPage(
-  selectInput(
-             'species',
-             label = 'Select species group',
-             choices = c('', 'Cod', 'Crabs', 'Lobsters', 'Pollock', 
-                         'Salmon', 'Scallops', 'Shrimp', 'Tuna')
-           ),
+ui <- page_sidebar(
+  
+  sidebar = sidebar(
+    title = 'Species Selection', 
+    selectInput(inputId = 'ecol_cat', 
+                label = 'Choose a Category',
+                choices = c('ALL', com_landings %>% 
+                              select(ECOLOGICAL_CATEGORY) %>%
+                              distinct() %>%
+                              mutate(ECOLOGICAL_CATEGORY = 
+                                       str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                              pull())),
+    uiOutput('filter_2'),
+    uiOutput('filter_3'),
+    uiOutput('filter_4')
+  ),
   tabsetPanel(
              tabPanel('Trade Balance (Value)',
                       plotOutput('balance')
