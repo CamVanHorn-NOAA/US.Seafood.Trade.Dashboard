@@ -51,15 +51,41 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   
   species <- toupper(species)
   
-  which_group <- as.symbol(
-    ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
-           'ECOLOGICAL_CATEGORY',
-           ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
-                  'SPECIES_CATEGORY',
-                  ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
-                         'SPECIES_GROUP',
-                         'SPECIES_NAME')))
-  )
+  if (species != 'ALL') {
+    which_group <- as.symbol(
+      ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
+             'ECOLOGICAL_CATEGORY',
+             ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
+                    'SPECIES_CATEGORY',
+                    ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
+                           'SPECIES_GROUP',
+                           'SPECIES_NAME')))
+    )
+  } else if (species == 'ALL') {
+    summarized_data <- trade_table %>%
+      select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
+             IMP_VOLUME_KG) %>%
+      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                        EXP_VALUE_2024USD),
+             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                        IMP_VALUE_2024USD),
+             EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                    EXP_VOLUME_KG),
+             IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                    IMP_VOLUME_KG)) %>%
+      group_by(YEAR) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
+             IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
+             EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+             IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+             EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+             IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+             EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+             IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+    return(summarized_data)
+  }
   
   group <- rlang::enquo(which_group)
   
