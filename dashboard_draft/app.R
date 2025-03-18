@@ -524,10 +524,7 @@ plot_hi <- function(hi_data) {
     scale_color_discrete(name = '',
                          labels = c('Exports', 'Imports')) +
     labs(x = '',
-         y = 'Herfindahl Index (HI)',
-         title = toupper(as.character(gsub('_hi_data', 
-                                           '', 
-                                           substitute(hi_data))))) +
+         y = 'Herfindahl Index (HI)') +
     scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
