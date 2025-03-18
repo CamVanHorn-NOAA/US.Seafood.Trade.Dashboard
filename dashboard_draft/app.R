@@ -1103,6 +1103,7 @@ server <- function(input, output, session) {
       'VALUE', import = T)
   })
 
+  # creates export volume plot
   output$exp_volume <- renderPlot({
     plot_trade(
       summarize_trade_yr_spp(
@@ -1115,6 +1116,7 @@ server <- function(input, output, session) {
       'VOLUME', export = T)
   })
 
+  # creates import volume plot
   output$imp_volume <- renderPlot({
     plot_trade(
       summarize_trade_yr_spp(
@@ -1126,7 +1128,157 @@ server <- function(input, output, session) {
                                     input$species_name))))), 
       'VOLUME', import = T)
   })
-
+  
+  # creates export price plot
+  output$exp_price <- renderPlot({
+    plot_trade(
+      summarize_trade_yr_spp(
+        trade_data,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      'PRICE', export = T)
+  })
+  
+  # creates import price plot
+  output$imp_price <- renderPlot({
+    plot_trade(
+      summarize_trade_yr_spp(
+        trade_data,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      'PRICE', import = T)
+  })
+  
+  # creates landings value plot
+  output$landings_value <- renderPlot({
+    plot_landings(
+      summarize_landings_yr_spp(
+        com_landings,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat, 
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      value = T)
+  })
+  
+  # creates landings volume plot
+  output$landings_volume <- renderPlot({
+    plot_landings(
+      summarize_landings_yr_spp(
+        com_landings,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat, 
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      volume = T)
+  })
+  
+  # creates processed products value plot
+  output$pp_value <- renderPlot({
+    plot_spp_pp(
+      summarize_pp_yr_spp(
+        pp_data,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      value = T)
+  })
+  
+  # creates processed products volume plot
+  output$pp_volume <- renderPlot({
+    plot_spp_pp(
+      summarize_pp_yr_spp(
+        pp_data,
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      volume = T)
+  })
+  
+  # creates MLTI export plot
+  output$exp_mlti <- renderPlot({
+    plot_mlti(
+      calculate_mlti(
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name)))),
+        exports = T),
+    exports = T)
+  })
+  
+  # creates MLTI import plot
+  output$imp_mlti <- renderPlot({
+    plot_mlti(
+      calculate_mlti(
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name)))),
+        imports = T),
+      imports = T)
+  })
+  
+  # creates HI plot
+  output$hi_plot <- renderPlot({
+    plot_hi(
+      calculate_hi(
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))))
+  })
+  
+  # creates apparent supply plot
+  output$supply_plot <- renderPlot({
+    plot_supply_metrics(
+      calculate_supply_metrics(
+        ifelse(input$ecol_cat == 'ALL', 'ALL', 
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      'SUPPLY')
+  })
+  
+  # creates apparent supply (ratio) plot
+  output$supply_ratio <- renderPlot({
+    plot_supply_metrics(
+      calculate_supply_metrics(
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      'RATIO')
+  })
+  
+  # creates apparent supply (share) plot
+  output$supply_share <- renderPlot({
+    plot_supply_metrics(
+      calculate_supply_metrics(
+        ifelse(input$ecol_cat == 'ALL', 'ALL',
+               ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                      ifelse(input$species_grp == 'ALL', input$species_cat,
+                             ifelse(input$species_name == 'ALL', input$species_grp,
+                                    input$species_name))))),
+      'SHARE')
+  })
 }
 
 # Run the app
