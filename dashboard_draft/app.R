@@ -238,15 +238,29 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 }
 summarize_pp_yr_spp <- function(product_data, species) {
   
-  which_group <- as.symbol(
-    ifelse(species %in% unique(product_data$ECOLOGICAL_CATEGORY), 
-           'ECOLOGICAL_CATEGORY',
-           ifelse(species %in% unique(product_data$SPECIES_CATEGORY), 
-                  'SPECIES_CATEGORY',
-                  ifelse(species %in% unique(product_data$SPECIES_GROUP), 
-                         'SPECIES_GROUP',
-                         'SPECIES_NAME')))
-  )
+  if (species != 'ALL') {
+    which_group <- as.symbol(
+      ifelse(species %in% unique(product_data$ECOLOGICAL_CATEGORY), 
+             'ECOLOGICAL_CATEGORY',
+             ifelse(species %in% unique(product_data$SPECIES_CATEGORY), 
+                    'SPECIES_CATEGORY',
+                    ifelse(species %in% unique(product_data$SPECIES_GROUP), 
+                           'SPECIES_GROUP',
+                           'SPECIES_NAME')))
+    )
+  } else if (species == 'ALL') {
+    summarized_data <- product_data %>%
+      select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+      group_by(YEAR, PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(MT = KG / 1000,
+             BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
+      rename(PP_VOLUME_MT = MT, 
+             PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
+    
+    return(summarized_data)
+  }
   
   group <- rlang::enquo(which_group)
   
@@ -263,15 +277,32 @@ summarize_pp_yr_spp <- function(product_data, species) {
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
   
-  which_group <- as.symbol(
-    ifelse(species %in% unique(landings_data$ECOLOGICAL_CATEGORY), 
-           'ECOLOGICAL_CATEGORY',
-           ifelse(species %in% unique(landings_data$SPECIES_CATEGORY), 
-                  'SPECIES_CATEGORY',
-                  ifelse(species %in% unique(landings_data$SPECIES_GROUP), 
-                         'SPECIES_GROUP',
-                         'SPECIES_NAME')))
-  )
+  if (species != 'ALL') {
+    which_group <- as.symbol(
+      ifelse(species %in% unique(landings_data$ECOLOGICAL_CATEGORY), 
+             'ECOLOGICAL_CATEGORY',
+             ifelse(species %in% unique(landings_data$SPECIES_CATEGORY), 
+                    'SPECIES_CATEGORY',
+                    ifelse(species %in% unique(landings_data$SPECIES_GROUP), 
+                           'SPECIES_GROUP',
+                           'SPECIES_NAME')))
+    )
+  } else if (species == 'ALL') {
+    summarized_data <- landings_data %>%
+      filter(CONFIDENTIALITY != 'Confidential',
+             !is.na(DOLLARS),
+             !is.na(KG)) %>%
+      select(YEAR, KG, DOLLARS_2024) %>%
+      group_by(YEAR) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(KG = KG / 1000,
+             DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
+      rename(COM_VOLUME_MT = KG,
+             COM_VALUE_BILLIONS_2024USD = DOLLARS_2024)
+    
+    return(summarized_data)
+  }
   
   group <- rlang::enquo(which_group)
   
@@ -314,30 +345,43 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   which_value <- rlang::enquo(which_value)
   which_volume <- rlang::enquo(which_volume)
   
-  which_group <- as.symbol(
-    ifelse(species %in% unique(trade_data$SPECIES_NAME), 
-           'SPECIES_NAME',
-           ifelse(species %in% unique(trade_data$SPECIES_GROUP), 
-                  'SPECIES_GROUP',
-                  ifelse(species %in% unique(trade_data$SPECIES_CATEGORY), 
-                         'SPECIES_CATEGORY',
-                         'ECOLOGICAL_CATEGORY')))
-  )
-  which_group <- rlang::enquo(which_group)
-  
-  
-  spp_data <- trade_data %>%
-    filter_species(species) %>%
-    filter(is.na(!!which_value) == F)
-  
-  summary_spp_data <- spp_data %>%
-    select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
-           !!which_volume) %>%
-    group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    filter(!!which_volume > 0) %>%
-    mutate(PRICE = !!which_value / !!which_volume)
+  if (species != 'ALL') {
+    which_group <- as.symbol(
+      ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
+             'ECOLOGICAL_CATEGORY',
+             ifelse(species %in% unique(trade_data$SPECIES_CATEGORY), 
+                    'SPECIES_CATEGORY',
+                    ifelse(species %in% unique(trade_data$SPECIES_GROUP), 
+                           'SPECIES_GROUP',
+                           'SPECIES_NAME')))
+    )
+    which_group <- rlang::enquo(which_group)
+    
+    spp_data <- trade_data %>%
+      filter_species(species) %>%
+      filter(is.na(!!which_value) == F)
+    
+    summary_spp_data <- spp_data %>%
+      select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+             !!which_volume) %>%
+      group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      filter(!!which_volume > 0) %>%
+      mutate(PRICE = !!which_value / !!which_volume)
+    
+  } else if (species == 'ALL') {
+    spp_data <- trade_data %>%
+      filter(is.na(!!which_value) == F)
+    
+    summary_spp_data <- spp_data %>%
+      select(YEAR, COUNTRY_NAME, !!which_value, !!which_volume) %>%
+      group_by(YEAR, COUNTRY_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      filter(!!which_volume > 0) %>%
+      mutate(PRICE = !!which_value / !!which_volume)
+  }
   
   total_years <- length(unique(summary_spp_data$YEAR))
   total_countries <- length(unique(summary_spp_data$COUNTRY_NAME))
@@ -414,6 +458,28 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
 }
 calculate_hi <- function(species) {
   
+  if(species == 'ALL') {
+    hi_data <- trade_data %>%
+      select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
+      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
+                                        0, EXP_VALUE_2024USD),
+             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
+                                        0, IMP_VALUE_2024USD)) %>%
+      group_by(YEAR) %>%
+      mutate(TOTAL_EXP_VALUE_YR = sum(EXP_VALUE_2024USD),
+             TOTAL_IMP_VALUE_YR = sum(IMP_VALUE_2024USD),
+             PROPORT_EXP_VALUE = EXP_VALUE_2024USD / TOTAL_EXP_VALUE_YR,
+             PROPORT_IMP_VALUE = IMP_VALUE_2024USD / TOTAL_IMP_VALUE_YR,
+             PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
+             PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
+             EXP_HI = sum(PROPORT_EXP_SQUARED),
+             IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
+      select(YEAR, EXP_HI, IMP_HI) %>%
+      distinct()
+    
+    return(hi_data)
+  }
+  
   hi_data <- trade_data %>%
     filter_species(species) %>%
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
@@ -436,6 +502,7 @@ calculate_hi <- function(species) {
     select(YEAR, EXP_HI, IMP_HI) %>%
     distinct()
   
+  return(hi_data)
 }
 plot_hi <- function(hi_data) {
   
@@ -518,8 +585,19 @@ calculate_supply_metrics <- function(species) {
     mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
            APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
            UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-             abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) %>%
-    rename(SPECIES = 2)
+             abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
+  
+  if(species == 'ALL') {
+    data <- data %>%
+      mutate(SPECIES = 'ALL')
+    
+    return(data)
+  } else {
+    data <- data %>%
+      rename(SPECIES = 2)
+    
+    return(data)
+  }
 }
 plot_supply_metrics <- function(supply_data, species, metric) {
   
@@ -647,8 +725,14 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   }
   species <- toupper(species)
   
-  summarized_data <- trade_table %>%
-    filter_species(species) %>%
+  if (species == 'ALL') {
+    filtered_data <- trade_table
+  } else {
+    filtered_data <- trade_table %>%
+      filter_species(species)
+  }
+  
+  summarized_data <- filtered_data %>%
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
     filter(YEAR >= time.frame[1],
