@@ -644,7 +644,7 @@ calculate_supply_metrics <- function(species) {
     return(data)
   }
 }
-plot_supply_metrics <- function(supply_data, species, metric) {
+plot_supply_metrics <- function(supply_data, metric) {
   
   if (metric == 'SUPPLY') {
     plot <- 
@@ -655,7 +655,7 @@ plot_supply_metrics <- function(supply_data, species, metric) {
       geom_col(fill = 'black') +
       labs(x = '',
            y = 'Volume (Thousand Metric Tons)',
-           title = paste0('Apparent Supply of ', species)) +
+           title = 'Apparent Supply') +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2004, 2023, by = 4)) +
       theme_bw() +
@@ -677,8 +677,7 @@ plot_supply_metrics <- function(supply_data, species, metric) {
                 linewidth = 1) +
       labs(x = '',
            y = 'Ratio',
-           title = paste0('Apparent Supply of ', species, 
-                          ' Relative to Domestic Production')) +
+           title = 'Apparent Supply Relative to Domestic Production') +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2004, 2023, by = 4)) +
       theme_bw() +
@@ -696,8 +695,7 @@ plot_supply_metrics <- function(supply_data, species, metric) {
       geom_col(fill = 'black') +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = paste0('Unexported Domestic Production of ', species,
-                          ' Relative to Apparent Supply')) +
+           title = 'Unexported Domestic Production of Relative to Apparent Supply') +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2004, 2023, by = 4)) +
       scale_y_continuous(labels = label_percent()) +
