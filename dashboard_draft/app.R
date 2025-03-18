@@ -887,19 +887,112 @@ ui <- page_sidebar(
     uiOutput('filter_3'),
     uiOutput('filter_4')
   ),
-  tabsetPanel(
-             tabPanel('Trade Balance (Value)',
-                      plotOutput('balance')
-                      ),
-             tabPanel('Trade Volume',
-                      fluidRow(
-                        plotOutput('exp_volume')
-                      ),
-                      fluidRow(
-                        plotOutput('imp_volume')
-                      )),
-             )
-           )
+  fluidRow(
+    navset_card_pill(title = 'Trade',
+                     nav_panel(title = 'Aggregate',
+                               fluidRow(
+                                 plotOutput('balance')
+                               ),
+                               fluidRow(
+                                 column(
+                                   plotOutput('trade_ratio'),
+                                   width = 6
+                                 ),
+                                 column(
+                                   plotOutput('top5_trade'),
+                                   width = 6
+                                 ))),
+                     nav_panel(title = 'Value',
+                               fluidRow(
+                                 column(
+                                   plotOutput('exp_value'),
+                                   width = 6
+                                 ),
+                                 column(
+                                   plotOutput('imp_value'),
+                                   width = 6
+                                 ))),
+                     nav_panel(title = 'Volume',
+                               fluidRow(
+                                 column(
+                                   plotOutput('exp_volume'),
+                                   width = 6
+                                 ),
+                                 column(
+                                   plotOutput('imp_volume'),
+                                   width = 6
+                                 ))),
+                     nav_panel(title = 'Price',
+                               fluidRow(
+                                 column(
+                                   plotOutput('exp_price'),
+                                   width = 6
+                                 ),
+                                 column(
+                                   plotOutput('imp_price'),
+                                   width = 6
+                                 ))),
+                     nav_panel(title = 'Advanced Metrics',
+                               fluidRow(
+                                 column(
+                                   plotOutput('exp_mlti'),
+                                   width = 6
+                                 ),
+                                 column(
+                                   plotOutput('imp_mlti'),
+                                   width = 6
+                                 )),
+                               fluidRow(
+                                 column(
+                                   plotOutput('hi_plot'),
+                                   width = 3
+                                 ),
+                                 column(
+                                   plotOutput('supply_plot'),
+                                   width = 3
+                                 ),
+                                 column(
+                                   plotOutput('supply_ratio'),
+                                   width = 3
+                                 ),
+                                 column(
+                                   plotOutput('supply_share'),
+                                   width = 3
+                                 ))))),
+  fluidRow(
+    column(
+      navset_card_pill(title = 'Commercial Landings',
+                       nav_panel(title = 'Value',
+                                 plotOutput('landings_value')),
+                       nav_panel(title = 'Volume',
+                                 plotOutput('landings_volume'))),
+      width = 6
+    ),
+    column(
+      navset_card_pill(title = 'Processed Products',
+                       nav_panel(title = 'Value',
+                                 plotOutput('pp_value')),
+                       nav_panel(title = 'Quantity',
+                                 plotOutput('pp_volume'))),
+      width = 6
+    )
+  )
+             # tabPanel(title = 'Trade',
+             #          navset_pill(
+             #            nav_panel(title = 'Aggregate',
+             #                      plotOutput('balance')),
+             #            nav_panel(title = 'Exports',
+             #                      fluidRow(
+             #                        plotOutput('exp_volume')
+             #                      ),
+             #                      fluidRow(
+             #                        plotOutput('imp_volume')
+             #                      ))
+             #          )),
+             # tabPanel(title = 'Commercial Landings'),
+             # tabPanel(title = 'Processed Products')
+             # )
+  )
 
 # Define server logic 
 server <- function(input, output, session) {
