@@ -338,6 +338,8 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     stop('Please set either "exports" or "imports" to "T"')
   }
   
+  species <- toupper(species)
+  
   which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
                                   'IMP_VALUE_2024USD'))
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
