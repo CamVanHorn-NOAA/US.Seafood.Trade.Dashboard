@@ -534,42 +534,87 @@ plot_hi <- function(hi_data) {
           plot.title = element_text(size = 18))
   
 }
-plot_spp_pp <- function(processed_product_data, species) {
+plot_spp_pp <- function(processed_product_data, value = F, volume = F) {
   
-  low_prop_types <- processed_product_data %>%
-    select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-           VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-    filter(VOLUME_SHARE < 0.02) %>%
-    pull(PRODUCT_NAME)
+  if (value == F & volume == F) {
+    stop('Please specify value or volume to be TRUE')
+  }
   
-  new_data <- processed_product_data %>%
-    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                 'OTHER*', PRODUCT_NAME)) %>%
-    mutate(PRODUCT_NAME = factor(PRODUCT_NAME),
-           THOUSAND_MT = PP_VOLUME_MT / 1000)
+  if (value == T & volume == T) {
+    stop('Please specify only ONE of value or volume to be TRUE')
+  }
   
-  yr_volume <- new_data %>%
-    select(YEAR, THOUSAND_MT) %>%
-    group_by(YEAR) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') 
+  if (value == T) {
+    y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
+    y <- rlang::enquo(y)
+    ylab <- 'Value (Billions, 2024 Real USD)'
+    
+    low_prop_types <- processed_product_data %>%
+      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
+             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
+      filter(VALUE_SHARE < 0.02) %>%
+      pull(PRODUCT_NAME)
+    
+    new_data <- processed_product_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      mutate(PRODUCT_NAME = factor(PRODUCT_NAME))
+    
+    yr_value <- new_data %>%
+      select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
+      group_by(YEAR) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop')
+    
+    ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
+  }
+  
+  if (volume == T) {
+    y <- as.symbol('THOUSAND_MT')
+    y <- rlang::enquo(y)
+    ylab <- 'Volume (Thousand Metric Tons)'
+    
+    low_prop_types <- processed_product_data %>%
+      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
+      filter(VOLUME_SHARE < 0.02) %>%
+      pull(PRODUCT_NAME)
+    
+    new_data <- processed_product_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      mutate(PRODUCT_NAME = factor(PRODUCT_NAME),
+             THOUSAND_MT = PP_VOLUME_MT / 1000)
+    
+    yr_volume <- new_data %>%
+      select(YEAR, THOUSAND_MT) %>%
+      group_by(YEAR) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') 
+    
+    ylim <- max(yr_volume$THOUSAND_MT)
+  }
   
   plot <- ggplot(data = new_data,
                  aes(x = factor(YEAR),
-                     y = THOUSAND_MT,
+                     y = !!y,
                      fill = PRODUCT_NAME)) +
     geom_col(position = 'stack') +
     scale_fill_manual(values = colors,
                       name = 'Product Condition') +
     labs(x = '',
-         y = 'Volume (Thousand Metric Tons)',
-         fill = 'Product Condition',
-         title = paste0('Domestic Processed ', species, ' Products')) +
-    scale_y_continuous(limits = c(0, max(yr_volume$THOUSAND_MT) + 10), 
+         y = ylab,
+         fill = 'Product Condition') +
+    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    scale_y_continuous(limits = c(0, ylim), 
                        expand = c(0, 0)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
@@ -577,6 +622,7 @@ plot_spp_pp <- function(processed_product_data, species) {
           legend.text = element_text(size = 12),
           legend.title = element_text(size = 15))
   
+  return(plot)
 }
 calculate_supply_metrics <- function(species) {
   
