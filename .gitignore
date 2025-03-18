@@ -53,4 +53,4 @@ rsconnect/
 *.csv
 
 # all HMS plot
-*HMS
+*HMS_Plots/
