@@ -231,7 +231,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 30.5, 'points'))
+            plot.margin = margin(5.5, 5.5, 5.5, 40.5, 'points'))
   }
   
   return(plot)
