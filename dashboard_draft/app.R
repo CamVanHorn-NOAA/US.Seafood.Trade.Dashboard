@@ -165,12 +165,31 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
   }
   
-  if (plot_format %in% c('VALUE', 'VOLUME', 'PRICE')) {
+  if (plot_format %in% c('VALUE', 'VOLUME')) {
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
                  y = !!y)) + 
       geom_col(fill = 'black') +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      scale_y_continuous(labels = label) +
+      labs(x = 'Year',
+           y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else if (plot_format == 'PRICE') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = !!y)) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
       scale_x_discrete(breaks = seq(2004, 2024, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
