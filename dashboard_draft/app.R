@@ -295,10 +295,12 @@ summarize_pp_yr_spp <- function(product_data, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(MT = KG / 1000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
-    rename(PP_VOLUME_MT = MT,
-           PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
+           BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
            PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+    rename(PP_VALUE_2024USD = DOLLARS_2024,
+           PP_VOLUME_MT = MT,
+           PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
+           PP_VOLUME_KG = KG)
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
   
