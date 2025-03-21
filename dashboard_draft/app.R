@@ -974,7 +974,7 @@ names(colors) <- levels(factor(levels = c(
   'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
   'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
 # App --------------------------------------------------------------------------
-# Define UI 
+# Define UI --------------------------------------------------------------------
 ui <- page_sidebar(
   
   sidebar = sidebar(
@@ -1102,7 +1102,7 @@ ui <- page_sidebar(
              # )
   )
 
-# Define server logic 
+# Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
   
   # creates input: species_cat
@@ -1228,7 +1228,7 @@ server <- function(input, output, session) {
   # creates landings value plot
   output$landings_value <- renderPlot({
     plot_landings(landings_df(), 
-                  value = T)
+                  'VALUE')
   })
   
   # creates landings volume plot
@@ -1255,7 +1255,7 @@ server <- function(input, output, session) {
   # creates processed products value plot
   output$pp_value <- renderPlot({
     plot_spp_pp(pp_df(),
-                value = T)
+                'VALUE')
   })
   
   # creates processed products volume plot
