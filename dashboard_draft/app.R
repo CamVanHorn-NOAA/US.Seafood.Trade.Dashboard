@@ -793,16 +793,11 @@ plot_supply_metrics <- function(supply_data, metric) {
   
   return(plot)
 }
-plot_landings <- function(data, value = F, volume = F) {
+plot_landings <- function(data, plot.format) {
   
-  if (value == F & volume == F) {
-    stop('Please set either value or volume to TRUE')
-  }
-  if (value == T & volume == T) {
-    stop('Please set only value OR volume to TRUE, not both')
-  }
+  plot.format <- toupper(plot.format)
   
-  if (value == T) {
+  if (plot.format == 'VALUE') {
     y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
     y <- rlang::enquo(y)
     
@@ -810,7 +805,7 @@ plot_landings <- function(data, value = F, volume = F) {
     ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
   }
   
-  if (volume == T) {
+  if (plot.format == 'VOLUME') {
     y <- as.symbol('COM_VOLUME_THOUSAND_MT')
     y <- rlang::enquo(y)
     
