@@ -257,6 +257,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
 }
 summarize_pp_yr_spp <- function(product_data, species) {
   
+  species <- toupper(species)
+  
   if (species != 'ALL') {
     which_group <- as.symbol(
       ifelse(species %in% unique(product_data$ECOLOGICAL_CATEGORY), 
@@ -295,6 +297,8 @@ summarize_pp_yr_spp <- function(product_data, species) {
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
+  
+  species <- toupper(species)
   
   if (species != 'ALL') {
     which_group <- as.symbol(
