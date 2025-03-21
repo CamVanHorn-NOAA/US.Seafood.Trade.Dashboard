@@ -1107,30 +1107,25 @@ server <- function(input, output, session) {
                'PRICE', import = T)
   })
   
+  # creates landings data
+  landings_df <- reactive(summarize_landings_yr_spp(
+    com_landings,
+    ifelse(input$ecol_cat == 'ALL', 'ALL', 
+           ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                  ifelse(input$species_grp == 'ALL', input$species_cat,
+                         ifelse(input$species_name == 'ALL', input$species_grp,
+                                input$species_name))))))
+  
   # creates landings value plot
   output$landings_value <- renderPlot({
-    plot_landings(
-      summarize_landings_yr_spp(
-        com_landings,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat, 
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      value = T)
+    plot_landings(landings_df(), 
+                  value = T)
   })
   
   # creates landings volume plot
   output$landings_volume <- renderPlot({
-    plot_landings(
-      summarize_landings_yr_spp(
-        com_landings,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat, 
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      volume = T)
+    plot_landings(landings_df(),
+                  volume = T)
   })
   
   # creates processed products value plot
