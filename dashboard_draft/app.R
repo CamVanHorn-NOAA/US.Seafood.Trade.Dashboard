@@ -1034,30 +1034,25 @@ server <- function(input, output, session) {
     selectInput('species_name', 'Choose a Species', species_names)
   })
 
+  # creates trade data
+  trade_df <- reactive(summarize_trade_yr_spp(
+    trade_data,
+    ifelse(input$ecol_cat == 'ALL', 'ALL',
+           ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                  ifelse(input$species_grp == 'ALL', input$species_cat,
+                         ifelse(input$species_name == 'ALL', input$species_grp,
+                                input$species_name))))))
+  
   # creates trade balance plot (value)
   output$balance <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data, 
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))), 
-      'BALANCE')
+    plot_trade(trade_df(), 
+               'BALANCE')
   })
   
   # creates export/import ratio plot
   output$trade_ratio <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'RATIO', export = T, import = T)
+    plot_trade(trade_df(), 
+               'RATIO', export = T, import = T)
   })
   
   # creates top 5 net export plot
@@ -1078,80 +1073,38 @@ server <- function(input, output, session) {
   
   # creates export value plot
   output$exp_value <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'VALUE', export = T)
+    plot_trade(trade_df(), 
+               'VALUE', export = T)
   })
   
   # creates import value plot
   output$imp_value <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'VALUE', import = T)
+    plot_trade(trade_df(),
+               'VALUE', import = T)
   })
 
   # creates export volume plot
   output$exp_volume <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data, 
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))), 
-      'VOLUME', export = T)
+    plot_trade(trade_df(), 
+               'VOLUME', export = T)
   })
 
   # creates import volume plot
   output$imp_volume <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data, 
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))), 
-      'VOLUME', import = T)
+    plot_trade(trade_df(), 
+               'VOLUME', import = T)
   })
   
   # creates export price plot
   output$exp_price <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'PRICE', export = T)
+    plot_trade(trade_df(),
+               'PRICE', export = T)
   })
   
   # creates import price plot
   output$imp_price <- renderPlot({
-    plot_trade(
-      summarize_trade_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'PRICE', import = T)
+    plot_trade(trade_df(),
+               'PRICE', import = T)
   })
   
   # creates landings value plot
