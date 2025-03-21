@@ -567,17 +567,11 @@ plot_hi <- function(hi_data) {
           plot.title = element_text(size = 18))
   
 }
-plot_spp_pp <- function(processed_product_data, value = F, volume = F) {
+plot_spp_pp <- function(processed_product_data, plot.format) {
   
-  if (value == F & volume == F) {
-    stop('Please specify value or volume to be TRUE')
-  }
+  plot.format <- toupper(plot.format)
   
-  if (value == T & volume == T) {
-    stop('Please specify only ONE of value or volume to be TRUE')
-  }
-  
-  if (value == T) {
+  if (plot.format == 'VALUE') {
     y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
     y <- rlang::enquo(y)
     ylab <- 'Value (Billions, 2024 Real USD)'
@@ -606,7 +600,7 @@ plot_spp_pp <- function(processed_product_data, value = F, volume = F) {
     ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
   }
   
-  if (volume == T) {
+  if (plot.format == 'VOLUME') {
     y <- as.symbol('THOUSAND_MT')
     y <- rlang::enquo(y)
     ylab <- 'Volume (Thousand Metric Tons)'
