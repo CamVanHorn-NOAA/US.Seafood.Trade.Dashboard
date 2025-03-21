@@ -1069,15 +1069,19 @@ ui <- page_sidebar(
                        nav_panel(title = 'Value',
                                  plotOutput('landings_value')),
                        nav_panel(title = 'Volume',
-                                 plotOutput('landings_volume'))),
+                                 plotOutput('landings_volume')),
+                       nav_panel(title = 'Price',
+                                 plotOutput('landings_price'))),
       width = 6
     ),
     column(
       navset_card_pill(title = 'Processed Products',
                        nav_panel(title = 'Value',
                                  plotOutput('pp_value')),
-                       nav_panel(title = 'Quantity',
-                                 plotOutput('pp_volume'))),
+                       nav_panel(title = 'Volume',
+                                 plotOutput('pp_volume')),
+                       nav_panel(title = 'Price',
+                                 plotOutput('pp_price'))),
       width = 6
     )
   )
