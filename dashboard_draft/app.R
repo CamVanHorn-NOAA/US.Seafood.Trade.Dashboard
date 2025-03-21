@@ -1128,30 +1128,25 @@ server <- function(input, output, session) {
                   volume = T)
   })
   
+  # creates processed products data
+  pp_df <- reactive(summarize_pp_yr_spp(
+    pp_data,
+    ifelse(input$ecol_cat == 'ALL', 'ALL',
+           ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                  ifelse(input$species_grp == 'ALL', input$species_cat,
+                         ifelse(input$species_name == 'ALL', input$species_grp,
+                                input$species_name))))))
+  
   # creates processed products value plot
   output$pp_value <- renderPlot({
-    plot_spp_pp(
-      summarize_pp_yr_spp(
-        pp_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      value = T)
+    plot_spp_pp(pp_df(),
+                value = T)
   })
   
   # creates processed products volume plot
   output$pp_volume <- renderPlot({
-    plot_spp_pp(
-      summarize_pp_yr_spp(
-        pp_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      volume = T)
+    plot_spp_pp(pp_df(),
+                volume = T)
   })
   
   # creates MLTI export plot
