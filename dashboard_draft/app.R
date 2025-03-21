@@ -1234,7 +1234,13 @@ server <- function(input, output, session) {
   # creates landings volume plot
   output$landings_volume <- renderPlot({
     plot_landings(landings_df(),
-                  volume = T)
+                  'VOLUME')
+  })
+  
+  # creates landings price plot
+  output$landings_price <- renderPlot({
+    plot_landings(landings_df(),
+                  'PRICE')
   })
   
   # creates processed products data
@@ -1255,7 +1261,13 @@ server <- function(input, output, session) {
   # creates processed products volume plot
   output$pp_volume <- renderPlot({
     plot_spp_pp(pp_df(),
-                volume = T)
+                'VOLUME')
+  })
+  
+  # creates processed products price plot
+  output$pp_price <- renderPlot({
+    plot_spp_pp(pp_df(),
+                'PRICE')
   })
   
   # creates MLTI export plot
