@@ -815,6 +815,29 @@ plot_landings <- function(data, plot.format) {
     ylab <- 'Total Landed Volume (Thousand Metric Tons)'
   }
   
+  if (plot.format == 'PRICE') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = COM_PRICE_2024USD_PER_KG)) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+                       limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label_currency(suffix = '/kg')) +
+      labs(x = '',
+           y = 'Average Ex-Vessel Price (Real 2024 USD)') +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+    
+    return(plot)
+  }
+  
   plot <- 
     ggplot(data = data,
            aes(x = factor(YEAR),
