@@ -276,9 +276,12 @@ summarize_pp_yr_spp <- function(product_data, species) {
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
       mutate(MT = KG / 1000,
-             BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
-      rename(PP_VOLUME_MT = MT, 
-             PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
+             BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
+             PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+      rename(PP_VALUE_2024USD = DOLLARS_2024,
+             PP_VOLUME_MT = MT, 
+             PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
+             PP_VOLUME_KG = KG)
     
     return(summarized_data)
   }
@@ -295,6 +298,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
            BILLIONS_2024USD = DOLLARS_2024 / 1000000000) %>%
     rename(PP_VOLUME_MT = MT,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD)
+           PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
   
@@ -319,10 +323,12 @@ summarize_landings_yr_spp <- function(landings_data, species) {
       group_by(YEAR) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
-      mutate(KG = KG / 1000,
-             DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
-      rename(COM_VOLUME_MT = KG,
-             COM_VALUE_BILLIONS_2024USD = DOLLARS_2024)
+      mutate(MT = KG / 1000,
+             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
+             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+      rename(COM_VOLUME_KG = KG,
+             COM_VOLUME_MT = MT,
+             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024)
     
     return(summarized_data)
   }
@@ -338,10 +344,12 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     group_by(YEAR, !!group) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(KG = KG / 1000, # will get named properly in rename call below
-           DOLLARS_2024 = DOLLARS_2024 / 1000000000) %>%
-    rename(COM_VOLUME_MT = KG,
-           COM_VALUE_BILLIONS_2024USD = DOLLARS_2024) 
+    mutate(MT = KG / 1000,
+           BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
+           COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+    rename(COM_VOLUME_KG = KG,
+           COM_VOLUME_MT = MT,
+           COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024) 
 }
 summarize_yr_spp <- function(species) {
   combined_data <- 
