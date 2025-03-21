@@ -1186,40 +1186,30 @@ server <- function(input, output, session) {
                                     input$species_name))))))
   })
   
+  # creates supply metric data
+  supply_df <- reactive(calculate_supply_metrics(
+    ifelse(input$ecol_cat == 'ALL', 'ALL',
+           ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                  ifelse(input$species_grp == 'ALL', input$species_cat,
+                         ifelse(input$species_name == 'ALL', input$species_grp,
+                                input$species_name))))))
+  
   # creates apparent supply plot
   output$supply_plot <- renderPlot({
-    plot_supply_metrics(
-      calculate_supply_metrics(
-        ifelse(input$ecol_cat == 'ALL', 'ALL', 
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'SUPPLY')
+    plot_supply_metrics(supply_df(),
+                        'SUPPLY')
   })
   
   # creates apparent supply (ratio) plot
   output$supply_ratio <- renderPlot({
-    plot_supply_metrics(
-      calculate_supply_metrics(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'RATIO')
+    plot_supply_metrics(supply_df(),
+                        'RATIO')
   })
   
   # creates apparent supply (share) plot
   output$supply_share <- renderPlot({
-    plot_supply_metrics(
-      calculate_supply_metrics(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))),
-      'SHARE')
+    plot_supply_metrics(supply_df(),
+                        'SHARE')
   })
 }
 
