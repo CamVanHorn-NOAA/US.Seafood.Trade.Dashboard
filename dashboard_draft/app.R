@@ -630,6 +630,65 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     ylim <- max(yr_volume$THOUSAND_MT)
   }
   
+  if (plot.format == 'PRICE') {
+    low_prop_types_value <- processed_product_data %>%
+      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
+             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
+      filter(VALUE_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types_volume <- processed_product_data %>%
+      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
+      filter(VOLUME_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
+      distinct() %>%
+      pull(PRODUCT_NAME)
+    
+    new_data <- processed_product_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      group_by(YEAR, PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+             PRODUCT_NAME = factor(PRODUCT_NAME))
+    
+    plot <- ggplot(data = new_data,
+                   aes(x = factor(YEAR),
+                       y = PP_PRICE_2024USD_PER_KG,
+                       color = PRODUCT_NAME)) +
+      geom_line(aes(group = PRODUCT_NAME),
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 1) +
+      scale_color_manual(values = colors,
+                        name = 'Product Condition') +
+      labs(x = '',
+           y = 'Average Price (Real 2024 USD)',
+           fill = 'Product Condition') +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+      scale_y_continuous(limits = c(0, max(new_data$PP_PRICE_2024USD_PER_KG) + 0.5),
+                         expand = c(0, 0)) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 12),
+            axis.title = element_text(size = 15),
+            legend.text = element_text(size = 12),
+            legend.title = element_text(size = 15))
+      
+    return(plot)
+  }
+  
   plot <- ggplot(data = new_data,
                  aes(x = factor(YEAR),
                      y = !!y,
