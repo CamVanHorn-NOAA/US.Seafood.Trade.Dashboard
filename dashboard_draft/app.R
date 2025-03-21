@@ -355,12 +355,13 @@ summarize_landings_yr_spp <- function(landings_data, species) {
 }
 summarize_yr_spp <- function(species) {
   combined_data <- 
-    left_join(summarize_trade_yr_spp(trade_data, species),
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species),
                         summarize_pp_yr_spp(pp_data, species) %>%
                           select(!PRODUCT_NAME) %>%
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
-                                    .groups = 'drop')) 
+                                    .groups = 'drop')),
+              summarize_landings_yr_spp(com_landings, species)) 
   
   return(combined_data)
 }
