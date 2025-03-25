@@ -14,6 +14,7 @@ library(nmfspalette)
 load('seafood_trade_data_munge_03_13_25.RData')
 
 # Store functions --------------------------------------------------------------
+# filter species
 filter_species <- function(data, species) {
   species_names <- unique(data$SPECIES_NAME)
   species_groups <- unique(data$SPECIES_GROUP)
@@ -47,6 +48,8 @@ filter_species <- function(data, species) {
   return(new_data)
   
 }
+
+# summary + calculation functions
 summarize_trade_yr_spp <- function(trade_table, species) {
   
   species <- toupper(species)
@@ -115,145 +118,73 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   
   return(summarized_data)
 }
-plot_trade <- function(data, plot_format, export = F, import = F) {
+summarize_trade_ctry_yr_spp <- function(trade_table, species, 
+                                        time.frame, value = F, volume = F) {
   
-  if (export == T & import == T) {
-    data <- data %>%
-      mutate(NET_VALUE_2024USD_BILLIONS = 
-               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-             NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
-    
-    shortform <- 'NET'
-    longform <- 'Net Export'
+  if (value == F & volume == F) {
+    stop('Please designate either value or volume as TRUE')
+  }
+  if (value == T & volume == T) {
+    stop('Please designate either value or volume as FALSE')
   }
   
-  if (export == T & import == F) {
-    shortform <- 'EXP'
-    longform <- 'Export'
-  }
-  
-  if (import == T & export == F) {
-    shortform <- 'IMP'
-    longform <- 'Import'
-  }
-  
-  plot_format <- toupper(plot_format)
-  
-  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
-    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
-  }
-  
-  if (plot_format == 'VALUE') {
-    y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
-    y <- rlang::enquo(y)
-    label <- label_currency(suffix = 'B')
-    ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
-  }
-  
-  if (plot_format == 'VOLUME') {
-    y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
-    y <- rlang::enquo(y)
-    label <- comma
-    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
-  }
-  
-  if (plot_format == 'PRICE') {
-    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-    y <- rlang::enquo(y)
-    label <- label_currency(suffix = '/kg')
-    ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
-  }
-  
-  if (plot_format %in% c('VALUE', 'VOLUME')) {
-    plot <- 
-      ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = !!y)) + 
-      geom_col(fill = 'black') +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                       limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
-      theme_bw() +
-      theme(axis.text = element_text(size = 10))
-  } else if (plot_format == 'PRICE') {
-    data$GROUP <- 'group'
-    
-    plot <- 
-      ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = !!y)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
-                linewidth = 1.5) +
-      geom_point(color = 'black',
-                 size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                       limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
-      theme_bw() +
-      theme(axis.text = element_text(size = 10))
-  } else if (plot_format == 'RATIO') {
-    data$GROUP <- 'group'
-    
-    plot <- 
-      ggplot(data = data, 
-             aes(x = factor(YEAR),
-                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
-                linewidth = 1.5) +
-      geom_point(color = 'black',
-                 size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
-                       limits = factor(2004:2024)) +
-      labs(x = '', 
-           y = 'Export / Import Volume Ratio') +
-      theme_bw() +
-      theme(axis.text = element_text(size = 10))
+  if (value == T) {
+    field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
+    field <- rlang::enquo(field)
   } else {
-    balance_data <- data %>%
-      rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
-             IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
-      select(YEAR, EXPORTS, IMPORTS) %>%
-      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
-      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      mutate(name = as.factor(name))
-    
-    plot <- 
-      ggplot(data = balance_data,
-             aes(x = factor(YEAR),
-                 y = value)) +
-      geom_bar(aes(fill = name),
-               stat = 'identity',
-               position = 'dodge') +
-      labs(x = '',
-           y = 'Billions (Real 2024 USD)',
-           fill = '') +
-      scale_fill_discrete(labels = c('Exports',
-                                     'Imports',
-                                     'Trade Balance')) +
-      coord_axes_inside(labels_inside = T) +
-      scale_x_discrete(limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label_currency()) +
-      geom_hline(yintercept = 0, color = 'black') +
-      theme_minimal() +
-      theme(legend.position = 'top',
-            axis.line.y = element_line(color = 'black'),
-            axis.text.x = element_text(hjust = 0.8,
-                                       size = 8),
-            axis.title.y = element_text(vjust = 14),
-            plot.background = element_rect(fill = 'white',
-                                           color = 'white'),
-            panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 40.5, 'points'))
+    field <- as.symbol('TOTAL_TRADE_VOLUME')
+    field <- rlang::enquo(field)
+  }
+  species <- toupper(species)
+  
+  if (species == 'ALL') {
+    filtered_data <- trade_table
+  } else {
+    filtered_data <- trade_table %>%
+      filter_species(species)
   }
   
-  return(plot)
+  summarized_data <- filtered_data %>%
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
+    filter(YEAR >= time.frame[1],
+           YEAR <= time.frame[2]) %>%
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                      EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                      IMP_VALUE_2024USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG)) %>%
+    group_by(YEAR, COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  top5 <- summarized_data %>%
+    select(!YEAR) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
+           TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
+    top_n(5, !!field) %>%
+    pull(COUNTRY_NAME)
+  
+  final_data <- summarized_data %>%
+    filter(COUNTRY_NAME %in% top5) %>%
+    mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+           NET_VALUE_2024USD_BILLIONS = 
+             EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+           NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+           NET_PRICE_2024USD_PER_KG = 
+             (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
+             (EXP_VOLUME_KG - IMP_VOLUME_KG))
+  
+  return(final_data)
 }
 summarize_pp_yr_spp <- function(product_data, species) {
   
@@ -467,30 +398,6 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   
   return(mlti_data)
 }
-plot_mlti <- function(mlti_data, exports = F, imports = F) {
-  
-  if (exports == F & imports == F) {
-    stop('Please set "exports" or "imports" to "T"')
-  }
-  
-  label <- ifelse(exports == T, 'Export', 'Import')
-  
-  ggplot(data = mlti_data,
-         aes(x = factor(YEAR),
-             y = MLTI)) +
-    geom_point() +
-    facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
-    scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
-    geom_hline(yintercept = 1, color = 'black') +
-    labs(x = '',
-         y = paste0('Multilateral ', label, ' Quantity Index')) +
-    theme_bw() +
-    theme(axis.text = element_text(size = 15),
-          axis.title.y = element_text(size = 20),
-          strip.text = element_text(size = 15,
-                                    color = 'white'),
-          strip.background = element_rect(fill = 'black'))
-}
 calculate_hi <- function(species) {
   
   if(species == 'ALL') {
@@ -539,33 +446,206 @@ calculate_hi <- function(species) {
   
   return(hi_data)
 }
-plot_hi <- function(hi_data) {
+calculate_supply_metrics <- function(species) {
   
-  format_hi_data <- hi_data %>%
-    rename(EXPORTS = EXP_HI,
-           IMPORTS = IMP_HI) %>%
-    pivot_longer(cols = c(EXPORTS, IMPORTS))
+  data <- summarize_yr_spp(species) %>%
+    mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
+           APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
+           UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
+             abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
   
-  ggplot(data = format_hi_data,
-         aes(x = as.factor(YEAR),
-             y = value)) +
-    geom_line(aes(group = name, 
-                  colour = name),
-              linewidth = 1.5) +
-    geom_point(size = 2,
-               color = 'black') +
-    scale_color_discrete(name = '',
-                         labels = c('Exports', 'Imports')) +
+  if(species == 'ALL') {
+    data <- data %>%
+      mutate(SPECIES = 'ALL')
+    
+    return(data)
+  } else {
+    data <- data %>%
+      rename(SPECIES = 2)
+    
+    return(data)
+  }
+}
+
+# plot functions
+plot_trade <- function(data, plot_format, export = F, import = F) {
+  
+  if (export == T & import == T) {
+    data <- data %>%
+      mutate(NET_VALUE_2024USD_BILLIONS = 
+               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
+    
+    shortform <- 'NET'
+    longform <- 'Net Export'
+  }
+  
+  if (export == T & import == F) {
+    shortform <- 'EXP'
+    longform <- 'Export'
+  }
+  
+  if (import == T & export == F) {
+    shortform <- 'IMP'
+    longform <- 'Import'
+  }
+  
+  plot_format <- toupper(plot_format)
+  
+  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
+    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
+  }
+  
+  if (plot_format == 'VALUE') {
+    y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = 'B')
+    ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
+  }
+  
+  if (plot_format == 'VOLUME') {
+    y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
+    y <- rlang::enquo(y)
+    label <- comma
+    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+  }
+  
+  if (plot_format == 'PRICE') {
+    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = '/kg')
+    ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
+  }
+  
+  if (plot_format %in% c('VALUE', 'VOLUME')) {
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = !!y)) + 
+      geom_col(fill = 'black') +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      scale_y_continuous(labels = label) +
+      labs(x = 'Year',
+           y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else if (plot_format == 'PRICE') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = !!y)) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      scale_y_continuous(labels = label) +
+      labs(x = 'Year',
+           y = ylab) +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else if (plot_format == 'RATIO') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data, 
+             aes(x = factor(YEAR),
+                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+                       limits = factor(2004:2024)) +
+      labs(x = '', 
+           y = 'Export / Import Volume Ratio') +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+  } else {
+    balance_data <- data %>%
+      rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
+             IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      mutate(name = as.factor(name))
+    
+    plot <- 
+      ggplot(data = balance_data,
+             aes(x = factor(YEAR),
+                 y = value)) +
+      geom_bar(aes(fill = name),
+               stat = 'identity',
+               position = 'dodge') +
+      labs(x = '',
+           y = 'Billions (Real 2024 USD)',
+           fill = '') +
+      scale_fill_discrete(labels = c('Exports',
+                                     'Imports',
+                                     'Trade Balance')) +
+      coord_axes_inside(labels_inside = T) +
+      scale_x_discrete(limits = factor(2004:2024)) +
+      scale_y_continuous(labels = label_currency()) +
+      geom_hline(yintercept = 0, color = 'black') +
+      theme_minimal() +
+      theme(legend.position = 'top',
+            axis.line.y = element_line(color = 'black'),
+            axis.text.x = element_text(hjust = 0.8,
+                                       size = 8),
+            axis.title.y = element_text(vjust = 14),
+            plot.background = element_rect(fill = 'white',
+                                           color = 'white'),
+            panel.grid = element_blank(),
+            plot.margin = margin(5.5, 5.5, 5.5, 40.5, 'points'))
+  }
+  
+  return(plot)
+}
+plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
+  
+  if (value == F & volume == F) {
+    stop('Please specify which plot to create by setting either value or volume to T')
+  }
+  if (value == T & volume == T) {
+    stop('Please specify only one plot to create')
+  }
+  
+  if (value == T) {
+    y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
+    y <- rlang::enquo(y)
+    label <- label_currency(suffix = 'B')
+    ylab <- 'Net Export Value (Real 2024 USD, Billions)'
+  } else {
+    y <- as.symbol('NET_VOLUME_MT')
+    y <- rlang::enquo(y)
+    label <- comma
+    ylab <- 'Net Export Volume (Metric Tons)'
+  }
+  
+  ggplot(data = data,
+         aes(x = factor(COUNTRY_NAME),
+             y = !!y, 
+             fill = factor(YEAR))) +
+    geom_col(position = 'dodge') +
+    scale_fill_nmfs(palette = 'oceans') +
     labs(x = '',
-         y = 'Herfindahl Index (HI)') +
-    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+         y = ylab,
+         fill = 'Year') +
+    scale_y_continuous(labels = label) +
     theme_bw() +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
-          legend.text = element_text(size = 15),
-          legend.position = 'bottom',
-          plot.title = element_text(size = 18))
-  
+    geom_hline(yintercept = 0, 'black') +
+    theme(axis.text = element_text(color = 'black',
+                                   size = 10),
+          axis.title = element_text(size = 14),
+          legend.title = element_text(size = 14),
+          legend.text = element_text(size = 10))
 }
 plot_spp_pp <- function(processed_product_data, plot.format) {
   
@@ -710,25 +790,117 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
   
   return(plot)
 }
-calculate_supply_metrics <- function(species) {
+plot_landings <- function(data, plot.format) {
   
-  data <- summarize_yr_spp(species) %>%
-    mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
-           APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
-           UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-             abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
+  plot.format <- toupper(plot.format)
   
-  if(species == 'ALL') {
-    data <- data %>%
-      mutate(SPECIES = 'ALL')
+  if (plot.format == 'VALUE') {
+    y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    y <- rlang::enquo(y)
     
-    return(data)
-  } else {
-    data <- data %>%
-      rename(SPECIES = 2)
-    
-    return(data)
+    label <- label_currency(suffix = 'B')
+    ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
   }
+  
+  if (plot.format == 'VOLUME') {
+    y <- as.symbol('COM_VOLUME_THOUSAND_MT')
+    y <- rlang::enquo(y)
+    
+    data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
+    
+    label <- comma
+    ylab <- 'Total Landed Volume (Thousand Metric Tons)'
+  }
+  
+  if (plot.format == 'PRICE') {
+    data$GROUP <- 'group'
+    
+    plot <- 
+      ggplot(data = data,
+             aes(x = factor(YEAR),
+                 y = COM_PRICE_2024USD_PER_KG)) +
+      geom_line(aes(group = GROUP),
+                color = 'black',
+                linewidth = 1.5) +
+      geom_point(color = 'black',
+                 size = 2) +
+      scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+                       limits = factor(2004:2023)) +
+      scale_y_continuous(labels = label_currency(suffix = '/kg')) +
+      labs(x = '',
+           y = 'Average Ex-Vessel Price (Real 2024 USD)') +
+      theme_bw() +
+      theme(axis.text = element_text(size = 10))
+    
+    return(plot)
+  }
+  
+  plot <- 
+    ggplot(data = data,
+           aes(x = factor(YEAR),
+               y = !!y)) +
+    geom_col(fill = 'black') +
+    scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+                     limits = factor(2004:2023)) +
+    scale_y_continuous(labels = label) +
+    labs(x = '',
+         y = ylab) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 10))
+  
+  return(plot)
+}
+plot_mlti <- function(mlti_data, exports = F, imports = F) {
+  
+  if (exports == F & imports == F) {
+    stop('Please set "exports" or "imports" to "T"')
+  }
+  
+  label <- ifelse(exports == T, 'Export', 'Import')
+  
+  ggplot(data = mlti_data,
+         aes(x = factor(YEAR),
+             y = MLTI)) +
+    geom_point() +
+    facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
+    scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
+    geom_hline(yintercept = 1, color = 'black') +
+    labs(x = '',
+         y = paste0('Multilateral ', label, ' Quantity Index')) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 15),
+          axis.title.y = element_text(size = 20),
+          strip.text = element_text(size = 15,
+                                    color = 'white'),
+          strip.background = element_rect(fill = 'black'))
+}
+plot_hi <- function(hi_data) {
+  
+  format_hi_data <- hi_data %>%
+    rename(EXPORTS = EXP_HI,
+           IMPORTS = IMP_HI) %>%
+    pivot_longer(cols = c(EXPORTS, IMPORTS))
+  
+  ggplot(data = format_hi_data,
+         aes(x = as.factor(YEAR),
+             y = value)) +
+    geom_line(aes(group = name, 
+                  colour = name),
+              linewidth = 1.5) +
+    geom_point(size = 2,
+               color = 'black') +
+    scale_color_discrete(name = '',
+                         labels = c('Exports', 'Imports')) +
+    labs(x = '',
+         y = 'Herfindahl Index (HI)') +
+    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.text = element_text(size = 15),
+          legend.position = 'bottom',
+          plot.title = element_text(size = 18))
+  
 }
 plot_supply_metrics <- function(supply_data, metric) {
   
@@ -792,173 +964,6 @@ plot_supply_metrics <- function(supply_data, metric) {
   }
   
   return(plot)
-}
-plot_landings <- function(data, plot.format) {
-  
-  plot.format <- toupper(plot.format)
-  
-  if (plot.format == 'VALUE') {
-    y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
-    y <- rlang::enquo(y)
-    
-    label <- label_currency(suffix = 'B')
-    ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
-  }
-  
-  if (plot.format == 'VOLUME') {
-    y <- as.symbol('COM_VOLUME_THOUSAND_MT')
-    y <- rlang::enquo(y)
-    
-    data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
-    
-    label <- comma
-    ylab <- 'Total Landed Volume (Thousand Metric Tons)'
-  }
-  
-  if (plot.format == 'PRICE') {
-    data$GROUP <- 'group'
-    
-    plot <- 
-      ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = COM_PRICE_2024USD_PER_KG)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
-                linewidth = 1.5) +
-      geom_point(color = 'black',
-                 size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2023, by = 4),
-                       limits = factor(2004:2023)) +
-      scale_y_continuous(labels = label_currency(suffix = '/kg')) +
-      labs(x = '',
-           y = 'Average Ex-Vessel Price (Real 2024 USD)') +
-      theme_bw() +
-      theme(axis.text = element_text(size = 10))
-    
-    return(plot)
-  }
-  
-  plot <- 
-    ggplot(data = data,
-           aes(x = factor(YEAR),
-               y = !!y)) +
-    geom_col(fill = 'black') +
-    scale_x_discrete(breaks = seq(2004, 2023, by = 4),
-                     limits = factor(2004:2023)) +
-    scale_y_continuous(labels = label) +
-    labs(x = '',
-         y = ylab) +
-    theme_bw() +
-    theme(axis.text = element_text(size = 10))
-  
-  return(plot)
-}
-summarize_trade_ctry_yr_spp <- function(trade_table, species, 
-                                        time.frame, value = F, volume = F) {
-  
-  if (value == F & volume == F) {
-    stop('Please designate either value or volume as TRUE')
-  }
-  if (value == T & volume == T) {
-    stop('Please designate either value or volume as FALSE')
-  }
-  
-  if (value == T) {
-    field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
-    field <- rlang::enquo(field)
-  } else {
-    field <- as.symbol('TOTAL_TRADE_VOLUME')
-    field <- rlang::enquo(field)
-  }
-  species <- toupper(species)
-  
-  if (species == 'ALL') {
-    filtered_data <- trade_table
-  } else {
-    filtered_data <- trade_table %>%
-      filter_species(species)
-  }
-  
-  summarized_data <- filtered_data %>%
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
-    filter(YEAR >= time.frame[1],
-           YEAR <= time.frame[2]) %>%
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                      EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                      IMP_VALUE_2024USD),
-           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                  EXP_VOLUME_KG),
-           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                  IMP_VOLUME_KG)) %>%
-    group_by(YEAR, COUNTRY_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop')
-  
-  top5 <- summarized_data %>%
-    select(!YEAR) %>%
-    group_by(COUNTRY_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
-           TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
-    top_n(5, !!field) %>%
-    pull(COUNTRY_NAME)
-  
-  final_data <- summarized_data %>%
-    filter(COUNTRY_NAME %in% top5) %>%
-    mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-           NET_VALUE_2024USD_BILLIONS = 
-             EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-           NET_PRICE_2024USD_PER_KG = 
-             (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
-             (EXP_VOLUME_KG - IMP_VOLUME_KG))
-  
-  return(final_data)
-}
-plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
-  
-  if (value == F & volume == F) {
-    stop('Please specify which plot to create by setting either value or volume to T')
-  }
-  if (value == T & volume == T) {
-    stop('Please specify only one plot to create')
-  }
-  
-  if (value == T) {
-    y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
-    y <- rlang::enquo(y)
-    label <- label_currency(suffix = 'B')
-    ylab <- 'Net Export Value (Real 2024 USD, Billions)'
-  } else {
-    y <- as.symbol('NET_VOLUME_MT')
-    y <- rlang::enquo(y)
-    label <- comma
-    ylab <- 'Net Export Volume (Metric Tons)'
-  }
-  
-  ggplot(data = data,
-         aes(x = factor(COUNTRY_NAME),
-             y = !!y, 
-             fill = factor(YEAR))) +
-    geom_col(position = 'dodge') +
-    scale_fill_nmfs(palette = 'oceans') +
-    labs(x = '',
-         y = ylab,
-         fill = 'Year') +
-    scale_y_continuous(labels = label) +
-    theme_bw() +
-    geom_hline(yintercept = 0, 'black') +
-    theme(axis.text = element_text(color = 'black',
-                                   size = 10),
-          axis.title = element_text(size = 14),
-          legend.title = element_text(size = 14),
-          legend.text = element_text(size = 10))
 }
 
 # Colors -----------------------------------------------------------------------
