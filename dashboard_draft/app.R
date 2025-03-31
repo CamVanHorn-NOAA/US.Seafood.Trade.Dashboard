@@ -8,7 +8,8 @@ if(!require("bslib"))       install.packages("bslib")
 if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
-if(!require("nmfspalette")) install.packages("nmfspalette")
+# if(!require("nmfspalette")) install.packages("nmfspalette")
+source("nmfs_cols.R")
 
 # Pull Data 
 load('seafood_trade_data_munge_03_13_25.RData')
