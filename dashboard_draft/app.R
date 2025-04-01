@@ -227,10 +227,12 @@ summarize_pp_yr_spp <- function(product_data, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(MT = KG / 1000,
+           MILLIONS_2024USD = DOLLARS_2024 / 1000000,
            BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
            PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
     rename(PP_VALUE_2024USD = DOLLARS_2024,
            PP_VOLUME_MT = MT,
+           PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
            PP_VOLUME_KG = KG)
 }
@@ -258,10 +260,12 @@ summarize_landings_yr_spp <- function(landings_data, species) {
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
       mutate(MT = KG / 1000,
+             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
              BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
              COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
       rename(COM_VOLUME_KG = KG,
              COM_VOLUME_MT = MT,
+             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
              COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024)
     
     return(summarized_data)
@@ -279,10 +283,12 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(MT = KG / 1000,
+           MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
            BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
            COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
     rename(COM_VOLUME_KG = KG,
            COM_VOLUME_MT = MT,
+           COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
            COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024) 
 }
 summarize_yr_spp <- function(species) {
@@ -399,6 +405,107 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   
   return(mlti_data)
 }
+calculate_mlti_table <- function(species, exports = F, imports = F) {
+  # major difference: calculate top 5 countries, not 9
+  if (exports == F & imports == F) {
+    stop('Please set either "exports" or "imports" to "T"')
+  }
+  
+  species <- toupper(species)
+  
+  which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
+                                  'IMP_VALUE_2024USD'))
+  which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
+                                   'IMP_VOLUME_KG'))
+  which_value <- rlang::enquo(which_value)
+  which_volume <- rlang::enquo(which_volume)
+  
+  if (species != 'ALL') {
+    which_group <- as.symbol(
+      ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
+             'ECOLOGICAL_CATEGORY',
+             ifelse(species %in% unique(trade_data$SPECIES_CATEGORY), 
+                    'SPECIES_CATEGORY',
+                    ifelse(species %in% unique(trade_data$SPECIES_GROUP), 
+                           'SPECIES_GROUP',
+                           'SPECIES_NAME')))
+    )
+    which_group <- rlang::enquo(which_group)
+    
+    spp_data <- trade_data %>%
+      filter_species(species) %>%
+      filter(is.na(!!which_value) == F) 
+    
+    summary_spp_data <- spp_data %>%
+      select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+             !!which_volume) %>%
+      group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      filter(!!which_volume > 0) %>%
+      mutate(PRICE = !!which_value / !!which_volume)
+    
+  } else if (species == 'ALL') {
+    spp_data <- trade_data %>%
+      filter(is.na(!!which_value) == F)
+    
+    summary_spp_data <- spp_data %>%
+      select(YEAR, COUNTRY_NAME, !!which_value, !!which_volume) %>%
+      group_by(YEAR, COUNTRY_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      filter(!!which_volume > 0) %>%
+      mutate(PRICE = !!which_value / !!which_volume)
+  }
+  
+  total_years <- length(unique(summary_spp_data$YEAR))
+  total_countries <- length(unique(summary_spp_data$COUNTRY_NAME))
+  
+  
+  average_price <- summary_spp_data %>%
+    select(!c(YEAR, !!which_value, !!which_volume)) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    summarise(across(where(is.numeric), sum)) 
+  
+  average_price <- average_price$PRICE / (total_years * total_countries)
+  
+  top9 <- summary_spp_data %>%
+    filter(YEAR == 2024) %>%
+    group_by(COUNTRY_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    arrange(-!!which_value) %>%
+    top_n(5, !!which_value)
+  
+  base_country <- top9$COUNTRY_NAME[3]
+  trade_nations <- summary_spp_data %>%
+    filter(YEAR == 2004) %>%
+    select(COUNTRY_NAME) %>%
+    distinct() 
+  
+  base_country_q <- summary_spp_data %>%
+    filter(YEAR == 2004,
+           COUNTRY_NAME == base_country) %>%
+    mutate(Q_INDEX = !!which_volume * average_price)
+  
+  index_base <- base_country_q$Q_INDEX
+  
+  mlti_data <- summary_spp_data %>%
+    filter(COUNTRY_NAME %in% top9$COUNTRY_NAME) %>%
+    mutate(Q_INDEX = !!which_volume * average_price) %>%
+    select(YEAR, COUNTRY_NAME, Q_INDEX) %>%
+    mutate(MLTI = Q_INDEX / index_base) %>%
+    select(!Q_INDEX) %>%
+    mutate(COUNTRY_NAME = str_to_title(COUNTRY_NAME)) %>%
+    rename(Year = YEAR) %>%
+    pivot_wider(names_from = COUNTRY_NAME,
+                values_from = MLTI) %>%
+    mutate(Year = as.character(Year))
+  
+  return(mlti_data)
+}
 calculate_hi <- function(species) {
   
   if(species == 'ALL') {
@@ -475,6 +582,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     data <- data %>%
       mutate(NET_VALUE_2024USD_BILLIONS = 
                EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VALUE_2024USD_MILLIONS = 
+               EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
              NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
              NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
     
@@ -499,9 +608,11 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   }
   
   if (plot_format == 'VALUE') {
-    y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
+    # y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
+    y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
     y <- rlang::enquo(y)
-    label <- label_currency(suffix = 'B')
+    # label <- label_currency(suffix = 'B')
+    label <- label_currency(suffix = 'M')
     ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
   }
   
@@ -525,7 +636,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
              aes(x = factor(YEAR),
                  y = !!y)) + 
       geom_col(fill = 'black') +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+      scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
       labs(x = 'Year',
@@ -544,7 +655,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+      scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
       labs(x = 'Year',
@@ -563,7 +674,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4),
+      scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       labs(x = '', 
            y = 'Export / Import Volume Ratio') +
@@ -571,8 +682,10 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       theme(axis.text = element_text(size = 10))
   } else {
     balance_data <- data %>%
-      rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
-             IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
+      # rename(EXPORTS = EXP_VALUE_2024USD_BILLIONS,
+      #        IMPORTS = IMP_VALUE_2024USD_BILLIONS) %>%
+      rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
+             IMPORTS = IMP_VALUE_2024USD_MILLIONS) %>%
       select(YEAR, EXPORTS, IMPORTS) %>%
       mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
       pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
@@ -586,7 +699,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
                stat = 'identity',
                position = 'dodge') +
       labs(x = '',
-           y = 'Billions (Real 2024 USD)',
+           # y = 'Billions (Real 2024 USD)',
+           y = 'Millions (Real 2024 USD)',
            fill = '') +
       scale_fill_discrete(labels = c('Exports',
                                      'Imports',
@@ -600,11 +714,11 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
             axis.line.y = element_line(color = 'black'),
             axis.text.x = element_text(hjust = 0.8,
                                        size = 8),
-            axis.title.y = element_text(vjust = 14),
+            axis.title.y = element_text(vjust = 23),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 40.5, 'points'))
+            plot.margin = margin(5.5, 5.5, 5.5, 55.5, 'points'))
   }
   
   return(plot)
@@ -758,7 +872,7 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
       labs(x = '',
            y = 'Average Price (Real 2024 USD)',
            fill = 'Product Condition') +
-      scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+      scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(limits = c(0, max(new_data$PP_PRICE_2024USD_PER_KG) + 0.5),
                          expand = c(0, 0)) +
       theme_bw() +
@@ -780,7 +894,7 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     labs(x = '',
          y = ylab,
          fill = 'Product Condition') +
-    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     scale_y_continuous(limits = c(0, ylim), 
                        expand = c(0, 0)) +
     theme_bw() +
@@ -825,7 +939,7 @@ plot_landings <- function(data, plot.format) {
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 2) +
-      scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+      scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2023)) +
       scale_y_continuous(labels = label_currency(suffix = '/kg')) +
       labs(x = '',
@@ -841,7 +955,7 @@ plot_landings <- function(data, plot.format) {
            aes(x = factor(YEAR),
                y = !!y)) +
     geom_col(fill = 'black') +
-    scale_x_discrete(breaks = seq(2004, 2023, by = 4),
+    scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                      limits = factor(2004:2023)) +
     scale_y_continuous(labels = label) +
     labs(x = '',
@@ -894,12 +1008,12 @@ plot_hi <- function(hi_data) {
                          labels = c('Exports', 'Imports')) +
     labs(x = '',
          y = 'Herfindahl Index (HI)') +
-    scale_x_discrete(breaks = seq(2004, 2024, by = 4)) +
+    scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 15),
-          legend.position = 'bottom',
+          legend.position = 'top',
           plot.title = element_text(size = 18))
   
 }
@@ -916,7 +1030,7 @@ plot_supply_metrics <- function(supply_data, metric) {
            y = 'Volume (Thousand Metric Tons)',
            title = 'Apparent Supply') +
       scale_x_discrete(limits = factor(c(2004:2023)),
-                       breaks = seq(2004, 2023, by = 4)) +
+                       breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
@@ -936,9 +1050,9 @@ plot_supply_metrics <- function(supply_data, metric) {
                 linewidth = 1) +
       labs(x = '',
            y = 'Ratio',
-           title = 'Apparent Supply Relative to Domestic Production') +
+           title = 'Apparent Supply Relative to \nDomestic Production') +
       scale_x_discrete(limits = factor(c(2004:2023)),
-                       breaks = seq(2004, 2023, by = 4)) +
+                       breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
@@ -954,14 +1068,14 @@ plot_supply_metrics <- function(supply_data, metric) {
       geom_col(fill = 'black') +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = 'Unexported Domestic Production of Relative to Apparent Supply') +
+           title = 'Unexported Domestic Production \nRelative to Apparent Supply') +
       scale_x_discrete(limits = factor(c(2004:2023)),
-                       breaks = seq(2004, 2023, by = 4)) +
+                       breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent()) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 17))
+            plot.title = element_text(size = 15))
   }
   
   return(plot)
@@ -988,6 +1102,7 @@ ui <- page_sidebar(
     selectInput(inputId = 'ecol_cat', 
                 label = 'Choose a Category',
                 choices = c('ALL', com_landings %>% 
+                              filter(CONFIDENTIALITY != 'Confidential') %>%
                               select(ECOLOGICAL_CATEGORY) %>%
                               distinct() %>%
                               mutate(ECOLOGICAL_CATEGORY = 
@@ -1045,11 +1160,13 @@ ui <- page_sidebar(
                      nav_panel(title = 'Advanced Metrics',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_mlti'),
+                                   tableOutput('exp_mlti_table'),
+                                   # plotOutput('exp_mlti'),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_mlti'),
+                                   tableOutput('imp_mlti_table'),
+                                   # plotOutput('imp_mlti'),
                                    width = 6
                                  )),
                                fluidRow(
@@ -1276,6 +1393,17 @@ server <- function(input, output, session) {
                 'PRICE')
   })
   
+  # creates MLTI export table
+  output$exp_mlti_table <- renderTable({
+    calculate_mlti_table(
+      ifelse(input$ecol_cat == 'ALL', 'ALL',
+             ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                    ifelse(input$species_grp == 'ALL', input$species_cat,
+                           ifelse(input$species_name == 'ALL', input$species_grp,
+                                  input$species_name)))),
+      exports = T)
+  })
+  
   # creates MLTI export plot
   output$exp_mlti <- renderPlot({
     plot_mlti(
@@ -1287,6 +1415,17 @@ server <- function(input, output, session) {
                                     input$species_name)))),
         exports = T),
     exports = T)
+  })
+  
+  # creates MLTI import table
+  output$imp_mlti_table <- renderTable({
+    calculate_mlti_table(
+      ifelse(input$ecol_cat == 'ALL', 'ALL',
+             ifelse(input$species_cat == 'ALL', input$ecol_cat,
+                    ifelse(input$species_grp == 'ALL', input$species_cat,
+                           ifelse(input$species_name == 'ALL', input$species_grp,
+                                  input$species_name)))),
+      imports = T)
   })
   
   # creates MLTI import plot
@@ -1338,6 +1477,7 @@ server <- function(input, output, session) {
     plot_supply_metrics(supply_df(),
                         'SHARE')
   })
+  
 }
 
 # Run the app
