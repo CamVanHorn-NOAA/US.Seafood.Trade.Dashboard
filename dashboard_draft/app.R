@@ -178,6 +178,10 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            NET_VALUE_2024USD_BILLIONS = 
              EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+           NET_VALUE_2024USD_MILLIONS =
+             EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
            IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
            NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
@@ -733,10 +737,13 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
   }
   
   if (value == T) {
-    y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
+    # y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
+    y <- as.symbol('NET_VALUE_2024USD_MILLIONS')
     y <- rlang::enquo(y)
-    label <- label_currency(suffix = 'B')
-    ylab <- 'Net Export Value (Real 2024 USD, Billions)'
+    # label <- label_currency(suffix = 'B')
+    label <- label_currency(suffix = 'M')
+    # ylab <- 'Net Export Value (Real 2024 USD, Billions)'
+    ylab <- 'Net Export Value (Real 2024 USD, Millions)'
   } else {
     y <- as.symbol('NET_VOLUME_MT')
     y <- rlang::enquo(y)
@@ -1160,11 +1167,17 @@ ui <- page_sidebar(
                      nav_panel(title = 'Advanced Metrics',
                                fluidRow(
                                  column(
+                                   fluidRow(
+                                     'Exports'
+                                   ),
                                    tableOutput('exp_mlti_table'),
                                    # plotOutput('exp_mlti'),
                                    width = 6
                                  ),
                                  column(
+                                   fluidRow(
+                                     'Imports'
+                                   ),
                                    tableOutput('imp_mlti_table'),
                                    # plotOutput('imp_mlti'),
                                    width = 6
