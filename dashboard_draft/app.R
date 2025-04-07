@@ -1,7 +1,13 @@
-# Developing a proof-of-concept dashboard for U.S. seafood trade metrics
+# A Shiny app for investigating U.S. Seafood trade, landings, and processing
+  # data through time
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
 
+# A note on the general data formatting:
+  # all 'value' data are calculated in Real 2024 U.S. Dollars (USD) to account
+  # for inflation (see 2_data_munge.R)
+
+# Packages Sources, and Data ---------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("shiny"))       install.packages("shiny")
 if(!require("bslib"))       install.packages("bslib")
@@ -9,54 +15,96 @@ if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
+# Due to some limitations in downloading nmfspalette on devices, use source
+  # file located in app directory for nmfspalette colors
 source("nmfs_cols.R")
 
-# Pull Data 
+# Pull Data (most recent version)
 load('seafood_trade_data_munge_03_13_25.RData')
 
-# Store functions --------------------------------------------------------------
-# filter species
+# Custom Functions -------------------------------------------------------------
+### filter species
 filter_species <- function(data, species) {
-  species_names <- unique(data$SPECIES_NAME)
-  species_groups <- unique(data$SPECIES_GROUP)
-  species_categories <- unique(data$SPECIES_CATEGORY)
-  ecology_categories <- unique(data$ECOLOGICAL_CATEGORY)
+  # data is a formatted data frame created from 2_data_munge.R (see GitHub)
+  # species is a character vector of a species of interest 
+    # (e.g., 'Albacore Tuna')
   
+  # species are organized in a hierarhcy of four levels:
+    # ecological category (e.g., 'Large Pelagics')
+    # species category (e.g., 'Tunas')
+    # species group (e.g., 'Hawaii Tuna')
+    # species name (e.g., 'Yellowfin Tuna')
+  
+  # store unique values in each species hierarchy level
+  ecology_categories <- unique(data$ECOLOGICAL_CATEGORY)
+  species_categories <- unique(data$SPECIES_CATEGORY)
+  species_groups <- unique(data$SPECIES_GROUP)
+  species_names <- unique(data$SPECIES_NAME)
+  
+  # coerce species input to upper case to align with data frame formatting
   species <- toupper(species)
   
-  locate_group <- 
+  # ifelse loop to find which hierarchy level the input species is stored
+  locate_level <- 
+    # first search highest level 'Ecological Category'
     ifelse(species %in% ecology_categories, 
            'ECOLOGICAL_CATEGORY',
+           # return the category if species is found, otherwise continue loop
            ifelse(species %in% species_categories, 
                   'SPECIES_CATEGORY',
                   ifelse(species %in% species_groups, 
                          'SPECIES_GROUP',
                          ifelse(species %in% species_names, 
                                 'SPECIES_NAME',
+                                # if the species is not found in the data, 
+                                # return 'UNAVAILABLE'
                                 'UNAVAILABLE'))))
   
-  if (locate_group == 'UNAVAILABLE') {
+  # if species was not found, stop function with message to try a different
+    # species input or search for available entries
+  if (locate_level == 'UNAVAILABLE') {
     stop("The species you provided is either too specific or not available.
          Try 'unique(your_data$your_column) to find acceptable calls.")
   } 
   
-  group <- as.symbol(locate_group)
-  group <- rlang::enquo(group)
+  # only runs if species is found
+  # store the hierarchy level as symbol, then as object of type quosure
+    # (see RLang package for more information on quosures)
+    # this enables the object to be called in a dplyr pipe via bang-bang (!!)
+  level <- as.symbol(locate_level)
+  level <- rlang::enquo(level)
   
+  # filter the input data frame for the species of interest using the hierarchy
+    # level column in which the entry was found
   new_data <- data %>%
-    filter(!!group == species)
+    filter(!!level == species)
   
   return(new_data)
   
+  # a note on the hierarchy level conventions:
+    # including multiple levels of species classification to each product 
+    # enables more data to be used in the event that a product does not contain
+    # a specific species on the label (e.g., 'tuna'). Also, it enables us to 
+    # investigate the data at different resolutions (e.g., all tunas compared
+    # to just Yellowfin Tuna)
 }
 
-# summary + calculation functions
+### summary + calculation functions
 summarize_trade_yr_spp <- function(trade_table, species) {
+  # this function summarizes trade data by year and species of interest
+  # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
+  # species is a character vector of a species of interest
   
+  # coerce species to upper case
+    # IF NOT COERCED TO UPPER CASE: app would not display data as species input
+    # is sourced from a selected user input of pre-determined values, which are 
+    # provided in lower case (as title; e.g., 'Tuna' instead of 'tuna')
   species <- toupper(species)
   
+  # if a species is selected, find which level the species input resides
+  # see filter_species function for info on why we store as symbol and quosure
   if (species != 'ALL') {
-    which_group <- as.symbol(
+    which_level <- as.symbol(
       ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
              ifelse(species %in% unique(trade_table$SPECIES_CATEGORY), 
@@ -65,10 +113,14 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                            'SPECIES_GROUP',
                            'SPECIES_NAME')))
     )
+  # if species is not selected (default is ALL), summarize all trade
+      # i.e., no filter_species needed
   } else if (species == 'ALL') {
     summarized_data <- trade_table %>%
+      # select only necessary columns (exports, imports, year)
       select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
              IMP_VOLUME_KG) %>%
+      # replace NA values with 0 so that sums and averages are not NA
       mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
                                         EXP_VALUE_2024USD),
              IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
@@ -77,9 +129,13 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                                     EXP_VOLUME_KG),
              IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                     IMP_VOLUME_KG)) %>%
+      # group by YEAR to aggregate data within each year
       group_by(YEAR) %>%
+      # sum all numeric columns within the group, drop groups at end
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
+      # create columns of price per KG, value in millions/billions, 
+        # volume in metric tons
       mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
              IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
              EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
@@ -91,11 +147,17 @@ summarize_trade_yr_spp <- function(trade_table, species) {
     return(summarized_data)
   }
   
-  group <- rlang::enquo(which_group)
+  # store level as object of quosure to work in dplyr pipe (via !!)
+  level <- rlang::enquo(which_level)
   
   summarized_data <- trade_table %>%
+    # below is identical to dplyr pipe above save for three distinctions:
+      # 1) filter_species used to include only data of specified species
+      # 2) retain column of the hierarchy level in which the species was found
+      # 3) group the data by Year AND species (this lets us keep the species
+        # in the data as a column)
     filter_species(species) %>%
-    select(YEAR, !!group, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
                                       EXP_VALUE_2024USD),
@@ -105,7 +167,7 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                   IMP_VOLUME_KG)) %>%
-    group_by(YEAR, !!group) %>%
+    group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
@@ -121,14 +183,30 @@ summarize_trade_yr_spp <- function(trade_table, species) {
 }
 summarize_trade_ctry_yr_spp <- function(trade_table, species, 
                                         time.frame, value = F, volume = F) {
+  # this function summarizes trade data by year and species of interest
+    # within the top 5 trading partners of the U.S. for that species during
+    # the specified period of time
+  # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
+  # species is a character vector of a species of interest
+  # time.frame is a vector of two years that bookend a desired time period
+  # value is logical that specifies if the function should output summaries by 
+    # trade value, set to FALSE by default
+  # volume is logical that specifies if the function should output summaries by
+    # trade volume, set to FALSE by default
   
+  # Both value and volume cannot be FALSE so user must specify one
   if (value == F & volume == F) {
     stop('Please designate either value or volume as TRUE')
   }
+  # Both value and volume cannot be TRUE so user must choose one
   if (value == T & volume == T) {
     stop('Please designate either value or volume as FALSE')
   }
   
+  # Function only proceeds if either value OR volume are T
+  # store which column ('field') to summarize by as object of type symbol, then 
+    # as type quosure to function within dplyr pipe 
+      # (see RLang package for more details)
   if (value == T) {
     field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
     field <- rlang::enquo(field)
@@ -136,20 +214,28 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
     field <- as.symbol('TOTAL_TRADE_VOLUME')
     field <- rlang::enquo(field)
   }
+  
+  # coerce species to upper case to match data formatting
   species <- toupper(species)
   
+  # if no species is selected ('ALL' is the default), do not filter for species
   if (species == 'ALL') {
     filtered_data <- trade_table
   } else {
+    # otherwise, filter trade table by species
     filtered_data <- trade_table %>%
       filter_species(species)
   }
   
+  # dplyr pipe to summarize exports and imports by year and country
   summarized_data <- filtered_data %>%
+    # select only columns of interest: year, country, exports and imports
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
+    # filter data to be within the specified time frame
     filter(YEAR >= time.frame[1],
            YEAR <= time.frame[2]) %>%
+    # set NAs to 0 so sums and averages can be calculated without outputting NA
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
                                       EXP_VALUE_2024USD),
            IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
@@ -158,22 +244,39 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                   IMP_VOLUME_KG)) %>%
+    # group_by year and country
     group_by(YEAR, COUNTRY_NAME) %>%
+    # sum all numeric columns, drop groups
     summarise(across(where(is.numeric), sum),
               .groups = 'drop')
   
+  # dplyr pipe to find top 5 trading nations during time frame for input species
   top5 <- summarized_data %>%
+    # remove YEAR so it does not get summed
     select(!YEAR) %>%
+    # group by country
     group_by(COUNTRY_NAME) %>%
+    # sum all numeric columns (i.e., export and import value and volume)
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
+    # calculate total real trade value by summing export and import values
+    # calculate total real trade volume by summing export and import volumes 
     mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
            TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
+    # filter for the top 5 countries based on the field specified from 
+      # the logical value and volume function inputs
     top_n(5, !!field) %>%
+    # pull() outputs the values in the specified field as a vector
     pull(COUNTRY_NAME)
   
+  # summarize trade data by top five countries during time period
+  # summarized_data is already filtered for the time period
   final_data <- summarized_data %>%
+    # filter for the top 5 countries
     filter(COUNTRY_NAME %in% top5) %>%
+    # calculate export and import values in millions/billions,
+    # calculate export and import volumes in metric tons,
+    # calculate net value and net volume by subtracting imports from exports
     mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            NET_VALUE_2024USD_BILLIONS = 
@@ -192,41 +295,48 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   return(final_data)
 }
 summarize_pp_yr_spp <- function(product_data, species) {
+  # this function summarizes processed product data by year and species of 
+    # interest
+  # product_data is a formatted data frame of FOSS processed product data
+    # (see 2_data_munge.R)
+  # species is a character vector of a species of interest
   
+  # coerce species to upper case to match data formatting
   species <- toupper(species)
   
-  if (species != 'ALL') {
-    which_group <- as.symbol(
-      ifelse(species %in% unique(product_data$ECOLOGICAL_CATEGORY), 
-             'ECOLOGICAL_CATEGORY',
-             ifelse(species %in% unique(product_data$SPECIES_CATEGORY), 
-                    'SPECIES_CATEGORY',
-                    ifelse(species %in% unique(product_data$SPECIES_GROUP), 
-                           'SPECIES_GROUP',
-                           'SPECIES_NAME')))
-    )
-  } else if (species == 'ALL') {
+  # if no species is provided (default is 'ALL'), summarize data without 
+    # filtering for a species
+  if (species == 'ALL') {
     summarized_data <- product_data %>%
+      # select only necessary columns: year, product_name (e.g., canned), 
+        # volume (KG), and value (DOLLARS_2024)
       select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+      # group by year and the product condition (product_name)
       group_by(YEAR, PRODUCT_NAME) %>%
+      # sum all numeric columns (i.e., value and volume), drop groups
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
+      # convert kilograms to metric tons
+      # convert value to billions and millions
       mutate(MT = KG / 1000,
+             MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+      # rename columns to label value, volume, and PP (processed product) prefix
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT, 
+             PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
              PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
              PP_VOLUME_KG = KG)
     
     return(summarized_data)
   }
   
-  group <- rlang::enquo(which_group)
-  
+  # identical to dplyr pipe above, save for filtering for a specified species
+  # only runs if species != 'ALL'
   product_data %>%
     filter_species(species) %>%
-    select(YEAR, !!group, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
