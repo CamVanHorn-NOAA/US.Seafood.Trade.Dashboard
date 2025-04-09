@@ -1047,7 +1047,7 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
            VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
     filter(VALUE_SHARE < 0.02) %>%
-    pull(PRODUCT_NAME)
+    select(PRODUCT_NAME)
   
   low_prop_types_volume <- processed_product_data %>%
     select(PP_VOLUME_MT, PRODUCT_NAME) %>%
@@ -1057,7 +1057,7 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
            VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
     filter(VOLUME_SHARE < 0.02) %>%
-    pull(PRODUCT_NAME)
+    select(PRODUCT_NAME)
   
   low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
     distinct() %>%
@@ -1071,38 +1071,46 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+           PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
            PRODUCT_NAME = factor(PRODUCT_NAME))
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
-    y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
+    # y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
+    y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
-    ylab <- 'Value (Billions, 2024 Real USD)'
+    # ylab <- 'Value (Billions, 2024 Real USD)'
+    ylab <- 'Value (Millions, 2024 Real USD)'
+    # label <- label_currency(suffix = 'B')
+    label <- label_currency(suffix = 'M')
     
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
-      select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
+      # select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
+      select(YEAR, PP_VALUE_MILLIONS_2024USD) %>%
       group_by(YEAR) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop')
     
-    ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
+    # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
+    ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)
   }
   
   if (plot.format == 'VOLUME') {
     # set labels for VOLUME plots
-    y <- as.symbol('THOUSAND_MT')
+    y <- as.symbol('PP_VOLUME_THOUSAND_MT')
     y <- rlang::enquo(y)
     ylab <- 'Volume (Thousand Metric Tons)'
+    label <- comma
     
     # calculate the total value per year to find upper limit
     yr_volume <- new_data %>%
-      select(YEAR, THOUSAND_MT) %>%
+      select(YEAR, PP_VOLUME_THOUSAND_MT) %>%
       group_by(YEAR) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') 
     
-    ylim <- max(yr_volume$THOUSAND_MT)
+    ylim <- max(yr_volume$PP_VOLUME_THOUSAND_MT + 1)
   }
   
   if (plot.format == 'PRICE') {
@@ -1146,7 +1154,8 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
          fill = 'Product Condition') +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     scale_y_continuous(limits = c(0, ylim), 
-                       expand = c(0, 0)) +
+                       expand = c(0, 0),
+                       labels = label) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
