@@ -1227,11 +1227,17 @@ plot_landings <- function(data, plot.format) {
   return(plot)
 }
 plot_mlti <- function(mlti_data, exports = F, imports = F) {
+  # this function generates a grid of plots that display MLTI data
+  # mlti_data is a data set formatted by calculate_mlti
+  # exports is logical that reflects if the data input is for exports
+  # imports is logical that reflects if the data input is for imports
   
+  # stop function if neither exports nor imports were specified
   if (exports == F & imports == F) {
     stop('Please set "exports" or "imports" to "T"')
   }
   
+  # set label for plot based on exports logical
   label <- ifelse(exports == T, 'Export', 'Import')
   
   ggplot(data = mlti_data,
@@ -1240,6 +1246,7 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
     geom_point() +
     facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
+    # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
          y = paste0('Multilateral ', label, ' Quantity Index')) +
@@ -1251,22 +1258,26 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
           strip.background = element_rect(fill = 'black'))
 }
 plot_hi <- function(hi_data) {
+  # this function generates a line plot that compares HI for exports and imports
+  # hi_data is a data set formatted by calculate_hi
   
+  # format the data by renaming columns for plot labels
   format_hi_data <- hi_data %>%
-    rename(EXPORTS = EXP_HI,
-           IMPORTS = IMP_HI) %>%
-    pivot_longer(cols = c(EXPORTS, IMPORTS))
+    rename(Exports = EXP_HI,
+           Imports = IMP_HI) %>%
+    # pivot the plot longer to create a grouping column by export or import
+    pivot_longer(cols = c(Exports, Imports))
   
   ggplot(data = format_hi_data,
          aes(x = as.factor(YEAR),
              y = value)) +
+    # group lines by the pivoted longer column 'name'
     geom_line(aes(group = name, 
                   colour = name),
               linewidth = 1.5) +
     geom_point(size = 2,
                color = 'black') +
-    scale_color_discrete(name = '',
-                         labels = c('Exports', 'Imports')) +
+    scale_color_discrete(name = '') +
     labs(x = '',
          y = 'Herfindahl Index (HI)') +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
@@ -1279,12 +1290,24 @@ plot_hi <- function(hi_data) {
   
 }
 plot_supply_metrics <- function(supply_data, metric) {
+  # this function generates three types of plots 
+  # supply_data is data formatted by calculate_supply_metrics in tandem with
+    # summarize_yr_spp
+  # metric is a character vector of three accepted inputs: 
+    # SUPPLY, RATIO, AND SHARE
+    # SUPPLY outputs plots of apparent supply 
+    # RATIO outputs plots of apparent supply relative to domestic production
+    # SHARE outputs plots of Unexported domestic production relative to 
+      # apparent supply
   
   if (metric == 'SUPPLY') {
     plot <- 
       ggplot(data = supply_data %>%
+               # we do not have landings or processing data for 2024 despite
+                # having so for trade data
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
+                 # divided by 1000 for thousand metric tons (volume metric)
                  y = APPARENT_SUPPLY / 1000)) +
       geom_col(fill = 'black') +
       labs(x = '',
@@ -1369,6 +1392,9 @@ ui <- page_sidebar(
                               mutate(ECOLOGICAL_CATEGORY = 
                                        str_to_title(ECOLOGICAL_CATEGORY)) %>%
                               pull())),
+    # these outputs only appear once a selection is made for the prior input
+      # this means filter_4 only appears once filter_3 has input, which only
+      # appears once filter_2 has input, etc.
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4')
@@ -1472,36 +1498,22 @@ ui <- page_sidebar(
                                  plotOutput('pp_volume')),
                        nav_panel(title = 'Price',
                                  plotOutput('pp_price'))),
-      width = 6
-    )
-  )
-             # tabPanel(title = 'Trade',
-             #          navset_pill(
-             #            nav_panel(title = 'Aggregate',
-             #                      plotOutput('balance')),
-             #            nav_panel(title = 'Exports',
-             #                      fluidRow(
-             #                        plotOutput('exp_volume')
-             #                      ),
-             #                      fluidRow(
-             #                        plotOutput('imp_volume')
-             #                      ))
-             #          )),
-             # tabPanel(title = 'Commercial Landings'),
-             # tabPanel(title = 'Processed Products')
-             # )
-  )
+      width = 6)))
 
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
   
   # creates input: species_cat
+  # filter_2 appears once an ecological category (ecol_cat) is selected
   output$filter_2 <- renderUI({
+    # req prevents anything from being run if ecol_cat is not specified
     req(input$ecol_cat != 'ALL')
+    # grab all species categories for the selected ecological category
     species_cats <- c('ALL', com_landings %>%
                         filter_species(input$ecol_cat) %>%
                         select(SPECIES_CATEGORY) %>%
                         distinct() %>%
+                        # display strings as titles (first letter capitalized)
                         mutate(SPECIES_CATEGORY = 
                                  str_to_title(SPECIES_CATEGORY)) %>%
                         pull())
@@ -1509,12 +1521,17 @@ server <- function(input, output, session) {
   })
   
   # creates input: species_grp
+  # filter_3 appears once a species category (species_cat) is selected
   output$filter_3 <- renderUI({
+    # req prevents anything from being run if both species_cat AND ecol_cat
+      # are not specified
     req(input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    # grab all species groups for the selected species category
     species_groups <- c('ALL', com_landings %>%
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
                           distinct() %>%
+                          # display strings as titles (first letter capitalized)
                           mutate(SPECIES_GROUP = 
                                    str_to_title(SPECIES_GROUP)) %>%
                           pull())
@@ -1522,12 +1539,17 @@ server <- function(input, output, session) {
   })
   
   # creates input: species_name
+  # filter_4 appears once a species group (species_grp) is selected
   output$filter_4 <- renderUI ({
+    # req prevents anything from being run if species_cat, ecol_cat, and 
+      # species_grp are not selected
     req(input$species_grp != 'ALL' & input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    # grab all species names for the selected species group
     species_names <- c('ALL', com_landings %>%
                          filter_species(input$species_grp) %>%
                          select(SPECIES_NAME) %>%
                          distinct() %>%
+                         # display strings as titles (first letter capitalized)
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
     selectInput('species_name', 'Choose a Species', species_names)
