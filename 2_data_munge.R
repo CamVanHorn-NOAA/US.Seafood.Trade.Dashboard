@@ -203,7 +203,7 @@ pp_data <- foss_pp %>%
          # convert pounds to kilograms in separate column
          KG = POUNDS * 0.45359237) %>%
   arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
-  # reorder columns so species is left of product_name for ease of viewing
+  # reorder columns so species is left of PRODUCT_NAME for ease of viewing
   select(YEAR, SPECIES, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
          ECOLOGICAL_CATEGORY, PRODUCT_NAME, POUNDS, DOLLARS, KG) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
@@ -221,8 +221,6 @@ com_landings <- foss_com_landings %>%
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
          METRIC_TONS = as.numeric(gsub(',', '', METRIC_TONS)),
          DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
-  # connect only SPECIES from processed products data to enable later joining
-  left_join(pp_landings_map) %>%
   # connect groups from map
   left_join(landings_map %>%
               select(NMFS_NAME, TSN, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%

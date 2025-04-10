@@ -20,7 +20,7 @@ if(!require("ggh4x"))       install.packages("ggh4x")
 source("nmfs_cols.R")
 
 # Pull Data (most recent version)
-load('seafood_trade_data_munge_03_13_25.RData')
+load('seafood_trade_data_munge_04_10_25.RData')
 
 # Custom Functions -------------------------------------------------------------
 ### filter species
@@ -309,10 +309,10 @@ summarize_pp_yr_spp <- function(product_data, species) {
     # filtering for a species
   if (species == 'ALL') {
     summarized_data <- product_data %>%
-      # select only necessary columns: year, product_name (e.g., canned), 
+      # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
         # volume (KG), and value (DOLLARS_2024)
       select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
-      # group by year and the product condition (product_name)
+      # group by year and the product condition (PRODUCT_NAME)
       group_by(YEAR, PRODUCT_NAME) %>%
       # sum all numeric columns (i.e., value and volume), drop groups
       summarise(across(where(is.numeric), sum),
