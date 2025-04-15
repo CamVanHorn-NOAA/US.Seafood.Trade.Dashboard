@@ -22,6 +22,33 @@ source("nmfs_cols.R")
 # Pull Data (most recent version)
 load('seafood_trade_data_munge_04_10_25.RData')
 
+# Create list of terms for each level of organization hierarchy
+  # these lists will be used to determine where a provided species input is 
+  # found in the hierarchy
+ecat_list <- com_landings %>%
+  select(ECOLOGICAL_CATEGORY) %>%
+  distinct() %>%
+  mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+  pull()
+
+scat_list <- com_landings %>%
+  select(SPECIES_CATEGORY) %>%
+  distinct() %>%
+  mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+  pull()
+
+sgrp_list <- com_landings %>%
+  select(SPECIES_GROUP) %>%
+  distinct() %>%
+  mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+  pull()
+
+sname_list <- com_landings %>%
+  select(SPECIES_NAME) %>%
+  distinct() %>%
+  mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+  pull()
+
 # Custom Functions -------------------------------------------------------------
 ### filter species
 filter_species <- function(data, species) {
