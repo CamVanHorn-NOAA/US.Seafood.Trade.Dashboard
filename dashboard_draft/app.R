@@ -1406,7 +1406,10 @@ ui <- page_sidebar(
       # appears once filter_2 has input, etc.
     uiOutput('filter_2'),
     uiOutput('filter_3'),
-    uiOutput('filter_4')
+    uiOutput('filter_4'),
+    selectizeInput(inputId = 'search_term',
+                   label = 'or Search for a Species',
+                   choices = NULL)
   ),
   fluidRow(
     navset_card_pill(title = 'Trade',
@@ -1563,6 +1566,40 @@ server <- function(input, output, session) {
                          pull())
     selectInput('species_name', 'Choose a Species', species_names)
   })
+  
+  # define search bar terms
+  updateSelectizeInput(session = session,
+                       'search_term',
+                       choices = 
+                         sort(c(com_landings %>%
+                                  filter(CONFIDENTIALITY != 'Confidential') %>%
+                                  select(ECOLOGICAL_CATEGORY) %>%
+                                  distinct() %>%
+                                  mutate(ECOLOGICAL_CATEGORY = 
+                                           str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                                  pull(),
+                                com_landings %>%
+                                  filter(CONFIDENTIALITY != 'Confidential') %>%
+                                  select(SPECIES_CATEGORY) %>%
+                                  distinct() %>%
+                                  mutate(SPECIES_CATEGORY = 
+                                           str_to_title(SPECIES_CATEGORY)) %>%
+                                  pull(),
+                                com_landings %>%
+                                  filter(CONFIDENTIALITY != 'Confidential') %>%
+                                  select(SPECIES_GROUP) %>%
+                                  distinct() %>%
+                                  mutate(SPECIES_GROUP = 
+                                           str_to_title(SPECIES_GROUP)) %>%
+                                  pull(),
+                                com_landings %>%
+                                  filter(CONFIDENTIALITY != 'Confidential') %>%
+                                  select(SPECIES_NAME) %>%
+                                  distinct() %>%
+                                  mutate(SPECIES_NAME = 
+                                           str_to_title(SPECIES_NAME)) %>%
+                                  pull())),
+                       server = T)
 
   # creates trade data
   trade_df <- reactive(summarize_trade_yr_spp(
