@@ -1419,15 +1419,7 @@ ui <- page_sidebar(
   
   sidebar = sidebar(
     title = 'Species Selection', 
-    selectInput(inputId = 'ecol_cat', 
-                label = 'Choose a Category',
-                choices = c('ALL', com_landings %>% 
-                              filter(CONFIDENTIALITY != 'Confidential') %>%
-                              select(ECOLOGICAL_CATEGORY) %>%
-                              distinct() %>%
-                              mutate(ECOLOGICAL_CATEGORY = 
-                                       str_to_title(ECOLOGICAL_CATEGORY)) %>%
-                              pull())),
+    uiOutput('filter_1'),
     # these outputs only appear once a selection is made for the prior input
       # this means filter_4 only appears once filter_3 has input, which only
       # appears once filter_2 has input, etc.
@@ -1541,6 +1533,22 @@ ui <- page_sidebar(
 
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
+  
+  # creates input: ecol_cat
+  # filter_1 is always present in the sidebar
+  output$filter_1 <- renderUI({
+    # grab all ecological categories
+    ecol_cats <- c('ALL', com_landings %>% 
+                     filter(CONFIDENTIALITY != 'Confidential') %>%
+                     select(ECOLOGICAL_CATEGORY) %>%
+                     distinct() %>%
+                     # display strings as titles (first letter capitalized)
+                     mutate(ECOLOGICAL_CATEGORY = 
+                              str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                     pull())
+    selectInput('ecol_cat', 'Choose a Category', ecol_cats)
+    
+  })
   
   # creates input: species_cat
   # filter_2 appears once an ecological category (ecol_cat) is selected
