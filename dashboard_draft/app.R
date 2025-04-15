@@ -1428,7 +1428,16 @@ ui <- page_sidebar(
     uiOutput('filter_4'),
     selectizeInput(inputId = 'search_term',
                    label = 'or Search for a Species',
-                   choices = NULL)
+                   choices = NULL),
+    # htmlOutput allows us to incorporate page breaks ('<br>')
+    htmlOutput('search_term_ecat'),
+    # add breaks between text for readability
+    br(), br(),
+    htmlOutput('search_term_scat'),
+    br(), br(),
+    htmlOutput('search_term_sgrp'),
+    br(), br(),
+    htmlOutput('search_term_sname')
   ),
   fluidRow(
     navset_card_pill(title = 'Trade',
@@ -1606,7 +1615,7 @@ server <- function(input, output, session) {
   updateSelectizeInput(session = session,
                        'search_term',
                        choices = 
-                         sort(c(com_landings %>%
+                         c('', sort(c(com_landings %>%
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(ECOLOGICAL_CATEGORY) %>%
                                   distinct() %>%
@@ -1633,8 +1642,71 @@ server <- function(input, output, session) {
                                   distinct() %>%
                                   mutate(SPECIES_NAME = 
                                            str_to_title(SPECIES_NAME)) %>%
-                                  pull())),
+                                  pull()))),
                        server = T)
+  
+  # Display search term categories for user to filter by
+  output$search_term_ecat <- renderText({
+    # require a search term to be inputted
+    req(input$search_term != '')
+    # set string to title to match data formatting
+    # pull all ecological categories matching the term (there can be multiple)
+    term <- str_to_title(as.character(com_landings %>%
+                           filter_species(input$search_term) %>%
+                           select(ECOLOGICAL_CATEGORY) %>%
+                           distinct() %>%
+                           pull()))
+    
+    # use collapse to convert multiple strings into one with ', <br>' separating
+    paste('Select the following: <br><br>Ecological Category: <br>', 
+          paste(term, collapse = ', <br>'))
+  })
+  
+  # see above notes
+  output$search_term_scat <- renderText({
+    req(input$search_term != '')
+    # require that the search_term appears in this and preceding levels of the
+      # organization hierarchy for text to appear
+      # This ensures that we only display instructions for filtering up to
+      # the level of the desired species input
+    req(input$search_term %in% scat_list |
+          input$search_term %in% sgrp_list |
+          input$search_term %in% sname_list)
+    term <- str_to_title(as.character(com_landings %>%
+                                        filter_species(input$search_term) %>%
+                                        select(SPECIES_CATEGORY) %>%
+                                        distinct() %>%
+                                        pull()))
+    paste('Species Category: <br>',
+          paste(term, collapse = ', <br>'))
+  })
+  
+  # see above notes
+  output$search_term_sgrp <- renderText({
+    req(input$search_term != '')
+    req(input$search_term %in% sgrp_list |
+          input$search_term %in% sname_list)
+    term <- str_to_title(as.character(com_landings %>%
+                                        filter_species(input$search_term) %>%
+                                        select(SPECIES_GROUP) %>%
+                                        distinct() %>%
+                                        pull()))
+    paste('Species Group: <br>',
+          paste(term, collapse = ', <br>'))
+  })
+  
+  # see above notes
+  output$search_term_sname <- renderText({
+    req(input$search_term != '')
+    req(input$search_term %in% sname_list)
+    term <- str_to_title(as.character(com_landings %>%
+                                        filter_species(input$search_term) %>%
+                                        select(SPECIES_NAME) %>%
+                                        distinct() %>%
+                                        pull()))
+    paste('Species Name: <br>',
+          paste(term, collapse = ', <br>'))
+  })
 
   # creates trade data
   trade_df <- reactive(summarize_trade_yr_spp(
