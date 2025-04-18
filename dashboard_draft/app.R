@@ -49,7 +49,19 @@ sname_list <- com_landings %>%
   mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
   pull()
 
+trade_terms <- c('ALL',
+                 str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
+                 str_to_title(unique(trade_data$SPECIES_CATEGORY)),
+                 str_to_title(unique(trade_data$SPECIES_GROUP)),
+                 str_to_title(unique(trade_data$SPECIES_NAME)))
+
 # Custom Functions -------------------------------------------------------------
+# stop functions without outputting error message
+stop_quietly <- function() {
+  opt <- options(show.error.messages = FALSE)
+  on.exit(options(opt))
+  stop()
+}
 ### filter species
 filter_species <- function(data, species) {
   # data is a formatted data frame created from 2_data_munge.R (see GitHub)
@@ -90,8 +102,7 @@ filter_species <- function(data, species) {
   # if species was not found, stop function with message to try a different
     # species input or search for available entries
   if (locate_level == 'UNAVAILABLE') {
-    stop("The species you provided is either too specific or not available.
-         Try 'unique(your_data$your_column) to find acceptable calls.")
+    stop()
   } 
   
   # only runs if species is found
@@ -1707,18 +1718,32 @@ server <- function(input, output, session) {
     paste('Species Name: <br>',
           paste(term, collapse = ', <br>'))
   })
-
-  # creates trade data
-  trade_df <- reactive(summarize_trade_yr_spp(
-    trade_data,
+  
+  # sets aside species selection
+  species_selection <- reactive({
     ifelse(input$ecol_cat == 'ALL', 'ALL',
            ifelse(input$species_cat == 'ALL', input$ecol_cat,
                   ifelse(input$species_grp == 'ALL', input$species_cat,
                          ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+                                input$species_name))))
+  })
+
+  # creates trade data
+  trade_df <- reactive({
+    summarize_trade_yr_spp(
+      trade_data,
+      species_selection()
+      )
+    })
+  
+  validation <- reactive({
+    validate(need(try(species_selection() %in% trade_terms),
+                  'Loading...'))
+  })
   
   # creates trade balance plot (value)
   output$balance <- renderPlot({
+    validation()
     plot_trade(trade_df(), 
                'BALANCE')
   })
@@ -1734,11 +1759,7 @@ server <- function(input, output, session) {
     plot_trade_ctry_yr_spp(
       summarize_trade_ctry_yr_spp(
         trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
+        species_selection(),
         time.frame = c(2020, 2024),
         value = T),
       value = T
@@ -1782,13 +1803,11 @@ server <- function(input, output, session) {
   })
   
   # creates landings data
-  landings_df <- reactive(summarize_landings_yr_spp(
-    com_landings,
-    ifelse(input$ecol_cat == 'ALL', 'ALL', 
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  landings_df <- reactive({
+    summarize_landings_yr_spp(
+      com_landings,
+      species_selection())
+    })
   
   # creates landings value plot
   output$landings_value <- renderPlot({
@@ -1809,13 +1828,11 @@ server <- function(input, output, session) {
   })
   
   # creates processed products data
-  pp_df <- reactive(summarize_pp_yr_spp(
-    pp_data,
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  pp_df <- reactive({
+    summarize_pp_yr_spp(
+      pp_data,
+      species_selection())
+    })
   
   # creates processed products value plot
   output$pp_value <- renderPlot({
@@ -1838,11 +1855,7 @@ server <- function(input, output, session) {
   # creates MLTI export table
   output$exp_mlti_table <- renderTable({
     calculate_mlti_table(
-      ifelse(input$ecol_cat == 'ALL', 'ALL',
-             ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                    ifelse(input$species_grp == 'ALL', input$species_cat,
-                           ifelse(input$species_name == 'ALL', input$species_grp,
-                                  input$species_name)))),
+      species_selection(),
       exports = T)
   })
   
@@ -1850,11 +1863,7 @@ server <- function(input, output, session) {
   output$exp_mlti <- renderPlot({
     plot_mlti(
       calculate_mlti(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
+        species_selection(),
         exports = T),
     exports = T)
   })
@@ -1862,11 +1871,7 @@ server <- function(input, output, session) {
   # creates MLTI import table
   output$imp_mlti_table <- renderTable({
     calculate_mlti_table(
-      ifelse(input$ecol_cat == 'ALL', 'ALL',
-             ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                    ifelse(input$species_grp == 'ALL', input$species_cat,
-                           ifelse(input$species_name == 'ALL', input$species_grp,
-                                  input$species_name)))),
+      species_selection(),
       imports = T)
   })
   
@@ -1874,11 +1879,7 @@ server <- function(input, output, session) {
   output$imp_mlti <- renderPlot({
     plot_mlti(
       calculate_mlti(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
+        species_selection(),
         imports = T),
       imports = T)
   })
@@ -1887,20 +1888,14 @@ server <- function(input, output, session) {
   output$hi_plot <- renderPlot({
     plot_hi(
       calculate_hi(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))))
+        species_selection()))
   })
   
   # creates supply metric data
-  supply_df <- reactive(calculate_supply_metrics(
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  supply_df <- reactive({
+    calculate_supply_metrics(
+      species_selection())
+    })
   
   # creates apparent supply plot
   output$supply_plot <- renderPlot({
