@@ -55,6 +55,14 @@ trade_terms <- c('ALL',
                  str_to_title(unique(trade_data$SPECIES_GROUP)),
                  str_to_title(unique(trade_data$SPECIES_NAME)))
 
+landings_terms <- c('ALL', ecat_list, scat_list, sgrp_list, sname_list)
+
+pp_terms <- c('ALL',
+              str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
+              str_to_title(unique(pp_data$SPECIES_CATEGORY)),
+              str_to_title(unique(pp_data$SPECIES_GROUP)),
+              str_to_title(unique(pp_data$SPECIES_NAME)))
+
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -849,6 +857,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
+ 
   
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
