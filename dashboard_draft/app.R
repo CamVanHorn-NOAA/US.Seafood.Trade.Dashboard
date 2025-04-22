@@ -14,6 +14,7 @@ if(!require("bslib"))       install.packages("bslib")
 if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
+if(!require("shinycssloaders")) install.packages("shinycssloaders")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
 # Due to some limitations in downloading nmfspalette on devices, use source
   # file located in app directory for nmfspalette colors
@@ -1459,45 +1460,63 @@ ui <- page_sidebar(
     navset_card_pill(title = 'Trade',
                      nav_panel(title = 'Aggregate',
                                fluidRow(
-                                 plotOutput('balance')
+                                 withSpinner(
+                                   plotOutput('balance'), 
+                                   type = 7)
                                ),
                                fluidRow(
                                  column(
-                                   plotOutput('trade_ratio'),
+                                   withSpinner(
+                                     plotOutput('trade_ratio'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('top5_trade'),
+                                   withSpinner(
+                                     plotOutput('top5_trade'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Value',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_value'),
+                                   withSpinner(
+                                     plotOutput('exp_value'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_value'),
+                                   withSpinner(
+                                     plotOutput('imp_value'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Volume',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_volume'),
+                                   withSpinner(
+                                     plotOutput('exp_volume'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_volume'),
+                                   withSpinner(
+                                     plotOutput('imp_volume'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Price',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_price'),
+                                   withSpinner(
+                                     plotOutput('exp_price'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_price'),
+                                   withSpinner(
+                                     plotOutput('imp_price'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Advanced Metrics',
@@ -1506,7 +1525,9 @@ ui <- page_sidebar(
                                    fluidRow(
                                      'Exports'
                                    ),
-                                   tableOutput('exp_mlti_table'),
+                                   withSpinner(
+                                     tableOutput('exp_mlti_table'), 
+                                     type = 7),
                                    # plotOutput('exp_mlti'),
                                    width = 6
                                  ),
@@ -1514,46 +1535,68 @@ ui <- page_sidebar(
                                    fluidRow(
                                      'Imports'
                                    ),
-                                   tableOutput('imp_mlti_table'),
+                                   withSpinner(
+                                     tableOutput('imp_mlti_table'), 
+                                     type = 7),
                                    # plotOutput('imp_mlti'),
                                    width = 6
                                  )),
                                fluidRow(
                                  column(
-                                   plotOutput('hi_plot'),
+                                   withSpinner(
+                                     plotOutput('hi_plot'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_plot'),
+                                   withSpinner(
+                                     plotOutput('supply_plot'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_ratio'),
+                                   withSpinner(
+                                     plotOutput('supply_ratio'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_share'),
+                                   withSpinner(
+                                     plotOutput('supply_share'), 
+                                     type = 7),
                                    width = 3
                                  ))))),
   fluidRow(
     column(
       navset_card_pill(title = 'Commercial Landings',
                        nav_panel(title = 'Value',
-                                 plotOutput('landings_value')),
+                                 withSpinner(
+                                   plotOutput('landings_value'),
+                                   type = 7)),
                        nav_panel(title = 'Volume',
-                                 plotOutput('landings_volume')),
+                                 withSpinner(
+                                   plotOutput('landings_volume'),
+                                   type = 7)),
                        nav_panel(title = 'Price',
-                                 plotOutput('landings_price'))),
+                                 withSpinner(
+                                   plotOutput('landings_price'),
+                                   type = 7))),
       width = 6
     ),
     column(
       navset_card_pill(title = 'Processed Products',
                        nav_panel(title = 'Value',
-                                 plotOutput('pp_value')),
+                                 withSpinner(
+                                   plotOutput('pp_value'),
+                                   type = 7)),
                        nav_panel(title = 'Volume',
-                                 plotOutput('pp_volume')),
+                                 withSpinner(
+                                   plotOutput('pp_volume'),
+                                   type = 7)),
                        nav_panel(title = 'Price',
-                                 plotOutput('pp_price'))),
+                                 withSpinner(
+                                   plotOutput('pp_price'),
+                                   type = 7))),
       width = 6)))
 
 # Define server logic ----------------------------------------------------------
