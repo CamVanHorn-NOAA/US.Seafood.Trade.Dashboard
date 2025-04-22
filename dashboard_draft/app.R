@@ -1759,6 +1759,15 @@ server <- function(input, output, session) {
                'RATIO', export = T, import = T)
   })
   
+  # creates top 5 net export data
+  top5_trade_df <- reactive({
+    summarize_trade_ctry_yr_spp(
+      trade_data,
+      species_selection(),
+      time.frame = c(2020, 2024),
+      value = T)
+  })
+  
   # creates top 5 net export plot
   output$top5_trade <- renderPlot({
     plot_trade_ctry_yr_spp(
