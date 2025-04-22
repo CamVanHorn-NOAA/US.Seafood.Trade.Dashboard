@@ -887,10 +887,6 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
-  # stop function if plot format is not included
-  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
-    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
-  }
   
   # set labels and y values for plots of VALUE
   if (plot_format == 'VALUE') {
