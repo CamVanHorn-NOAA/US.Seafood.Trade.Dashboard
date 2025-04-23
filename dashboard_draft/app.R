@@ -1544,13 +1544,13 @@ ui <- page_sidebar(
                                fluidRow(
                                  column(
                                    withSpinner(
-                                     plotOutput('hi_plot'), 
+                                     plotOutput('hi'), 
                                      type = 7),
                                    width = 3
                                  ),
                                  column(
                                    withSpinner(
-                                     plotOutput('supply_plot'), 
+                                     plotOutput('supply'), 
                                      type = 7),
                                    width = 3
                                  ),
@@ -1784,28 +1784,36 @@ server <- function(input, output, session) {
       )
     })
   
+  # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
     validate(need(try(species_selection() %in% trade_terms),
                   'There is no available trade data for the selected species'))
   })
   
   # creates trade balance plot (value)
+  balance_plot <- reactive({
+    plot_trade(trade_df(), 'BALANCE')
+  })
+  
+  # outputs trade balance plot (value)
   output$balance <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'BALANCE'))),
+    validate(need(try(!is.na(balance_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(), 
-               'BALANCE')
+    balance_plot()
   })
   
   # creates export/import ratio plot
+  ratio_plot <- reactive({
+    plot_trade(trade_df(), 'RATIO', export = T, import = T)
+  })
+  
+  # outputs export/import ratio plot
   output$trade_ratio <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'RATIO', 
-                                        export = T, import = T))),
+    validate(need(try(!is.na(ratio_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(), 
-               'RATIO', export = T, import = T)
+    ratio_plot()
   })
   
   # creates top 5 net export data
@@ -1818,70 +1826,97 @@ server <- function(input, output, session) {
   })
   
   # creates top 5 net export plot
+  top5_trade_plot <- reactive({
+    plot_trade_ctry_yr_spp(top5_trade_df(), value = T)
+  })
+  
+  # outputs top 5 net export plot
   output$top5_trade <- renderPlot({
     trade_data_validation()
-    validate(need(try(plot_trade_ctry_yr_spp(top5_trade_df(), value = T)),
+    validate(need(try(!is.na(top5_trade_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade_ctry_yr_spp(
-      top5_trade_df(),
-      value = T
-    )
+    top5_trade_plot()
   })
   
   # creates export value plot
+  exp_value_plot <- reactive({
+    plot_trade(trade_df(), 'VALUE', export = T)
+  })
+  
+  # outputs export value plot
   output$exp_value <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'VALUE', export = T))),
+    validate(need(try(!is.na(exp_value_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(), 
-               'VALUE', export = T)
+    exp_value_plot()
   })
   
   # creates import value plot
+  imp_value_plot <- reactive({
+    plot_trade(trade_df(), 'VALUE', import = T)
+  })
+  
+  # outputs import value plot
   output$imp_value <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'VALUE', import = T))),
+    validate(need(try(!is.na(imp_value_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(),
-               'VALUE', import = T)
+    imp_value_plot()
   })
 
   # creates export volume plot
+  exp_volume_plot <- reactive({
+    plot_trade(trade_df(), 'VOLUME', export = T)
+  })
+  
+  # outputs export volume plot
   output$exp_volume <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'VOLUME', export = T))),
+    validate(need(try(!is.na(exp_volume_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(), 
-               'VOLUME', export = T)
+    exp_volume_plot()
   })
 
   # creates import volume plot
+  imp_volume_plot <- reactive({
+    plot_trade(trade_df(), 'VOLUME', import = T)
+  })
+  
+  # outputs import volume plot
   output$imp_volume <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'VOLUME', import = T))),
+    validate(need(try(!is.na(imp_volume_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(), 
-               'VOLUME', import = T)
+    imp_volume_plot()
   })
   
   # creates export price plot
+  exp_price_plot <- reactive({
+    plot_trade(trade_df(), 'PRICE', export = T)
+  })
+  
+  # outputs export price plot
   output$exp_price <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'PRICE', export = T))),
+    validate(need(try(!is.na(exp_price_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(),
-               'PRICE', export = T)
+    exp_price_plot()
   })
   
   # creates import price plot
-  output$imp_price <- renderPlot({
-    trade_data_validation()
-    validate(need(try(!is.na(plot_trade(trade_df(), 'PRICE', import = T))),
-                  'Data for this species is insufficient to produce this plot'))
-    plot_trade(trade_df(),
-               'PRICE', import = T)
+  imp_price_plot <- reactive({
+    plot_trade(trade_df(), 'PRICE', import = T)
   })
   
+  # outputs import price plot
+  output$imp_price <- renderPlot({
+    trade_data_validation()
+    validate(need(try(!is.na(imp_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    imp_price_plot()
+  })
+  
+  # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
     validate(need(try(species_selection() %in% landings_terms),
                   'There is no available landings data for this species'))
@@ -1895,32 +1930,45 @@ server <- function(input, output, session) {
     })
   
   # creates landings value plot
+  landings_value_plot <- reactive({
+    plot_landings(landings_df(), 'VALUE')
+  })
+  
+  # outputs landings value plot
   output$landings_value <- renderPlot({
     landings_data_validation()
-    validate(need(try(!is.na(plot_landings(landings_df(), 'VALUE'))),
+    validate(need(try(!is.na(landings_value_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_landings(landings_df(), 
-                  'VALUE')
+    landings_value_plot()
   })
   
   # creates landings volume plot
+  landings_volume_plot <- reactive({
+    plot_landings(landings_df(), 'VOLUME')
+  })
+  
+  # outputs landings volume plot
   output$landings_volume <- renderPlot({
     landings_data_validation()
-    validate(need(try(!is.na(plot_landings(landings_df(), 'VOLUME'))),
+    validate(need(try(!is.na(landings_volume_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_landings(landings_df(),
-                  'VOLUME')
+    landings_volume_plot()
   })
   
   # creates landings price plot
-  output$landings_price <- renderPlot({
-    landings_data_validation()
-    validate(need(try(!is.na(plot_landings(landings_df(), 'PRICE'))),
-                  'Data for this species is insufficient to produce this plot'))
-    plot_landings(landings_df(),
-                  'PRICE')
+  landings_price_plot <- reactive({
+    plot_landings(landings_df(), 'PRICE')
   })
   
+  # outputs landings price plot
+  output$landings_price <- renderPlot({
+    landings_data_validation()
+    validate(need(try(!is.na(landings_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    landings_price_plot()
+  })
+  
+  # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
     validate(need(try(species_selection() %in% pp_terms),
                   'There is no available production data for this species'))
@@ -1934,88 +1982,107 @@ server <- function(input, output, session) {
     })
   
   # creates processed products value plot
+  pp_value_plot <- reactive({
+    plot_spp_pp(pp_df(), 'VALUE')
+  })
+  
+  # outputs processed products value plot
   output$pp_value <- renderPlot({
     pp_data_validation()
-    validate(need(try(!is.na(plot_spp_pp(pp_df(), 'VALUE'))),
+    validate(need(try(!is.na(pp_value_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_spp_pp(pp_df(),
-                'VALUE')
+    pp_value_plot()
   })
   
   # creates processed products volume plot
+  pp_volume_plot <- reactive({
+    plot_spp_pp(pp_df(), 'VOLUME')
+  })
+  
+  # outputs processed products volume plot
   output$pp_volume <- renderPlot({
     pp_data_validation()
-    validate(need(try(!is.na(plot_spp_pp(pp_df(), 'VOLUME'))),
+    validate(need(try(!is.na(pp_volume_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_spp_pp(pp_df(),
-                'VOLUME')
+    pp_volume_plot()
   })
   
   # creates processed products price plot
+  pp_price_plot <- reactive({
+    plot_spp_pp(pp_df(), 'PRICE')
+  })
+  
+  # outputs processed products price plot
   output$pp_price <- renderPlot({
     pp_data_validation()
-    validate(need(try(!is.na(plot_spp_pp(pp_df(), 'PRICE'))),
+    validate(need(try(!is.na(pp_price_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_spp_pp(pp_df(),
-                'PRICE')
+    pp_price_plot()
   })
   
   # creates MLTI export table
+  exp_mlti_table_df <- reactive({
+    calculate_mlti_table(species_selection(), exports = T)
+  })
+  
+  # outputs MLTI export table
   output$exp_mlti_table <- renderTable({
     trade_data_validation()
-    validate(need(try(!is.na(calculate_mlti_table(species_selection(),
-                                                  exports = T))),
+    validate(need(try(!is.na(exp_mlti_table_df())),
                   'Data for this species is insufficient to produce this table'))
-    calculate_mlti_table(
-      species_selection(),
-      exports = T)
+    exp_mlti_table_df()
   })
   
   # creates MLTI export plot
+  exp_mlti_plot <- reactive({
+    plot_mlti(calculate_mlti(species_selection(), exports = T), exports = T)
+  })
+  
+  # outputs MLTI export plot
   output$exp_mlti <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(calculate_mlti_table(species_selection(),
-                                                  exports = T))),
+    validate(need(try(!is.na(exp_mlti_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_mlti(
-      calculate_mlti(
-        species_selection(),
-        exports = T),
-    exports = T)
+    exp_mlti_plot()
   })
   
   # creates MLTI import table
+  imp_mlti_table_df <- reactive({
+    calculate_mlti_table(species_selection(), imports = T)
+  })
+  
+  # outputs MLTI import table
   output$imp_mlti_table <- renderTable({
     trade_data_validation()
-    validate(need(try(!is.na(calculate_mlti_table(species_selection(),
-                                                  imports = T))),
+    validate(need(try(!is.na(imp_mlti_table_df())),
                   'Data for this species is insufficient to produce this table'))
-    calculate_mlti_table(
-      species_selection(),
-      imports = T)
+    imp_mlti_table_df()
   })
   
   # creates MLTI import plot
+  imp_mlti_plot <- reactive({
+    plot_mlti(calculate_mlti(species_selection(), imports = T), imports = T)
+  })
+  
+  # outputs MLTI import plot
   output$imp_mlti <- renderPlot({
     trade_data_validation()
-    validate(need(try(!is.na(calculate_mlti_table(species_selection(),
-                                                  imports = T))),
+    validate(need(try(!is.na(imp_mlti_plot())),
                   'Data for this species is insufficient to produce this plot'))
-    plot_mlti(
-      calculate_mlti(
-        species_selection(),
-        imports = T),
-      imports = T)
+    imp_mlti_plot()
   })
   
   # creates HI plot
-  output$hi_plot <- renderPlot({
+  hi_plot <- reactive({
+    plot_hi(calculate_hi(species_selection()))
+  })
+  
+  # outputs HI plot
+  output$hi <- renderPlot({
     trade_data_validation()
-    validate(need(try(plot_hi(calculate_hi(species_selection()))),
+    validate(need(try(!is.na(hi_plot())),
                   'Data for this species is insufficient to produce this table'))
-    plot_hi(
-      calculate_hi(
-        species_selection()))
+    hi_plot()
   })
   
   # creates supply metric data
@@ -2025,30 +2092,42 @@ server <- function(input, output, session) {
     })
   
   # creates apparent supply plot
-  output$supply_plot <- renderPlot({
+  supply_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'SUPPLY')
+  })
+  
+  # outputs apparent supply plot
+  output$supply <- renderPlot({
     trade_data_validation()
-    validate(need(try(plot_supply_metrics(supply_df(), 'SUPPLY')),
+    validate(need(try(supply_plot()),
                   'Data for this species is insufficient to produce this table'))
-    plot_supply_metrics(supply_df(),
-                        'SUPPLY')
+    supply_plot()
   })
   
   # creates apparent supply (ratio) plot
+  supply_ratio_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'RATIO')
+  })
+  
+  # outputs apparent supply (ratio) plot
   output$supply_ratio <- renderPlot({
     trade_data_validation()
-    validate(need(try(plot_supply_metrics(supply_df(), 'RATIO')),
+    validate(need(try(supply_ratio_plot()),
                   'Data for this species is insufficient to produce this table'))
-    plot_supply_metrics(supply_df(),
-                        'RATIO')
+    supply_ratio_plot()
   })
   
   # creates apparent supply (share) plot
+  supply_share_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'SHARE')
+  })
+  
+  # outputs apparent supply (share) plot
   output$supply_share <- renderPlot({
     trade_data_validation()
-    validate(need(try(plot_supply_metrics(supply_df(), 'SHARE')),
+    validate(need(try(supply_share_plot()),
                   'Data for this species is insufficient to produce this table'))
-    plot_supply_metrics(supply_df(),
-                        'SHARE')
+    supply_share_plot()
   })
   
 }
