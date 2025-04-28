@@ -1842,18 +1842,22 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  species_selection_trade <- reactive({
+    ifelse(species_selected() %in% trade_terms, species_selected(),
+           unfilter_species_trade())
+  })
 
   # creates trade data
   trade_df <- reactive({
     summarize_trade_yr_spp(
       trade_data,
-      species_selection()
+      species_selection_trade()
       )
     })
   
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
-    validate(need(try(species_selection() %in% trade_terms),
+    validate(need(try(species_selection_trade() %in% trade_terms),
                   'There is no available trade data for the selected species'))
   })
   
@@ -1887,7 +1891,7 @@ server <- function(input, output, session) {
   top5_trade_df <- reactive({
     summarize_trade_ctry_yr_spp(
       trade_data,
-      species_selection(),
+      species_selection_trade(),
       time.frame = c(2020, 2024),
       value = T)
   })
@@ -1991,9 +1995,14 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  species_selection_landings <- reactive({
+    ifelse(species_selected() %in% landings_terms, species_selected(),
+           unfilter_species_landings())
+  })
+  
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
-    validate(need(try(species_selection() %in% landings_terms),
+    validate(need(try(species_selection_landings() %in% landings_terms),
                   'There is no available landings data for this species'))
   })
   
@@ -2001,7 +2010,7 @@ server <- function(input, output, session) {
   landings_df <- reactive({
     summarize_landings_yr_spp(
       com_landings,
-      species_selection())
+      species_selection_landings())
     })
   
   # creates landings value plot
@@ -2051,9 +2060,14 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  species_selection_products <- reactive({
+    ifelse(species_selected() %in% pp_terms, species_selected(),
+           unfilter_species_products())
+  })
+  
   # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
-    validate(need(try(species_selection() %in% pp_terms),
+    validate(need(try(species_selection_products() %in% pp_terms),
                   'There is no available production data for this species'))
   })
   
@@ -2061,7 +2075,7 @@ server <- function(input, output, session) {
   pp_df <- reactive({
     summarize_pp_yr_spp(
       pp_data,
-      species_selection())
+      species_selection_products())
     })
   
   # creates processed products value plot
@@ -2105,7 +2119,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection(), exports = T)
+    calculate_mlti_table(species_selection_trade(), exports = T)
   })
   
   # outputs MLTI export table
@@ -2118,7 +2132,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export plot
   exp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection(), exports = T), exports = T)
+    plot_mlti(calculate_mlti(species_selection_trade(), exports = T), exports = T)
   })
   
   # outputs MLTI export plot
@@ -2131,7 +2145,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection(), imports = T)
+    calculate_mlti_table(species_selection_trade(), imports = T)
   })
   
   # outputs MLTI import table
@@ -2144,7 +2158,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import plot
   imp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection(), imports = T), imports = T)
+    plot_mlti(calculate_mlti(species_selection_trade(), imports = T), imports = T)
   })
   
   # outputs MLTI import plot
@@ -2157,7 +2171,7 @@ server <- function(input, output, session) {
   
   # creates HI plot
   hi_plot <- reactive({
-    plot_hi(calculate_hi(species_selection()))
+    plot_hi(calculate_hi(species_selection_trade()))
   })
   
   # outputs HI plot
@@ -2171,7 +2185,7 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection())
+      species_selection_trade())
     })
   
   # creates apparent supply plot
