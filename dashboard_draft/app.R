@@ -50,14 +50,17 @@ sname_list <- com_landings %>%
   mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
   pull()
 
+# list of all categorizations available in trade data
 trade_terms <- c('ALL',
                  str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
                  str_to_title(unique(trade_data$SPECIES_CATEGORY)),
                  str_to_title(unique(trade_data$SPECIES_GROUP)),
                  str_to_title(unique(trade_data$SPECIES_NAME)))
 
+# list of all categorizations available in landings data
 landings_terms <- c('ALL', ecat_list, scat_list, sgrp_list, sname_list)
 
+# list of all categorizations available in production data
 pp_terms <- c('ALL',
               str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
               str_to_title(unique(pp_data$SPECIES_CATEGORY)),
@@ -1480,9 +1483,13 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
+    # these outputs only appear once a selection is not available for a given
+      # section (landings, trade, production)
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
+    # search bar that outputs directions for how to filter for the searched 
+      # species (if available)
     selectizeInput(inputId = 'search_term',
                    label = 'or Search for a Species',
                    choices = NULL),
@@ -1710,18 +1717,24 @@ server <- function(input, output, session) {
     selectInput('species_name', 'Choose a Species', species_names)
   })
   
+  # creates checkbox to unfilter trade up one level
+    # requires the selected species to NOT be available in trade categories
   output$trade_unfilter_button <- renderUI({
     req(!(species_selected() %in% trade_terms))
     
     checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
   })
   
+  # creates checkbox to unfilter production up one level
+    # requires the selected species to NOT be available in production categories
   output$product_unfilter_button <- renderUI({
     req(!(species_selected() %in% pp_terms))
     
     checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
   })
   
+  # creates checkbox to unfilter landings up one level
+    # requires the selected species to NOT be available in landings categories
   output$landings_unfilter_button <- renderUI({
     req(!(species_selected() %in% landings_terms))
     
@@ -1825,7 +1838,7 @@ server <- function(input, output, session) {
           paste(term, collapse = ', <br>'))
   })
   
-  # sets aside species selection
+  # sets aside species selected by the user
   species_selected <- reactive({
     ifelse(input$ecol_cat == 'ALL', 'ALL',
            ifelse(input$species_cat == 'ALL', input$ecol_cat,
@@ -1834,6 +1847,8 @@ server <- function(input, output, session) {
                                 input$species_name))))
   })
   
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available trade data
   unfilter_species_trade <- reactive({
     req(input$trade_button == T)
     ifelse(input$species_name != '', input$species_grp,
@@ -1842,6 +1857,12 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_trade) should be used for trade data visualization based
+    # on whether the selected species is available in trade data
+  # because unfilter_species_trade requires the trade_button to be checked by
+    # the user, this will only switch to unfilter_species_trade once the user
+    # checks the box
   species_selection_trade <- reactive({
     ifelse(species_selected() %in% trade_terms, species_selected(),
            unfilter_species_trade())
@@ -1987,6 +2008,8 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available landings data 
   unfilter_species_landings <- reactive({
     req(input$landings_button == T)
     ifelse(input$species_name != '', input$species_grp,
@@ -1995,6 +2018,12 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_landings) should be used for landings data visualization 
+    # based on whether the selected species is available in landings data
+  # because unfilter_species_landings requires the landings_button to be checked by
+    # the user, this will only switch to unfilter_species_landings once the user
+    # checks the box
   species_selection_landings <- reactive({
     ifelse(species_selected() %in% landings_terms, species_selected(),
            unfilter_species_landings())
@@ -2052,6 +2081,8 @@ server <- function(input, output, session) {
     landings_price_plot()
   })
   
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available production data 
   unfilter_species_products <- reactive({
     req(input$products_button == T)
     ifelse(input$species_name != '', input$species_grp,
@@ -2060,6 +2091,12 @@ server <- function(input, output, session) {
                          NA)))
   })
   
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_products) should be used for production data visualization 
+    # based on whether the selected species is available in production data
+  # because unfilter_species_products requires the products_button to be checked by
+    # the user, this will only switch to unfilter_species_products once the user
+    # checks the box
   species_selection_products <- reactive({
     ifelse(species_selected() %in% pp_terms, species_selected(),
            unfilter_species_products())
