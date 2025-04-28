@@ -1833,6 +1833,15 @@ server <- function(input, output, session) {
                          ifelse(input$species_name == 'ALL', input$species_grp,
                                 input$species_name))))
   })
+  
+  unfilter_species_trade <- reactive({
+    req(input$trade_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
+  })
+  
 
   # creates trade data
   trade_df <- reactive({
@@ -1974,6 +1983,14 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  unfilter_species_landings <- reactive({
+    req(input$landings_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
+  })
+  
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
     validate(need(try(species_selection() %in% landings_terms),
@@ -2024,6 +2041,14 @@ server <- function(input, output, session) {
     validate(need(try(!is.na(landings_price_plot())),
                   'Data for this species is insufficient to produce this plot'))
     landings_price_plot()
+  })
+  
+  unfilter_species_products <- reactive({
+    req(input$products_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
   })
   
   # validation reactive; outputs message if species is not found in production data
