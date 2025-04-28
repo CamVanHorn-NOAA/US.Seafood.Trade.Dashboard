@@ -1560,7 +1560,7 @@ ui <- page_sidebar(
                                fluidRow(
                                  column(
                                    fluidRow(
-                                     'Exports'
+                                     'Export Multilateral Trade Index'
                                    ),
                                    withSpinner(
                                      tableOutput('exp_mlti_table'), 
@@ -1570,7 +1570,7 @@ ui <- page_sidebar(
                                  ),
                                  column(
                                    fluidRow(
-                                     'Imports'
+                                     'Import Multilateral Trade Index'
                                    ),
                                    withSpinner(
                                      tableOutput('imp_mlti_table'), 
