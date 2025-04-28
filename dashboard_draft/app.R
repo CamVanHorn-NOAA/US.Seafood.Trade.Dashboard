@@ -1480,6 +1480,9 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
+    uiOutput('trade_unfilter_button'),
+    uiOutput('product_unfilter_button'),
+    uiOutput('landings_unfilter_button'),
     selectizeInput(inputId = 'search_term',
                    label = 'or Search for a Species',
                    choices = NULL),
@@ -1692,7 +1695,7 @@ server <- function(input, output, session) {
   
   # creates input: species_name
   # filter_4 appears once a species group (species_grp) is selected
-  output$filter_4 <- renderUI ({
+  output$filter_4 <- renderUI({
     # req prevents anything from being run if species_cat, ecol_cat, and 
       # species_grp are not selected
     req(input$species_grp != 'ALL' & input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
@@ -1705,6 +1708,24 @@ server <- function(input, output, session) {
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
     selectInput('species_name', 'Choose a Species', species_names)
+  })
+  
+  output$trade_unfilter_button <- renderUI({
+    req(!(species_selected() %in% trade_terms))
+    
+    checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
+  })
+  
+  output$product_unfilter_button <- renderUI({
+    req(!(species_selected() %in% pp_terms))
+    
+    checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
+  })
+  
+  output$landings_unfilter_button <- renderUI({
+    req(!(species_selected() %in% landings_terms))
+    
+    checkboxInput('landings_button', 'Unfilter Landings Plots Up One Level')
   })
   
   # define search bar terms
