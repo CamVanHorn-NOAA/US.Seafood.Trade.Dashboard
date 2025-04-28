@@ -879,12 +879,12 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   # set shortform and longform values for plot labeling if export
   if (export == T & import == F) {
     shortform <- 'EXP'
-    longform <- 'Export'
+    longform <- 'Exports'
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
-    longform <- 'Import'
+    longform <- 'Imports'
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
@@ -896,7 +896,9 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- rlang::enquo(y)
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
+    # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
+    ylab <- 'Millions (Real 2024 USD)'
+    tlab <- 'Value'
   }
   
   # set labels and y values for plots of VOLUME
@@ -904,7 +906,9 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
     y <- rlang::enquo(y)
     label <- comma
-    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+    # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+    ylab <- 'Metric Tons'
+    tlab <- 'Volume'
   }
   
   # set labels and y values for plots of PRICE
@@ -912,7 +916,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
     y <- rlang::enquo(y)
     label <- label_currency(suffix = '/kg')
-    ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
+    ylab <- 'Average Price (Real 2024 USD)'
   }
   
   # plots of VALUE and VOLUME
@@ -926,10 +930,13 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
+      labs(x = '',
+           y = ylab,
+           title = longform) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else if (plot_format == 'PRICE') {
     # plot of PRICE
     # PRICE is a line chart, so we need a column to group by
@@ -947,10 +954,13 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
+      labs(x = '',
+           y = ylab,
+           title = longform) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else if (plot_format == 'RATIO') {
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
@@ -969,9 +979,12 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       labs(x = '', 
-           y = 'Export / Import Volume Ratio') +
+           y = 'Export / Import',
+           title = 'Volume Ratio') +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else {
     # plot of BALANCE
     # create trade balance data by including both export and import data
@@ -999,7 +1012,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       labs(x = '',
            # y = 'Billions (Real 2024 USD)',
            y = 'Millions (Real 2024 USD)',
-           fill = '') +
+           fill = '',
+           title = 'Value Balance') +
       scale_fill_discrete(labels = c('Exports',
                                      'Imports',
                                      'Trade Balance')) +
@@ -1011,12 +1025,16 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       theme(legend.position = 'top',
             axis.line.y = element_line(color = 'black'),
             axis.text.x = element_text(hjust = 0.8,
-                                       size = 8),
-            axis.title.y = element_text(vjust = 23),
+                                       size = 12),
+            axis.text.y = element_text(size = 12),
+            axis.title.y = element_text(vjust = 23,
+                                        size = 15),
+            legend.text = element_text(size = 15),
+            plot.title = element_text(size = 18),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 55.5, 'points'))
+            plot.margin = margin(5.5, 5.5, 5.5, 75.5, 'points'))
   }
   
   return(plot)
@@ -1044,7 +1062,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     # ylab <- 'Net Export Value (Real 2024 USD, Billions)'
-    ylab <- 'Net Export Value (Real 2024 USD, Millions)'
+    ylab <- 'Millions (Real 2024 USD)'
   } else {
     # set plot labels for volume plot
     y <- as.symbol('NET_VOLUME_MT')
@@ -1061,15 +1079,16 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
     scale_fill_nmfs(palette = 'oceans') +
     labs(x = '',
          y = ylab,
-         fill = 'Year') +
+         fill = 'Year',
+         title = 'Net Export Value for Top 5 Trading Partners') +
     scale_y_continuous(labels = label) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
-    theme(axis.text = element_text(color = 'black',
-                                   size = 10),
-          axis.title = element_text(size = 14),
-          legend.title = element_text(size = 14),
-          legend.text = element_text(size = 10))
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 18))
 }
 plot_spp_pp <- function(processed_product_data, plot.format) {
   # function that plots processed product data 
@@ -1124,9 +1143,10 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     # ylab <- 'Value (Billions, 2024 Real USD)'
-    ylab <- 'Value (Millions, 2024 Real USD)'
+    ylab <- 'Millions (2024 Real USD)'
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    tlab <- 'Production Value'
     
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
@@ -1144,8 +1164,9 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     # set labels for VOLUME plots
     y <- as.symbol('PP_VOLUME_THOUSAND_MT')
     y <- rlang::enquo(y)
-    ylab <- 'Volume (Thousand Metric Tons)'
+    ylab <- 'Metric Tons (Thousands)'
     label <- comma
+    tlab <- 'Production Volume'
     
     # calculate the total value per year to find upper limit
     yr_volume <- new_data %>%
@@ -1172,15 +1193,18 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
                         name = 'Product Condition') +
       labs(x = '',
            y = 'Average Price (Real 2024 USD)',
-           fill = 'Product Condition') +
+           fill = 'Product Condition',
+           title = 'Production Price') +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(limits = c(0, max(new_data$PP_PRICE_2024USD_PER_KG) + 0.5),
-                         expand = c(0, 0)) +
+                         expand = c(0, 0),
+                         labels = label_currency(suffix = '/kg')) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
             legend.text = element_text(size = 12),
-            legend.title = element_text(size = 15))
+            legend.title = element_text(size = 15),
+            plot.title = element_text(size = 18))
       
     return(plot)
   }
@@ -1195,7 +1219,8 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
                       name = 'Product Condition') +
     labs(x = '',
          y = ylab,
-         fill = 'Product Condition') +
+         fill = 'Product Condition',
+         title = tlab) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     scale_y_continuous(limits = c(0, ylim), 
                        expand = c(0, 0),
@@ -1204,7 +1229,8 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 12),
-          legend.title = element_text(size = 15))
+          legend.title = element_text(size = 15),
+          plot.title = element_text(size = 18))
   
   return(plot)
 }
@@ -1218,11 +1244,15 @@ plot_landings <- function(data, plot.format) {
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
-    y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     
-    label <- label_currency(suffix = 'B')
-    ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
+    # label <- label_currency(suffix = 'B')
+    label <- label_currency(suffix = 'M')
+    # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
+    ylab <- 'Millions (Real 2024 USD)'
+    tlab <- 'Ex-Vessel Value'
   }
   
   # set labels for VOLUME plot
@@ -1234,7 +1264,8 @@ plot_landings <- function(data, plot.format) {
     data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
     
     label <- comma
-    ylab <- 'Total Landed Volume (Thousand Metric Tons)'
+    ylab <- 'Metric Tons (Thousands)'
+    tlab <- 'Landed Volume'
   }
   
   # create plot for PRICE (this is a line chart which contrasts with VALUE and
@@ -1256,9 +1287,12 @@ plot_landings <- function(data, plot.format) {
                        limits = factor(2004:2023)) +
       scale_y_continuous(labels = label_currency(suffix = '/kg')) +
       labs(x = '',
-           y = 'Average Ex-Vessel Price (Real 2024 USD)') +
+           y = 'Average Price (Real 2024 USD)',
+           title = 'Ex-Vessel Price') +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            axis.title = element_text(size = 15),
+            plot.title = element_text(size = 18))
     
     return(plot)
   }
@@ -1273,9 +1307,12 @@ plot_landings <- function(data, plot.format) {
                      limits = factor(2004:2023)) +
     scale_y_continuous(labels = label) +
     labs(x = '',
-         y = ylab) +
+         y = ylab,
+         title = tlab) +
     theme_bw() +
-    theme(axis.text = element_text(size = 10))
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 18))
   
   return(plot)
 }
@@ -1364,14 +1401,14 @@ plot_supply_metrics <- function(supply_data, metric) {
                  y = APPARENT_SUPPLY / 1000)) +
       geom_col(fill = 'black') +
       labs(x = '',
-           y = 'Volume (Thousand Metric Tons)',
+           y = 'Metric Tons (Thousands)',
            title = 'Apparent Supply') +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 17))
+            plot.title = element_text(size = 18))
   }
   
   if (metric == 'RATIO') {
@@ -1393,7 +1430,7 @@ plot_supply_metrics <- function(supply_data, metric) {
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 17))
+            plot.title = element_text(size = 18))
   }
   
   if (metric == 'SHARE') {
@@ -1412,7 +1449,7 @@ plot_supply_metrics <- function(supply_data, metric) {
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 15))
+            plot.title = element_text(size = 18))
   }
   
   return(plot)
