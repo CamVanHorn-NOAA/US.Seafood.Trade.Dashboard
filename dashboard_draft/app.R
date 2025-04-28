@@ -1826,7 +1826,7 @@ server <- function(input, output, session) {
   })
   
   # sets aside species selection
-  species_selection <- reactive({
+  species_selected <- reactive({
     ifelse(input$ecol_cat == 'ALL', 'ALL',
            ifelse(input$species_cat == 'ALL', input$ecol_cat,
                   ifelse(input$species_grp == 'ALL', input$species_cat,
