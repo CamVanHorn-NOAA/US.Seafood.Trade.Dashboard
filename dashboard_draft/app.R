@@ -51,17 +51,17 @@ sname_list <- com_landings %>%
   pull()
 
 # list of all categorizations available in trade data
-trade_terms <- c('ALL',
+trade_terms <- c('All Species',
                  str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
                  str_to_title(unique(trade_data$SPECIES_CATEGORY)),
                  str_to_title(unique(trade_data$SPECIES_GROUP)),
                  str_to_title(unique(trade_data$SPECIES_NAME)))
 
 # list of all categorizations available in landings data
-landings_terms <- c('ALL', ecat_list, scat_list, sgrp_list, sname_list)
+landings_terms <- c('All Species', ecat_list, scat_list, sgrp_list, sname_list)
 
 # list of all categorizations available in production data
-pp_terms <- c('ALL',
+pp_terms <- c('All Species',
               str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
               str_to_title(unique(pp_data$SPECIES_CATEGORY)),
               str_to_title(unique(pp_data$SPECIES_GROUP)),
@@ -154,7 +154,7 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   # if a species is selected, find the level of the categorization hierarchy in
     # which the species input resides
   # see filter_species function for info on why we store as symbol and quosure
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -164,9 +164,9 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                            'SPECIES_GROUP',
                            'SPECIES_NAME')))
     )
-  # if species is not selected (default is ALL), summarize all trade
+  # if species is not selected (default is ALL SPECIES), summarize all trade
       # i.e., no filter_species needed
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     summarized_data <- trade_table %>%
       # select only necessary columns (exports, imports, year)
       select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
@@ -269,8 +269,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   # coerce species to upper case to match data formatting
   species <- toupper(species)
   
-  # if no species is selected ('ALL' is the default), do not filter for species
-  if (species == 'ALL') {
+  # if no species is selected ('ALL SPECIES' is the default), do not filter for species
+  if (species == 'ALL SPECIES') {
     filtered_data <- trade_table
   } else {
     # otherwise, filter trade table by species
@@ -355,9 +355,9 @@ summarize_pp_yr_spp <- function(product_data, species) {
   # coerce species to upper case to match data formatting
   species <- toupper(species)
   
-  # if no species is provided (default is 'ALL'), summarize data without 
+  # if no species is provided (default is 'ALL SPECIES'), summarize data without 
     # filtering for a species
-  if (species == 'ALL') {
+  if (species == 'ALL SPECIES') {
     summarized_data <- product_data %>%
       # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
         # volume (KG), and value (DOLLARS_2024)
@@ -384,7 +384,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
   }
   
   # identical to dplyr pipe above, save for filtering for a specified species
-  # only runs if species != 'ALL'
+  # only runs if species != 'ALL SPECIES'
   product_data %>%
     filter_species(species) %>%
     select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
@@ -413,7 +413,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
   
   # if species is provided, find the level of the categorization hierarchy in 
     # which it exists
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(landings_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -423,7 +423,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
                            'SPECIES_GROUP',
                            'SPECIES_NAME')))
     )
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     # for the default case (no species provided), summarize all landings data
     summarized_data <- landings_data %>%
       # remove confidential data as to only represent public data
@@ -535,7 +535,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   
   # if a species is specified, find the level of the classification hierarchy
     # in which it resides
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -564,7 +564,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
       filter(!!which_volume > 0) %>%
       mutate(PRICE = !!which_value / !!which_volume)
     
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     # alternative: if no species is selected
     # same steps as before except no species is selected
     spp_data <- trade_data %>%
@@ -666,7 +666,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   which_value <- rlang::enquo(which_value)
   which_volume <- rlang::enquo(which_volume)
   
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_group <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -691,7 +691,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
       filter(!!which_volume > 0) %>%
       mutate(PRICE = !!which_value / !!which_volume)
     
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     spp_data <- trade_data %>%
       filter(is.na(!!which_value) == F)
     
@@ -757,7 +757,7 @@ calculate_hi <- function(species) {
   # species is a character vector of a species of interest
   
   # if no species provided
-  if(species == 'ALL') {
+  if(species == 'All Species') {
     # calculate index from trade data
     hi_data <- trade_data %>%
       # select only columns of interest
@@ -838,10 +838,10 @@ calculate_supply_metrics <- function(species) {
            UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
              abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
   
-  # if no species is provided, add column for species to be 'ALL'
-  if(species == 'ALL') {
+  # if no species is provided, add column for species to be 'ALL SPECIES'
+  if(species == 'All Species') {
     data <- data %>%
-      mutate(SPECIES = 'ALL')
+      mutate(SPECIES = 'All Species')
     
     return(data)
   } else {
@@ -1653,7 +1653,7 @@ server <- function(input, output, session) {
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
     # grab all ecological categories
-    ecol_cats <- c('ALL', com_landings %>% 
+    ecol_cats <- c('All Species', com_landings %>% 
                      filter(CONFIDENTIALITY != 'Confidential') %>%
                      select(ECOLOGICAL_CATEGORY) %>%
                      distinct() %>%
@@ -1669,9 +1669,9 @@ server <- function(input, output, session) {
   # filter_2 appears once an ecological category (ecol_cat) is selected
   output$filter_2 <- renderUI({
     # req prevents anything from being run if ecol_cat is not specified
-    req(input$ecol_cat != 'ALL')
+    req(input$ecol_cat != 'All Species')
     # grab all species categories for the selected ecological category
-    species_cats <- c('ALL', com_landings %>%
+    species_cats <- c('All Species', com_landings %>%
                         filter_species(input$ecol_cat) %>%
                         select(SPECIES_CATEGORY) %>%
                         distinct() %>%
@@ -1687,9 +1687,9 @@ server <- function(input, output, session) {
   output$filter_3 <- renderUI({
     # req prevents anything from being run if both species_cat AND ecol_cat
       # are not specified
-    req(input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    req(input$species_cat != 'All Species' & input$ecol_cat != 'All Species')
     # grab all species groups for the selected species category
-    species_groups <- c('ALL', com_landings %>%
+    species_groups <- c('All Species', com_landings %>%
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
                           distinct() %>%
@@ -1705,9 +1705,11 @@ server <- function(input, output, session) {
   output$filter_4 <- renderUI({
     # req prevents anything from being run if species_cat, ecol_cat, and 
       # species_grp are not selected
-    req(input$species_grp != 'ALL' & input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    req(input$species_grp != 'All Species' & 
+          input$species_cat != 'All Species' & 
+          input$ecol_cat != 'All Species')
     # grab all species names for the selected species group
-    species_names <- c('ALL', com_landings %>%
+    species_names <- c('All Species', com_landings %>%
                          filter_species(input$species_grp) %>%
                          select(SPECIES_NAME) %>%
                          distinct() %>%
@@ -1840,10 +1842,10 @@ server <- function(input, output, session) {
   
   # sets aside species selected by the user
   species_selected <- reactive({
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
+    ifelse(input$ecol_cat == 'All Species', 'All Species',
+           ifelse(input$species_cat == 'All Species', input$ecol_cat,
+                  ifelse(input$species_grp == 'All Species', input$species_cat,
+                         ifelse(input$species_name == 'All Species', input$species_grp,
                                 input$species_name))))
   })
   
