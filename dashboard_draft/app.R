@@ -1647,7 +1647,9 @@ ui <- page_sidebar(
                                  withSpinner(
                                    plotOutput('pp_price'),
                                    type = 7))),
-      width = 6)))
+      width = 6)) # ,
+  # tags$head(tags$style(HTML('* {font-family: "Gill Sans MT"};')))
+  )
 
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
