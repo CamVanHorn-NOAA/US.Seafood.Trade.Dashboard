@@ -1662,6 +1662,8 @@ server <- function(input, output, session) {
                      filter(CONFIDENTIALITY != 'Confidential') %>%
                      select(ECOLOGICAL_CATEGORY) %>%
                      distinct() %>%
+                     # remove NA category
+                     filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
                      # display strings as titles (first letter capitalized)
                      mutate(ECOLOGICAL_CATEGORY = 
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
@@ -1680,6 +1682,8 @@ server <- function(input, output, session) {
                         filter_species(input$ecol_cat) %>%
                         select(SPECIES_CATEGORY) %>%
                         distinct() %>%
+                        # remove NA category
+                        filter(!is.na(SPECIES_CATEGORY)) %>%
                         # display strings as titles (first letter capitalized)
                         mutate(SPECIES_CATEGORY = 
                                  str_to_title(SPECIES_CATEGORY)) %>%
@@ -1698,6 +1702,8 @@ server <- function(input, output, session) {
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
                           distinct() %>%
+                          # remove NA category
+                          filter(!is.na(SPECIES_GROUP)) %>%
                           # display strings as titles (first letter capitalized)
                           mutate(SPECIES_GROUP = 
                                    str_to_title(SPECIES_GROUP)) %>%
@@ -1718,6 +1724,8 @@ server <- function(input, output, session) {
                          filter_species(input$species_grp) %>%
                          select(SPECIES_NAME) %>%
                          distinct() %>%
+                         # remove NA category
+                         filter(!is.na(SPECIES_NAME)) %>%
                          # display strings as titles (first letter capitalized)
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
@@ -1756,6 +1764,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(ECOLOGICAL_CATEGORY) %>%
                                   distinct() %>%
+                                  filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
                                   mutate(ECOLOGICAL_CATEGORY = 
                                            str_to_title(ECOLOGICAL_CATEGORY)) %>%
                                   pull(),
@@ -1763,6 +1772,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_CATEGORY) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_CATEGORY)) %>%
                                   mutate(SPECIES_CATEGORY = 
                                            str_to_title(SPECIES_CATEGORY)) %>%
                                   pull(),
@@ -1770,6 +1780,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_GROUP) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_GROUP)) %>%
                                   mutate(SPECIES_GROUP = 
                                            str_to_title(SPECIES_GROUP)) %>%
                                   pull(),
@@ -1777,6 +1788,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_NAME) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_NAME)) %>%
                                   mutate(SPECIES_NAME = 
                                            str_to_title(SPECIES_NAME)) %>%
                                   pull()))),
