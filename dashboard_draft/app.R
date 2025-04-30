@@ -14,13 +14,14 @@ if(!require("bslib"))       install.packages("bslib")
 if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
+if(!require("shinycssloaders")) install.packages("shinycssloaders")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
 # Due to some limitations in downloading nmfspalette on devices, use source
   # file located in app directory for nmfspalette colors
 source("nmfs_cols.R")
 
 # Pull Data (most recent version)
-load('seafood_trade_data_munge_04_10_25.RData')
+load('seafood_trade_data_munge_04_30_25.RData')
 
 # Create list of terms for each level of organization hierarchy
   # these lists will be used to determine where a provided species input is 
@@ -49,7 +50,30 @@ sname_list <- com_landings %>%
   mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
   pull()
 
+# list of all categorizations available in trade data
+trade_terms <- c('All Species',
+                 str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
+                 str_to_title(unique(trade_data$SPECIES_CATEGORY)),
+                 str_to_title(unique(trade_data$SPECIES_GROUP)),
+                 str_to_title(unique(trade_data$SPECIES_NAME)))
+
+# list of all categorizations available in landings data
+landings_terms <- c('All Species', ecat_list, scat_list, sgrp_list, sname_list)
+
+# list of all categorizations available in production data
+pp_terms <- c('All Species',
+              str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
+              str_to_title(unique(pp_data$SPECIES_CATEGORY)),
+              str_to_title(unique(pp_data$SPECIES_GROUP)),
+              str_to_title(unique(pp_data$SPECIES_NAME)))
+
 # Custom Functions -------------------------------------------------------------
+# stop functions without outputting error message
+stop_quietly <- function() {
+  opt <- options(show.error.messages = FALSE)
+  on.exit(options(opt))
+  stop()
+}
 ### filter species
 filter_species <- function(data, species) {
   # data is a formatted data frame created from 2_data_munge.R (see GitHub)
@@ -90,8 +114,7 @@ filter_species <- function(data, species) {
   # if species was not found, stop function with message to try a different
     # species input or search for available entries
   if (locate_level == 'UNAVAILABLE') {
-    stop("The species you provided is either too specific or not available.
-         Try 'unique(your_data$your_column) to find acceptable calls.")
+    stop()
   } 
   
   # only runs if species is found
@@ -131,7 +154,7 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   # if a species is selected, find the level of the categorization hierarchy in
     # which the species input resides
   # see filter_species function for info on why we store as symbol and quosure
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_table$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -141,9 +164,9 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                            'SPECIES_GROUP',
                            'SPECIES_NAME')))
     )
-  # if species is not selected (default is ALL), summarize all trade
+  # if species is not selected (default is ALL SPECIES), summarize all trade
       # i.e., no filter_species needed
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     summarized_data <- trade_table %>%
       # select only necessary columns (exports, imports, year)
       select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
@@ -246,8 +269,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   # coerce species to upper case to match data formatting
   species <- toupper(species)
   
-  # if no species is selected ('ALL' is the default), do not filter for species
-  if (species == 'ALL') {
+  # if no species is selected ('ALL SPECIES' is the default), do not filter for species
+  if (species == 'ALL SPECIES') {
     filtered_data <- trade_table
   } else {
     # otherwise, filter trade table by species
@@ -332,9 +355,9 @@ summarize_pp_yr_spp <- function(product_data, species) {
   # coerce species to upper case to match data formatting
   species <- toupper(species)
   
-  # if no species is provided (default is 'ALL'), summarize data without 
+  # if no species is provided (default is 'ALL SPECIES'), summarize data without 
     # filtering for a species
-  if (species == 'ALL') {
+  if (species == 'ALL SPECIES') {
     summarized_data <- product_data %>%
       # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
         # volume (KG), and value (DOLLARS_2024)
@@ -361,7 +384,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
   }
   
   # identical to dplyr pipe above, save for filtering for a specified species
-  # only runs if species != 'ALL'
+  # only runs if species != 'ALL SPECIES'
   product_data %>%
     filter_species(species) %>%
     select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
@@ -390,7 +413,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
   
   # if species is provided, find the level of the categorization hierarchy in 
     # which it exists
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(landings_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -400,7 +423,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
                            'SPECIES_GROUP',
                            'SPECIES_NAME')))
     )
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     # for the default case (no species provided), summarize all landings data
     summarized_data <- landings_data %>%
       # remove confidential data as to only represent public data
@@ -512,7 +535,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   
   # if a species is specified, find the level of the classification hierarchy
     # in which it resides
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -541,7 +564,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
       filter(!!which_volume > 0) %>%
       mutate(PRICE = !!which_value / !!which_volume)
     
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     # alternative: if no species is selected
     # same steps as before except no species is selected
     spp_data <- trade_data %>%
@@ -643,7 +666,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   which_value <- rlang::enquo(which_value)
   which_volume <- rlang::enquo(which_volume)
   
-  if (species != 'ALL') {
+  if (species != 'ALL SPECIES') {
     which_group <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
              'ECOLOGICAL_CATEGORY',
@@ -668,7 +691,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
       filter(!!which_volume > 0) %>%
       mutate(PRICE = !!which_value / !!which_volume)
     
-  } else if (species == 'ALL') {
+  } else if (species == 'ALL SPECIES') {
     spp_data <- trade_data %>%
       filter(is.na(!!which_value) == F)
     
@@ -734,7 +757,7 @@ calculate_hi <- function(species) {
   # species is a character vector of a species of interest
   
   # if no species provided
-  if(species == 'ALL') {
+  if(species == 'All Species') {
     # calculate index from trade data
     hi_data <- trade_data %>%
       # select only columns of interest
@@ -815,10 +838,10 @@ calculate_supply_metrics <- function(species) {
            UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
              abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
   
-  # if no species is provided, add column for species to be 'ALL'
-  if(species == 'ALL') {
+  # if no species is provided, add column for species to be 'ALL SPECIES'
+  if(species == 'All Species') {
     data <- data %>%
-      mutate(SPECIES = 'ALL')
+      mutate(SPECIES = 'All Species')
     
     return(data)
   } else {
@@ -831,13 +854,14 @@ calculate_supply_metrics <- function(species) {
 }
 
 # plot functions
-plot_trade <- function(data, plot_format, export = F, import = F) {
+plot_trade <- function(data, plot_format, export = F, import = F, species) {
   # this function has the power to generate multiple plot types of trade data
   # data is formatted trade data from summarize_trade_yr_spp
   # plot_format is a character vector that currently accepts these inputs:
     # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
+ 
   
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
@@ -858,19 +882,15 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
   # set shortform and longform values for plot labeling if export
   if (export == T & import == F) {
     shortform <- 'EXP'
-    longform <- 'Export'
+    longform <- 'Exports'
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
-    longform <- 'Import'
+    longform <- 'Imports'
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
-  # stop function if plot format is not included
-  if (!(plot_format %in% c('VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'))) {
-    stop('acceptable plot_format inputs include \"Value\", \"Volume\", \"Price\",  \"Balance\", and \"Ratio\"')
-  }
   
   # set labels and y values for plots of VALUE
   if (plot_format == 'VALUE') {
@@ -879,7 +899,9 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- rlang::enquo(y)
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
+    # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
+    ylab <- 'Millions (Real 2024 USD)'
+    tlab <- 'Value'
   }
   
   # set labels and y values for plots of VOLUME
@@ -887,7 +909,9 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
     y <- rlang::enquo(y)
     label <- comma
-    ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+    # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+    ylab <- 'Metric Tons'
+    tlab <- 'Volume'
   }
   
   # set labels and y values for plots of PRICE
@@ -895,7 +919,7 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
     y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
     y <- rlang::enquo(y)
     label <- label_currency(suffix = '/kg')
-    ylab <- paste0('Average ', longform, ' Price (Real 2024 USD)')
+    ylab <- 'Average Price (Real 2024 USD)'
   }
   
   # plots of VALUE and VOLUME
@@ -909,10 +933,13 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
+      labs(x = '',
+           y = ylab,
+           title = paste0(species, ' ', longform)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else if (plot_format == 'PRICE') {
     # plot of PRICE
     # PRICE is a line chart, so we need a column to group by
@@ -930,10 +957,13 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label) +
-      labs(x = 'Year',
-           y = ylab) +
+      labs(x = '',
+           y = ylab,
+           title = paste0(species, ' ', longform)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else if (plot_format == 'RATIO') {
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
@@ -952,9 +982,12 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       labs(x = '', 
-           y = 'Export / Import Volume Ratio') +
+           y = 'Export / Import',
+           title = paste0('Volume Ratio of ', species)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            plot.title = element_text(size = 18),
+            axis.title = element_text(size = 15))
   } else {
     # plot of BALANCE
     # create trade balance data by including both export and import data
@@ -982,7 +1015,8 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       labs(x = '',
            # y = 'Billions (Real 2024 USD)',
            y = 'Millions (Real 2024 USD)',
-           fill = '') +
+           fill = '',
+           title = paste0('Value Balance of ', species)) +
       scale_fill_discrete(labels = c('Exports',
                                      'Imports',
                                      'Trade Balance')) +
@@ -994,17 +1028,21 @@ plot_trade <- function(data, plot_format, export = F, import = F) {
       theme(legend.position = 'top',
             axis.line.y = element_line(color = 'black'),
             axis.text.x = element_text(hjust = 0.8,
-                                       size = 8),
-            axis.title.y = element_text(vjust = 23),
+                                       size = 12),
+            axis.text.y = element_text(size = 12),
+            axis.title.y = element_text(vjust = 23,
+                                        size = 15),
+            legend.text = element_text(size = 15),
+            plot.title = element_text(size = 18),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
-            plot.margin = margin(5.5, 5.5, 5.5, 55.5, 'points'))
+            plot.margin = margin(5.5, 5.5, 5.5, 75.5, 'points'))
   }
   
   return(plot)
 }
-plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
+plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species) {
   # this function plots trade among the top five trading partners for a species
     # using data generated by summarize_trade_ctry_yr_spp
   # value is logical that specifies if the data is formatted for value
@@ -1027,7 +1065,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     # ylab <- 'Net Export Value (Real 2024 USD, Billions)'
-    ylab <- 'Net Export Value (Real 2024 USD, Millions)'
+    ylab <- 'Millions (Real 2024 USD)'
   } else {
     # set plot labels for volume plot
     y <- as.symbol('NET_VOLUME_MT')
@@ -1037,24 +1075,26 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F) {
   }
   
   ggplot(data = data,
-         aes(x = factor(COUNTRY_NAME),
+         aes(x = factor(gsub(' ', '\n', COUNTRY_NAME)),
              y = !!y, 
              fill = factor(YEAR))) +
     geom_col(position = 'dodge') +
     scale_fill_nmfs(palette = 'oceans') +
     labs(x = '',
          y = ylab,
-         fill = 'Year') +
+         fill = 'Year',
+         title = paste0('Net Export Value for Top 5 Trading Partners \nof ', 
+                        species)) +
     scale_y_continuous(labels = label) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
-    theme(axis.text = element_text(color = 'black',
-                                   size = 10),
-          axis.title = element_text(size = 14),
-          legend.title = element_text(size = 14),
-          legend.text = element_text(size = 10))
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          legend.title = element_text(size = 15),
+          legend.text = element_text(size = 12),
+          plot.title = element_text(size = 18))
 }
-plot_spp_pp <- function(processed_product_data, plot.format) {
+plot_spp_pp <- function(processed_product_data, plot.format, species) {
   # function that plots processed product data 
   # processed_product_data is data formatted by summarize_pp_yr_spp
   # plot.format is a character vector of three inputs:
@@ -1107,9 +1147,10 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     # ylab <- 'Value (Billions, 2024 Real USD)'
-    ylab <- 'Value (Millions, 2024 Real USD)'
+    ylab <- 'Millions (2024 Real USD)'
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    tlab <- 'Production Value of '
     
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
@@ -1127,8 +1168,9 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     # set labels for VOLUME plots
     y <- as.symbol('PP_VOLUME_THOUSAND_MT')
     y <- rlang::enquo(y)
-    ylab <- 'Volume (Thousand Metric Tons)'
+    ylab <- 'Metric Tons (Thousands)'
     label <- comma
+    tlab <- 'Production Volume of '
     
     # calculate the total value per year to find upper limit
     yr_volume <- new_data %>%
@@ -1155,15 +1197,18 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
                         name = 'Product Condition') +
       labs(x = '',
            y = 'Average Price (Real 2024 USD)',
-           fill = 'Product Condition') +
+           fill = 'Product Condition',
+           title = paste0('Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(limits = c(0, max(new_data$PP_PRICE_2024USD_PER_KG) + 0.5),
-                         expand = c(0, 0)) +
+                         expand = c(0, 0),
+                         labels = label_currency(suffix = '/kg')) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
             legend.text = element_text(size = 12),
-            legend.title = element_text(size = 15))
+            legend.title = element_text(size = 15),
+            plot.title = element_text(size = 18))
       
     return(plot)
   }
@@ -1178,7 +1223,8 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
                       name = 'Product Condition') +
     labs(x = '',
          y = ylab,
-         fill = 'Product Condition') +
+         fill = 'Product Condition',
+         title = paste0(tlab, species)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     scale_y_continuous(limits = c(0, ylim), 
                        expand = c(0, 0),
@@ -1187,11 +1233,12 @@ plot_spp_pp <- function(processed_product_data, plot.format) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 12),
-          legend.title = element_text(size = 15))
+          legend.title = element_text(size = 15),
+          plot.title = element_text(size = 18))
   
   return(plot)
 }
-plot_landings <- function(data, plot.format) {
+plot_landings <- function(data, plot.format, species) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
     # and PRICE
@@ -1201,11 +1248,15 @@ plot_landings <- function(data, plot.format) {
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
-    y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+    y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     
-    label <- label_currency(suffix = 'B')
-    ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
+    # label <- label_currency(suffix = 'B')
+    label <- label_currency(suffix = 'M')
+    # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
+    ylab <- 'Millions (Real 2024 USD)'
+    tlab <- 'Ex-Vessel Value of '
   }
   
   # set labels for VOLUME plot
@@ -1217,7 +1268,8 @@ plot_landings <- function(data, plot.format) {
     data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
     
     label <- comma
-    ylab <- 'Total Landed Volume (Thousand Metric Tons)'
+    ylab <- 'Metric Tons (Thousands)'
+    tlab <- 'Landed Volume of '
   }
   
   # create plot for PRICE (this is a line chart which contrasts with VALUE and
@@ -1239,9 +1291,12 @@ plot_landings <- function(data, plot.format) {
                        limits = factor(2004:2023)) +
       scale_y_continuous(labels = label_currency(suffix = '/kg')) +
       labs(x = '',
-           y = 'Average Ex-Vessel Price (Real 2024 USD)') +
+           y = 'Average Price (Real 2024 USD)',
+           title = paste0('Ex-Vessel Price of ', species)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 10))
+      theme(axis.text = element_text(size = 12),
+            axis.title = element_text(size = 15),
+            plot.title = element_text(size = 18))
     
     return(plot)
   }
@@ -1256,13 +1311,16 @@ plot_landings <- function(data, plot.format) {
                      limits = factor(2004:2023)) +
     scale_y_continuous(labels = label) +
     labs(x = '',
-         y = ylab) +
+         y = ylab,
+         title = paste0(tlab, species)) +
     theme_bw() +
-    theme(axis.text = element_text(size = 10))
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 15),
+          plot.title = element_text(size = 18))
   
   return(plot)
 }
-plot_mlti <- function(mlti_data, exports = F, imports = F) {
+plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
   # this function generates a grid of plots that display MLTI data
   # mlti_data is a data set formatted by calculate_mlti
   # exports is logical that reflects if the data input is for exports
@@ -1285,7 +1343,7 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
     # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
-         y = paste0('Multilateral ', label, ' Quantity Index')) +
+         y = paste0('Multilateral ', label, ' Quantity Index of ', species)) +
     theme_bw() +
     theme(axis.text = element_text(size = 15),
           axis.title.y = element_text(size = 20),
@@ -1293,7 +1351,7 @@ plot_mlti <- function(mlti_data, exports = F, imports = F) {
                                     color = 'white'),
           strip.background = element_rect(fill = 'black'))
 }
-plot_hi <- function(hi_data) {
+plot_hi <- function(hi_data, species) {
   # this function generates a line plot that compares HI for exports and imports
   # hi_data is a data set formatted by calculate_hi
   
@@ -1315,7 +1373,8 @@ plot_hi <- function(hi_data) {
                color = 'black') +
     scale_color_discrete(name = '') +
     labs(x = '',
-         y = 'Herfindahl Index (HI)') +
+         y = 'Index',
+         title = paste0('Herfindahl Index of \n', species)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
@@ -1325,7 +1384,7 @@ plot_hi <- function(hi_data) {
           plot.title = element_text(size = 18))
   
 }
-plot_supply_metrics <- function(supply_data, metric) {
+plot_supply_metrics <- function(supply_data, metric, species) {
   # this function generates three types of plots 
   # supply_data is data formatted by calculate_supply_metrics in tandem with
     # summarize_yr_spp
@@ -1347,14 +1406,14 @@ plot_supply_metrics <- function(supply_data, metric) {
                  y = APPARENT_SUPPLY / 1000)) +
       geom_col(fill = 'black') +
       labs(x = '',
-           y = 'Volume (Thousand Metric Tons)',
-           title = 'Apparent Supply') +
+           y = 'Metric Tons (Thousands)',
+           title = paste0('Apparent Supply of \n', species)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 17))
+            plot.title = element_text(size = 18))
   }
   
   if (metric == 'RATIO') {
@@ -1370,13 +1429,14 @@ plot_supply_metrics <- function(supply_data, metric) {
                 linewidth = 1) +
       labs(x = '',
            y = 'Ratio',
-           title = 'Apparent Supply Relative to \nDomestic Production') +
+           title = paste0('Apparent Supply of \n', species, 
+                          '\nRelative to Domestic \nProduction')) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 17))
+            plot.title = element_text(size = 18))
   }
   
   if (metric == 'SHARE') {
@@ -1388,14 +1448,14 @@ plot_supply_metrics <- function(supply_data, metric) {
       geom_col(fill = 'black') +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = 'Unexported Domestic Production \nRelative to Apparent Supply') +
+           title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', species)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent()) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
-            plot.title = element_text(size = 15))
+            plot.title = element_text(size = 18))
   }
   
   return(plot)
@@ -1426,6 +1486,13 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
+    # these outputs only appear once a selection is not available for a given
+      # section (landings, trade, production)
+    uiOutput('trade_unfilter_button'),
+    uiOutput('product_unfilter_button'),
+    uiOutput('landings_unfilter_button'),
+    # search bar that outputs directions for how to filter for the searched 
+      # species (if available)
     selectizeInput(inputId = 'search_term',
                    label = 'or Search for a Species',
                    choices = NULL),
@@ -1443,102 +1510,146 @@ ui <- page_sidebar(
     navset_card_pill(title = 'Trade',
                      nav_panel(title = 'Aggregate',
                                fluidRow(
-                                 plotOutput('balance')
+                                 withSpinner(
+                                   plotOutput('balance'), 
+                                   type = 7)
                                ),
                                fluidRow(
                                  column(
-                                   plotOutput('trade_ratio'),
+                                   withSpinner(
+                                     plotOutput('trade_ratio'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('top5_trade'),
+                                   withSpinner(
+                                     plotOutput('top5_trade'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Value',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_value'),
+                                   withSpinner(
+                                     plotOutput('exp_value'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_value'),
+                                   withSpinner(
+                                     plotOutput('imp_value'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Volume',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_volume'),
+                                   withSpinner(
+                                     plotOutput('exp_volume'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_volume'),
+                                   withSpinner(
+                                     plotOutput('imp_volume'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Price',
                                fluidRow(
                                  column(
-                                   plotOutput('exp_price'),
+                                   withSpinner(
+                                     plotOutput('exp_price'), 
+                                     type = 7),
                                    width = 6
                                  ),
                                  column(
-                                   plotOutput('imp_price'),
+                                   withSpinner(
+                                     plotOutput('imp_price'), 
+                                     type = 7),
                                    width = 6
                                  ))),
                      nav_panel(title = 'Advanced Metrics',
                                fluidRow(
                                  column(
                                    fluidRow(
-                                     'Exports'
+                                     'Export Multilateral Trade Index'
                                    ),
-                                   tableOutput('exp_mlti_table'),
+                                   withSpinner(
+                                     tableOutput('exp_mlti_table'), 
+                                     type = 7),
                                    # plotOutput('exp_mlti'),
                                    width = 6
                                  ),
                                  column(
                                    fluidRow(
-                                     'Imports'
+                                     'Import Multilateral Trade Index'
                                    ),
-                                   tableOutput('imp_mlti_table'),
+                                   withSpinner(
+                                     tableOutput('imp_mlti_table'), 
+                                     type = 7),
                                    # plotOutput('imp_mlti'),
                                    width = 6
                                  )),
                                fluidRow(
                                  column(
-                                   plotOutput('hi_plot'),
+                                   withSpinner(
+                                     plotOutput('hi'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_plot'),
+                                   withSpinner(
+                                     plotOutput('supply'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_ratio'),
+                                   withSpinner(
+                                     plotOutput('supply_ratio'), 
+                                     type = 7),
                                    width = 3
                                  ),
                                  column(
-                                   plotOutput('supply_share'),
+                                   withSpinner(
+                                     plotOutput('supply_share'), 
+                                     type = 7),
                                    width = 3
                                  ))))),
   fluidRow(
     column(
       navset_card_pill(title = 'Commercial Landings',
                        nav_panel(title = 'Value',
-                                 plotOutput('landings_value')),
+                                 withSpinner(
+                                   plotOutput('landings_value'),
+                                   type = 7)),
                        nav_panel(title = 'Volume',
-                                 plotOutput('landings_volume')),
+                                 withSpinner(
+                                   plotOutput('landings_volume'),
+                                   type = 7)),
                        nav_panel(title = 'Price',
-                                 plotOutput('landings_price'))),
+                                 withSpinner(
+                                   plotOutput('landings_price'),
+                                   type = 7))),
       width = 6
     ),
     column(
       navset_card_pill(title = 'Processed Products',
                        nav_panel(title = 'Value',
-                                 plotOutput('pp_value')),
+                                 withSpinner(
+                                   plotOutput('pp_value'),
+                                   type = 7)),
                        nav_panel(title = 'Volume',
-                                 plotOutput('pp_volume')),
+                                 withSpinner(
+                                   plotOutput('pp_volume'),
+                                   type = 7)),
                        nav_panel(title = 'Price',
-                                 plotOutput('pp_price'))),
-      width = 6)))
+                                 withSpinner(
+                                   plotOutput('pp_price'),
+                                   type = 7))),
+      width = 6)) # ,
+  # tags$head(tags$style(HTML('* {font-family: "Gill Sans MT"};')))
+  )
 
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
@@ -1547,10 +1658,12 @@ server <- function(input, output, session) {
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
     # grab all ecological categories
-    ecol_cats <- c('ALL', com_landings %>% 
+    ecol_cats <- c('All Species', com_landings %>% 
                      filter(CONFIDENTIALITY != 'Confidential') %>%
                      select(ECOLOGICAL_CATEGORY) %>%
                      distinct() %>%
+                     # remove NA category
+                     filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
                      # display strings as titles (first letter capitalized)
                      mutate(ECOLOGICAL_CATEGORY = 
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
@@ -1563,12 +1676,14 @@ server <- function(input, output, session) {
   # filter_2 appears once an ecological category (ecol_cat) is selected
   output$filter_2 <- renderUI({
     # req prevents anything from being run if ecol_cat is not specified
-    req(input$ecol_cat != 'ALL')
+    req(input$ecol_cat != 'All Species')
     # grab all species categories for the selected ecological category
-    species_cats <- c('ALL', com_landings %>%
+    species_cats <- c('All Species', com_landings %>%
                         filter_species(input$ecol_cat) %>%
                         select(SPECIES_CATEGORY) %>%
                         distinct() %>%
+                        # remove NA category
+                        filter(!is.na(SPECIES_CATEGORY)) %>%
                         # display strings as titles (first letter capitalized)
                         mutate(SPECIES_CATEGORY = 
                                  str_to_title(SPECIES_CATEGORY)) %>%
@@ -1581,12 +1696,14 @@ server <- function(input, output, session) {
   output$filter_3 <- renderUI({
     # req prevents anything from being run if both species_cat AND ecol_cat
       # are not specified
-    req(input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    req(input$species_cat != 'All Species' & input$ecol_cat != 'All Species')
     # grab all species groups for the selected species category
-    species_groups <- c('ALL', com_landings %>%
+    species_groups <- c('All Species', com_landings %>%
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
                           distinct() %>%
+                          # remove NA category
+                          filter(!is.na(SPECIES_GROUP)) %>%
                           # display strings as titles (first letter capitalized)
                           mutate(SPECIES_GROUP = 
                                    str_to_title(SPECIES_GROUP)) %>%
@@ -1596,19 +1713,47 @@ server <- function(input, output, session) {
   
   # creates input: species_name
   # filter_4 appears once a species group (species_grp) is selected
-  output$filter_4 <- renderUI ({
+  output$filter_4 <- renderUI({
     # req prevents anything from being run if species_cat, ecol_cat, and 
       # species_grp are not selected
-    req(input$species_grp != 'ALL' & input$species_cat != 'ALL' & input$ecol_cat != 'ALL')
+    req(input$species_grp != 'All Species' & 
+          input$species_cat != 'All Species' & 
+          input$ecol_cat != 'All Species')
     # grab all species names for the selected species group
-    species_names <- c('ALL', com_landings %>%
+    species_names <- c('All Species', com_landings %>%
                          filter_species(input$species_grp) %>%
                          select(SPECIES_NAME) %>%
                          distinct() %>%
+                         # remove NA category
+                         filter(!is.na(SPECIES_NAME)) %>%
                          # display strings as titles (first letter capitalized)
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
     selectInput('species_name', 'Choose a Species', species_names)
+  })
+  
+  # creates checkbox to unfilter trade up one level
+    # requires the selected species to NOT be available in trade categories
+  output$trade_unfilter_button <- renderUI({
+    req(!(species_selected() %in% trade_terms))
+    
+    checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
+  })
+  
+  # creates checkbox to unfilter production up one level
+    # requires the selected species to NOT be available in production categories
+  output$product_unfilter_button <- renderUI({
+    req(!(species_selected() %in% pp_terms))
+    
+    checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
+  })
+  
+  # creates checkbox to unfilter landings up one level
+    # requires the selected species to NOT be available in landings categories
+  output$landings_unfilter_button <- renderUI({
+    req(!(species_selected() %in% landings_terms))
+    
+    checkboxInput('landings_button', 'Unfilter Landings Plots Up One Level')
   })
   
   # define search bar terms
@@ -1619,6 +1764,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(ECOLOGICAL_CATEGORY) %>%
                                   distinct() %>%
+                                  filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
                                   mutate(ECOLOGICAL_CATEGORY = 
                                            str_to_title(ECOLOGICAL_CATEGORY)) %>%
                                   pull(),
@@ -1626,6 +1772,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_CATEGORY) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_CATEGORY)) %>%
                                   mutate(SPECIES_CATEGORY = 
                                            str_to_title(SPECIES_CATEGORY)) %>%
                                   pull(),
@@ -1633,6 +1780,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_GROUP) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_GROUP)) %>%
                                   mutate(SPECIES_GROUP = 
                                            str_to_title(SPECIES_GROUP)) %>%
                                   pull(),
@@ -1640,6 +1788,7 @@ server <- function(input, output, session) {
                                   filter(CONFIDENTIALITY != 'Confidential') %>%
                                   select(SPECIES_NAME) %>%
                                   distinct() %>%
+                                  filter(!is.na(SPECIES_NAME)) %>%
                                   mutate(SPECIES_NAME = 
                                            str_to_title(SPECIES_NAME)) %>%
                                   pull()))),
@@ -1707,217 +1856,451 @@ server <- function(input, output, session) {
     paste('Species Name: <br>',
           paste(term, collapse = ', <br>'))
   })
+  
+  # sets aside species selected by the user
+  species_selected <- reactive({
+    ifelse(input$ecol_cat == 'All Species', 'All Species',
+           ifelse(input$species_cat == 'All Species', input$ecol_cat,
+                  ifelse(input$species_grp == 'All Species', input$species_cat,
+                         ifelse(input$species_name == 'All Species', input$species_grp,
+                                input$species_name))))
+  })
+  
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available trade data
+  unfilter_species_trade <- reactive({
+    req(input$trade_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
+  })
+  
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_trade) should be used for trade data visualization based
+    # on whether the selected species is available in trade data
+  # because unfilter_species_trade requires the trade_button to be checked by
+    # the user, this will only switch to unfilter_species_trade once the user
+    # checks the box
+  species_selection_trade <- reactive({
+    ifelse(species_selected() %in% trade_terms, species_selected(),
+           unfilter_species_trade())
+  })
 
   # creates trade data
-  trade_df <- reactive(summarize_trade_yr_spp(
-    trade_data,
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  trade_df <- reactive({
+    summarize_trade_yr_spp(
+      trade_data,
+      species_selection_trade()
+      )
+    })
+  
+  # validation reactive; outputs message if species is not available in trade data
+  trade_data_validation <- reactive({
+    validate(need(try(species_selection_trade() %in% trade_terms),
+                  'There is no available trade data for the selected species'))
+  })
   
   # creates trade balance plot (value)
+  balance_plot <- reactive({
+    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade())
+  })
+  
+  # outputs trade balance plot (value)
   output$balance <- renderPlot({
-    plot_trade(trade_df(), 
-               'BALANCE')
+    trade_data_validation()
+    validate(need(try(!is.na(balance_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    balance_plot()
   })
   
   # creates export/import ratio plot
+  ratio_plot <- reactive({
+    plot_trade(trade_df(), 'RATIO', export = T, import = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs export/import ratio plot
   output$trade_ratio <- renderPlot({
-    plot_trade(trade_df(), 
-               'RATIO', export = T, import = T)
+    trade_data_validation()
+    validate(need(try(!is.na(ratio_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    ratio_plot()
+  })
+  
+  # creates top 5 net export data
+  top5_trade_df <- reactive({
+    summarize_trade_ctry_yr_spp(
+      trade_data,
+      species_selection_trade(),
+      time.frame = c(2020, 2024),
+      value = T)
   })
   
   # creates top 5 net export plot
+  top5_trade_plot <- reactive({
+    plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
+                           species = species_selection_trade())
+  })
+  
+  # outputs top 5 net export plot
   output$top5_trade <- renderPlot({
-    plot_trade_ctry_yr_spp(
-      summarize_trade_ctry_yr_spp(
-        trade_data,
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
-        time.frame = c(2020, 2024),
-        value = T),
-      value = T
-    )
+    trade_data_validation()
+    validate(need(try(!is.na(top5_trade_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    top5_trade_plot()
   })
   
   # creates export value plot
+  exp_value_plot <- reactive({
+    plot_trade(trade_df(), 'VALUE', export = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs export value plot
   output$exp_value <- renderPlot({
-    plot_trade(trade_df(), 
-               'VALUE', export = T)
+    trade_data_validation()
+    validate(need(try(!is.na(exp_value_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    exp_value_plot()
   })
   
   # creates import value plot
+  imp_value_plot <- reactive({
+    plot_trade(trade_df(), 'VALUE', import = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs import value plot
   output$imp_value <- renderPlot({
-    plot_trade(trade_df(),
-               'VALUE', import = T)
+    trade_data_validation()
+    validate(need(try(!is.na(imp_value_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    imp_value_plot()
   })
 
   # creates export volume plot
+  exp_volume_plot <- reactive({
+    plot_trade(trade_df(), 'VOLUME', export = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs export volume plot
   output$exp_volume <- renderPlot({
-    plot_trade(trade_df(), 
-               'VOLUME', export = T)
+    trade_data_validation()
+    validate(need(try(!is.na(exp_volume_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    exp_volume_plot()
   })
 
   # creates import volume plot
+  imp_volume_plot <- reactive({
+    plot_trade(trade_df(), 'VOLUME', import = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs import volume plot
   output$imp_volume <- renderPlot({
-    plot_trade(trade_df(), 
-               'VOLUME', import = T)
+    trade_data_validation()
+    validate(need(try(!is.na(imp_volume_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    imp_volume_plot()
   })
   
   # creates export price plot
+  exp_price_plot <- reactive({
+    plot_trade(trade_df(), 'PRICE', export = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs export price plot
   output$exp_price <- renderPlot({
-    plot_trade(trade_df(),
-               'PRICE', export = T)
+    trade_data_validation()
+    validate(need(try(!is.na(exp_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    exp_price_plot()
   })
   
   # creates import price plot
+  imp_price_plot <- reactive({
+    plot_trade(trade_df(), 'PRICE', import = T, 
+               species = species_selection_trade())
+  })
+  
+  # outputs import price plot
   output$imp_price <- renderPlot({
-    plot_trade(trade_df(),
-               'PRICE', import = T)
+    trade_data_validation()
+    validate(need(try(!is.na(imp_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    imp_price_plot()
+  })
+  
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available landings data 
+  unfilter_species_landings <- reactive({
+    req(input$landings_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
+  })
+  
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_landings) should be used for landings data visualization 
+    # based on whether the selected species is available in landings data
+  # because unfilter_species_landings requires the landings_button to be checked by
+    # the user, this will only switch to unfilter_species_landings once the user
+    # checks the box
+  species_selection_landings <- reactive({
+    ifelse(species_selected() %in% landings_terms, species_selected(),
+           unfilter_species_landings())
+  })
+  
+  # validation reactive; displays message if species is not found in landings data
+  landings_data_validation <- reactive({
+    validate(need(try(species_selection_landings() %in% landings_terms),
+                  'There is no available landings data for this species'))
   })
   
   # creates landings data
-  landings_df <- reactive(summarize_landings_yr_spp(
-    com_landings,
-    ifelse(input$ecol_cat == 'ALL', 'ALL', 
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  landings_df <- reactive({
+    summarize_landings_yr_spp(
+      com_landings,
+      species_selection_landings())
+    })
   
   # creates landings value plot
+  landings_value_plot <- reactive({
+    plot_landings(landings_df(), 'VALUE', 
+                  species = species_selection_landings())
+  })
+  
+  # outputs landings value plot
   output$landings_value <- renderPlot({
-    plot_landings(landings_df(), 
-                  'VALUE')
+    landings_data_validation()
+    validate(need(try(!is.na(landings_value_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    landings_value_plot()
   })
   
   # creates landings volume plot
+  landings_volume_plot <- reactive({
+    plot_landings(landings_df(), 'VOLUME', 
+                  species = species_selection_landings())
+  })
+  
+  # outputs landings volume plot
   output$landings_volume <- renderPlot({
-    plot_landings(landings_df(),
-                  'VOLUME')
+    landings_data_validation()
+    validate(need(try(!is.na(landings_volume_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    landings_volume_plot()
   })
   
   # creates landings price plot
+  landings_price_plot <- reactive({
+    plot_landings(landings_df(), 'PRICE', 
+                  species = species_selection_landings())
+  })
+  
+  # outputs landings price plot
   output$landings_price <- renderPlot({
-    plot_landings(landings_df(),
-                  'PRICE')
+    landings_data_validation()
+    validate(need(try(!is.na(landings_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    landings_price_plot()
+  })
+  
+  # identifies which species is the next highest level based on if the 
+    # selected category is not available from available production data 
+  unfilter_species_products <- reactive({
+    req(input$products_button == T)
+    ifelse(input$species_name != '', input$species_grp,
+           ifelse(input$species_group != '', input$species_cat,
+                  ifelse(input$species_cat != '', input$ecol_cat,
+                         NA)))
+  })
+  
+  # determines if the selected species OR the next highest level of categorization
+    # (unfilter_species_products) should be used for production data visualization 
+    # based on whether the selected species is available in production data
+  # because unfilter_species_products requires the products_button to be checked by
+    # the user, this will only switch to unfilter_species_products once the user
+    # checks the box
+  species_selection_products <- reactive({
+    ifelse(species_selected() %in% pp_terms, species_selected(),
+           unfilter_species_products())
+  })
+  
+  # validation reactive; outputs message if species is not found in production data
+  pp_data_validation <- reactive({
+    validate(need(try(species_selection_products() %in% pp_terms),
+                  'There is no available production data for this species'))
   })
   
   # creates processed products data
-  pp_df <- reactive(summarize_pp_yr_spp(
-    pp_data,
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  pp_df <- reactive({
+    summarize_pp_yr_spp(
+      pp_data,
+      species_selection_products())
+    })
   
   # creates processed products value plot
+  pp_value_plot <- reactive({
+    plot_spp_pp(pp_df(), 'VALUE', 
+                species = species_selection_products())
+  })
+  
+  # outputs processed products value plot
   output$pp_value <- renderPlot({
-    plot_spp_pp(pp_df(),
-                'VALUE')
+    pp_data_validation()
+    validate(need(try(!is.na(pp_value_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    pp_value_plot()
   })
   
   # creates processed products volume plot
+  pp_volume_plot <- reactive({
+    plot_spp_pp(pp_df(), 'VOLUME', 
+                species = species_selection_products())
+  })
+  
+  # outputs processed products volume plot
   output$pp_volume <- renderPlot({
-    plot_spp_pp(pp_df(),
-                'VOLUME')
+    pp_data_validation()
+    validate(need(try(!is.na(pp_volume_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    pp_volume_plot()
   })
   
   # creates processed products price plot
+  pp_price_plot <- reactive({
+    plot_spp_pp(pp_df(), 'PRICE', 
+                species = species_selection_products())
+  })
+  
+  # outputs processed products price plot
   output$pp_price <- renderPlot({
-    plot_spp_pp(pp_df(),
-                'PRICE')
+    pp_data_validation()
+    validate(need(try(!is.na(pp_price_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    pp_price_plot()
   })
   
   # creates MLTI export table
+  exp_mlti_table_df <- reactive({
+    calculate_mlti_table(species_selection_trade(), exports = T)
+  })
+  
+  # outputs MLTI export table
   output$exp_mlti_table <- renderTable({
-    calculate_mlti_table(
-      ifelse(input$ecol_cat == 'ALL', 'ALL',
-             ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                    ifelse(input$species_grp == 'ALL', input$species_cat,
-                           ifelse(input$species_name == 'ALL', input$species_grp,
-                                  input$species_name)))),
-      exports = T)
+    trade_data_validation()
+    validate(need(try(!is.na(exp_mlti_table_df())),
+                  'Data for this species is insufficient to produce this table'))
+    exp_mlti_table_df()
   })
   
   # creates MLTI export plot
+  exp_mlti_plot <- reactive({
+    plot_mlti(calculate_mlti(species_selection_trade(), exports = T), 
+              exports = T, species = species_selection_trade())
+  })
+  
+  # outputs MLTI export plot
   output$exp_mlti <- renderPlot({
-    plot_mlti(
-      calculate_mlti(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
-        exports = T),
-    exports = T)
+    trade_data_validation()
+    validate(need(try(!is.na(exp_mlti_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    exp_mlti_plot()
   })
   
   # creates MLTI import table
+  imp_mlti_table_df <- reactive({
+    calculate_mlti_table(species_selection_trade(), imports = T)
+  })
+  
+  # outputs MLTI import table
   output$imp_mlti_table <- renderTable({
-    calculate_mlti_table(
-      ifelse(input$ecol_cat == 'ALL', 'ALL',
-             ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                    ifelse(input$species_grp == 'ALL', input$species_cat,
-                           ifelse(input$species_name == 'ALL', input$species_grp,
-                                  input$species_name)))),
-      imports = T)
+    trade_data_validation()
+    validate(need(try(!is.na(imp_mlti_table_df())),
+                  'Data for this species is insufficient to produce this table'))
+    imp_mlti_table_df()
   })
   
   # creates MLTI import plot
+  imp_mlti_plot <- reactive({
+    plot_mlti(calculate_mlti(species_selection_trade(), imports = T), 
+              imports = T, species = species_selection_trade())
+  })
+  
+  # outputs MLTI import plot
   output$imp_mlti <- renderPlot({
-    plot_mlti(
-      calculate_mlti(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name)))),
-        imports = T),
-      imports = T)
+    trade_data_validation()
+    validate(need(try(!is.na(imp_mlti_plot())),
+                  'Data for this species is insufficient to produce this plot'))
+    imp_mlti_plot()
   })
   
   # creates HI plot
-  output$hi_plot <- renderPlot({
-    plot_hi(
-      calculate_hi(
-        ifelse(input$ecol_cat == 'ALL', 'ALL',
-               ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                      ifelse(input$species_grp == 'ALL', input$species_cat,
-                             ifelse(input$species_name == 'ALL', input$species_grp,
-                                    input$species_name))))))
+  hi_plot <- reactive({
+    plot_hi(calculate_hi(species_selection_trade()), 
+            species = species_selection_trade())
+  })
+  
+  # outputs HI plot
+  output$hi <- renderPlot({
+    trade_data_validation()
+    validate(need(try(!is.na(hi_plot())),
+                  'Data for this species is insufficient to produce this table'))
+    hi_plot()
   })
   
   # creates supply metric data
-  supply_df <- reactive(calculate_supply_metrics(
-    ifelse(input$ecol_cat == 'ALL', 'ALL',
-           ifelse(input$species_cat == 'ALL', input$ecol_cat,
-                  ifelse(input$species_grp == 'ALL', input$species_cat,
-                         ifelse(input$species_name == 'ALL', input$species_grp,
-                                input$species_name))))))
+  supply_df <- reactive({
+    calculate_supply_metrics(
+      species_selection_trade())
+    })
   
   # creates apparent supply plot
-  output$supply_plot <- renderPlot({
-    plot_supply_metrics(supply_df(),
-                        'SUPPLY')
+  supply_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'SUPPLY', 
+                        species = species_selection_trade())
+  })
+  
+  # outputs apparent supply plot
+  output$supply <- renderPlot({
+    trade_data_validation()
+    validate(need(try(supply_plot()),
+                  'Data for this species is insufficient to produce this table'))
+    supply_plot()
   })
   
   # creates apparent supply (ratio) plot
+  supply_ratio_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'RATIO', 
+                        species = species_selection_trade())
+  })
+  
+  # outputs apparent supply (ratio) plot
   output$supply_ratio <- renderPlot({
-    plot_supply_metrics(supply_df(),
-                        'RATIO')
+    trade_data_validation()
+    validate(need(try(supply_ratio_plot()),
+                  'Data for this species is insufficient to produce this table'))
+    supply_ratio_plot()
   })
   
   # creates apparent supply (share) plot
+  supply_share_plot <- reactive({
+    plot_supply_metrics(supply_df(), 'SHARE', 
+                        species = species_selection_trade())
+  })
+  
+  # outputs apparent supply (share) plot
   output$supply_share <- renderPlot({
-    plot_supply_metrics(supply_df(),
-                        'SHARE')
+    trade_data_validation()
+    validate(need(try(supply_share_plot()),
+                  'Data for this species is insufficient to produce this table'))
+    supply_share_plot()
   })
   
 }
