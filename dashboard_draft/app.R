@@ -1819,38 +1819,34 @@ server <- function(input, output, session) {
   updateSelectizeInput(session = session,
                        'search_term',
                        choices = 
-                         c('', sort(c(com_landings %>%
-                                  filter(CONFIDENTIALITY != 'Confidential') %>%
-                                  select(ECOLOGICAL_CATEGORY) %>%
-                                  distinct() %>%
-                                  filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
-                                  mutate(ECOLOGICAL_CATEGORY = 
-                                           str_to_title(ECOLOGICAL_CATEGORY)) %>%
-                                  pull(),
-                                com_landings %>%
-                                  filter(CONFIDENTIALITY != 'Confidential') %>%
-                                  select(SPECIES_CATEGORY) %>%
-                                  distinct() %>%
-                                  filter(!is.na(SPECIES_CATEGORY)) %>%
-                                  mutate(SPECIES_CATEGORY = 
-                                           str_to_title(SPECIES_CATEGORY)) %>%
-                                  pull(),
-                                com_landings %>%
-                                  filter(CONFIDENTIALITY != 'Confidential') %>%
-                                  select(SPECIES_GROUP) %>%
-                                  distinct() %>%
-                                  filter(!is.na(SPECIES_GROUP)) %>%
-                                  mutate(SPECIES_GROUP = 
-                                           str_to_title(SPECIES_GROUP)) %>%
-                                  pull(),
-                                com_landings %>%
-                                  filter(CONFIDENTIALITY != 'Confidential') %>%
-                                  select(SPECIES_NAME) %>%
-                                  distinct() %>%
-                                  filter(!is.na(SPECIES_NAME)) %>%
-                                  mutate(SPECIES_NAME = 
-                                           str_to_title(SPECIES_NAME)) %>%
-                                  pull()))),
+                         c('', sort(c(categorization_matrix %>%
+                                        select(ECOLOGICAL_CATEGORY) %>%
+                                        distinct() %>%
+                                        filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
+                                        mutate(ECOLOGICAL_CATEGORY = 
+                                                 str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                                        pull(),
+                                      categorization_matrix %>%
+                                        select(SPECIES_CATEGORY) %>%
+                                        distinct() %>%
+                                        filter(!is.na(SPECIES_CATEGORY)) %>%
+                                        mutate(SPECIES_CATEGORY = 
+                                                 str_to_title(SPECIES_CATEGORY)) %>%
+                                        pull(),
+                                      categorization_matrix %>%
+                                        select(SPECIES_GROUP) %>%
+                                        distinct() %>%
+                                        filter(!is.na(SPECIES_GROUP)) %>%
+                                        mutate(SPECIES_GROUP = 
+                                                 str_to_title(SPECIES_GROUP)) %>%
+                                        pull(),
+                                      categorization_matrix %>%
+                                        select(SPECIES_NAME) %>%
+                                        distinct() %>%
+                                        filter(!is.na(SPECIES_NAME)) %>%
+                                        mutate(SPECIES_NAME = 
+                                                 str_to_title(SPECIES_NAME)) %>%
+                                        pull()))),
                        server = T)
   
   # Display search term categories for user to filter by
