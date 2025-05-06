@@ -1855,7 +1855,7 @@ server <- function(input, output, session) {
     req(input$search_term != '')
     # set string to title to match data formatting
     # pull all ecological categories matching the term (there can be multiple)
-    term <- str_to_title(as.character(com_landings %>%
+    term <- str_to_title(as.character(categorization_matrix %>%
                            filter_species(input$search_term) %>%
                            select(ECOLOGICAL_CATEGORY) %>%
                            distinct() %>%
@@ -1876,7 +1876,7 @@ server <- function(input, output, session) {
     req(input$search_term %in% scat_list |
           input$search_term %in% sgrp_list |
           input$search_term %in% sname_list)
-    term <- str_to_title(as.character(com_landings %>%
+    term <- str_to_title(as.character(categorization_matrix %>%
                                         filter_species(input$search_term) %>%
                                         select(SPECIES_CATEGORY) %>%
                                         distinct() %>%
@@ -1890,7 +1890,7 @@ server <- function(input, output, session) {
     req(input$search_term != '')
     req(input$search_term %in% sgrp_list |
           input$search_term %in% sname_list)
-    term <- str_to_title(as.character(com_landings %>%
+    term <- str_to_title(as.character(categorization_matrix %>%
                                         filter_species(input$search_term) %>%
                                         select(SPECIES_GROUP) %>%
                                         distinct() %>%
@@ -1903,7 +1903,7 @@ server <- function(input, output, session) {
   output$search_term_sname <- renderText({
     req(input$search_term != '')
     req(input$search_term %in% sname_list)
-    term <- str_to_title(as.character(com_landings %>%
+    term <- str_to_title(as.character(categorization_matrix %>%
                                         filter_species(input$search_term) %>%
                                         select(SPECIES_NAME) %>%
                                         distinct() %>%
