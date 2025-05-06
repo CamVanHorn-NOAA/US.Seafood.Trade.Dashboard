@@ -35,23 +35,33 @@ categorization_matrix <- bind_rows(trade_data, com_landings, pp_data) %>%
   distinct() %>%
   ungroup()
 
-scat_list <- com_landings %>%
-  select(SPECIES_CATEGORY) %>%
+# create matrix of all trade categorization terms available in the data
+trade_categorization_matrix <- trade_data %>%
+  select(SPECIES_NAME, SPECIES_GROUP, 
+         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+  group_by(SPECIES_NAME, SPECIES_GROUP, 
+           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   distinct() %>%
-  mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
-  pull()
+  ungroup()
 
-sgrp_list <- com_landings %>%
-  select(SPECIES_GROUP) %>%
+# create matrix of all landings categorization terms available in the data
+landings_categorization_matrix <- com_landings %>%
+  select(SPECIES_NAME, SPECIES_GROUP,
+         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+  group_by(SPECIES_NAME, SPECIES_GROUP,
+           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   distinct() %>%
-  mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
-  pull()
+  ungroup()
 
-sname_list <- com_landings %>%
-  select(SPECIES_NAME) %>%
+# create matrix of all products categorization terms available in the data
+products_categorization_matrix <- pp_data %>%
+  select(SPECIES_NAME, SPECIES_GROUP,
+         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+  group_by(SPECIES_NAME, SPECIES_GROUP,
+           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   distinct() %>%
-  mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
-  pull()
+  ungroup()
+
 
 # list of all categorizations available in trade data
 trade_terms <- c('All Species',
