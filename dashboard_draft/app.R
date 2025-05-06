@@ -23,6 +23,7 @@ source("nmfs_cols.R")
 # Pull Data (most recent version)
 load('seafood_trade_data_munge_04_30_25.RData')
 
+# filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
   filter(CONFIDENTIALITY == 'Public')
 
@@ -129,6 +130,7 @@ filter_species <- function(data, species) {
   # species is a character vector of a species of interest 
     # (e.g., 'Albacore Tuna')
   
+  # if All Species is entered, no filtering occurs, original data returned
   if(species == 'All Species') {
     return(data)
   }
@@ -1753,6 +1755,8 @@ server <- function(input, output, session) {
     req(input$species_cat != 'All Species' & input$ecol_cat != 'All Species')
     # grab all species groups for the selected species category
     species_groups <- c('All Species', categorization_matrix %>%
+                          # filter for both previous inputs to only show terms
+                            # related to previous filtering
                           filter_species(input$ecol_cat) %>%
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
@@ -1777,6 +1781,8 @@ server <- function(input, output, session) {
           input$ecol_cat != 'All Species')
     # grab all species names for the selected species group
     species_names <- c('All Species', categorization_matrix %>%
+                         # filter for all previous inputs so presented terms 
+                          # only reflect those within selected filters
                          filter_species(input$ecol_cat) %>%
                          filter_species(input$species_cat) %>%
                          filter_species(input$species_grp) %>%
@@ -1923,6 +1929,16 @@ server <- function(input, output, session) {
   
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available trade data
+  # operates by determining which level contains 'All Species'. For that level,
+    # it will unfilter to the next two levels up (because, if species name is
+    # 'All Species', species group was last selected, which means there is no
+    # data for that species group, thus we must unfilter back to species cat,
+    # which is two levels up from species name).
+  # If species cat is 'All Species', then there is no data for ecol cat, which
+    # means we must unfilter back up to All Species (i.e. no filter)
+  # If species name has a selection, then we only unfilter to species group, 
+    # because there must have been data for that species group to have selected
+    # a species name
   unfilter_species_trade <- reactive({
     req(input$trade_button == T)
     ifelse(input$species_cat == 'All Species', 'All Species',
@@ -1942,18 +1958,34 @@ server <- function(input, output, session) {
            unfilter_species_trade())
   })
   
+  # progressive filter applied to data such that plots accurately reflect all
+    # inputted species selections
+  # operates with several if statements that evaluate which filters should be
+    # applied to the data. There are instances where several of the conditions
+    # will be met, thus filtering the data several times. This is fine, because
+    # each if statement overwrites 'new_data', thus only the last met condition
+    # will apply to the outputted data
   trade_filtered <- reactive({
+    # first filter data for the selected ecol_cat
+      # (this will work if 'all species' is selected (default) bc filter_species
+      # accounts for that input)
     new_data <- trade_data %>%
       filter_species(input$ecol_cat)
     
+    # It will apply the next inputted filter only if there is an input for that
+      # filter AND if the selected filter is present in the trade data at that
+      # level (this protects against the ifelse breaking)
     if(species_selection_trade() %in% 
        trade_categorization_matrix$SPECIES_CATEGORY &
        !(is.null(input$species_cat))) {
       
+      # apply filter for both selected inputs
       new_data <- trade_data %>%
         filter_species(input$ecol_cat) %>%
         filter_species(input$species_cat)
       
+      # if the trade button is inputted, replace data with only one filter
+        # applied
       if(input$trade_button == T) {
         new_data <- trade_data %>%
           filter_species(input$ecol_cat)
@@ -2147,6 +2179,7 @@ server <- function(input, output, session) {
   
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available landings data 
+  # see notes above 'unfilter_species_trade'
   unfilter_species_landings <- reactive({
     req(input$landings_button == T)
     ifelse(input$species_cat == 'All Species', 'All Species',
@@ -2166,6 +2199,7 @@ server <- function(input, output, session) {
            unfilter_species_landings())
   })
   
+  # see notes above and within trade_filtered
   landings_filtered <- reactive({
     new_data <- com_landings %>%
       filter_species(input$ecol_cat)
@@ -2279,6 +2313,7 @@ server <- function(input, output, session) {
   
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available production data 
+  # see notes above 'unfilter_species_trade'
   unfilter_species_products <- reactive({
     req(input$products_button == T)
     ifelse(input$species_cat == 'All Species', 'All Species',
@@ -2298,6 +2333,7 @@ server <- function(input, output, session) {
            unfilter_species_products())
   })
   
+  # see notes above and within trade_filtered
   products_filtered <- reactive({
     new_data <- pp_data %>%
       filter_species(input$ecol_cat)
