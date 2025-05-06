@@ -62,6 +62,38 @@ products_categorization_matrix <- pp_data %>%
   distinct() %>%
   ungroup()
 
+# Create list of terms for each level of organization hierarchy
+  # these lists will be used to determine where a provided species input is 
+  # found in the hierarchy
+ecat_list <- unique(categorization_matrix %>%
+                      select(ECOLOGICAL_CATEGORY) %>%
+                      distinct() %>%
+                      filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
+                      mutate(ECOLOGICAL_CATEGORY = 
+                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                      pull()) 
+
+scat_list <- unique(categorization_matrix %>%
+                      select(SPECIES_CATEGORY) %>%
+                      distinct() %>%
+                      filter(!is.na(SPECIES_CATEGORY)) %>%
+                      mutate(SPECIES_CATEGORY = 
+                               str_to_title(SPECIES_CATEGORY)) %>%
+                      pull())
+
+sgrp_list <- unique(categorization_matrix %>%
+                      select(SPECIES_GROUP) %>%
+                      distinct() %>%
+                      filter(!is.na(SPECIES_GROUP)) %>%
+                      mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                      pull())
+
+sname_list <- unique(categorization_matrix %>%
+                       select(SPECIES_NAME) %>%
+                       distinct() %>%
+                       filter(!is.na(SPECIES_NAME)) %>%
+                       mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                       pull())
 
 # list of all categorizations available in trade data
 trade_terms <- c('All Species',
