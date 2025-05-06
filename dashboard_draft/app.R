@@ -1711,8 +1711,7 @@ server <- function(input, output, session) {
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
     # grab all ecological categories
-    ecol_cats <- c('All Species', com_landings %>% 
-                     filter(CONFIDENTIALITY != 'Confidential') %>%
+    ecol_cats <- c('All Species', categorization_matrix %>%
                      select(ECOLOGICAL_CATEGORY) %>%
                      distinct() %>%
                      # remove NA category
@@ -1721,6 +1720,7 @@ server <- function(input, output, session) {
                      mutate(ECOLOGICAL_CATEGORY = 
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
                      pull())
+    
     selectInput('ecol_cat', 'Choose a Category', ecol_cats)
     
   })
@@ -1731,7 +1731,7 @@ server <- function(input, output, session) {
     # req prevents anything from being run if ecol_cat is not specified
     req(input$ecol_cat != 'All Species')
     # grab all species categories for the selected ecological category
-    species_cats <- c('All Species', com_landings %>%
+    species_cats <- c('All Species', categorization_matrix %>%
                         filter_species(input$ecol_cat) %>%
                         select(SPECIES_CATEGORY) %>%
                         distinct() %>%
@@ -1741,6 +1741,7 @@ server <- function(input, output, session) {
                         mutate(SPECIES_CATEGORY = 
                                  str_to_title(SPECIES_CATEGORY)) %>%
                         pull())
+    
     selectInput('species_cat', 'Choose a Secondary Category', species_cats)
   })
   
@@ -1751,16 +1752,18 @@ server <- function(input, output, session) {
       # are not specified
     req(input$species_cat != 'All Species' & input$ecol_cat != 'All Species')
     # grab all species groups for the selected species category
-    species_groups <- c('All Species', com_landings %>%
+    species_groups <- c('All Species', categorization_matrix %>%
+                          filter_species(input$ecol_cat) %>%
                           filter_species(input$species_cat) %>%
                           select(SPECIES_GROUP) %>%
                           distinct() %>%
                           # remove NA category
                           filter(!is.na(SPECIES_GROUP)) %>%
                           # display strings as titles (first letter capitalized)
-                          mutate(SPECIES_GROUP = 
+                          mutate(SPECIES_GROUP =
                                    str_to_title(SPECIES_GROUP)) %>%
                           pull())
+    
     selectInput('species_grp', 'Choose a Group', species_groups)
   })
   
@@ -1773,7 +1776,9 @@ server <- function(input, output, session) {
           input$species_cat != 'All Species' & 
           input$ecol_cat != 'All Species')
     # grab all species names for the selected species group
-    species_names <- c('All Species', com_landings %>%
+    species_names <- c('All Species', categorization_matrix %>%
+                         filter_species(input$ecol_cat) %>%
+                         filter_species(input$species_cat) %>%
                          filter_species(input$species_grp) %>%
                          select(SPECIES_NAME) %>%
                          distinct() %>%
@@ -1782,6 +1787,7 @@ server <- function(input, output, session) {
                          # display strings as titles (first letter capitalized)
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
+    
     selectInput('species_name', 'Choose a Species', species_names)
   })
   
