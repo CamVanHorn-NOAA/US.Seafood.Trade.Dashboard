@@ -2000,7 +2000,7 @@ server <- function(input, output, session) {
   # creates trade data
   trade_df <- reactive({
     summarize_trade_yr_spp(
-      trade_data,
+      trade_filtered(),
       species_selection_trade()
       )
     })
@@ -2231,7 +2231,7 @@ server <- function(input, output, session) {
   # creates landings data
   landings_df <- reactive({
     summarize_landings_yr_spp(
-      com_landings,
+      landings_filtered(),
       species_selection_landings())
     })
   
@@ -2362,7 +2362,7 @@ server <- function(input, output, session) {
   # creates processed products data
   pp_df <- reactive({
     summarize_pp_yr_spp(
-      pp_data,
+      products_filtered(),
       species_selection_products())
     })
   
