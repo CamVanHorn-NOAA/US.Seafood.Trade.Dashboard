@@ -1941,6 +1941,61 @@ server <- function(input, output, session) {
     ifelse(species_selected() %in% trade_terms, species_selected(),
            unfilter_species_trade())
   })
+  
+  trade_filtered <- reactive({
+    new_data <- trade_data %>%
+      filter_species(input$ecol_cat)
+    
+    if(species_selection_trade() %in% 
+       trade_categorization_matrix$SPECIES_CATEGORY &
+       !(is.null(input$species_cat))) {
+      
+      new_data <- trade_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat)
+      
+      if(input$trade_button == T) {
+        new_data <- trade_data %>%
+          filter_species(input$ecol_cat)
+      }
+    }
+    
+    if(species_selection_trade() %in% 
+       trade_categorization_matrix$SPECIES_GROUP &
+       !(is.null(input$species_grp))) {
+      
+      new_data <- trade_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp)
+      
+      if(input$trade_button == T) {
+        new_data <- trade_button %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat)
+      }
+    }
+    
+    if(species_selection_trade() %in% 
+       trade_categorization_matrix$SPECIES_NAME &
+       !(is.null(input$species_name))) {
+      
+      new_data <- trade_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter_species(input$species_name)
+      
+      if(input$trade_button == T) {
+        new_data <- trade_data %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat) %>%
+          filter_species(input$species_grp)
+      }
+    }
+    
+    new_data
+  })
 
   # creates trade data
   trade_df <- reactive({
@@ -2111,6 +2166,62 @@ server <- function(input, output, session) {
            unfilter_species_landings())
   })
   
+  landings_filtered <- reactive({
+    new_data <- com_landings %>%
+      filter_species(input$ecol_cat)
+    
+    if(species_selection_landings() %in% 
+       landings_categorization_matrix$SPECIES_CATEGORY &
+       !(is.null(input$species_cat))) {
+      
+      new_data <- com_landings %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat)
+      
+      if(input$landings_button == T) {
+        new_data <- com_landings %>%
+          filter_species(input$ecol_cat)
+      }
+    }
+    
+    if(species_selection_landings() %in% 
+       landings_categorization_matrix$SPECIES_GROUP &
+       !(is.null(input$species_grp))) {
+      
+      new_data <- com_landings %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp)
+      
+      if(input$landings_button == T) {
+        new_data <- com_landings %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat)
+      }
+      
+    }
+    
+    if(species_selection_landings() %in% 
+       landings_categorization_matrix$SPECIES_NAME &
+       !(is.null(input$species_name))) {
+      
+      new_data <- com_landings %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter_species(input$species_name)
+      
+      if(input$landings_button == T) {
+        new_data <- com_landings %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat) %>%
+          filter_species(input$species_grp)
+      }
+    }
+    
+    new_data
+  })
+  
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
     validate(need(try(species_selection_landings() %in% landings_terms),
@@ -2185,6 +2296,61 @@ server <- function(input, output, session) {
   species_selection_products <- reactive({
     ifelse(species_selected() %in% pp_terms, species_selected(),
            unfilter_species_products())
+  })
+  
+  products_filtered <- reactive({
+    new_data <- pp_data %>%
+      filter_species(input$ecol_cat)
+    
+    if(species_selection_products() %in% 
+       products_categorization_matrix$SPECIES_CATEGORY &
+       !(is.null(input$species_cat))) {
+      
+      new_data <- pp_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat)
+      
+      if(input$products_button == T) {
+        new_data <- pp_data %>%
+          filter_species(input$ecol_cat)
+      }
+    }
+    
+    if(species_selection_products() %in% 
+       products_categorization_matrix$SPECIES_GROUP &
+       !(is.null(input$species_grp))) {
+      
+      new_data <- pp_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp)
+      
+      if(input$products_button == T) {
+        new_data <- pp_data %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat)
+      }
+    }
+    
+    if(species_selection_products() %in% 
+       products_categorization_matrix$SPECIES_NAME &
+       !(is.null(input$species_name))) {
+      
+      new_data <- pp_data %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter_species(input$species_name)
+      
+      if(input$products_button == T) {
+        new_data <- pp_data %>%
+          filter_species(input$ecol_cat) %>%
+          filter_species(input$species_cat) %>%
+          filter_species(input$species_grp)
+      }
+    }
+    
+    new_data
   })
   
   # validation reactive; outputs message if species is not found in production data
