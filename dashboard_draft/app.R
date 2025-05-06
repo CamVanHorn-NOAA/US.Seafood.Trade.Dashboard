@@ -103,7 +103,11 @@ trade_terms <- c('All Species',
                  str_to_title(unique(trade_data$SPECIES_NAME)))
 
 # list of all categorizations available in landings data
-landings_terms <- c('All Species', ecat_list, scat_list, sgrp_list, sname_list)
+landings_terms <- c('All Species',
+                    str_to_title(unique(com_landings$ECOLOGICAL_CATEGORY)),
+                    str_to_title(unique(com_landings$SPECIES_CATEGORY)),
+                    str_to_title(unique(com_landings$SPECIES_GROUP)),
+                    str_to_title(unique(com_landings$SPECIES_NAME)))
 
 # list of all categorizations available in production data
 pp_terms <- c('All Species',
