@@ -28,6 +28,8 @@ load('seafood_trade_data_munge_04_30_25.RData')
   # found in the hierarchy
 ecat_list <- com_landings %>%
   select(ECOLOGICAL_CATEGORY) %>%
+com_landings <- com_landings %>%
+  filter(CONFIDENTIALITY == 'Public')
   distinct() %>%
   mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
   pull()
