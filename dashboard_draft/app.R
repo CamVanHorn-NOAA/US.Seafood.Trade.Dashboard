@@ -129,6 +129,10 @@ filter_species <- function(data, species) {
   # species is a character vector of a species of interest 
     # (e.g., 'Albacore Tuna')
   
+  if(species == 'All Species') {
+    return(data)
+  }
+  
   # species are organized in a hierarhcy of four levels:
     # ecological category (e.g., 'Large Pelagics')
     # species category (e.g., 'Tunas')
