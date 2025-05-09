@@ -1906,6 +1906,50 @@ server <- function(input, output, session) {
                                 input$species_name))))
   })
   
+  trade_terms <- reactive({
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', trade_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
+  })
+  
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available trade data
   # operates by determining which level contains 'All Species'. For that level,
@@ -2156,6 +2200,55 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  landings_terms <- reactive({
+    
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', landings_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
+  })
+  
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available landings data 
   # see notes above 'unfilter_species_trade'
@@ -2288,6 +2381,55 @@ server <- function(input, output, session) {
     validate(need(try(!is.na(landings_price_plot())),
                   'Data for this species is insufficient to produce this plot'))
     landings_price_plot()
+  })
+  
+  pp_terms <- reactive({
+    
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', products_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
   })
   
   # identifies which species is the next highest level based on if the 
