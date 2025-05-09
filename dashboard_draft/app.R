@@ -96,27 +96,6 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
-# list of all categorizations available in trade data
-trade_terms <- c('All Species',
-                 str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
-                 str_to_title(unique(trade_data$SPECIES_CATEGORY)),
-                 str_to_title(unique(trade_data$SPECIES_GROUP)),
-                 str_to_title(unique(trade_data$SPECIES_NAME)))
-
-# list of all categorizations available in landings data
-landings_terms <- c('All Species',
-                    str_to_title(unique(com_landings$ECOLOGICAL_CATEGORY)),
-                    str_to_title(unique(com_landings$SPECIES_CATEGORY)),
-                    str_to_title(unique(com_landings$SPECIES_GROUP)),
-                    str_to_title(unique(com_landings$SPECIES_NAME)))
-
-# list of all categorizations available in production data
-pp_terms <- c('All Species',
-              str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
-              str_to_title(unique(pp_data$SPECIES_CATEGORY)),
-              str_to_title(unique(pp_data$SPECIES_GROUP)),
-              str_to_title(unique(pp_data$SPECIES_NAME)))
-
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -1799,24 +1778,33 @@ server <- function(input, output, session) {
   
   # creates checkbox to unfilter trade up one level
     # requires the selected species to NOT be available in trade categories
+    # the validate prevents an error from being displayed in the side bar
   output$trade_unfilter_button <- renderUI({
-    req(!(species_selected() %in% trade_terms))
+    validate(need(try(!(species_selected() %in% trade_terms())),
+                  ''))
+    req(!(species_selected() %in% trade_terms()))
     
     checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
   })
   
   # creates checkbox to unfilter production up one level
     # requires the selected species to NOT be available in production categories
+    # the validate prevents an error from being displayed in the side bar
   output$product_unfilter_button <- renderUI({
-    req(!(species_selected() %in% pp_terms))
+    validate(need(try(!(species_selected() %in% pp_terms())),
+                  ''))
+    req(!(species_selected() %in% pp_terms()))
     
     checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
   })
   
   # creates checkbox to unfilter landings up one level
     # requires the selected species to NOT be available in landings categories
+    # the validate prevents an error from being displayed in the side bar
   output$landings_unfilter_button <- renderUI({
-    req(!(species_selected() %in% landings_terms))
+    validate(need(try(!(species_selected() %in% landings_terms())),
+                  ''))
+    req(!(species_selected() %in% landings_terms()))
     
     checkboxInput('landings_button', 'Unfilter Landings Plots Up One Level')
   })
@@ -1927,6 +1915,76 @@ server <- function(input, output, session) {
                                 input$species_name))))
   })
   
+  # create list of trade categories based on selected filters
+  trade_terms <- reactive({
+    
+    # determine which category the user selected last
+      # is.null(input$ecol_cat) is the default because, despite the app displaying
+        # 'All Species' on startup, the input is NULL because no selection has 
+        # technically been made by the user. If the user later selects 'All Species'
+        # for ecol_cat, then the input is not NULL
+      # whichever category lists 'All Species', the prior category contains the
+        # most recent specific selection
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    
+    # trade_terms() will return the list of terms for the selected category that
+      # exist in the trade data
+      # this is so that we can test to see if the selected term exists in the
+        # trade data based on the selected filters
+    # if the user has selected an ecological category, or if the ecological 
+      # category is 'All Species', will return the list of ecological categories
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', trade_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    
+    # if a species category was selected, will return all species categories
+      # for the selected ecological category in the trade data
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    
+    # if a species group was selected, will return all species groups for
+      # that species category AND that ecological category in the trade data
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    
+    # if a species name was selected, will return all species names for
+      # that species group AND species category AND ecological category in the
+      # trade data
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  trade_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
+  })
+  
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available trade data
   # operates by determining which level contains 'All Species'. For that level,
@@ -1949,12 +2007,13 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_trade) should be used for trade data visualization based
-    # on whether the selected species is available in trade data
+    # on whether the selected species (based on all selected filters) exists
+    # in the trade data
   # because unfilter_species_trade requires the trade_button to be checked by
     # the user, this will only switch to unfilter_species_trade once the user
     # checks the box
   species_selection_trade <- reactive({
-    ifelse(species_selected() %in% trade_terms, species_selected(),
+    ifelse(species_selected() %in% trade_terms(), species_selected(),
            unfilter_species_trade())
   })
   
@@ -2039,7 +2098,7 @@ server <- function(input, output, session) {
   
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
-    validate(need(try(species_selection_trade() %in% trade_terms),
+    validate(need(try(species_selection_trade() %in% trade_terms()),
                   'There is no available trade data for the selected species'))
   })
   
@@ -2177,6 +2236,57 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  # create list of landings categories based on selected filters
+  # see trade_terms() notes 
+  landings_terms <- reactive({
+    
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', landings_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  landings_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
+  })
+  
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available landings data 
   # see notes above 'unfilter_species_trade'
@@ -2190,12 +2300,13 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_landings) should be used for landings data visualization 
-    # based on whether the selected species is available in landings data
+    # based on whether the selected species (and all selected filters) exists in
+    # the landings data
   # because unfilter_species_landings requires the landings_button to be checked by
     # the user, this will only switch to unfilter_species_landings once the user
     # checks the box
   species_selection_landings <- reactive({
-    ifelse(species_selected() %in% landings_terms, species_selected(),
+    ifelse(species_selected() %in% landings_terms(), species_selected(),
            unfilter_species_landings())
   })
   
@@ -2258,7 +2369,7 @@ server <- function(input, output, session) {
   
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
-    validate(need(try(species_selection_landings() %in% landings_terms),
+    validate(need(try(species_selection_landings() %in% landings_terms()),
                   'There is no available landings data for this species'))
   })
   
@@ -2311,6 +2422,57 @@ server <- function(input, output, session) {
     landings_price_plot()
   })
   
+  # create list of production categories based on selected filters
+  # see trade_terms() notes
+  pp_terms <- reactive({
+    
+    cat_index <- 
+      ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
+             ifelse(input$species_cat == 'All Species', 'ecat',
+                    ifelse(input$species_grp == 'All Species', 'scat',
+                           ifelse(input$species_name == 'All Species', 'sgrp',
+                                  'sname'))))
+    
+    if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
+      result <- c('All Species', products_categorization_matrix %>%
+                    select(ECOLOGICAL_CATEGORY) %>%
+                    mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'scat') {
+      result <- c(input$ecol_cat,
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    select(SPECIES_CATEGORY) %>%
+                    mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sgrp') {
+      result <- c(input$ecol_cat, input$species_cat, 
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    select(SPECIES_GROUP) %>%
+                    mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
+                    pull())
+    }
+    
+    if(cat_index == 'sname') {
+      result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
+                  products_categorization_matrix %>%
+                    filter_species(input$ecol_cat) %>%
+                    filter_species(input$species_cat) %>%
+                    filter_species(input$species_grp) %>%
+                    select(SPECIES_NAME) %>%
+                    mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
+                    pull())
+    }
+    
+    result
+  })
+  
   # identifies which species is the next highest level based on if the 
     # selected category is not available from available production data 
   # see notes above 'unfilter_species_trade'
@@ -2324,12 +2486,13 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_products) should be used for production data visualization 
-    # based on whether the selected species is available in production data
+    # based on whether the selected species (and all selected filters) exists in
+    # the production data
   # because unfilter_species_products requires the products_button to be checked by
     # the user, this will only switch to unfilter_species_products once the user
     # checks the box
   species_selection_products <- reactive({
-    ifelse(species_selected() %in% pp_terms, species_selected(),
+    ifelse(species_selected() %in% pp_terms(), species_selected(),
            unfilter_species_products())
   })
   
@@ -2391,7 +2554,7 @@ server <- function(input, output, session) {
   
   # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
-    validate(need(try(species_selection_products() %in% pp_terms),
+    validate(need(try(species_selection_products() %in% pp_terms()),
                   'There is no available production data for this species'))
   })
   
