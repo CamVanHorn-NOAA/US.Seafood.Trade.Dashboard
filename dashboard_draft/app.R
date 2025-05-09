@@ -1983,7 +1983,7 @@ server <- function(input, output, session) {
     # the user, this will only switch to unfilter_species_trade once the user
     # checks the box
   species_selection_trade <- reactive({
-    ifelse(species_selected() %in% trade_terms, species_selected(),
+    ifelse(species_selected() %in% trade_terms(), species_selected(),
            unfilter_species_trade())
   })
   
@@ -2068,7 +2068,7 @@ server <- function(input, output, session) {
   
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
-    validate(need(try(species_selection_trade() %in% trade_terms),
+    validate(need(try(species_selection_trade() %in% trade_terms()),
                   'There is no available trade data for the selected species'))
   })
   
@@ -2273,7 +2273,7 @@ server <- function(input, output, session) {
     # the user, this will only switch to unfilter_species_landings once the user
     # checks the box
   species_selection_landings <- reactive({
-    ifelse(species_selected() %in% landings_terms, species_selected(),
+    ifelse(species_selected() %in% landings_terms(), species_selected(),
            unfilter_species_landings())
   })
   
@@ -2336,7 +2336,7 @@ server <- function(input, output, session) {
   
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
-    validate(need(try(species_selection_landings() %in% landings_terms),
+    validate(need(try(species_selection_landings() %in% landings_terms()),
                   'There is no available landings data for this species'))
   })
   
@@ -2456,7 +2456,7 @@ server <- function(input, output, session) {
     # the user, this will only switch to unfilter_species_products once the user
     # checks the box
   species_selection_products <- reactive({
-    ifelse(species_selected() %in% pp_terms, species_selected(),
+    ifelse(species_selected() %in% pp_terms(), species_selected(),
            unfilter_species_products())
   })
   
@@ -2518,7 +2518,7 @@ server <- function(input, output, session) {
   
   # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
-    validate(need(try(species_selection_products() %in% pp_terms),
+    validate(need(try(species_selection_products() %in% pp_terms()),
                   'There is no available production data for this species'))
   })
   
