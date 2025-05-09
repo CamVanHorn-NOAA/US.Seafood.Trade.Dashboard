@@ -96,27 +96,6 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
-# list of all categorizations available in trade data
-trade_terms <- c('All Species',
-                 str_to_title(unique(trade_data$ECOLOGICAL_CATEGORY)),
-                 str_to_title(unique(trade_data$SPECIES_CATEGORY)),
-                 str_to_title(unique(trade_data$SPECIES_GROUP)),
-                 str_to_title(unique(trade_data$SPECIES_NAME)))
-
-# list of all categorizations available in landings data
-landings_terms <- c('All Species',
-                    str_to_title(unique(com_landings$ECOLOGICAL_CATEGORY)),
-                    str_to_title(unique(com_landings$SPECIES_CATEGORY)),
-                    str_to_title(unique(com_landings$SPECIES_GROUP)),
-                    str_to_title(unique(com_landings$SPECIES_NAME)))
-
-# list of all categorizations available in production data
-pp_terms <- c('All Species',
-              str_to_title(unique(pp_data$ECOLOGICAL_CATEGORY)),
-              str_to_title(unique(pp_data$SPECIES_CATEGORY)),
-              str_to_title(unique(pp_data$SPECIES_GROUP)),
-              str_to_title(unique(pp_data$SPECIES_NAME)))
-
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
