@@ -1779,7 +1779,9 @@ server <- function(input, output, session) {
   # creates checkbox to unfilter trade up one level
     # requires the selected species to NOT be available in trade categories
   output$trade_unfilter_button <- renderUI({
-    req(!(species_selected() %in% trade_terms))
+    validate(need(try(!(species_selected() %in% trade_terms())),
+                  ''))
+    req(!(species_selected() %in% trade_terms()))
     
     checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
   })
@@ -1787,7 +1789,9 @@ server <- function(input, output, session) {
   # creates checkbox to unfilter production up one level
     # requires the selected species to NOT be available in production categories
   output$product_unfilter_button <- renderUI({
-    req(!(species_selected() %in% pp_terms))
+    validate(need(try(!(species_selected() %in% pp_terms())),
+                  ''))
+    req(!(species_selected() %in% pp_terms()))
     
     checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
   })
@@ -1795,7 +1799,9 @@ server <- function(input, output, session) {
   # creates checkbox to unfilter landings up one level
     # requires the selected species to NOT be available in landings categories
   output$landings_unfilter_button <- renderUI({
-    req(!(species_selected() %in% landings_terms))
+    validate(need(try(!(species_selected() %in% landings_terms())),
+                  ''))
+    req(!(species_selected() %in% landings_terms()))
     
     checkboxInput('landings_button', 'Unfilter Landings Plots Up One Level')
   })
