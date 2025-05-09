@@ -1778,6 +1778,7 @@ server <- function(input, output, session) {
   
   # creates checkbox to unfilter trade up one level
     # requires the selected species to NOT be available in trade categories
+    # the validate prevents an error from being displayed in the side bar
   output$trade_unfilter_button <- renderUI({
     validate(need(try(!(species_selected() %in% trade_terms())),
                   ''))
@@ -1788,6 +1789,7 @@ server <- function(input, output, session) {
   
   # creates checkbox to unfilter production up one level
     # requires the selected species to NOT be available in production categories
+    # the validate prevents an error from being displayed in the side bar
   output$product_unfilter_button <- renderUI({
     validate(need(try(!(species_selected() %in% pp_terms())),
                   ''))
@@ -1798,6 +1800,7 @@ server <- function(input, output, session) {
   
   # creates checkbox to unfilter landings up one level
     # requires the selected species to NOT be available in landings categories
+    # the validate prevents an error from being displayed in the side bar
   output$landings_unfilter_button <- renderUI({
     validate(need(try(!(species_selected() %in% landings_terms())),
                   ''))
@@ -1912,19 +1915,38 @@ server <- function(input, output, session) {
                                 input$species_name))))
   })
   
+  # create list of trade categories based on selected filters
   trade_terms <- reactive({
+    
+    # determine which category the user selected last
+      # is.null(input$ecol_cat) is the default because, despite the app displaying
+        # 'All Species' on startup, the input is NULL because no selection has 
+        # technically been made by the user. If the user later selects 'All Species'
+        # for ecol_cat, then the input is not NULL
+      # whichever category lists 'All Species', the prior category contains the
+        # most recent specific selection
     cat_index <- 
       ifelse(is.null(input$ecol_cat) | input$ecol_cat == 'All Species', 'DEFAULT',
              ifelse(input$species_cat == 'All Species', 'ecat',
                     ifelse(input$species_grp == 'All Species', 'scat',
                            ifelse(input$species_name == 'All Species', 'sgrp',
                                   'sname'))))
+    
+    # trade_terms() will return the list of terms for the selected category that
+      # exist in the trade data
+      # this is so that we can test to see if the selected term exists in the
+        # trade data based on the selected filters
+    # if the user has selected an ecological category, or if the ecological 
+      # category is 'All Species', will return the list of ecological categories
     if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
       result <- c('All Species', trade_categorization_matrix %>%
                     select(ECOLOGICAL_CATEGORY) %>%
                     mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
                     pull())
     }
+    
+    # if a species category was selected, will return all species categories
+      # for the selected ecological category in the trade data
     if(cat_index == 'scat') {
       result <- c(input$ecol_cat,
                   trade_categorization_matrix %>%
@@ -1933,6 +1955,9 @@ server <- function(input, output, session) {
                     mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
                     pull())
     }
+    
+    # if a species group was selected, will return all species groups for
+      # that species category AND that ecological category in the trade data
     if(cat_index == 'sgrp') {
       result <- c(input$ecol_cat, input$species_cat, 
                   trade_categorization_matrix %>%
@@ -1942,6 +1967,10 @@ server <- function(input, output, session) {
                     mutate(SPECIES_GROUP = str_to_title(SPECIES_GROUP)) %>%
                     pull())
     }
+    
+    # if a species name was selected, will return all species names for
+      # that species group AND species category AND ecological category in the
+      # trade data
     if(cat_index == 'sname') {
       result <- c(input$ecol_cat, input$species_cat, input$species_grp, 
                   trade_categorization_matrix %>%
@@ -1978,7 +2007,8 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_trade) should be used for trade data visualization based
-    # on whether the selected species is available in trade data
+    # on whether the selected species (based on all selected filters) exists
+    # in the trade data
   # because unfilter_species_trade requires the trade_button to be checked by
     # the user, this will only switch to unfilter_species_trade once the user
     # checks the box
@@ -2206,6 +2236,8 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  # create list of landings categories based on selected filters
+  # see trade_terms() notes 
   landings_terms <- reactive({
     
     cat_index <- 
@@ -2268,7 +2300,8 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_landings) should be used for landings data visualization 
-    # based on whether the selected species is available in landings data
+    # based on whether the selected species (and all selected filters) exists in
+    # the landings data
   # because unfilter_species_landings requires the landings_button to be checked by
     # the user, this will only switch to unfilter_species_landings once the user
     # checks the box
@@ -2389,6 +2422,8 @@ server <- function(input, output, session) {
     landings_price_plot()
   })
   
+  # create list of production categories based on selected filters
+  # see trade_terms() notes
   pp_terms <- reactive({
     
     cat_index <- 
@@ -2451,7 +2486,8 @@ server <- function(input, output, session) {
   
   # determines if the selected species OR the next highest level of categorization
     # (unfilter_species_products) should be used for production data visualization 
-    # based on whether the selected species is available in production data
+    # based on whether the selected species (and all selected filters) exists in
+    # the production data
   # because unfilter_species_products requires the products_button to be checked by
     # the user, this will only switch to unfilter_species_products once the user
     # checks the box
