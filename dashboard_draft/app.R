@@ -1814,27 +1814,6 @@ server <- function(input, output, session) {
                        'search_term',
                        choices = 
                          c('', sort(c(categorization_matrix %>%
-                                        select(ECOLOGICAL_CATEGORY) %>%
-                                        distinct() %>%
-                                        filter(!is.na(ECOLOGICAL_CATEGORY)) %>%
-                                        mutate(ECOLOGICAL_CATEGORY = 
-                                                 str_to_title(ECOLOGICAL_CATEGORY)) %>%
-                                        pull(),
-                                      categorization_matrix %>%
-                                        select(SPECIES_CATEGORY) %>%
-                                        distinct() %>%
-                                        filter(!is.na(SPECIES_CATEGORY)) %>%
-                                        mutate(SPECIES_CATEGORY = 
-                                                 str_to_title(SPECIES_CATEGORY)) %>%
-                                        pull(),
-                                      categorization_matrix %>%
-                                        select(SPECIES_GROUP) %>%
-                                        distinct() %>%
-                                        filter(!is.na(SPECIES_GROUP)) %>%
-                                        mutate(SPECIES_GROUP = 
-                                                 str_to_title(SPECIES_GROUP)) %>%
-                                        pull(),
-                                      categorization_matrix %>%
                                         select(SPECIES_NAME) %>%
                                         distinct() %>%
                                         filter(!is.na(SPECIES_NAME)) %>%
