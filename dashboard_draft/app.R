@@ -1928,12 +1928,22 @@ server <- function(input, output, session) {
     
     # if a species category was selected, will return all species categories
       # for the selected ecological category in the trade data
+      # We also need to include the previously selected ecological category,
+        # but only if that category exists in the trade data
     if(cat_index == 'scat') {
       if(toupper(input$ecol_cat) %in% 
          trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
+        # if the category does not exist, create empty vector for functionality
         terms <- vector()
+      }
+      
+      # the output will include the ecological category term (if it exists) and
+        # all species categories that exist within that ecological category
+        # Should the e_cat NOT exist in the trade data, filter_species will 
+          # return an empty data frame, thus trade_terms will be empty, and
+          # 'All Species' will be returned later in unfilter_species_trade()
       result <- c(terms,
                   trade_categorization_matrix %>%
                     filter_species(input$ecol_cat) %>%
@@ -1944,15 +1954,20 @@ server <- function(input, output, session) {
     
     # if a species group was selected, will return all species groups for
       # that species category AND that ecological category in the trade data
+      # We also need to include the previously selected ecological and species
+        # categories but only if they exist in the trade data
     if(cat_index == 'sgrp') {
       if(toupper(input$species_cat) %in% (trade_categorization_matrix %>%
                                           filter_species(input$ecol_cat) %>%
                                           select(SPECIES_CATEGORY) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
+        # if they don't exist, then check if ecol_cat exists in the trade data
       } else if(toupper(input$ecol_cat) %in%
                 trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
+        # if neither the selected species or e_cat terms exist, returns empty
+          # vector
       } else {
         terms <- vector()
       }
@@ -1969,6 +1984,9 @@ server <- function(input, output, session) {
     # if a species name was selected, will return all species names for
       # that species group AND species category AND ecological category in the
       # trade data
+      # We also need to include the previously selected ecological and species
+        # categories and the species group, but only if they exist in the trade
+        # data
     if(cat_index == 'sname') {
       if(toupper(input$species_grp) %in% (trade_categorization_matrix %>%
                                          filter_species(input$ecol_cat) %>%
@@ -1976,14 +1994,19 @@ server <- function(input, output, session) {
                                          select(SPECIES_GROUP) %>%
                                          pull())) {
         terms <- c(input$ecol_cat, input$species_cat, input$species_grp)
+        # if they don't, check if the selected ecological and species categories
+          # exist in the trade data
       } else if(toupper(input$species_cat) %in% (trade_categorization_matrix %>%
                                                  filter_species(input$ecol_cat) %>%
                                                  select(SPECIES_CATEGORY) %>%
                                                  pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
+        # if they don't, check if the selected ecological category exists in the
+          # trade data
       } else if(toupper(input$ecol_cat) %in% 
                 trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
+        # if it doesn't, return empty vector
       } else {
         terms <- vector()
       }
@@ -1998,6 +2021,13 @@ server <- function(input, output, session) {
                     pull())
     }
     
+    # result will thus include any selected terms made by the user ONLY if those
+      # terms exist within their prior filters, and all terms of the last 
+      # selected input. This creates a vector of terms that subsequent reactive
+      # expressions will search through to determine if the last selected input
+      # exists in the trade data. This enables functionality of the unfilter 
+      # button such that, when checked, it will default back to the last 
+      # available term within this result vector
     result
   })
   
@@ -2016,9 +2046,26 @@ server <- function(input, output, session) {
   unfilter_species_trade <- reactive({
     req(input$trade_button == T)
     
+    # determine what the last selected input was. We start from the earliest
+      # possible filter (in this case, species_cat since if ecol_cat == 'All
+      # Species' then no selection was made)
     if(input$species_cat == 'All Species') {
+      # if species_cat == 'All Species', then the user has only inputted 
+        # ecol_cat, which means we only have to check that input
+      # trade_terms, as explained above, includes all previously selected terms
+        # ONLY IF they exist in the trade data, and all available terms within
+        # the previously selected filters (e.g., if the last selected filter was
+        # species group, trade_terms() includes the selected e_cat and 
+        # species_cat terms and all species_grp terms that exist in the data
+        # after filtering for the selected e_cat and species_cat's)
       ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
              'All Species')
+      # Subsequent ifelse terms work backwards from the last selected input
+        # to determine which last selected term exists in the trade data based
+        # on the selected filters. This is such that if a user selected down
+        # to species name, but the last available trade data was from the 
+        # selected ecol_cat term, then selecting the unfilter_button would
+        # display the ecol_cat filtered data for trade plots
     } else if(input$species_grp == 'All Species') {
       ifelse(input$species_cat %in% trade_terms(), input$species_cat,
              ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
