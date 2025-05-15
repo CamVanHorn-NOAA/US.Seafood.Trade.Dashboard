@@ -96,6 +96,8 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
+###
+
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -148,7 +150,7 @@ filter_species <- function(data, species) {
   # if species was not found, stop function with message to try a different
     # species input or search for available entries
   if (locate_level == 'UNAVAILABLE') {
-    stop()
+    return(data[-c(1:nrow(data)), ])
   } 
   
   # only runs if species is found
