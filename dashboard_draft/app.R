@@ -2015,10 +2015,28 @@ server <- function(input, output, session) {
     # a species name
   unfilter_species_trade <- reactive({
     req(input$trade_button == T)
-    ifelse(input$species_cat == 'All Species', 'All Species',
-           ifelse(input$species_grp == 'All Species', input$ecol_cat,
-                  ifelse(input$species_name == 'All Species', input$species_cat,
-                         ifelse(input$species_name != 'All Species', input$species_grp))))
+    
+    if(input$species_cat == 'All Species') {
+      ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
+             'All Species')
+    } else if(input$species_grp == 'All Species') {
+      ifelse(input$species_cat %in% trade_terms(), input$species_cat,
+             ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
+                    'All Species'))
+    } else if(input$species_name == 'All Species') {
+      ifelse(input$species_grp %in% trade_terms(), input$species_grp,
+             ifelse(input$species_cat %in% trade_terms(), input$species_cat,
+                    ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
+                           'All Species')))
+    } else if(input$species_name != 'All Species') {
+      ifelse(input$species_name %in% trade_terms(), input$species_name,
+             ifelse(input$species_grp %in% trade_terms(), input$species_grp,
+                    ifelse(input$species_cat %in% trade_terms(), input$species_cat,
+                           ifelse(input$ecol_cat %in% trade_terms(), input$ecol_cat,
+                                  'All Species'))))
+    }
+    
+    
   })
   
   # determines if the selected species OR the next highest level of categorization
@@ -2345,10 +2363,26 @@ server <- function(input, output, session) {
   # see notes above 'unfilter_species_trade'
   unfilter_species_landings <- reactive({
     req(input$landings_button == T)
-    ifelse(input$species_cat == 'All Species', 'All Species',
-           ifelse(input$species_grp == 'All Species', input$ecol_cat,
-                  ifelse(input$species_name == 'All Species', input$species_cat,
-                         ifelse(input$species_name != 'All Species', input$species_grp))))
+    
+    if(input$species_cat == 'All Species') {
+      ifelse(input$ecol_cat %in% landings_terms(), input$ecol_cat,
+             'All Species')
+    } else if(input$species_grp == 'All Species') {
+      ifelse(input$species_cat %in% landings_terms(), input$species_cat,
+             ifelse(input$ecol_cat %in% landings_terms(), input$ecol_cat,
+                    'All Species'))
+    } else if(input$species_name == 'All Species') {
+      ifelse(input$species_grp %in% landings_terms(), input$species_grp,
+             ifelse(input$species_cat %in% landings_terms(), input$species_cat,
+                    ifelse(input$ecol_cat %in% landings_terms(), input$ecol_cat,
+                           'All Species')))
+    } else if(input$species_name != 'All Species') {
+      ifelse(input$species_name %in% landings_terms(), input$species_name,
+             ifelse(input$species_grp %in% landings_terms(), input$species_grp,
+                    ifelse(input$species_cat %in% landings_terms(), input$species_cat,
+                           ifelse(input$ecol_cat %in% landings_terms(), input$ecol_cat,
+                                  'All Species'))))
+    }
   })
   
   # determines if the selected species OR the next highest level of categorization
@@ -2568,10 +2602,26 @@ server <- function(input, output, session) {
   # see notes above 'unfilter_species_trade'
   unfilter_species_products <- reactive({
     req(input$products_button == T)
-    ifelse(input$species_cat == 'All Species', 'All Species',
-           ifelse(input$species_grp == 'All Species', input$ecol_cat,
-                  ifelse(input$species_name == 'All Species', input$species_cat,
-                         ifelse(input$species_name != 'All Species', input$species_grp))))
+    
+    if(input$species_cat == 'All Species') {
+      ifelse(input$ecol_cat %in% pp_terms(), input$ecol_cat,
+             'All Species')
+    } else if(input$species_grp == 'All Species') {
+      ifelse(input$species_cat %in% pp_terms(), input$species_cat,
+             ifelse(input$ecol_cat %in% pp_terms(), input$ecol_cat,
+                    'All Species'))
+    } else if(input$species_name == 'All Species') {
+      ifelse(input$species_grp %in% pp_terms(), input$species_grp,
+             ifelse(input$species_cat %in% pp_terms(), input$species_cat,
+                    ifelse(input$ecol_cat %in% pp_terms(), input$ecol_cat,
+                           'All Species')))
+    } else if(input$species_name != 'All Species') {
+      ifelse(input$species_name %in% pp_terms(), input$species_name,
+             ifelse(input$species_grp %in% pp_terms(), input$species_grp,
+                    ifelse(input$species_cat %in% pp_terms(), input$species_cat,
+                           ifelse(input$ecol_cat %in% pp_terms(), input$ecol_cat,
+                                  'All Species'))))
+    }
   })
   
   # determines if the selected species OR the next highest level of categorization
