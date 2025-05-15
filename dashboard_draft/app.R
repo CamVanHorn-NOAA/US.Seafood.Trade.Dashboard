@@ -1786,7 +1786,7 @@ server <- function(input, output, session) {
                   ''))
     req(!(species_selected() %in% trade_terms()))
     
-    checkboxInput('trade_button', 'Unfilter Trade Plots Up One Level')
+    checkboxInput('trade_button', 'Revert trade data to last available selection')
   })
   
   # creates checkbox to unfilter production up one level
@@ -1797,7 +1797,7 @@ server <- function(input, output, session) {
                   ''))
     req(!(species_selected() %in% pp_terms()))
     
-    checkboxInput('products_button', 'Unfilter Products Plots Up One Level')
+    checkboxInput('products_button', 'Revert products data to last available selection')
   })
   
   # creates checkbox to unfilter landings up one level
@@ -1808,7 +1808,7 @@ server <- function(input, output, session) {
                   ''))
     req(!(species_selected() %in% landings_terms()))
     
-    checkboxInput('landings_button', 'Unfilter Landings Plots Up One Level')
+    checkboxInput('landings_button', 'Revert landings data to last available selection')
   })
   
   # define search bar terms
