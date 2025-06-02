@@ -1718,6 +1718,42 @@ ui <- page_sidebar(
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
   
+  output$download_trade <- downloadHandler(
+    filename = 'trade_data.csv',
+    content = function(con) {
+      # Show Modal presents to the user that the download is happening
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      on.exit(removeModal())
+      
+      write.csv(trade_data, con)
+    }
+  )
+  output$download_landings <- downloadHandler(
+    filename = 'landings_data.csv',
+    content = function(con) {
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      write.csv(com_landings, con)
+    }
+  )
+  
+  output$download_products <- downloadHandler(
+    filename = 'processed_products_data.csv',
+    content = function(con) {
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      # because the products data is so small, the download happens too quickly
+        # for showModal to understand that the data is ready for download
+      # without Sys.sleep, the modalDialog box will not go away and render the
+        # dashboard unusable
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      write.csv(pp_data, con)
+    }
+  )
+  
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
