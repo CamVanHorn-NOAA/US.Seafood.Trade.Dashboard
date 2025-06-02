@@ -1969,6 +1969,72 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  output$download_products_page1 <- downloadHandler(
+    filename = 'processed_products_value.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_value.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_value.png', pp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_products_page2 <- downloadHandler(
+    filename = 'processed_products_volume.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_volume.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_volume.png', pp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_products_page3 <- downloadHandler(
+    filename = 'processed_products_price.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_price.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_price.png', pp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
