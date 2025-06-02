@@ -1718,6 +1718,7 @@ ui <- page_sidebar(
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
   
+  # Download buttons -----------------------------------------------------------
   output$download_trade <- downloadHandler(
     filename = 'trade_data.csv',
     content = function(con) {
@@ -2035,6 +2036,8 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # species filter and search inputs -------------------------------------------
+  
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
@@ -2240,6 +2243,8 @@ server <- function(input, output, session) {
                          ifelse(input$species_name == 'All Species', input$species_grp,
                                 input$species_name))))
   })
+  
+  # trade ----------------------------------------------------------------------
   
   # create list of trade categories based on selected filters
   trade_terms <- reactive({
@@ -2662,6 +2667,8 @@ server <- function(input, output, session) {
     imp_price_plot()
   })
   
+  # landings -------------------------------------------------------------------
+  
   # create list of landings categories based on selected filters
   # see trade_terms() notes 
   landings_terms <- reactive({
@@ -2901,6 +2908,8 @@ server <- function(input, output, session) {
     landings_price_plot()
   })
   
+  # products -------------------------------------------------------------------
+  
   # create list of production categories based on selected filters
   # see trade_terms() notes
   pp_terms <- reactive({
@@ -3138,6 +3147,8 @@ server <- function(input, output, session) {
                   'Data for this species is insufficient to produce this plot'))
     pp_price_plot()
   })
+  
+  # advanced metrics -----------------------------------------------------------
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
