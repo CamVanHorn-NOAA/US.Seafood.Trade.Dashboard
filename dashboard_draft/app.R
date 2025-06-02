@@ -1674,15 +1674,21 @@ ui <- page_sidebar(
                        nav_panel(title = 'Value',
                                  withSpinner(
                                    plotOutput('landings_value'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_landings_page1',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Volume',
                                  withSpinner(
                                    plotOutput('landings_volume'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_landings_page2',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Price',
                                  withSpinner(
                                    plotOutput('landings_price'),
-                                   type = 7))),
+                                   type = 7),
+                                 downloadButton('download_landings_page3',
+                                                'Download this plot and the data'))),
       width = 6
     ),
     column(
