@@ -1540,7 +1540,13 @@ ui <- page_sidebar(
     br(), br(),
     htmlOutput('search_term_sgrp'),
     br(), br(),
-    htmlOutput('search_term_sname')
+    htmlOutput('search_term_sname'),
+    downloadButton('download_trade',
+                   'Download raw trade data'),
+    downloadButton('download_landings',
+                   'Download raw landings data'),
+    downloadButton('download_products',
+                   'Download raw processed products data')
   ),
   fluidRow(
     navset_card_pill(title = 'Trade',
