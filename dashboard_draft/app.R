@@ -1719,6 +1719,13 @@ ui <- page_sidebar(
 server <- function(input, output, session) {
   
   # Download buttons -----------------------------------------------------------
+  # The following are a series of download buttons that provide the user the
+    # ability to download pieces of the dashboard, organized by page and tab
+    # For instance, the user can download landings price, or trade advanced metrics,
+    # or processed products volume. Each button will download the plots associated
+    # with that page as well as the data used to generate the figures
+  
+  # download the raw trade data
   output$download_trade <- downloadHandler(
     filename = 'trade_data.csv',
     content = function(con) {
@@ -1729,6 +1736,8 @@ server <- function(input, output, session) {
       write.csv(trade_data, con)
     }
   )
+  
+  # download the raw landings data
   output$download_landings <- downloadHandler(
     filename = 'landings_data.csv',
     content = function(con) {
@@ -1740,6 +1749,7 @@ server <- function(input, output, session) {
     }
   )
   
+  # download the raw products data
   output$download_products <- downloadHandler(
     filename = 'processed_products_data.csv',
     content = function(con) {
@@ -1755,14 +1765,22 @@ server <- function(input, output, session) {
     }
   )
   
+  # download page 1 of trade data (Aggregate tab)
   output$download_page1 <- downloadHandler(
     filename = 'trade_aggregate_page.zip',
     content = function(fname) {
       showModal(modalDialog('Downloading plots and data...', footer = NULL))
       Sys.sleep(1)
       on.exit(removeModal())
+      # fname is a placeholder, I'm not sure if it needs to be called that
+        # the code was derived from stackoverflow answers
+      
+      # set up a temporary working directory for the data and plots to save to
       tmpdir <- tempdir()
       setwd(tempdir())
+      
+      # list of names that will be saved, these MUST match the csv's and
+        # ggsave items listed below
       fs <- c('balance_plot.png', 'ratio_plot.png', 'top5_trade_plot.png',
               'trade_plots_data.csv', 'top5_trade_plot_data.csv')
       ggsave('balance_plot.png', balance_plot(),
@@ -1780,10 +1798,15 @@ server <- function(input, output, session) {
       write.csv(trade_df(), 'trade_plots_data.csv')
       write.csv(top5_trade_df(), 'top5_trade_plot_data.csv')
       
+      # we are saving multiple files so they must be in a zip file
+      # fname is filename that derives from the start of the function
       zip(zipfile = fname, files = fs)
     },
+    # specify the content saved is a zip
     contentType = 'application/zip'
   )
+  
+  # download page 2 of trade data (value)
   output$download_page2 <- downloadHandler(
     filename = 'trade_value_page.zip',
     content = function(fname) {
@@ -1811,6 +1834,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 3 of trade data (volume)
   output$download_page3 <- downloadHandler(
     filename = 'trade_volume_page.zip',
     content = function(fname) {
@@ -1838,6 +1862,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 4 of trade data (price)
   output$download_page4 <- downloadHandler(
     filename = 'trade_price_page.zip',
     content = function(fname) {
@@ -1865,6 +1890,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 5 of trade data (advanced metrics)
   output$download_page5 <- downloadHandler(
     filename = 'trade_advanced_metrics_page.zip',
     content = function(fname) {
@@ -1904,6 +1930,10 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 1 of landings data (value)
+    # initially this was meant to download all landings plots and its data,
+    # however it is difficult to place the download icon such that it will not
+    # disappear once the user selects different tabs (value, volume, etc.)
   output$download_landings_page1 <- downloadHandler(
     filename = 'commercial_landings_value.zip',
     content = function(fname) {
@@ -1926,6 +1956,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 2 of landings data (volume)
   output$download_landings_page2 <- downloadHandler(
     filename = 'commercial_landings_volume.zip',
     content = function(fname) {
@@ -1948,6 +1979,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 3 of landings data (price)
   output$download_landings_page3 <- downloadHandler(
     filename = 'commercial_landings_price.zip',
     content = function(fname) {
@@ -1970,6 +2002,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 1 of processed products data (value)
   output$download_products_page1 <- downloadHandler(
     filename = 'processed_products_value.zip',
     content = function(fname) {
@@ -1992,6 +2025,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 2 of processed products data (volume)
   output$download_products_page2 <- downloadHandler(
     filename = 'processed_products_volume.zip',
     content = function(fname) {
@@ -2014,6 +2048,7 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  # download page 3 of processed products data (price)
   output$download_products_page3 <- downloadHandler(
     filename = 'processed_products_price.zip',
     content = function(fname) {
