@@ -1903,6 +1903,72 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
+  output$download_landings_page1 <- downloadHandler(
+    filename = 'commercial_landings_value.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_value.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_value.png', landings_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_landings_page2 <- downloadHandler(
+    filename = 'commercial_landings_volume.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_volume.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_volume.png', landings_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_landings_page3 <- downloadHandler(
+    filename = 'commercial_landings_price.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_price.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_price.png', landings_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
