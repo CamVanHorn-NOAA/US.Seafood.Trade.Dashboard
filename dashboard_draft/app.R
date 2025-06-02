@@ -1754,6 +1754,155 @@ server <- function(input, output, session) {
     }
   )
   
+  output$download_page1 <- downloadHandler(
+    filename = 'trade_aggregate_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      fs <- c('balance_plot.png', 'ratio_plot.png', 'top5_trade_plot.png',
+              'trade_plots_data.csv', 'top5_trade_plot_data.csv')
+      ggsave('balance_plot.png', balance_plot(),
+             width = 15,
+             height = 8,
+             device = 'png')
+      ggsave('ratio_plot.png', ratio_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('top5_trade_plot.png', top5_trade_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(top5_trade_df(), 'top5_trade_plot_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  output$download_page2 <- downloadHandler(
+    filename = 'trade_value_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_value_plot.png', 'import_value_plot.png', 
+              'trade_plots_data.csv')
+      ggsave('export_value_plot.png', exp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_value_plot.png', imp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_page3 <- downloadHandler(
+    filename = 'trade_volume_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_volume_plot.png', 'import_volume_plot.png',
+              'trade_plots_data.csv')
+      ggsave('export_volume_plot.png', exp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_volume_plot.png', imp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_page4 <- downloadHandler(
+    filename = 'trade_price_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_price_plot.png', 'import_price_plot.png',
+              'trade_plots_data.csv')
+      ggsave('export_price_plot.png', exp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_price_plot.png', imp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  output$download_page5 <- downloadHandler(
+    filename = 'trade_advanced_metrics_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_MLTI_table.csv', 'import_MLTI_table.csv', 
+              'supply_plots_data.csv', 'HI_plot.png', 'supply_plot.png', 
+              'supply_production_ratio.png', 
+              'unexported_production_supply_rate.png')
+      write.csv(exp_mlti_table_df(), 'export_MLTI_table.csv')
+      write.csv(imp_mlti_table_df(), 'import_MLTI_table.csv')
+      write.csv(supply_df(), 'supply_plots_data.csv')
+      ggsave('HI_plot.png', hi_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('supply_plot.png', supply_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('supply_production_ratio.png', supply_ratio_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('unexported_production_supply_rate.png', supply_share_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
   output$filter_1 <- renderUI({
