@@ -1568,7 +1568,9 @@ ui <- page_sidebar(
                                      plotOutput('top5_trade'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page1',
+                                              'Download these plots and their data'),),
                      nav_panel(title = 'Value',
                                fluidRow(
                                  column(
@@ -1582,7 +1584,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_value'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page2',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Volume',
                                fluidRow(
                                  column(
@@ -1596,7 +1600,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_volume'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page3',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Price',
                                fluidRow(
                                  column(
@@ -1610,7 +1616,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_price'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page4',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Advanced Metrics',
                                fluidRow(
                                  column(
@@ -1657,7 +1665,9 @@ ui <- page_sidebar(
                                      plotOutput('supply_share'), 
                                      type = 7),
                                    width = 3
-                                 ))))),
+                                 )),
+                               downloadButton('download_page5',
+                                              'Download these plots and their data')))),
   fluidRow(
     column(
       navset_card_pill(title = 'Commercial Landings',
