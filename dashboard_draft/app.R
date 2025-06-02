@@ -1540,7 +1540,13 @@ ui <- page_sidebar(
     br(), br(),
     htmlOutput('search_term_sgrp'),
     br(), br(),
-    htmlOutput('search_term_sname')
+    htmlOutput('search_term_sname'),
+    downloadButton('download_trade',
+                   'Download raw trade data'),
+    downloadButton('download_landings',
+                   'Download raw landings data'),
+    downloadButton('download_products',
+                   'Download raw processed products data')
   ),
   fluidRow(
     navset_card_pill(title = 'Trade',
@@ -1562,7 +1568,9 @@ ui <- page_sidebar(
                                      plotOutput('top5_trade'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page1',
+                                              'Download these plots and their data'),),
                      nav_panel(title = 'Value',
                                fluidRow(
                                  column(
@@ -1576,7 +1584,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_value'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page2',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Volume',
                                fluidRow(
                                  column(
@@ -1590,7 +1600,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_volume'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page3',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Price',
                                fluidRow(
                                  column(
@@ -1604,7 +1616,9 @@ ui <- page_sidebar(
                                      plotOutput('imp_price'), 
                                      type = 7),
                                    width = 6
-                                 ))),
+                                 )),
+                               downloadButton('download_page4',
+                                              'Download these plots and their data')),
                      nav_panel(title = 'Advanced Metrics',
                                fluidRow(
                                  column(
@@ -1651,22 +1665,30 @@ ui <- page_sidebar(
                                      plotOutput('supply_share'), 
                                      type = 7),
                                    width = 3
-                                 ))))),
+                                 )),
+                               downloadButton('download_page5',
+                                              'Download these plots and their data')))),
   fluidRow(
     column(
       navset_card_pill(title = 'Commercial Landings',
                        nav_panel(title = 'Value',
                                  withSpinner(
                                    plotOutput('landings_value'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_landings_page1',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Volume',
                                  withSpinner(
                                    plotOutput('landings_volume'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_landings_page2',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Price',
                                  withSpinner(
                                    plotOutput('landings_price'),
-                                   type = 7))),
+                                   type = 7),
+                                 downloadButton('download_landings_page3',
+                                                'Download this plot and the data'))),
       width = 6
     ),
     column(
@@ -1674,21 +1696,382 @@ ui <- page_sidebar(
                        nav_panel(title = 'Value',
                                  withSpinner(
                                    plotOutput('pp_value'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_products_page1',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Volume',
                                  withSpinner(
                                    plotOutput('pp_volume'),
-                                   type = 7)),
+                                   type = 7),
+                                 downloadButton('download_products_page2',
+                                                'Download this plot and the data')),
                        nav_panel(title = 'Price',
                                  withSpinner(
                                    plotOutput('pp_price'),
-                                   type = 7))),
+                                   type = 7),
+                                 downloadButton('download_products_page3',
+                                                'Download this plot and the data'))),
       width = 6)) # ,
   # tags$head(tags$style(HTML('* {font-family: "Gill Sans MT"};')))
   )
 
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
+  
+  # Download buttons -----------------------------------------------------------
+  # The following are a series of download buttons that provide the user the
+    # ability to download pieces of the dashboard, organized by page and tab
+    # For instance, the user can download landings price, or trade advanced metrics,
+    # or processed products volume. Each button will download the plots associated
+    # with that page as well as the data used to generate the figures
+  
+  # download the raw trade data
+  output$download_trade <- downloadHandler(
+    filename = 'trade_data.csv',
+    content = function(con) {
+      # Show Modal presents to the user that the download is happening
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      on.exit(removeModal())
+      
+      write.csv(trade_data, con)
+    }
+  )
+  
+  # download the raw landings data
+  output$download_landings <- downloadHandler(
+    filename = 'landings_data.csv',
+    content = function(con) {
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      write.csv(com_landings, con)
+    }
+  )
+  
+  # download the raw products data
+  output$download_products <- downloadHandler(
+    filename = 'processed_products_data.csv',
+    content = function(con) {
+      showModal(modalDialog('Downloading data...', footer = NULL))
+      # because the products data is so small, the download happens too quickly
+        # for showModal to understand that the data is ready for download
+      # without Sys.sleep, the modalDialog box will not go away and render the
+        # dashboard unusable
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      write.csv(pp_data, con)
+    }
+  )
+  
+  # download page 1 of trade data (Aggregate tab)
+  output$download_page1 <- downloadHandler(
+    filename = 'trade_aggregate_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      # fname is a placeholder, I'm not sure if it needs to be called that
+        # the code was derived from stackoverflow answers
+      
+      # set up a temporary working directory for the data and plots to save to
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      # list of names that will be saved, these MUST match the csv's and
+        # ggsave items listed below
+      fs <- c('balance_plot.png', 'ratio_plot.png', 'top5_trade_plot.png',
+              'trade_plots_data.csv', 'top5_trade_plot_data.csv')
+      ggsave('balance_plot.png', balance_plot(),
+             width = 15,
+             height = 8,
+             device = 'png')
+      ggsave('ratio_plot.png', ratio_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('top5_trade_plot.png', top5_trade_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(top5_trade_df(), 'top5_trade_plot_data.csv')
+      
+      # we are saving multiple files so they must be in a zip file
+      # fname is filename that derives from the start of the function
+      zip(zipfile = fname, files = fs)
+    },
+    # specify the content saved is a zip
+    contentType = 'application/zip'
+  )
+  
+  # download page 2 of trade data (value)
+  output$download_page2 <- downloadHandler(
+    filename = 'trade_value_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_value_plot.png', 'import_value_plot.png', 
+              'trade_plots_data.csv')
+      ggsave('export_value_plot.png', exp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_value_plot.png', imp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 3 of trade data (volume)
+  output$download_page3 <- downloadHandler(
+    filename = 'trade_volume_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_volume_plot.png', 'import_volume_plot.png',
+              'trade_plots_data.csv')
+      ggsave('export_volume_plot.png', exp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_volume_plot.png', imp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 4 of trade data (price)
+  output$download_page4 <- downloadHandler(
+    filename = 'trade_price_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_price_plot.png', 'import_price_plot.png',
+              'trade_plots_data.csv')
+      ggsave('export_price_plot.png', exp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('import_price_plot.png', imp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      write.csv(trade_df(), 'trade_plots_data.csv')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 5 of trade data (advanced metrics)
+  output$download_page5 <- downloadHandler(
+    filename = 'trade_advanced_metrics_page.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('export_MLTI_table.csv', 'import_MLTI_table.csv', 
+              'supply_plots_data.csv', 'HI_plot.png', 'supply_plot.png', 
+              'supply_production_ratio.png', 
+              'unexported_production_supply_rate.png')
+      write.csv(exp_mlti_table_df(), 'export_MLTI_table.csv')
+      write.csv(imp_mlti_table_df(), 'import_MLTI_table.csv')
+      write.csv(supply_df(), 'supply_plots_data.csv')
+      ggsave('HI_plot.png', hi_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('supply_plot.png', supply_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('supply_production_ratio.png', supply_ratio_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      ggsave('unexported_production_supply_rate.png', supply_share_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 1 of landings data (value)
+    # initially this was meant to download all landings plots and its data,
+    # however it is difficult to place the download icon such that it will not
+    # disappear once the user selects different tabs (value, volume, etc.)
+  output$download_landings_page1 <- downloadHandler(
+    filename = 'commercial_landings_value.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_value.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_value.png', landings_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 2 of landings data (volume)
+  output$download_landings_page2 <- downloadHandler(
+    filename = 'commercial_landings_volume.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_volume.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_volume.png', landings_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 3 of landings data (price)
+  output$download_landings_page3 <- downloadHandler(
+    filename = 'commercial_landings_price.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('commercial_landings_plots_data.csv', 'landings_price.png')
+      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      ggsave('landings_price.png', landings_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 1 of processed products data (value)
+  output$download_products_page1 <- downloadHandler(
+    filename = 'processed_products_value.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_value.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_value.png', pp_value_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 2 of processed products data (volume)
+  output$download_products_page2 <- downloadHandler(
+    filename = 'processed_products_volume.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_volume.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_volume.png', pp_volume_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # download page 3 of processed products data (price)
+  output$download_products_page3 <- downloadHandler(
+    filename = 'processed_products_price.zip',
+    content = function(fname) {
+      showModal(modalDialog('Downloading plots and data...', footer = NULL))
+      Sys.sleep(1)
+      on.exit(removeModal())
+      
+      tmpdir <- tempdir()
+      setwd(tempdir())
+      
+      fs <- c('products_plots_data.csv', 'products_price.png')
+      write.csv(pp_df(), 'products_plots_data.csv')
+      ggsave('products_price.png', pp_price_plot(),
+             width = 10,
+             height = 8,
+             device = 'png')
+      
+      zip(zipfile = fname, files = fs)
+    },
+    contentType = 'application/zip'
+  )
+  
+  # species filter and search inputs -------------------------------------------
   
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
@@ -1895,6 +2278,8 @@ server <- function(input, output, session) {
                          ifelse(input$species_name == 'All Species', input$species_grp,
                                 input$species_name))))
   })
+  
+  # trade ----------------------------------------------------------------------
   
   # create list of trade categories based on selected filters
   trade_terms <- reactive({
@@ -2213,7 +2598,7 @@ server <- function(input, output, session) {
   # creates top 5 net export data
   top5_trade_df <- reactive({
     summarize_trade_ctry_yr_spp(
-      trade_data,
+      trade_filtered(),
       species_selection_trade(),
       time.frame = c(2020, 2024),
       value = T)
@@ -2316,6 +2701,8 @@ server <- function(input, output, session) {
                   'Data for this species is insufficient to produce this plot'))
     imp_price_plot()
   })
+  
+  # landings -------------------------------------------------------------------
   
   # create list of landings categories based on selected filters
   # see trade_terms() notes 
@@ -2556,6 +2943,8 @@ server <- function(input, output, session) {
     landings_price_plot()
   })
   
+  # products -------------------------------------------------------------------
+  
   # create list of production categories based on selected filters
   # see trade_terms() notes
   pp_terms <- reactive({
@@ -2793,6 +3182,8 @@ server <- function(input, output, session) {
                   'Data for this species is insufficient to produce this plot'))
     pp_price_plot()
   })
+  
+  # advanced metrics -----------------------------------------------------------
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
