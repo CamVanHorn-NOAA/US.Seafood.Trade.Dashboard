@@ -1550,7 +1550,7 @@ ui <- page_sidebar(
   ),
   fluidRow(
     navset_card_pill(title = 'Trade',
-                     nav_panel(title = 'Aggregate',
+                     nav_panel(title = 'Market Summary',
                                fluidRow(
                                  withSpinner(
                                    plotOutput('balance'), 
