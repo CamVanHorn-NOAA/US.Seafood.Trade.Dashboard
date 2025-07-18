@@ -1548,173 +1548,212 @@ ui <- page_sidebar(
     downloadButton('download_products',
                    'Download raw processed products data')
   ),
+  
+  # Banner
+  div(
+    style = 'background: linear-gradient(155deg, #001743 0%, #0085CA 100%);
+             color: white;
+             padding: 30px 20px;
+             margin-bottom: 10px;
+             border-radius: 10px;
+             align-items: center;
+             text-align: left;
+             display: flex;
+             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);',
+    
+    # Image
+    div(
+      style = 'flex-shrink: 0;',
+      img(src = 'NOAA_FISHERIES_H.png',
+          align = 'left',
+          style = 'width: 200px; height: 200px;'
+      )
+    ),
+    
+    # Text
+    div(
+      style = 'flex: 1; text-align: left;',
+      h1('NOAA Fisheries Seafood Dashboard',
+         style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.5rem, 4vw, 4.5rem); margin-bottom: 0px;'),
+      
+      p('Investigate 20 Years of U.S. Fisheries Data',
+        style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.0rem, 2.6vw, 2.6rem); margin-top: 0px; margin-bottom: 0px; opacity: 0.9;')
+    )),
+  
   fluidRow(
-    navset_card_pill(title = 'Trade',
-                     nav_panel(title = 'Market Summary',
-                               fluidRow(
-                                 withSpinner(
-                                   plotOutput('balance'), 
-                                   type = 7)
-                               ),
-                               fluidRow(
-                                 column(
+    div(
+      style = 'border: 3px solid #005761; border-radius: 12px;',
+      navset_card_pill(title = 'Trade',
+                       nav_panel(title = 'Market Summary',
+                                 fluidRow(
                                    withSpinner(
-                                     plotOutput('trade_ratio'), 
-                                     type = 7),
-                                   width = 6
+                                     plotOutput('balance'), 
+                                     type = 7)
                                  ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('top5_trade'), 
-                                     type = 7),
-                                   width = 6
-                                 )),
-                               downloadButton('download_page1',
-                                              'Download these plots and their data'),),
-                     nav_panel(title = 'Value',
-                               fluidRow(
-                                 column(
-                                   withSpinner(
-                                     plotOutput('exp_value'), 
-                                     type = 7),
-                                   width = 6
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('imp_value'), 
-                                     type = 7),
-                                   width = 6
-                                 )),
-                               downloadButton('download_page2',
-                                              'Download these plots and their data')),
-                     nav_panel(title = 'Volume',
-                               fluidRow(
-                                 column(
-                                   withSpinner(
-                                     plotOutput('exp_volume'), 
-                                     type = 7),
-                                   width = 6
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('imp_volume'), 
-                                     type = 7),
-                                   width = 6
-                                 )),
-                               downloadButton('download_page3',
-                                              'Download these plots and their data')),
-                     nav_panel(title = 'Price',
-                               fluidRow(
-                                 column(
-                                   withSpinner(
-                                     plotOutput('exp_price'), 
-                                     type = 7),
-                                   width = 6
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('imp_price'), 
-                                     type = 7),
-                                   width = 6
-                                 )),
-                               downloadButton('download_page4',
-                                              'Download these plots and their data')),
-                     nav_panel(title = 'Advanced Metrics',
-                               fluidRow(
-                                 column(
-                                   fluidRow(
-                                     'Export Multilateral Trade Index'
+                                 fluidRow(
+                                   column(
+                                     withSpinner(
+                                       plotOutput('trade_ratio'), 
+                                       type = 7),
+                                     width = 6
                                    ),
-                                   withSpinner(
-                                     tableOutput('exp_mlti_table'), 
-                                     type = 7),
-                                   # plotOutput('exp_mlti'),
-                                   width = 6
-                                 ),
-                                 column(
-                                   fluidRow(
-                                     'Import Multilateral Trade Index'
+                                   column(
+                                     withSpinner(
+                                       plotOutput('top5_trade'), 
+                                       type = 7),
+                                     width = 6
+                                   )),
+                                 downloadButton('download_page1',
+                                               'Download these plots and their data'),),
+                       nav_panel(title = 'Value',
+                                 fluidRow(
+                                   column(
+                                     withSpinner(
+                                       plotOutput('exp_value'), 
+                                       type = 7),
+                                     width = 6
                                    ),
-                                   withSpinner(
-                                     tableOutput('imp_mlti_table'), 
-                                     type = 7),
-                                   # plotOutput('imp_mlti'),
-                                   width = 6
-                                 )),
-                               fluidRow(
-                                 column(
-                                   withSpinner(
-                                     plotOutput('hi'), 
-                                     type = 7),
-                                   width = 3
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('supply'), 
-                                     type = 7),
-                                   width = 3
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('supply_ratio'), 
-                                     type = 7),
-                                   width = 3
-                                 ),
-                                 column(
-                                   withSpinner(
-                                     plotOutput('supply_share'), 
-                                     type = 7),
-                                   width = 3
-                                 )),
-                               downloadButton('download_page5',
-                                              'Download these plots and their data')))),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('imp_value'), 
+                                       type = 7),
+                                     width = 6
+                                   )),
+                                 downloadButton('download_page2',
+                                                'Download these plots and their data')),
+                       nav_panel(title = 'Volume',
+                                 fluidRow(
+                                   column(
+                                     withSpinner(
+                                       plotOutput('exp_volume'), 
+                                       type = 7),
+                                     width = 6
+                                   ),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('imp_volume'), 
+                                       type = 7),
+                                     width = 6
+                                   )),
+                                 downloadButton('download_page3',
+                                                'Download these plots and their data')),
+                       nav_panel(title = 'Price',
+                                 fluidRow(
+                                   column(
+                                     withSpinner(
+                                       plotOutput('exp_price'), 
+                                       type = 7),
+                                     width = 6
+                                   ),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('imp_price'), 
+                                       type = 7),
+                                     width = 6
+                                   )),
+                                 downloadButton('download_page4',
+                                                'Download these plots and their data')),
+                       nav_panel(title = 'Advanced Metrics',
+                                 fluidRow(
+                                   column(
+                                     fluidRow(
+                                       'Export Multilateral Trade Index'
+                                     ),
+                                     withSpinner(
+                                       tableOutput('exp_mlti_table'), 
+                                       type = 7),
+                                     # plotOutput('exp_mlti'),
+                                     width = 6
+                                   ),
+                                   column(
+                                     fluidRow(
+                                       'Import Multilateral Trade Index'
+                                     ),
+                                     withSpinner(
+                                       tableOutput('imp_mlti_table'), 
+                                       type = 7),
+                                     # plotOutput('imp_mlti'),
+                                     width = 6
+                                   )),
+                                 fluidRow(
+                                   column(
+                                     withSpinner(
+                                       plotOutput('hi'), 
+                                       type = 7),
+                                     width = 3
+                                   ),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('supply'), 
+                                       type = 7),
+                                     width = 3
+                                   ),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('supply_ratio'), 
+                                       type = 7),
+                                     width = 3
+                                   ),
+                                   column(
+                                     withSpinner(
+                                       plotOutput('supply_share'), 
+                                       type = 7),
+                                     width = 3
+                                   )),
+                                 downloadButton('download_page5',
+                                                'Download these plots and their data'))))
+  ),
   fluidRow(
     column(
-      navset_card_pill(title = 'Commercial Landings',
-                       nav_panel(title = 'Value',
-                                 withSpinner(
-                                   plotOutput('landings_value'),
-                                   type = 7),
-                                 downloadButton('download_landings_page1',
-                                                'Download this plot and the data')),
-                       nav_panel(title = 'Volume',
-                                 withSpinner(
-                                   plotOutput('landings_volume'),
-                                   type = 7),
-                                 downloadButton('download_landings_page2',
-                                                'Download this plot and the data')),
-                       nav_panel(title = 'Price',
-                                 withSpinner(
-                                   plotOutput('landings_price'),
-                                   type = 7),
-                                 downloadButton('download_landings_page3',
-                                                'Download this plot and the data'))),
+      div(
+        style = 'border: 3px solid #234515; border-radius: 12px;',
+        navset_card_pill(title = 'Commercial Landings',
+                         nav_panel(title = 'Value',
+                                   withSpinner(
+                                     plotOutput('landings_value'),
+                                     type = 7),
+                                   downloadButton('download_landings_page1',
+                                                  'Download this plot and the data')),
+                         nav_panel(title = 'Volume',
+                                   withSpinner(
+                                     plotOutput('landings_volume'),
+                                     type = 7),
+                                   downloadButton('download_landings_page2',
+                                                  'Download this plot and the data')),
+                         nav_panel(title = 'Price',
+                                   withSpinner(
+                                     plotOutput('landings_price'),
+                                     type = 7),
+                                   downloadButton('download_landings_page3',
+                                                  'Download this plot and the data')))),
       width = 6
     ),
     column(
-      navset_card_pill(title = 'Processed Products',
-                       nav_panel(title = 'Value',
-                                 withSpinner(
-                                   plotOutput('pp_value'),
-                                   type = 7),
-                                 downloadButton('download_products_page1',
-                                                'Download this plot and the data')),
-                       nav_panel(title = 'Volume',
-                                 withSpinner(
-                                   plotOutput('pp_volume'),
-                                   type = 7),
-                                 downloadButton('download_products_page2',
-                                                'Download this plot and the data')),
-                       nav_panel(title = 'Price',
-                                 withSpinner(
-                                   plotOutput('pp_price'),
-                                   type = 7),
-                                 downloadButton('download_products_page3',
-                                                'Download this plot and the data'))),
-      width = 6)) # ,
-  # tags$head(tags$style(HTML('* {font-family: "Gill Sans MT"};')))
-  )
-
+      div(
+        style = 'border: 3px solid #681617; border-radius: 12px;',
+        navset_card_pill(title = 'Processed Products',
+                         nav_panel(title = 'Value',
+                                   withSpinner(
+                                     plotOutput('pp_value'),
+                                     type = 7),
+                                   downloadButton('download_products_page1',
+                                                  'Download this plot and the data')),
+                         nav_panel(title = 'Volume',
+                                   withSpinner(
+                                     plotOutput('pp_volume'),
+                                     type = 7),
+                                   downloadButton('download_products_page2',
+                                                  'Download this plot and the data')),
+                         nav_panel(title = 'Price',
+                                   withSpinner(
+                                     plotOutput('pp_price'),
+                                     type = 7),
+                                   downloadButton('download_products_page3',
+                                                  'Download this plot and the data')))),
+      width = 6))
+)
+      
+  
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
   
