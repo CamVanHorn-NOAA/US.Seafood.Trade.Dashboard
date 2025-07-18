@@ -1548,6 +1548,36 @@ ui <- page_sidebar(
     downloadButton('download_products',
                    'Download raw processed products data')
   ),
+  div(
+    style = 'background: linear-gradient(155deg, #001743 0%, #0085CA 100%);
+             color: white;
+             padding: 30px 20px;
+             margin-bottom: 10px;
+             border-radius: 10px;
+             align-items: center;
+             text-align: left;
+             display: flex;
+             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);',
+    
+    # Image
+    div(
+      style = 'flex-shrink: 0;',
+      img(src = 'NOAA_FISHERIES_H.png',
+          align = 'left',
+          style = 'width: 200px; height: 200px;'
+      )
+    ),
+    
+    # Text
+    div(
+      style = 'flex: 1; text-align: left;',
+      h1('NOAA Fisheries Seafood Dashboard',
+         style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.5rem, 4vw, 4.5rem); margin-bottom: 0px;'),
+      
+      p('Investigate 20 Years of U.S. Fisheries Data',
+        style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.0rem, 2.6vw, 2.6rem); margin-top: 0px; margin-bottom: 0px; opacity: 0.9;')
+    )),
+  
   fluidRow(
     navset_card_pill(title = 'Trade',
                      nav_panel(title = 'Market Summary',
