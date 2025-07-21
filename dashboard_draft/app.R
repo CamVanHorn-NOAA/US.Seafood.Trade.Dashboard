@@ -1367,7 +1367,8 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
   # set label for plot based on exports logical
   label <- ifelse(exports == T, 'Export', 'Import')
   
-  ggplot(data = mlti_data,
+  ggplot(data = mlti_data %>%
+           mutate(COUNTRY_NAME = str_to_title(COUNTRY_NAME)),
          aes(x = factor(YEAR),
              y = MLTI)) +
     geom_point() +
