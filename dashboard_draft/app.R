@@ -545,8 +545,8 @@ summarize_yr_spp <- function(species) {
 }
 calculate_mlti <- function(species, exports = F, imports = F) {
   # this function calculates the multi-lateral Lowe trade index (MLTI) among
-    # the top 9 trading countries for a given species, either for imports
-    # or exports
+  # the top 5 trading countries for a given species, either for imports
+  # or exports
   # species is a character vector of a species of interest
   # exports is logical that specifies if the MLTI is an export index
   # imports is logical that specifies if the MLTI is an import index
@@ -560,7 +560,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   species <- toupper(species)
   
   # set value and volume to class of type symbol, specify if the value and 
-    # volume are export or import
+  # volume are export or import
   which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
                                   'IMP_VALUE_2024USD'))
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
@@ -570,7 +570,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   which_volume <- rlang::enquo(which_volume)
   
   # if a species is specified, find the level of the classification hierarchy
-    # in which it resides
+  # in which it resides
   if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
@@ -628,11 +628,11 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     summarise(across(where(is.numeric), sum)) 
   
   # step 5: calculate the overall average price by dividing step 4's output
-    # by the product of the number of years and the number of countries
+  # by the product of the number of years and the number of countries
   average_price <- average_price$PRICE / (total_years * total_countries)
   
-  # step 6: find top 9 trading partners by value during most recent year (2024)
-  top9 <- summary_spp_data %>%
+  # step 6: find top 5 trading partners by value during most recent year (2024)
+  top5 <- summary_spp_data %>%
     filter(YEAR == 2024) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
@@ -640,9 +640,9 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     arrange(-!!which_value) %>%
     top_n(9, !!which_value)
   
-  # step 7: set base country as the middle (fifth) country in the list
-    # the list is arranged by value
-  base_country <- top9$COUNTRY_NAME[5]
+  # step 7: set base country as the middle (third) country in the list
+  # the list is arranged by value
+  base_country <- top5$COUNTRY_NAME[3]
   # output trading partners from first year of period (2004)
   trade_nations <- summary_spp_data %>%
     filter(YEAR == 2004) %>%
@@ -650,21 +650,17 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     distinct() 
   
   # make sure that the base country was a trade partner in 2004
-    # if it is not, set base country as the fourth listed country
-      # if that is not, set base country as the third listed country
-    # this is a band-aid solution
+  # if it is not, set base country as the second listed country
+  # this is a band-aid solution
   if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
-    base_country <- top9$COUNTRY_NAME[4]
-    if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
-      base_country <- top9$COUNTRY_NAME[3]
-    }
+    base_country <- top5$COUNTRY_NAME[2]
   } 
   
   # step 8: calculate the Q-index of the base country in 2004
-    # the Q-index is the base country's trade volume in the base year multiplied
-    # by the average price calculated in step 5; in other words, it is the
-    # normalized value of the traded volume determined by the average price
-    # of the traded product during the time period by all trading partners
+  # the Q-index is the base country's trade volume in the base year multiplied
+  # by the average price calculated in step 5; in other words, it is the
+  # normalized value of the traded volume determined by the average price
+  # of the traded product during the time period by all trading partners
   base_country_q <- summary_spp_data %>%
     filter(YEAR == 2004,
            COUNTRY_NAME == base_country) %>%
@@ -674,10 +670,10 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   index_base <- base_country_q$Q_INDEX
   
   # step 9: calculate the MLTI for the top 9 countries throughout the time period
-    # the MLTI is each country's Q-index divided by the index base, or the base
-    # country's Q-index during the base year
+  # the MLTI is each country's Q-index divided by the index base, or the base
+  # country's Q-index during the base year
   mlti_data <- summary_spp_data %>%
-    filter(COUNTRY_NAME %in% top9$COUNTRY_NAME) %>%
+    filter(COUNTRY_NAME %in% top5$COUNTRY_NAME) %>%
     mutate(Q_INDEX = !!which_volume * average_price) %>%
     select(YEAR, COUNTRY_NAME, Q_INDEX) %>%
     mutate(MLTI = Q_INDEX / index_base)
@@ -1357,7 +1353,8 @@ plot_landings <- function(data, plot.format, species) {
   return(plot)
 }
 plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
-  # this function generates a grid of plots that display MLTI data
+  # this function generates a plot of MLTI data with countries distinct by
+    # color and point shape
   # mlti_data is a data set formatted by calculate_mlti
   # exports is logical that reflects if the data input is for exports
   # imports is logical that reflects if the data input is for imports
