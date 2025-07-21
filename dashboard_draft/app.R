@@ -1370,9 +1370,13 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
   ggplot(data = mlti_data %>%
            mutate(COUNTRY_NAME = str_to_title(COUNTRY_NAME)),
          aes(x = factor(YEAR),
-             y = MLTI)) +
-    geom_point() +
-    facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
+             y = MLTI,
+             color = COUNTRY_NAME,
+             shape = COUNTRY_NAME)) +
+    geom_line(aes(group = COUNTRY_NAME),
+              linewidth = 1.25) +
+    geom_point(color = 'black',
+               size = 2.5) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
