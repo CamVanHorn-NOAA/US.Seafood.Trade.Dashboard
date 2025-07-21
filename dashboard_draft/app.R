@@ -1382,12 +1382,18 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
     # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
-         y = paste0('Multilateral ', label, ' Quantity Index of ', species)) +
+         y = 'Multilateral Trade Index',
+         title = paste0(label, 's of ', species),
+         color = '',
+         shape = '') +
     theme_bw() +
     theme(axis.text = element_text(size = 15),
-          axis.title.y = element_text(size = 20),
+          axis.title.y = element_text(size = 18),
+          plot.title = element_text(size = 20),
           strip.text = element_text(size = 15,
                                     color = 'white'),
+          legend.text = element_text(size = 15),
+          legend.key.size = unit(2, 'line'),
           strip.background = element_rect(fill = 'black'))
 }
 plot_hi <- function(hi_data, species) {
