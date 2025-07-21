@@ -592,9 +592,9 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     
     # step 2: calculate the average price per year per country
     summary_spp_data <- spp_data %>%
-      select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+      select(YEAR, COUNTRY_NAME, !!which_level, !!which_value,
              !!which_volume) %>%
-      group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+      group_by(YEAR, COUNTRY_NAME, !!which_level) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
       filter(!!which_volume > 0) %>%
