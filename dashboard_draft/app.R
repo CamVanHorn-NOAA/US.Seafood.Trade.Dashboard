@@ -3233,7 +3233,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection_trade(), exports = T)
+    calculate_mlti(species_selection_trade(), exports = T)
   })
   
   # outputs MLTI export table
@@ -3246,7 +3246,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export plot
   exp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection_trade(), exports = T), 
+    plot_mlti(exp_mlti_table_df(), 
               exports = T, species = species_selection_trade())
   })
   
@@ -3260,7 +3260,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection_trade(), imports = T)
+    calculate_mlti(species_selection_trade(), imports = T)
   })
   
   # outputs MLTI import table
@@ -3273,7 +3273,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import plot
   imp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection_trade(), imports = T), 
+    plot_mlti(imp_mlti_table_df(), 
               imports = T, species = species_selection_trade())
   })
   
