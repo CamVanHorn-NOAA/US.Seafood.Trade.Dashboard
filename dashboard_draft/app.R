@@ -638,7 +638,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     arrange(-!!which_value) %>%
-    top_n(9, !!which_value)
+    top_n(5, !!which_value)
   
   # step 7: set base country as the middle (third) country in the list
   # the list is arranged by value
