@@ -1669,23 +1669,17 @@ ui <- page_sidebar(
                        nav_panel(title = 'Advanced Metrics',
                                  fluidRow(
                                    column(
-                                     fluidRow(
-                                       'Export Multilateral Trade Index'
-                                     ),
                                      withSpinner(
-                                       tableOutput('exp_mlti_table'), 
+                                       # tableOutput('exp_mlti_table'),
+                                       plotOutput('exp_mlti'),
                                        type = 7),
-                                     # plotOutput('exp_mlti'),
                                      width = 6
                                    ),
                                    column(
-                                     fluidRow(
-                                       'Import Multilateral Trade Index'
-                                     ),
                                      withSpinner(
-                                       tableOutput('imp_mlti_table'), 
+                                       # tableOutput('imp_mlti_table'), 
+                                       plotOutput('imp_mlti'),
                                        type = 7),
-                                     # plotOutput('imp_mlti'),
                                      width = 6
                                    )),
                                  fluidRow(
