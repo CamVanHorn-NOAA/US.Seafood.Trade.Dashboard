@@ -1378,6 +1378,7 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
     geom_point(color = 'black',
                size = 2.5) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
+    scale_color_manual(values = mlti_colors) +
     # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
@@ -1511,6 +1512,10 @@ names(colors) <- levels(factor(levels = c(
   'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
   'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
   'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+
+# Because the countries will change based on the selected species,
+  # the colors have no mapping
+mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 # App --------------------------------------------------------------------------
 # Define UI --------------------------------------------------------------------
 ui <- page_sidebar(
