@@ -545,8 +545,8 @@ summarize_yr_spp <- function(species) {
 }
 calculate_mlti <- function(species, exports = F, imports = F) {
   # this function calculates the multi-lateral Lowe trade index (MLTI) among
-    # the top 9 trading countries for a given species, either for imports
-    # or exports
+  # the top 5 trading countries for a given species, either for imports
+  # or exports
   # species is a character vector of a species of interest
   # exports is logical that specifies if the MLTI is an export index
   # imports is logical that specifies if the MLTI is an import index
@@ -560,7 +560,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   species <- toupper(species)
   
   # set value and volume to class of type symbol, specify if the value and 
-    # volume are export or import
+  # volume are export or import
   which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
                                   'IMP_VALUE_2024USD'))
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
@@ -570,7 +570,7 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   which_volume <- rlang::enquo(which_volume)
   
   # if a species is specified, find the level of the classification hierarchy
-    # in which it resides
+  # in which it resides
   if (species != 'ALL SPECIES') {
     which_level <- as.symbol(
       ifelse(species %in% unique(trade_data$ECOLOGICAL_CATEGORY), 
@@ -592,9 +592,9 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     
     # step 2: calculate the average price per year per country
     summary_spp_data <- spp_data %>%
-      select(YEAR, COUNTRY_NAME, !!which_group, !!which_value,
+      select(YEAR, COUNTRY_NAME, !!which_level, !!which_value,
              !!which_volume) %>%
-      group_by(YEAR, COUNTRY_NAME, !!which_group) %>%
+      group_by(YEAR, COUNTRY_NAME, !!which_level) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop') %>%
       filter(!!which_volume > 0) %>%
@@ -628,21 +628,21 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     summarise(across(where(is.numeric), sum)) 
   
   # step 5: calculate the overall average price by dividing step 4's output
-    # by the product of the number of years and the number of countries
+  # by the product of the number of years and the number of countries
   average_price <- average_price$PRICE / (total_years * total_countries)
   
-  # step 6: find top 9 trading partners by value during most recent year (2024)
-  top9 <- summary_spp_data %>%
+  # step 6: find top 5 trading partners by value during most recent year (2024)
+  top5 <- summary_spp_data %>%
     filter(YEAR == 2024) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     arrange(-!!which_value) %>%
-    top_n(9, !!which_value)
+    top_n(5, !!which_value)
   
-  # step 7: set base country as the middle (fifth) country in the list
-    # the list is arranged by value
-  base_country <- top9$COUNTRY_NAME[5]
+  # step 7: set base country as the middle (third) country in the list
+  # the list is arranged by value
+  base_country <- top5$COUNTRY_NAME[3]
   # output trading partners from first year of period (2004)
   trade_nations <- summary_spp_data %>%
     filter(YEAR == 2004) %>%
@@ -650,21 +650,17 @@ calculate_mlti <- function(species, exports = F, imports = F) {
     distinct() 
   
   # make sure that the base country was a trade partner in 2004
-    # if it is not, set base country as the fourth listed country
-      # if that is not, set base country as the third listed country
-    # this is a band-aid solution
+  # if it is not, set base country as the second listed country
+  # this is a band-aid solution
   if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
-    base_country <- top9$COUNTRY_NAME[4]
-    if (base_country %in% trade_nations$COUNTRY_NAME) {} else {
-      base_country <- top9$COUNTRY_NAME[3]
-    }
+    base_country <- top5$COUNTRY_NAME[2]
   } 
   
   # step 8: calculate the Q-index of the base country in 2004
-    # the Q-index is the base country's trade volume in the base year multiplied
-    # by the average price calculated in step 5; in other words, it is the
-    # normalized value of the traded volume determined by the average price
-    # of the traded product during the time period by all trading partners
+  # the Q-index is the base country's trade volume in the base year multiplied
+  # by the average price calculated in step 5; in other words, it is the
+  # normalized value of the traded volume determined by the average price
+  # of the traded product during the time period by all trading partners
   base_country_q <- summary_spp_data %>%
     filter(YEAR == 2004,
            COUNTRY_NAME == base_country) %>%
@@ -674,10 +670,10 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   index_base <- base_country_q$Q_INDEX
   
   # step 9: calculate the MLTI for the top 9 countries throughout the time period
-    # the MLTI is each country's Q-index divided by the index base, or the base
-    # country's Q-index during the base year
+  # the MLTI is each country's Q-index divided by the index base, or the base
+  # country's Q-index during the base year
   mlti_data <- summary_spp_data %>%
-    filter(COUNTRY_NAME %in% top9$COUNTRY_NAME) %>%
+    filter(COUNTRY_NAME %in% top5$COUNTRY_NAME) %>%
     mutate(Q_INDEX = !!which_volume * average_price) %>%
     select(YEAR, COUNTRY_NAME, Q_INDEX) %>%
     mutate(MLTI = Q_INDEX / index_base)
@@ -1357,7 +1353,8 @@ plot_landings <- function(data, plot.format, species) {
   return(plot)
 }
 plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
-  # this function generates a grid of plots that display MLTI data
+  # this function generates a plot of MLTI data with countries distinct by
+    # color and point shape
   # mlti_data is a data set formatted by calculate_mlti
   # exports is logical that reflects if the data input is for exports
   # imports is logical that reflects if the data input is for imports
@@ -1370,21 +1367,33 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
   # set label for plot based on exports logical
   label <- ifelse(exports == T, 'Export', 'Import')
   
-  ggplot(data = mlti_data,
+  ggplot(data = mlti_data %>%
+           mutate(COUNTRY_NAME = str_to_title(COUNTRY_NAME)),
          aes(x = factor(YEAR),
-             y = MLTI)) +
-    geom_point() +
-    facet_wrap( ~ factor(COUNTRY_NAME), nrow = 3) +
+             y = MLTI,
+             color = COUNTRY_NAME,
+             shape = COUNTRY_NAME)) +
+    geom_line(aes(group = COUNTRY_NAME),
+              linewidth = 1.25) +
+    geom_point(color = 'black',
+               size = 2.5) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
+    scale_color_manual(values = mlti_colors) +
     # hline sets baseline to compare points from base index for all plots
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
-         y = paste0('Multilateral ', label, ' Quantity Index of ', species)) +
+         y = 'Multilateral Trade Index',
+         title = paste0(label, 's of ', species),
+         color = '',
+         shape = '') +
     theme_bw() +
     theme(axis.text = element_text(size = 15),
-          axis.title.y = element_text(size = 20),
+          axis.title.y = element_text(size = 18),
+          plot.title = element_text(size = 20),
           strip.text = element_text(size = 15,
                                     color = 'white'),
+          legend.text = element_text(size = 15),
+          legend.key.size = unit(2, 'line'),
           strip.background = element_rect(fill = 'black'))
 }
 plot_hi <- function(hi_data, species) {
@@ -1509,6 +1518,10 @@ names(colors) <- levels(factor(levels = c(
   'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
   'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
   'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+
+# Because the countries will change based on the selected species,
+  # the colors have no mapping
+mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 # App --------------------------------------------------------------------------
 # Define UI --------------------------------------------------------------------
 ui <- page_sidebar(
@@ -1656,23 +1669,17 @@ ui <- page_sidebar(
                        nav_panel(title = 'Advanced Metrics',
                                  fluidRow(
                                    column(
-                                     fluidRow(
-                                       'Export Multilateral Trade Index'
-                                     ),
                                      withSpinner(
-                                       tableOutput('exp_mlti_table'), 
+                                       # tableOutput('exp_mlti_table'),
+                                       plotOutput('exp_mlti'),
                                        type = 7),
-                                     # plotOutput('exp_mlti'),
                                      width = 6
                                    ),
                                    column(
-                                     fluidRow(
-                                       'Import Multilateral Trade Index'
-                                     ),
                                      withSpinner(
-                                       tableOutput('imp_mlti_table'), 
+                                       # tableOutput('imp_mlti_table'), 
+                                       plotOutput('imp_mlti'),
                                        type = 7),
-                                     # plotOutput('imp_mlti'),
                                      width = 6
                                    )),
                                  fluidRow(
@@ -3226,7 +3233,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection_trade(), exports = T)
+    calculate_mlti(species_selection_trade(), exports = T)
   })
   
   # outputs MLTI export table
@@ -3239,7 +3246,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export plot
   exp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection_trade(), exports = T), 
+    plot_mlti(exp_mlti_table_df(), 
               exports = T, species = species_selection_trade())
   })
   
@@ -3253,7 +3260,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti_table(species_selection_trade(), imports = T)
+    calculate_mlti(species_selection_trade(), imports = T)
   })
   
   # outputs MLTI import table
@@ -3266,7 +3273,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import plot
   imp_mlti_plot <- reactive({
-    plot_mlti(calculate_mlti(species_selection_trade(), imports = T), 
+    plot_mlti(imp_mlti_table_df(), 
               imports = T, species = species_selection_trade())
   })
   
