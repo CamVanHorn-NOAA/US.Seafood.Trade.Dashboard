@@ -1378,7 +1378,7 @@ plot_landings <- function(data, plot.format, species) {
     return(plot)
   }
   
-  # output plot of VALUE or VOLUME
+  # output plot of VOLUME
   plot <- 
     ggplot(data = data,
            aes(x = factor(YEAR),
