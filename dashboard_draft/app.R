@@ -1304,10 +1304,16 @@ plot_landings <- function(data, plot.format, species) {
     y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     
+    y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
+    y2 <- rlang::enquo(y2)
+    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    label2 <- label_currency(suffix = '/kg')
+    
     # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
     ylab <- 'Millions (Real 2024 USD)'
+    ylab2 <- 'Average Price (Real 2024 USD)'
     tlab <- 'Ex-Vessel Value of '
   }
   
