@@ -1336,6 +1336,19 @@ plot_landings <- function(data, plot.format, species) {
     # create GROUP column for the line chart to GROUP by
     data$GROUP <- 'group'
     
+    # calculate scale factor (see plot_trade for details)
+    max_value <- data %>%
+      slice_max(!!y, n = 1) %>%
+      select(!!y) %>%
+      pull()
+    
+    max_price <- data %>%
+      slice_max(!!y2, n = 1) %>%
+      select(!!y2) %>%
+      pull()
+    
+    scale_factor <- max_value / max_price
+    
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
