@@ -991,18 +991,24 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     scale_factor <- max_value / max_price
     plot <- 
       ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = !!y)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
+             aes(x = factor(YEAR))) +
+      geom_col(aes(y = !!y),
+               fill = color,
+               color = 'black') +
+      geom_line(aes(y = !!y2 * scale_factor,
+                    group = GROUP),
+                color = '#A6D4EC',
                 linewidth = 1.5) +
-      geom_point(color = 'black',
+      geom_point(aes(y = !!y2 * scale_factor),
+                 color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
+      scale_y_continuous(name = ylab, 
+                         labels = label,
+                         sec.axis = sec_axis(~./scale_factor, name = ylab2,
+                                             labels = label2)) +
       labs(x = '',
-           y = ylab,
            title = paste0(species, ' ', longform)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
