@@ -890,10 +890,10 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   # this function has the power to generate multiple plot types of trade data
   # data is formatted trade data from summarize_trade_yr_spp
   # plot_format is a character vector that currently accepts these inputs:
-    # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
+  # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
- 
+  
   
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
@@ -915,11 +915,13 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   if (export == T & import == F) {
     shortform <- 'EXP'
     longform <- 'Exports'
+    color <- '#003087'
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Imports'
+    color <- '#0085CA'
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
@@ -929,11 +931,17 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
     y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
     y <- rlang::enquo(y)
+    
+    y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
+    y2 <- rlang::enquo(y2)
+    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    label2 <- label_currency(suffix = '/kg')
+    
     # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
     ylab <- 'Millions (Real 2024 USD)'
-    tlab <- 'Value'
+    ylab2 <- 'Average Price (Real 2024 USD)'
   }
   
   # set labels and y values for plots of VOLUME
@@ -946,16 +954,8 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     tlab <- 'Volume'
   }
   
-  # set labels and y values for plots of PRICE
-  if (plot_format == 'PRICE') {
-    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-    y <- rlang::enquo(y)
-    label <- label_currency(suffix = '/kg')
-    ylab <- 'Average Price (Real 2024 USD)'
-  }
-  
   # plots of VALUE and VOLUME
-  if (plot_format %in% c('VALUE', 'VOLUME')) {
+  if (plot_format %in% c('VOLUME')) {
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
@@ -972,25 +972,45 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
       theme(axis.text = element_text(size = 12),
             plot.title = element_text(size = 18),
             axis.title = element_text(size = 15))
-  } else if (plot_format == 'PRICE') {
-    # plot of PRICE
-    # PRICE is a line chart, so we need a column to group by
+  } else if (plot_format == 'VALUE') {
+    # plot of Value with Price overlayed as a line chart
+    # because we have a line chart, we need a column to group by
     data$GROUP <- 'group'
     
+    # for the two axes to work in ggplot, we need a scaling factor to apply
+    # The scaling factor will coerce the price values to work against the 
+    # main y axis of value while retaining price trends across years
+    max_value <- data %>%
+      slice_max(!!y, n = 1) %>%
+      select(!!y) %>%
+      pull()
+    
+    max_price <- data %>%
+      slice_max(!!y2, n = 1) %>%
+      select(!!y2) %>%
+      pull()
+    
+    scale_factor <- max_value / max_price
     plot <- 
       ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = !!y)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
+             aes(x = factor(YEAR))) +
+      geom_col(aes(y = !!y),
+               fill = color,
+               color = 'black') +
+      geom_line(aes(y = !!y2 * scale_factor,
+                    group = GROUP),
+                color = '#A6D4EC',
                 linewidth = 1.5) +
-      geom_point(color = 'black',
+      geom_point(aes(y = !!y2 * scale_factor),
+                 color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
+      scale_y_continuous(name = ylab, 
+                         labels = label,
+                         sec.axis = sec_axis(~./scale_factor, name = ylab2,
+                                             labels = label2)) +
       labs(x = '',
-           y = ylab,
            title = paste0(species, ' ', longform)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
@@ -1273,7 +1293,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, species) {
 plot_landings <- function(data, plot.format, species) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
-    # and PRICE
+  # and PRICE
   
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
@@ -1284,10 +1304,16 @@ plot_landings <- function(data, plot.format, species) {
     y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     
+    y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
+    y2 <- rlang::enquo(y2)
+    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    label2 <- label_currency(suffix = '/kg')
+    
     # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
     ylab <- 'Millions (Real 2024 USD)'
+    ylab2 <- 'Average Price (Real 2024 USD)'
     tlab <- 'Ex-Vessel Value of '
   }
   
@@ -1304,27 +1330,46 @@ plot_landings <- function(data, plot.format, species) {
     tlab <- 'Landed Volume of '
   }
   
-  # create plot for PRICE (this is a line chart which contrasts with VALUE and
-    # VOLUME bar charts)
-  if (plot.format == 'PRICE') {
+  # create plot for VALUE
+  # This plot has two y-axes to display value and price in the same chart
+  if (plot.format == 'VALUE') {
     # create GROUP column for the line chart to GROUP by
     data$GROUP <- 'group'
     
+    # calculate scale factor (see plot_trade for details)
+    max_value <- data %>%
+      slice_max(!!y, n = 1) %>%
+      select(!!y) %>%
+      pull()
+    
+    max_price <- data %>%
+      slice_max(!!y2, n = 1) %>%
+      select(!!y2) %>%
+      pull()
+    
+    scale_factor <- max_value / max_price
+    
     plot <- 
       ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = COM_PRICE_2024USD_PER_KG)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
+             aes(x = factor(YEAR))) +
+      geom_col(aes(y = !!y),
+               fill = '#853B00',
+               color = 'black') +
+      geom_line(aes(y = !!y2 * scale_factor,
+                    group = GROUP),
+                color = '#FFAB38',
                 linewidth = 1.5) +
-      geom_point(color = 'black',
+      geom_point(aes(y = !!y2 * scale_factor),
+                 color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2023)) +
-      scale_y_continuous(labels = label_currency(suffix = '/kg')) +
+      scale_y_continuous(name = ylab, 
+                         labels = label,
+                         sec.axis = sec_axis(~./scale_factor, name = ylab2,
+                                             labels = label2)) +
       labs(x = '',
-           y = 'Average Price (Real 2024 USD)',
-           title = paste0('Ex-Vessel Price of ', species)) +
+           title = paste0(tlab, species)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
@@ -1333,7 +1378,7 @@ plot_landings <- function(data, plot.format, species) {
     return(plot)
   }
   
-  # output plot of VALUE or VOLUME
+  # output plot of VOLUME
   plot <- 
     ggplot(data = data,
            aes(x = factor(YEAR),
@@ -1650,22 +1695,22 @@ ui <- page_sidebar(
                                    )),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
-                       nav_panel(title = 'Price',
-                                 fluidRow(
-                                   column(
-                                     withSpinner(
-                                       plotOutput('exp_price'), 
-                                       type = 7),
-                                     width = 6
-                                   ),
-                                   column(
-                                     withSpinner(
-                                       plotOutput('imp_price'), 
-                                       type = 7),
-                                     width = 6
-                                   )),
-                                 downloadButton('download_page4',
-                                                'Download these plots and their data')),
+                       # nav_panel(title = 'Price',
+                       #           fluidRow(
+                       #             column(
+                       #               withSpinner(
+                       #                 plotOutput('exp_price'), 
+                       #                 type = 7),
+                       #               width = 6
+                       #             ),
+                       #             column(
+                       #               withSpinner(
+                       #                 plotOutput('imp_price'), 
+                       #                 type = 7),
+                       #               width = 6
+                       #             )),
+                       #           downloadButton('download_page4',
+                       #                          'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
                                  fluidRow(
                                    column(
@@ -1707,7 +1752,7 @@ ui <- page_sidebar(
                                        type = 7),
                                      width = 3
                                    )),
-                                 downloadButton('download_page5',
+                                 downloadButton('download_page4',
                                                 'Download these plots and their data'))))
   ),
   fluidRow(
@@ -1727,12 +1772,13 @@ ui <- page_sidebar(
                                      type = 7),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data')),
-                         nav_panel(title = 'Price',
-                                   withSpinner(
-                                     plotOutput('landings_price'),
-                                     type = 7),
-                                   downloadButton('download_landings_page3',
-                                                  'Download this plot and the data')))),
+                         # nav_panel(title = 'Price',
+                         #           withSpinner(
+                         #             plotOutput('landings_price'),
+                         #             type = 7),
+                         #           downloadButton('download_landings_page3',
+                         #                          'Download this plot and the data'))
+                         )),
       width = 6
     ),
     column(
