@@ -1351,19 +1351,25 @@ plot_landings <- function(data, plot.format, species) {
     
     plot <- 
       ggplot(data = data,
-             aes(x = factor(YEAR),
-                 y = COM_PRICE_2024USD_PER_KG)) +
-      geom_line(aes(group = GROUP),
-                color = 'black',
+             aes(x = factor(YEAR))) +
+      geom_col(aes(y = !!y),
+               fill = '#853B00',
+               color = 'black') +
+      geom_line(aes(y = !!y2 * scale_factor,
+                    group = GROUP),
+                color = '#FFAB38',
                 linewidth = 1.5) +
-      geom_point(color = 'black',
+      geom_point(aes(y = !!y2 * scale_factor),
+                 color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2023)) +
-      scale_y_continuous(labels = label_currency(suffix = '/kg')) +
+      scale_y_continuous(name = ylab, 
+                         labels = label,
+                         sec.axis = sec_axis(~./scale_factor, name = ylab2,
+                                             labels = label2)) +
       labs(x = '',
-           y = 'Average Price (Real 2024 USD)',
-           title = paste0('Ex-Vessel Price of ', species)) +
+           title = paste0(tlab, species)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
