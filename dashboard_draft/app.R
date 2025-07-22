@@ -975,6 +975,20 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # because we have a line chart, we need a column to group by
     data$GROUP <- 'group'
     
+    # for the two axes to work in ggplot, we need a scaling factor to apply
+    # The scaling factor will coerce the price values to work against the 
+    # main y axis of value while retaining price trends across years
+    max_value <- data %>%
+      slice_max(!!y, n = 1) %>%
+      select(!!y) %>%
+      pull()
+    
+    max_price <- data %>%
+      slice_max(!!y2, n = 1) %>%
+      select(!!y2) %>%
+      pull()
+    
+    scale_factor <- max_value / max_price
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
