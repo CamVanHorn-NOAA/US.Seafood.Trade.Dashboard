@@ -915,11 +915,13 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   if (export == T & import == F) {
     shortform <- 'EXP'
     longform <- 'Exports'
+    color <- '#003087'
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Imports'
+    color <- '#0085CA'
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
