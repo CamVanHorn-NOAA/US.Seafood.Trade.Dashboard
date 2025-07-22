@@ -953,7 +953,7 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   }
   
   # plots of VALUE and VOLUME
-  if (plot_format %in% c('VALUE', 'VOLUME')) {
+  if (plot_format %in% c('VOLUME')) {
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
