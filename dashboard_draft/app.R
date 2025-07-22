@@ -970,9 +970,9 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
       theme(axis.text = element_text(size = 12),
             plot.title = element_text(size = 18),
             axis.title = element_text(size = 15))
-  } else if (plot_format == 'PRICE') {
-    # plot of PRICE
-    # PRICE is a line chart, so we need a column to group by
+  } else if (plot_format == 'VALUE') {
+    # plot of Value with Price overlayed as a line chart
+    # because we have a line chart, we need a column to group by
     data$GROUP <- 'group'
     
     plot <- 
