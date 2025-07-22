@@ -1752,7 +1752,7 @@ ui <- page_sidebar(
                                        type = 7),
                                      width = 3
                                    )),
-                                 downloadButton('download_page5',
+                                 downloadButton('download_page4',
                                                 'Download these plots and their data'))))
   ),
   fluidRow(
