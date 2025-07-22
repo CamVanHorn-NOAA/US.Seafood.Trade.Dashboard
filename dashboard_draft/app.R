@@ -1330,9 +1330,9 @@ plot_landings <- function(data, plot.format, species) {
     tlab <- 'Landed Volume of '
   }
   
-  # create plot for PRICE (this is a line chart which contrasts with VALUE and
-    # VOLUME bar charts)
-  if (plot.format == 'PRICE') {
+  # create plot for VALUE
+  # This plot has two y-axes to display value and price in the same chart
+  if (plot.format == 'VALUE') {
     # create GROUP column for the line chart to GROUP by
     data$GROUP <- 'group'
     
