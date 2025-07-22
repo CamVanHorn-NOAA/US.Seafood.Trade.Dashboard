@@ -952,14 +952,6 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     tlab <- 'Volume'
   }
   
-  # set labels and y values for plots of PRICE
-  if (plot_format == 'PRICE') {
-    y <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-    y <- rlang::enquo(y)
-    label <- label_currency(suffix = '/kg')
-    ylab <- 'Average Price (Real 2024 USD)'
-  }
-  
   # plots of VALUE and VOLUME
   if (plot_format %in% c('VALUE', 'VOLUME')) {
     plot <- 
