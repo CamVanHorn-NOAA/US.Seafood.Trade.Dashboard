@@ -890,10 +890,10 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   # this function has the power to generate multiple plot types of trade data
   # data is formatted trade data from summarize_trade_yr_spp
   # plot_format is a character vector that currently accepts these inputs:
-    # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
+  # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
- 
+  
   
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
@@ -929,11 +929,17 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
     y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
     y <- rlang::enquo(y)
+    
+    y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
+    y2 <- rlang::enquo(y2)
+    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
+    label2 <- label_currency(suffix = '/kg')
+    
     # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
     ylab <- 'Millions (Real 2024 USD)'
-    tlab <- 'Value'
+    ylab2 <- 'Average Price (Real 2024 USD)'
   }
   
   # set labels and y values for plots of VOLUME
@@ -1273,7 +1279,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, species) {
 plot_landings <- function(data, plot.format, species) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
-    # and PRICE
+  # and PRICE
   
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
