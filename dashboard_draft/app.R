@@ -2528,6 +2528,11 @@ server <- function(input, output, session) {
                                 input$species_name))))
   })
   
+  # specify the units
+  selected_units <- reactive({
+    ifelse(input$units == F, 'METRIC', 'IMPERIAL')
+  })
+  
   # trade ----------------------------------------------------------------------
   
   # create list of trade categories based on selected filters
