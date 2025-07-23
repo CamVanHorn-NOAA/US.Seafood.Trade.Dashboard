@@ -894,7 +894,6 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
   
-  
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
     # calculate net export value in billions/millions, and net export volume
@@ -942,6 +941,22 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
     ylab <- 'Millions (Real 2024 USD)'
     ylab2 <- 'Average Price (Real 2024 USD)'
+    
+    # normalize y-max for both export and import figures
+    # find maxes for both in a given year and retain the largest value
+    max_exp <- max(data$EXP_VALUE_2024USD_MILLIONS, na.rm = T)
+    max_imp <- max(data$IMP_VALUE_2024USD_MILLIONS, na.rm = T)
+    
+    y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
+    
+    # Because we have two axes, we will need to normalize the second y-axis too
+    # This is more complex due to ggplot requiring a scaling factor for 
+    # the second y-axis.
+    max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
+    max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
+    
+    y2_max <- ifelse(max_exp_price > max_imp_price, 
+                     max_exp_price, max_imp_price)
   }
   
   # set labels and y values for plots of VOLUME
