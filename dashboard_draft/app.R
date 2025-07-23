@@ -1309,44 +1309,82 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   }
   
   if (plot.format == 'VOLUME') {
-    # set labels for VOLUME plots
-    y <- as.symbol('PP_VOLUME_THOUSAND_MT')
-    y <- rlang::enquo(y)
-    ylab <- 'Metric Tons (Thousands)'
-    label <- comma
-    tlab <- 'Production Volume of '
+    if (units == 'METRIC') {
+      # set labels for VOLUME plots
+      y <- as.symbol('PP_VOLUME_THOUSAND_MT')
+      y <- rlang::enquo(y)
+      ylab <- 'Metric Tons (Thousands)'
+      label <- comma
+      tlab <- 'Production Volume of '
+      
+      # calculate the total value per year to find upper limit
+      yr_volume <- new_data %>%
+        select(YEAR, PP_VOLUME_THOUSAND_MT) %>%
+        group_by(YEAR) %>%
+        summarise(across(where(is.numeric), sum),
+                  .groups = 'drop') 
+      
+      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_MT + 1)
+    }
     
-    # calculate the total value per year to find upper limit
-    yr_volume <- new_data %>%
-      select(YEAR, PP_VOLUME_THOUSAND_MT) %>%
-      group_by(YEAR) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') 
-    
-    ylim <- max(yr_volume$PP_VOLUME_THOUSAND_MT + 1)
+    if (units == 'IMPERIAL') {
+      y <- as.symbol('PP_VOLUME_THOUSAND_ST')
+      y <- rlang::enquo(y)
+      ylab <- 'Short Tons (Thousands)'
+      label <- comma
+      tlab <- 'Production Volume of '
+      
+      # calculate the total value per year to find upper limit
+      yr_volume <- new_data %>%
+        select(YEAR, PP_VOLUME_THOUSAND_ST) %>%
+        group_by(YEAR) %>%
+        summarise(across(where(is.numeric), sum),
+                  .groups = 'drop')
+      
+      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_ST + 1)
+    }
   }
   
   if (plot.format == 'PRICE') {
     # because price is a line chart rather than a bar (as VALUE and VOLUME are),
       # just create plot for PRICE instead of setting label definitions
+    
+    # specify whether price is reported in per kg or per lb
+    if (units == 'METRIC') {
+      y <- as.symbol('PP_PRICE_2024USD_PER_KG')
+      y <- rlang::enquo(y)
+      
+      ymax <- max(new_data$PP_PRICE_2024USD_PER_KG)
+      
+      label <- label_currency(suffix = '/kg')
+    }
+    
+    if (units == 'IMPERIAL') {
+      y <- as.symbol('PP_PRICE_2024USD_PER_LB')
+      y <- rlang::enquo(y)
+      
+      ymax <- max(new_data$PP_PRICE_2024USD_PER_LB)
+      
+      label <- label_currency(suffix = '/lb')
+    }
     plot <- ggplot(data = new_data,
                    aes(x = factor(YEAR),
-                       y = PP_PRICE_2024USD_PER_KG,
+                       y = !!y,
                        color = PRODUCT_NAME)) +
       geom_line(aes(group = PRODUCT_NAME),
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 1) +
       scale_color_manual(values = colors,
-                        name = 'Product Condition') +
+                         name = 'Product Condition') +
       labs(x = '',
            y = 'Average Price (Real 2024 USD)',
            fill = 'Product Condition',
            title = paste0('Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
-      scale_y_continuous(limits = c(0, max(new_data$PP_PRICE_2024USD_PER_KG) + 0.5),
+      scale_y_continuous(limits = c(0, ymax + 0.5),
                          expand = c(0, 0),
-                         labels = label_currency(suffix = '/kg')) +
+                         labels = label) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
