@@ -2874,7 +2874,7 @@ server <- function(input, output, session) {
   
   # creates export value plot
   exp_value_plot <- reactive({
-    plot_trade(trade_df(), 'VALUE', export = T, 
+    plot_trade(trade_df(), 'VALUE', units = selected_units(), export = T, 
                species = species_selection_trade())
   })
   
@@ -2888,7 +2888,7 @@ server <- function(input, output, session) {
   
   # creates import value plot
   imp_value_plot <- reactive({
-    plot_trade(trade_df(), 'VALUE', import = T, 
+    plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
                species = species_selection_trade())
   })
   
@@ -2902,7 +2902,7 @@ server <- function(input, output, session) {
 
   # creates export volume plot
   exp_volume_plot <- reactive({
-    plot_trade(trade_df(), 'VOLUME', export = T, 
+    plot_trade(trade_df(), 'VOLUME', units = selected_units(), export = T, 
                species = species_selection_trade())
   })
   
@@ -2916,7 +2916,7 @@ server <- function(input, output, session) {
 
   # creates import volume plot
   imp_volume_plot <- reactive({
-    plot_trade(trade_df(), 'VOLUME', import = T, 
+    plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
                species = species_selection_trade())
   })
   
@@ -2930,7 +2930,7 @@ server <- function(input, output, session) {
   
   # creates export price plot
   exp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', export = T, 
+    plot_trade(trade_df(), 'PRICE', units = selected_units(), export = T, 
                species = species_selection_trade())
   })
   
@@ -2944,7 +2944,7 @@ server <- function(input, output, session) {
   
   # creates import price plot
   imp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', import = T, 
+    plot_trade(trade_df(), 'PRICE', units = selected_units(), import = T, 
                species = species_selection_trade())
   })
   
@@ -3157,7 +3157,7 @@ server <- function(input, output, session) {
   
   # creates landings value plot
   landings_value_plot <- reactive({
-    plot_landings(landings_df(), 'VALUE', 
+    plot_landings(landings_df(), 'VALUE', units = selected_units(),
                   species = species_selection_landings())
   })
   
@@ -3171,7 +3171,7 @@ server <- function(input, output, session) {
   
   # creates landings volume plot
   landings_volume_plot <- reactive({
-    plot_landings(landings_df(), 'VOLUME', 
+    plot_landings(landings_df(), 'VOLUME', units = selected_units(),
                   species = species_selection_landings())
   })
   
@@ -3185,7 +3185,7 @@ server <- function(input, output, session) {
   
   # creates landings price plot
   landings_price_plot <- reactive({
-    plot_landings(landings_df(), 'PRICE', 
+    plot_landings(landings_df(), 'PRICE', units = selected_units(), 
                   species = species_selection_landings())
   })
   
@@ -3411,7 +3411,7 @@ server <- function(input, output, session) {
   
   # creates processed products volume plot
   pp_volume_plot <- reactive({
-    plot_spp_pp(pp_df(), 'VOLUME', 
+    plot_spp_pp(pp_df(), 'VOLUME', units = selected_units(),
                 species = species_selection_products())
   })
   
@@ -3425,7 +3425,7 @@ server <- function(input, output, session) {
   
   # creates processed products price plot
   pp_price_plot <- reactive({
-    plot_spp_pp(pp_df(), 'PRICE', 
+    plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
                 species = species_selection_products())
   })
   
@@ -3510,12 +3510,12 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection_trade())
+      species_selection_trade(), units = selected_units())
     })
   
   # creates apparent supply plot
   supply_plot <- reactive({
-    plot_supply_metrics(supply_df(), 'SUPPLY', 
+    plot_supply_metrics(supply_df(), 'SUPPLY', units = selected_units(),
                         species = species_selection_trade())
   })
   
