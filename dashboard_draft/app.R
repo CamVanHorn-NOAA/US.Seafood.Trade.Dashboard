@@ -1420,7 +1420,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   return(plot)
 }
-plot_landings <- function(data, plot.format, species) {
+plot_landings <- function(data, plot.format, units = NULL, species) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
   # and PRICE
@@ -1430,16 +1430,26 @@ plot_landings <- function(data, plot.format, species) {
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
+    # Overlayed Prices will depend on specified units
+    if (units == 'METRIC') {
+      y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
+      y2 <- rlang::enquo(y2)
+      
+      label2 <- label_currency(suffix = '/kg')
+    }
+    
+    if (units == 'IMPERIAL') {
+      y2 <- as.symbol('COM_PRICE_2024USD_PER_LB')
+      y2 <- rlang::enquo(y2)
+      
+      label2 <- label_currency(suffix = '/lb')
+    }
     # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
     y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
     y <- rlang::enquo(y)
     
-    y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
-    y2 <- rlang::enquo(y2)
-    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    label2 <- label_currency(suffix = '/kg')
     
     # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
     ylab <- 'Millions (Real 2024 USD)'
@@ -1449,14 +1459,25 @@ plot_landings <- function(data, plot.format, species) {
   
   # set labels for VOLUME plot
   if (plot.format == 'VOLUME') {
-    y <- as.symbol('COM_VOLUME_THOUSAND_MT')
-    y <- rlang::enquo(y)
-    
     # format metric tons by thousands
     data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
+    data$COM_VOLUME_THOUSAND_ST <- data$COM_VOLUME_ST / 1000
+    
+    if (units == 'METRIC') {
+      y <- as.symbol('COM_VOLUME_THOUSAND_MT')
+      y <- rlang::enquo(y)
+      
+      ylab <- 'Metric Tons (Thousands)'
+    }
+    
+    if (units == 'IMPERIAL') {
+      y <- as.symbol('COM_VOLUME_THOUSAND_ST')
+      y <- rlang::enquo(y)
+      
+      ylab <- 'Short Tons (Thousands)'
+    }
     
     label <- comma
-    ylab <- 'Metric Tons (Thousands)'
     tlab <- 'Landed Volume of '
   }
   
