@@ -423,12 +423,16 @@ summarize_pp_yr_spp <- function(product_data, species) {
       # convert kilograms to metric tons
       # convert value to billions and millions
       mutate(MT = KG / 1000,
+             LB = KG * 2.20462,
+             ST = LB / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
       # rename columns to label value, volume, and PP (processed product) prefix
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT, 
+             PP_VOLUME_LB = LB,
+             PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
              PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
              PP_VOLUME_KG = KG)
@@ -445,11 +449,15 @@ summarize_pp_yr_spp <- function(product_data, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(MT = KG / 1000,
+           LB = KG * 2.20462,
+           ST = LB / 2000,
            MILLIONS_2024USD = DOLLARS_2024 / 1000000,
            BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
            PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
     rename(PP_VALUE_2024USD = DOLLARS_2024,
            PP_VOLUME_MT = MT,
+           PP_VOLUME_LB = LB,
+           PP_VOLUME_ST = ST,
            PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
            PP_VOLUME_KG = KG)
