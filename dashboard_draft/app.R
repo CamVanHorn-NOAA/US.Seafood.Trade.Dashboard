@@ -502,13 +502,18 @@ summarize_landings_yr_spp <- function(landings_data, species) {
                 .groups = 'drop') %>%
       # convert KG to metric tons and dollars to millions/billions
       mutate(MT = KG / 1000,
+             LB = KG * 2.20462,
+             ST = LB / 2000,
              MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
              BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB) %>%
       # add COM (commercial) as well as volume or value as column prefix
         # this will benefit table joinings later
       rename(COM_VOLUME_KG = KG,
              COM_VOLUME_MT = MT,
+             COM_VOLUME_LB = LB,
+             COM_VOLUME_ST = ST,
              COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
              COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024)
     
@@ -530,11 +535,15 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(MT = KG / 1000,
+           LB = KG * 2.20462,
+           ST = LB / 2000,
            MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
            BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
            COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
     rename(COM_VOLUME_KG = KG,
            COM_VOLUME_MT = MT,
+           COM_VOLUME_LB = LB,
+           COM_VOLUME_ST = ST,
            COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
            COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024) 
   
