@@ -1792,7 +1792,9 @@ ui <- page_sidebar(
       p('Investigate 20 Years of U.S. Fisheries Data',
         style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.0rem, 2.6vw, 2.6rem); margin-top: 0px; margin-bottom: 0px; opacity: 0.9;')
     )),
-  
+  fluidRow(
+    input_switch('units', 'Imperial Units')
+  ),
   fluidRow(
     div(
       style = 'border: 3px solid #005761; border-radius: 12px;',
