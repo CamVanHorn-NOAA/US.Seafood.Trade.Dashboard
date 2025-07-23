@@ -223,14 +223,20 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                 .groups = 'drop') %>%
       # create columns of price per KG, value in millions/billions, 
         # volume in metric tons
-      mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
+      mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
+             IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+             EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
              IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
+             EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
+             IMP_PRICE_USD_PER_LB = IMP_VALUE_2024USD / IMP_VOLUME_LB,
              EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
              IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
              EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
              IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
              EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-             IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+             IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+             EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
+             IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
     return(summarized_data)
   }
   
@@ -257,14 +263,20 @@ summarize_trade_yr_spp <- function(trade_table, species) {
     group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
+    mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
+           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+           EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
            IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
+           EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
+           IMP_PRICE_USD_PER_LB = IMP_VALUE_2024USD / IMP_VOLUME_LB,
            EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
            IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
            EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000)
+           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
+           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
   
   return(summarized_data)
 }
@@ -372,9 +384,14 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
            IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
            NET_VALUE_2024USD_MILLIONS =
              EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
+           EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
+           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
+           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
            EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
            IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
            NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+           NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
            NET_PRICE_2024USD_PER_KG = 
              (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
              (EXP_VOLUME_KG - IMP_VOLUME_KG))
