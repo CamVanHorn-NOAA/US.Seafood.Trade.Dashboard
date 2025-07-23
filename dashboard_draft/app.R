@@ -930,7 +930,7 @@ calculate_supply_metrics <- function(species, units) {
 }
 
 # plot functions
-plot_trade <- function(data, plot_format, export = F, import = F, species) {
+plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, species) {
   # this function has the power to generate multiple plot types of trade data
   # data is formatted trade data from summarize_trade_yr_spp
   # plot_format is a character vector that currently accepts these inputs:
@@ -947,6 +947,7 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
              NET_VALUE_2024USD_MILLIONS = 
                EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
              NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
              NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
     
     # set shortform and longform values for plot labeling
@@ -975,12 +976,32 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
     y <- rlang::enquo(y)
     
-    y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-    y2 <- rlang::enquo(y2)
-    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    label2 <- label_currency(suffix = '/kg')
+    
+    # the rate for price will depend on specified units
+    if (units == 'METRIC') {
+      y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
+      y2 <- rlang::enquo(y2)
+      
+      label2 <- label_currency(suffix = '/kg')
+      
+      # Because we have two axes, we will need to normalize the second y-axis too
+      # This is more complex due to ggplot requiring a scaling factor for 
+      # the second y-axis.
+      max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
+      max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
+    }
+    
+    if (units == 'IMPERIAL') {
+      y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_LB'))
+      y2 <- rlang::enquo(y2)
+      
+      label2 <- label_currency(suffix = '/lb')
+      
+      max_exp_price <- max(data$EXP_PRICE_USD_PER_LB, na.rm = T)
+      max_imp_price <- max(data$IMP_PRICE_USD_PER_LB, na.rm = T)
+    }
     
     # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
     ylab <- 'Millions (Real 2024 USD)'
@@ -993,31 +1014,38 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     
-    # Because we have two axes, we will need to normalize the second y-axis too
-    # This is more complex due to ggplot requiring a scaling factor for 
-    # the second y-axis.
-    max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
-    max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
-    
     y2_max <- ifelse(max_exp_price > max_imp_price, 
                      max_exp_price, max_imp_price)
   }
   
   # set labels and y values for plots of VOLUME
   if (plot_format == 'VOLUME') {
-    y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
-    y <- rlang::enquo(y)
-    label <- comma
-    # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
-    ylab <- 'Metric Tons'
-    tlab <- 'Volume'
+    # For units == metric
+    if (units == 'METRIC') {
+      y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
+      y <- rlang::enquo(y)
+      label <- comma
+      # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
+      ylab <- 'Metric Tons'
+      
+      # normalize y-max for both export and import figures
+      # find maxes for both in a given year and retain the largest value
+      max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
+      max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
+    }
     
-    # normalize y-max for both export and import figures
-    # find maxes for both in a given year and retain the largest value
-    max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
-    max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
+    if (units == 'IMPERIAL') {
+      y <- as.symbol(paste0(shortform, '_VOLUME_ST'))
+      y <- rlang::enquo(y)
+      label <- comma
+      ylab <- 'Short Tons'
+      
+      max_exp <- max(data$EXP_VOLUME_ST, na.rm = T)
+      max_imp <- max(data$IMP_VOLUME_ST, na.rm = T)
+    }
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
+    tlab <- 'Volume'
   }
   
   # plots of VALUE and VOLUME
@@ -1208,7 +1236,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species) {
           legend.text = element_text(size = 12),
           plot.title = element_text(size = 18))
 }
-plot_spp_pp <- function(processed_product_data, plot.format, species) {
+plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, species) {
   # function that plots processed product data 
   # processed_product_data is data formatted by summarize_pp_yr_spp
   # plot.format is a character vector of three inputs:
@@ -1252,7 +1280,9 @@ plot_spp_pp <- function(processed_product_data, plot.format, species) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+           PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
            PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
+           PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
            PRODUCT_NAME = factor(PRODUCT_NAME))
   
   # set labels for VALUE plots
