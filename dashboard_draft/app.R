@@ -1008,7 +1008,6 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # max price, which may not necessarily be both exports or imports
     scale_factor <- y_max / y2_max
     
-    scale_factor <- max_value / max_price
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
@@ -1026,6 +1025,7 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
                        limits = factor(2004:2024)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
+                         limits = c(0, y_max),
                          sec.axis = sec_axis(~./scale_factor, name = ylab2,
                                              labels = label2)) +
       labs(x = '',
