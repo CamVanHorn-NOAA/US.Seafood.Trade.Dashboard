@@ -1819,7 +1819,7 @@ ui <- page_sidebar(
                                      width = 6
                                    )),
                                  downloadButton('download_page1',
-                                               'Download these plots and their data'),),
+                                               'Download these plots and their data')),
                        nav_panel(title = 'Value',
                                  fluidRow(
                                    column(
@@ -1928,7 +1928,7 @@ ui <- page_sidebar(
                                      plotOutput('landings_volume'),
                                      type = 7),
                                    downloadButton('download_landings_page2',
-                                                  'Download this plot and the data')),
+                                                  'Download this plot and the data'))
                          # nav_panel(title = 'Price',
                          #           withSpinner(
                          #             plotOutput('landings_price'),
