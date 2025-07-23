@@ -967,6 +967,13 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
     ylab <- 'Metric Tons'
     tlab <- 'Volume'
+    
+    # normalize y-max for both export and import figures
+    # find maxes for both in a given year and retain the largest value
+    max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
+    max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
+    
+    y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
   }
   
   # plots of VALUE and VOLUME
