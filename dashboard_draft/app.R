@@ -894,7 +894,6 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
   
-  
   # if both export and import are true, output is Net Export data
   if (export == T & import == T) {
     # calculate net export value in billions/millions, and net export volume
@@ -942,6 +941,22 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
     ylab <- 'Millions (Real 2024 USD)'
     ylab2 <- 'Average Price (Real 2024 USD)'
+    
+    # normalize y-max for both export and import figures
+    # find maxes for both in a given year and retain the largest value
+    max_exp <- max(data$EXP_VALUE_2024USD_MILLIONS, na.rm = T)
+    max_imp <- max(data$IMP_VALUE_2024USD_MILLIONS, na.rm = T)
+    
+    y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
+    
+    # Because we have two axes, we will need to normalize the second y-axis too
+    # This is more complex due to ggplot requiring a scaling factor for 
+    # the second y-axis.
+    max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
+    max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
+    
+    y2_max <- ifelse(max_exp_price > max_imp_price, 
+                     max_exp_price, max_imp_price)
   }
   
   # set labels and y values for plots of VOLUME
@@ -952,6 +967,13 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
     ylab <- 'Metric Tons'
     tlab <- 'Volume'
+    
+    # normalize y-max for both export and import figures
+    # find maxes for both in a given year and retain the largest value
+    max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
+    max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
+    
+    y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
   }
   
   # plots of VALUE and VOLUME
@@ -964,7 +986,8 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
       geom_col(fill = 'black') +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
+      scale_y_continuous(labels = label,
+                         limits = c(0, y_max)) +
       labs(x = '',
            y = ylab,
            title = paste0(species, ' ', longform)) +
@@ -980,17 +1003,11 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
     # for the two axes to work in ggplot, we need a scaling factor to apply
     # The scaling factor will coerce the price values to work against the 
     # main y axis of value while retaining price trends across years
-    max_value <- data %>%
-      slice_max(!!y, n = 1) %>%
-      select(!!y) %>%
-      pull()
+    # To ensure the plots of exports and imports are coerced to the same axis,
+    # use the same scale factor for all plots by using the max value and 
+    # max price, which may not necessarily be both exports or imports
+    scale_factor <- y_max / y2_max
     
-    max_price <- data %>%
-      slice_max(!!y2, n = 1) %>%
-      select(!!y2) %>%
-      pull()
-    
-    scale_factor <- max_value / max_price
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
@@ -1008,6 +1025,7 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
                        limits = factor(2004:2024)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
+                         limits = c(0, y_max),
                          sec.axis = sec_axis(~./scale_factor, name = ylab2,
                                              labels = label2)) +
       labs(x = '',
