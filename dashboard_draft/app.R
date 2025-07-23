@@ -1625,7 +1625,7 @@ plot_hi <- function(hi_data, species) {
           plot.title = element_text(size = 18))
   
 }
-plot_supply_metrics <- function(supply_data, metric, species) {
+plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
   # this function generates three types of plots 
   # supply_data is data formatted by calculate_supply_metrics in tandem with
     # summarize_yr_spp
@@ -1637,6 +1637,10 @@ plot_supply_metrics <- function(supply_data, metric, species) {
       # apparent supply
   
   if (metric == 'SUPPLY') {
+    # units are embedded in the calculation function
+    # here, we only need to specify how the figure is labeled
+    ylab <- ifelse(units == 'METRIC', 'Metric Tons (Thousands)',
+                   'Short Tons (Thousands)')
     plot <- 
       ggplot(data = supply_data %>%
                # we do not have landings or processing data for 2024 despite
@@ -1647,7 +1651,7 @@ plot_supply_metrics <- function(supply_data, metric, species) {
                  y = APPARENT_SUPPLY / 1000)) +
       geom_col(fill = 'black') +
       labs(x = '',
-           y = 'Metric Tons (Thousands)',
+           y = ylab,
            title = paste0('Apparent Supply of \n', species)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
