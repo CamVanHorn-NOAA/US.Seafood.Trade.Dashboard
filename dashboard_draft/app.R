@@ -885,24 +885,34 @@ calculate_hi <- function(species) {
   
   return(hi_data)
 }
-calculate_supply_metrics <- function(species) {
+calculate_supply_metrics <- function(species, units) {
   # this function calculates three metrics that we visualize:
     # apparent supply, apparent supply relative to domestic production, and
     # unexported domestic production relative to apparent supply
   # the function relies on summarize_yr_spp for data formatting
   # species is a character vector of a species of interest
-  data <- summarize_yr_spp(species) %>%
-    # calculate apparent supply by summing domestic production and imports 
+  if (units == 'METRIC') {
+    data <- summarize_yr_spp(species) %>%
+      # calculate apparent supply by summing domestic production and imports 
       # and subtracting export volume
-    # calculate apparent supply relative to domestic production by dividing
+      # calculate apparent supply relative to domestic production by dividing
       # apparent supply by domestic production
-    # calculate unexported domestic production relative to apparent supply by
+      # calculate unexported domestic production relative to apparent supply by
       # dividing the absolute value of the difference of domestic production and
       # export volume by apparent supply
-    mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
-           APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
-           UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-             abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
+      mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
+             APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
+             UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
+               abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
+  }
+  
+  if (units == 'IMPERIAL') {
+    data <- summarize_yr_spp(species) %>%
+      mutate(APPARENT_SUPPLY = (PP_VOLUME_ST - EXP_VOLUME_ST) + IMP_VOLUME_ST,
+             APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_ST,
+             UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
+               abs(PP_VOLUME_ST - EXP_VOLUME_ST) / APPARENT_SUPPLY)
+  }
   
   # if no species is provided, add column for species to be 'ALL SPECIES'
   if(species == 'All Species') {
