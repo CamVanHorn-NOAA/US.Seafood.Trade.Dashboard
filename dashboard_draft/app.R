@@ -986,7 +986,8 @@ plot_trade <- function(data, plot_format, export = F, import = F, species) {
       geom_col(fill = 'black') +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label) +
+      scale_y_continuous(labels = label,
+                         limits = c(0, y_max)) +
       labs(x = '',
            y = ylab,
            title = paste0(species, ' ', longform)) +
