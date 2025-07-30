@@ -893,21 +893,38 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   
   return(mlti_data)
 }
-calculate_hi <- function(species) {
+calculate_hi <- function(species, nominal = F) {
   # this function calculates the herfindahl trade index for a species of interest
   # species is a character vector of a species of interest
+  
+  if (nominal == T) {
+    exp_value <- as.symbol('EXP_VALUE_USD')
+    imp_value <- as.symbol('IMP_VALUE_USD')
+    exp_value <- rlang::enquo(exp_value)
+    imp_value <- rlang::enquo(imp_value)
+  } else {
+    exp_value <- as.symbol('EXP_VALUE_2024USD')
+    imp_value <- as.symbol('IMP_VALUE_2024USD')
+    exp_value <- rlang::enquo(exp_value)
+    imp_value <- rlang::enquo(imp_value)
+  }
   
   # if no species provided
   if(species == 'All Species') {
     # calculate index from trade data
     hi_data <- trade_data %>%
       # select only columns of interest
-      select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
+      select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
+             EXP_VALUE_USD, IMP_VALUE_USD) %>%
       # set export and import NAs to 0 to prevent NA as sum values
       mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
                                         0, EXP_VALUE_2024USD),
              IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
-                                        0, IMP_VALUE_2024USD)) %>%
+                                        0, IMP_VALUE_2024USD),
+             EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD) == T,
+                                    0, EXP_VALUE_USD),
+             IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
+                                    0, IMP_VALUE_USD)) %>%
       # sum the total value by each country in each year
       group_by(YEAR, COUNTRY_NAME) %>%
       summarise(across(where(is.numeric), sum),
@@ -919,10 +936,10 @@ calculate_hi <- function(species) {
           # country
         # step 3: square the proportion of export and import value
         # step 4: sum the squares to calculate the HI for exports and imports
-      mutate(TOTAL_EXP_VALUE_YR = sum(EXP_VALUE_2024USD),
-             TOTAL_IMP_VALUE_YR = sum(IMP_VALUE_2024USD),
-             PROPORT_EXP_VALUE = EXP_VALUE_2024USD / TOTAL_EXP_VALUE_YR,
-             PROPORT_IMP_VALUE = IMP_VALUE_2024USD / TOTAL_IMP_VALUE_YR,
+      mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
+             TOTAL_IMP_VALUE_YR = sum(!!imp_value),
+             PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
+             PROPORT_IMP_VALUE = !!imp_value / TOTAL_IMP_VALUE_YR,
              PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
              PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
              EXP_HI = sum(PROPORT_EXP_SQUARED),
@@ -938,19 +955,24 @@ calculate_hi <- function(species) {
   # duplicate the above steps, except now filter for species of interest
   hi_data <- trade_data %>%
     filter_species(species) %>%
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD) %>%
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
+           EXP_VALUE_USD, IMP_VALUE_USD) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
                                       0, EXP_VALUE_2024USD),
            IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
-                                      0, IMP_VALUE_2024USD)) %>%
+                                      0, IMP_VALUE_2024USD),
+           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD) == T,
+                                  0, EXP_VALUE_USD),
+           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
+                                  0, IMP_VALUE_USD)) %>%
     group_by(YEAR, COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     group_by(YEAR) %>%
-    mutate(TOTAL_EXP_VALUE_YR = sum(EXP_VALUE_2024USD),
-           TOTAL_IMP_VALUE_YR = sum(IMP_VALUE_2024USD),
-           PROPORT_EXP_VALUE = EXP_VALUE_2024USD / TOTAL_EXP_VALUE_YR,
-           PROPORT_IMP_VALUE = IMP_VALUE_2024USD / TOTAL_IMP_VALUE_YR,
+    mutate(TOTAL_EXP_VALUE_YR = sum(exp_value),
+           TOTAL_IMP_VALUE_YR = sum(imp_value),
+           PROPORT_EXP_VALUE = exp_value / TOTAL_EXP_VALUE_YR,
+           PROPORT_IMP_VALUE = imp_value / TOTAL_IMP_VALUE_YR,
            PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
            PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
            EXP_HI = sum(PROPORT_EXP_SQUARED),
