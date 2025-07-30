@@ -1388,7 +1388,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal
           legend.text = element_text(size = 12),
           plot.title = element_text(size = 18))
 }
-plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, species) {
+plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, species, nominal = F) {
   # function that plots processed product data 
   # processed_product_data is data formatted by summarize_pp_yr_spp
   # plot.format is a character vector of three inputs:
@@ -1435,15 +1435,25 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
            PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
            PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
            PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-           PRODUCT_NAME = factor(PRODUCT_NAME))
+           PRODUCT_NAME = factor(PRODUCT_NAME),
+           PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
+           PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
-    # y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
-    y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
-    y <- rlang::enquo(y)
-    # ylab <- 'Value (Billions, 2024 Real USD)'
-    ylab <- 'Millions (2024 Real USD)'
+    if (nominal == T) {
+      y <- as.symbol('PP_VALUE_MILLIONS') 
+      y <- rlang::enquo(y)
+      
+      ylab <- 'Millions (Nominal USD)'
+    } else {
+      # y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
+      y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
+      y <- rlang::enquo(y)
+      # ylab <- 'Value (Billions, 2024 Real USD)'
+      ylab <- 'Millions (2024 Real USD)'
+    }
+    
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     tlab <- 'Production Value of '
@@ -1451,13 +1461,17 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
       # select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
-      select(YEAR, PP_VALUE_MILLIONS_2024USD) %>%
+      select(YEAR, !!y) %>%
       group_by(YEAR) %>%
       summarise(across(where(is.numeric), sum),
                 .groups = 'drop')
     
-    # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
-    ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)
+    if (nominal == T) {
+      ylim <- max(yr_value$PP_VALUE_MILLIONS + 5)
+    } else {
+      # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
+      ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)  
+    }
   }
   
   if (plot.format == 'VOLUME') {
@@ -1503,19 +1517,37 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     
     # specify whether price is reported in per kg or per lb
     if (units == 'METRIC') {
-      y <- as.symbol('PP_PRICE_2024USD_PER_KG')
-      y <- rlang::enquo(y)
-      
-      ymax <- max(new_data$PP_PRICE_2024USD_PER_KG)
+      if (nominal == T) {
+        y <- as.symbol('PP_PRICE_NOMINAL_PER_KG')
+        y <- rlang::enquo(y)
+        
+        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_KG)
+        ylab <- 'Average Price (Nominal USD)'
+      } else {
+        y <- as.symbol('PP_PRICE_2024USD_PER_KG')
+        y <- rlang::enquo(y)
+        
+        ymax <- max(new_data$PP_PRICE_2024USD_PER_KG) 
+        ylab <- 'Average Price (Real 2024 USD)'
+      }
       
       label <- label_currency(suffix = '/kg')
     }
     
     if (units == 'IMPERIAL') {
-      y <- as.symbol('PP_PRICE_2024USD_PER_LB')
-      y <- rlang::enquo(y)
-      
-      ymax <- max(new_data$PP_PRICE_2024USD_PER_LB)
+      if (nominal == T) {
+        y <- as.symbol('PP_PRICE_NOMINAL_PER_LB')
+        y <- rlang::enquo(y)
+        
+        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_LB)
+        ylab <- 'Average Price (Nominal USD)'
+      } else {
+        y <- as.symbol('PP_PRICE_2024USD_PER_LB')
+        y <- rlang::enquo(y)
+        
+        ymax <- max(new_data$PP_PRICE_2024USD_PER_LB) 
+        ylab <- 'Average Price (Real 2024 USD)'
+      }
       
       label <- label_currency(suffix = '/lb')
     }
@@ -1530,7 +1562,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       scale_color_manual(values = colors,
                          name = 'Product Condition') +
       labs(x = '',
-           y = 'Average Price (Real 2024 USD)',
+           y = ylab,
            fill = 'Product Condition',
            title = paste0('Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
