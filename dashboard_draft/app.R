@@ -1996,7 +1996,8 @@ ui <- page_sidebar(
         style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.0rem, 2.6vw, 2.6rem); margin-top: 0px; margin-bottom: 0px; opacity: 0.9;')
     )),
   fluidRow(
-    input_switch('units', 'Imperial Units')
+    input_switch('units', 'Imperial Units'),
+    input_switch('nominal', 'Nominal Values')
   ),
   fluidRow(
     div(
@@ -2734,6 +2735,10 @@ server <- function(input, output, session) {
   # specify the units
   selected_units <- reactive({
     ifelse(input$units == F, 'METRIC', 'IMPERIAL')
+  })
+  
+  selected_value <- reactive({
+    ifelse(input$nominal == F, 'FALSE', 'TRUE')
   })
   
   # trade ----------------------------------------------------------------------
