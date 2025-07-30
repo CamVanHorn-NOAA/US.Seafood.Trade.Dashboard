@@ -1604,7 +1604,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   return(plot)
 }
-plot_landings <- function(data, plot.format, units = NULL, species) {
+plot_landings <- function(data, plot.format, units = NULL, species, nominal = F) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
   # and PRICE
@@ -1616,28 +1616,47 @@ plot_landings <- function(data, plot.format, units = NULL, species) {
   if (plot.format == 'VALUE') {
     # Overlayed Prices will depend on specified units
     if (units == 'METRIC') {
-      y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
-      y2 <- rlang::enquo(y2)
+      if (nominal == T) {
+        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_KG')
+        y2 <- rlang::enquo(y2)
+      } else {
+        y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
+        y2 <- rlang::enquo(y2) 
+      }
       
       label2 <- label_currency(suffix = '/kg')
     }
     
     if (units == 'IMPERIAL') {
-      y2 <- as.symbol('COM_PRICE_2024USD_PER_LB')
-      y2 <- rlang::enquo(y2)
+      if (nominal == T) {
+        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_LB')
+        y2 <- rlang::enquo(y2)
+      } else {
+        y2 <- as.symbol('COM_PRICE_2024USD_PER_LB')
+        y2 <- rlang::enquo(y2) 
+      }
       
       label2 <- label_currency(suffix = '/lb')
     }
-    # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
-    y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
-    y <- rlang::enquo(y)
+    
+    if (nominal == T) {
+      y <- as.symbol('COM_VALUE_MILLIONS')
+      y <- rlang::enquo(y)
+      
+      ylab <- 'Millions (Nominal USD)'
+      ylab2 <- 'Average Price (Nominal USD)'
+    } else {
+      # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
+      y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
+      y <- rlang::enquo(y)
+      
+      ylab <- 'Millions (Real 2024 USD)'
+      ylab2 <- 'Average Price (Real 2024 USD)'
+    }
     
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     
-    # ylab <- 'Total Landed Value (Billions, Real 2024 USD)'
-    ylab <- 'Millions (Real 2024 USD)'
-    ylab2 <- 'Average Price (Real 2024 USD)'
     tlab <- 'Ex-Vessel Value of '
   }
   
