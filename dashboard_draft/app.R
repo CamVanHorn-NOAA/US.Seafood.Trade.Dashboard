@@ -551,7 +551,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
              !is.na(DOLLARS),
              !is.na(KG)) %>%
       # select only necessary columns (year, value, volume)
-      select(YEAR, KG, DOLLARS_2024) %>%
+      select(YEAR, KG, DOLLARS_2024, DOLLARS) %>%
       # group by year
       group_by(YEAR) %>%
       # sum values across all numeric columns (i.e., value and volume)
@@ -563,8 +563,12 @@ summarize_landings_yr_spp <- function(landings_data, species) {
              ST = LB / 2000,
              MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
              BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
+             MILLIONS = DOLLARS / 1000000,
+             BILLIONS = DOLLARS / 1000000000,
              COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB) %>%
+             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+             COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
       # add COM (commercial) as well as volume or value as column prefix
         # this will benefit table joinings later
       rename(COM_VOLUME_KG = KG,
@@ -572,7 +576,9 @@ summarize_landings_yr_spp <- function(landings_data, species) {
              COM_VOLUME_LB = LB,
              COM_VOLUME_ST = ST,
              COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024)
+             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
+             COM_VALUE_MILLIONS = MILLIONS,
+             COM_VALUE_BILLIONS = BILLIONS)
     
     return(summarized_data)
   }
@@ -587,7 +593,7 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     filter(CONFIDENTIALITY != 'Confidential',
            !is.na(DOLLARS),
            !is.na(KG)) %>%
-    select(YEAR, !!level, KG, DOLLARS_2024) %>%
+    select(YEAR, !!level, KG, DOLLARS_2024, DOLLARS) %>%
     group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -596,13 +602,20 @@ summarize_landings_yr_spp <- function(landings_data, species) {
            ST = LB / 2000,
            MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
            BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-           COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+           COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+           COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+           MILLIONS = DOLLARS / 1000000,
+           BILLIONS = DOLLARS / 1000000000,
+           COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+           COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
     rename(COM_VOLUME_KG = KG,
            COM_VOLUME_MT = MT,
            COM_VOLUME_LB = LB,
            COM_VOLUME_ST = ST,
            COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-           COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024) 
+           COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
+           COM_VALUE_MILLIONS = MILLIONS,
+           COM_VALUE_BILLIONS = BILLIONS) 
   
   return(summarized_data)
   
