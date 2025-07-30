@@ -647,7 +647,7 @@ summarize_yr_spp <- function(species) {
   
   return(combined_data)
 }
-calculate_mlti <- function(species, exports = F, imports = F) {
+calculate_mlti <- function(species, exports = F, imports = F, nominal = F) {
   # this function calculates the multi-lateral Lowe trade index (MLTI) among
   # the top 5 trading countries for a given species, either for imports
   # or exports
@@ -665,8 +665,13 @@ calculate_mlti <- function(species, exports = F, imports = F) {
   
   # set value and volume to class of type symbol, specify if the value and 
   # volume are export or import
-  which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
-                                  'IMP_VALUE_2024USD'))
+  if (nominal == T) {
+    which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_USD',
+                                    'IMP_VALUE_USD'))
+  } else {
+    which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
+                                    'IMP_VALUE_2024USD')) 
+  }
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
                                    'IMP_VOLUME_KG'))
   # set value and volume to type quosure (see RLang package for details)
