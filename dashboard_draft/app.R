@@ -3032,7 +3032,8 @@ server <- function(input, output, session) {
   
   # creates trade balance plot (value)
   balance_plot <- reactive({
-    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade())
+    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
+               nominal = selected_value())
   })
   
   # outputs trade balance plot (value)
@@ -3063,13 +3064,15 @@ server <- function(input, output, session) {
       trade_filtered(),
       species_selection_trade(),
       time.frame = c(2020, 2024),
-      value = T)
+      value = T,
+      nominal = selected_value())
   })
   
   # creates top 5 net export plot
   top5_trade_plot <- reactive({
     plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
-                           species = species_selection_trade())
+                           species = species_selection_trade(), 
+                           nominal = selected_value())
   })
   
   # outputs top 5 net export plot
@@ -3083,7 +3086,7 @@ server <- function(input, output, session) {
   # creates export value plot
   exp_value_plot <- reactive({
     plot_trade(trade_df(), 'VALUE', units = selected_units(), export = T, 
-               species = species_selection_trade())
+               species = species_selection_trade(), nominal = selected_value())
   })
   
   # outputs export value plot
@@ -3097,7 +3100,7 @@ server <- function(input, output, session) {
   # creates import value plot
   imp_value_plot <- reactive({
     plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
-               species = species_selection_trade())
+               species = species_selection_trade(), nominal = selected_value())
   })
   
   # outputs import value plot
@@ -3366,7 +3369,8 @@ server <- function(input, output, session) {
   # creates landings value plot
   landings_value_plot <- reactive({
     plot_landings(landings_df(), 'VALUE', units = selected_units(),
-                  species = species_selection_landings())
+                  species = species_selection_landings(),
+                  nominal = selected_value())
   })
   
   # outputs landings value plot
@@ -3606,7 +3610,8 @@ server <- function(input, output, session) {
   # creates processed products value plot
   pp_value_plot <- reactive({
     plot_spp_pp(pp_df(), 'VALUE', 
-                species = species_selection_products())
+                species = species_selection_products(),
+                nominal = selected_value())
   })
   
   # outputs processed products value plot
@@ -3634,7 +3639,8 @@ server <- function(input, output, session) {
   # creates processed products price plot
   pp_price_plot <- reactive({
     plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
-                species = species_selection_products())
+                species = species_selection_products(),
+                nominal = selected_value())
   })
   
   # outputs processed products price plot
@@ -3649,7 +3655,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), exports = T)
+    calculate_mlti(species_selection_trade(), exports = T, nominal = selected_value())
   })
   
   # outputs MLTI export table
@@ -3676,7 +3682,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), imports = T)
+    calculate_mlti(species_selection_trade(), imports = T, nominal = selected_value())
   })
   
   # outputs MLTI import table
@@ -3703,7 +3709,7 @@ server <- function(input, output, session) {
   
   # creates HI plot
   hi_plot <- reactive({
-    plot_hi(calculate_hi(species_selection_trade()), 
+    plot_hi(calculate_hi(species_selection_trade(), nominal = selected_value()), 
             species = species_selection_trade())
   })
   
