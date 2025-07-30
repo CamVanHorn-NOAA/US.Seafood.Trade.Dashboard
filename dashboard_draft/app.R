@@ -457,7 +457,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
     summarized_data <- product_data %>%
       # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
         # volume (KG), and value (DOLLARS_2024)
-      select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+      select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
       # group by year and the product condition (PRODUCT_NAME)
       group_by(YEAR, PRODUCT_NAME) %>%
       # sum all numeric columns (i.e., value and volume), drop groups
@@ -470,7 +470,11 @@ summarize_pp_yr_spp <- function(product_data, species) {
              ST = LB / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
-             PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+             PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             MILLIONS = DOLLARS / 1000000,
+             BILLIONS = DOLLARS / 1000000000,
+             PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+             PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
       # rename columns to label value, volume, and PP (processed product) prefix
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT, 
@@ -478,7 +482,10 @@ summarize_pp_yr_spp <- function(product_data, species) {
              PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
              PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
-             PP_VOLUME_KG = KG)
+             PP_VOLUME_KG = KG,
+             PP_NOMINAL_VALUE = DOLLARS,
+             PP_VALUE_MILLIONS = MILLIONS,
+             PP_VALUE_BILLIONS = BILLIONS)
     
     return(summarized_data)
   }
@@ -487,7 +494,7 @@ summarize_pp_yr_spp <- function(product_data, species) {
   # only runs if species != 'ALL SPECIES'
   product_data %>%
     filter_species(species) %>%
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024) %>%
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -496,14 +503,21 @@ summarize_pp_yr_spp <- function(product_data, species) {
            ST = LB / 2000,
            MILLIONS_2024USD = DOLLARS_2024 / 1000000,
            BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
-           PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG) %>%
+           PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+           MILLIONS = DOLLARS / 1000000,
+           BILLIONS = DOLLARS / 1000000000,
+           PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+           PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
     rename(PP_VALUE_2024USD = DOLLARS_2024,
            PP_VOLUME_MT = MT,
            PP_VOLUME_LB = LB,
            PP_VOLUME_ST = ST,
            PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
            PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
-           PP_VOLUME_KG = KG)
+           PP_VOLUME_KG = KG,
+           PP_NOMINAL_VALUE = DOLLARS,
+           PP_VALUE_MILLIONS = MILLIONS,
+           PP_VALUE_BILLIONS = BILLIONS)
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
   # this function summarizes landings data (not exclusively commercial) by 
