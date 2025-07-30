@@ -305,7 +305,8 @@ summarize_trade_yr_spp <- function(trade_table, species) {
   return(summarized_data)
 }
 summarize_trade_ctry_yr_spp <- function(trade_table, species, 
-                                        time.frame, value = F, volume = F) {
+                                        time.frame, value = F, volume = F,
+                                        nominal = F) {
   # this function summarizes trade data by year and species of interest
     # within the top 5 trading partners of the U.S. for that species during
     # the specified period of time
@@ -331,8 +332,13 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
     # as type quosure to function within dplyr pipe 
       # (see RLang package for more details)
   if (value == T) {
-    field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
-    field <- rlang::enquo(field)
+    if (nominal == T) {
+      field <- as.symbol('TOTAL_NOMINAL_TRADE_VALUE')
+      field <- rlang::enquo(field)
+    } else {
+      field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
+      field <- rlang::enquo(field)
+    }
   } else {
     field <- as.symbol('TOTAL_TRADE_VOLUME')
     field <- rlang::enquo(field)
@@ -354,7 +360,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   summarized_data <- filtered_data %>%
     # select only columns of interest: year, country, exports and imports
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2024USD, IMP_VOLUME_KG) %>%
+           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     # filter data to be within the specified time frame
     filter(YEAR >= time.frame[1],
            YEAR <= time.frame[2]) %>%
@@ -366,7 +372,11 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
            EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                  IMP_VOLUME_KG)) %>%
+                                  IMP_VOLUME_KG),
+           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
+                                  EXP_VALUE_USD),
+           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
+                                  IMP_VALUE_USD)) %>%
     # group_by year and country
     group_by(YEAR, COUNTRY_NAME) %>%
     # sum all numeric columns, drop groups
@@ -385,6 +395,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
     # calculate total real trade value by summing export and import values
     # calculate total real trade volume by summing export and import volumes 
     mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
+           TOTAL_NOMINAL_TRADE_VALUE = EXP_VALUE_USD + IMP_VALUE_USD,
            TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
     # filter for the top 5 countries based on the field specified from 
       # the logical value and volume function inputs
@@ -402,12 +413,20 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
     # calculate net value and net volume by subtracting imports from exports
     mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
            IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+           EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
+           IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
            NET_VALUE_2024USD_BILLIONS = 
              EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+           NET_VALUE_NOMINAL_BILLIONS = 
+             EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
            EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
            IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+           EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
+           IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
            NET_VALUE_2024USD_MILLIONS =
              EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
+           NET_VALUE_NOMINAL_MILLIONS = 
+             EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
            EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
            IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
            EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
