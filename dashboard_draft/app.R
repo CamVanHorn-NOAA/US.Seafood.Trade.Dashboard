@@ -1930,7 +1930,12 @@ mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 ui <- page_sidebar(
   
   sidebar = sidebar(
-    title = 'Species Selection', 
+    title = 'Species Selection',
+    # search bar that outputs directions for how to filter for the searched 
+    # species (if available)
+    selectizeInput(inputId = 'search_term',
+                   label = 'Search for a Species',
+                   choices = NULL),
     uiOutput('filter_1'),
     # these outputs only appear once a selection is made for the prior input
       # this means filter_4 only appears once filter_3 has input, which only
@@ -2645,82 +2650,6 @@ server <- function(input, output, session) {
     req(!(species_selected() %in% landings_terms()))
     
     checkboxInput('landings_button', 'Revert landings data to last available selection')
-  })
-  
-  # define search bar terms
-  updateSelectizeInput(session = session,
-                       'search_term',
-                       choices = 
-                         c('', sort(c(categorization_matrix %>%
-                                        select(SPECIES_NAME) %>%
-                                        distinct() %>%
-                                        filter(!is.na(SPECIES_NAME)) %>%
-                                        mutate(SPECIES_NAME = 
-                                                 str_to_title(SPECIES_NAME)) %>%
-                                        pull()))),
-                       server = T)
-  
-  # Display search term categories for user to filter by
-  output$search_term_ecat <- renderText({
-    # require a search term to be inputted
-    req(input$search_term != '')
-    # set string to title to match data formatting
-    # pull all ecological categories matching the term (there can be multiple)
-    term <- str_to_title(as.character(categorization_matrix %>%
-                           filter_species(input$search_term) %>%
-                           select(ECOLOGICAL_CATEGORY) %>%
-                           distinct() %>%
-                           pull()))
-    
-    # use collapse to convert multiple strings into one with ', <br>' separating
-    paste('Select the following: <br><br>Ecological Category: <br>', 
-          paste(term, collapse = ', <br>'))
-  })
-  
-  # see above notes
-  output$search_term_scat <- renderText({
-    req(input$search_term != '')
-    # require that the search_term appears in this and preceding levels of the
-      # organization hierarchy for text to appear
-      # This ensures that we only display instructions for filtering up to
-      # the level of the desired species input
-    req(input$search_term %in% scat_list |
-          input$search_term %in% sgrp_list |
-          input$search_term %in% sname_list)
-    term <- str_to_title(as.character(categorization_matrix %>%
-                                        filter_species(input$search_term) %>%
-                                        select(SPECIES_CATEGORY) %>%
-                                        distinct() %>%
-                                        pull()))
-    paste('Species Category: <br>',
-          paste(term, collapse = ', <br>'))
-  })
-  
-  # see above notes
-  output$search_term_sgrp <- renderText({
-    req(input$search_term != '')
-    req(input$search_term %in% sgrp_list |
-          input$search_term %in% sname_list)
-    term <- str_to_title(as.character(categorization_matrix %>%
-                                        filter_species(input$search_term) %>%
-                                        select(SPECIES_GROUP) %>%
-                                        distinct() %>%
-                                        pull()))
-    paste('Species Group: <br>',
-          paste(term, collapse = ', <br>'))
-  })
-  
-  # see above notes
-  output$search_term_sname <- renderText({
-    req(input$search_term != '')
-    req(input$search_term %in% sname_list)
-    term <- str_to_title(as.character(categorization_matrix %>%
-                                        filter_species(input$search_term) %>%
-                                        select(SPECIES_NAME) %>%
-                                        distinct() %>%
-                                        pull()))
-    paste('Species Name: <br>',
-          paste(term, collapse = ', <br>'))
   })
   
   # sets aside species selected by the user
