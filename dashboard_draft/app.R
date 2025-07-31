@@ -1931,6 +1931,9 @@ ui <- page_sidebar(
   
   sidebar = sidebar(
     title = 'Species Selection',
+    actionButton('reset_button', 'Reset All Filters',
+                 class = 'btn-warning',
+                 style = 'margin-bottom: 15px; width: 100%'),
     # search bar that outputs directions for how to filter for the searched 
     # species (if available)
     selectizeInput(inputId = 'search_term',
