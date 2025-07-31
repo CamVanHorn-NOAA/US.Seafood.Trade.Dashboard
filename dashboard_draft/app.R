@@ -2530,6 +2530,15 @@ server <- function(input, output, session) {
                        ),
                        server = T)
 
+  search_cats <- reactive({
+    categorization_matrix %>%
+      filter(SPECIES_NAME == toupper(input$search_term)) %>%
+      pivot_longer(c(SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+                   ECOLOGICAL_CATEGORY)) %>%
+      select(value) %>%
+      mutate(value = str_to_title(value)) %>%
+      pull()
+  }) 
   
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
