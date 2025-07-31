@@ -2514,6 +2514,22 @@ server <- function(input, output, session) {
   )
   
   # species filter and search inputs -------------------------------------------
+  # define search bar terms
+  updateSelectizeInput(session = session,
+                       'search_term',
+                       choices = 
+                         c('', sort(c(categorization_matrix %>%
+                                        select(SPECIES_NAME) %>%
+                                        distinct() %>%
+                                        filter(!is.na(SPECIES_NAME)) %>%
+                                        mutate(SPECIES_NAME = 
+                                                 str_to_title(SPECIES_NAME)) %>%
+                                        pull()))),
+                       options = list(
+                         placeholder = 'Type here...'
+                       ),
+                       server = T)
+
   
   # creates input: ecol_cat
   # filter_1 is always present in the sidebar
