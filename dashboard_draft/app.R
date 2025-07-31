@@ -2553,9 +2553,12 @@ server <- function(input, output, session) {
                      mutate(ECOLOGICAL_CATEGORY = 
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
                      pull())
-    
-    selectInput('ecol_cat', 'Choose a Category', ecol_cats)
-    
+    if (input$search_term == '') {
+      selectInput('ecol_cat', 'or Choose a Category', ecol_cats)
+    } else {
+      selectInput('ecol_cat', 'or Choose a Category', ecol_cats, 
+                  selected = search_cats()[4])
+    }
   })
   
   # creates input: species_cat
@@ -2575,7 +2578,12 @@ server <- function(input, output, session) {
                                  str_to_title(SPECIES_CATEGORY)) %>%
                         pull())
     
-    selectInput('species_cat', 'Choose a Secondary Category', species_cats)
+    if (input$search_term == '') {
+      selectInput('species_cat', 'Choose a Secondary Category', species_cats)
+    } else {
+      selectInput('species_cat', 'Choose a Secondary Category', species_cats,
+                  selected = search_cats()[3])
+    }
   })
   
   # creates input: species_grp
@@ -2599,7 +2607,12 @@ server <- function(input, output, session) {
                                    str_to_title(SPECIES_GROUP)) %>%
                           pull())
     
-    selectInput('species_grp', 'Choose a Group', species_groups)
+    if (input$search_term == '') {
+      selectInput('species_grp', 'Choose a Group', species_groups)
+    } else {
+      selectInput('species_grp', 'Choose a Group', species_groups,
+                  selected = search_cats()[2])
+    }
   })
   
   # creates input: species_name
@@ -2624,8 +2637,12 @@ server <- function(input, output, session) {
                          # display strings as titles (first letter capitalized)
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
-    
-    selectInput('species_name', 'Choose a Species', species_names)
+    if (input$search_term == '') {
+      selectInput('species_name', 'Choose a Species', species_names)
+    } else {
+      selectInput('species_name', 'Choose a Species', species_names,
+                  selected = search_cats()[1])
+    }
   })
   
   # creates checkbox to unfilter trade up one level
