@@ -1943,25 +1943,9 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
-    # these outputs only appear once a selection is not available for a given
-      # section (landings, trade, production)
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
-    # search bar that outputs directions for how to filter for the searched 
-      # species (if available)
-    selectizeInput(inputId = 'search_term',
-                   label = 'or Search for a Species',
-                   choices = NULL),
-    # htmlOutput allows us to incorporate page breaks ('<br>')
-    htmlOutput('search_term_ecat'),
-    # add breaks between text for readability
-    br(), br(),
-    htmlOutput('search_term_scat'),
-    br(), br(),
-    htmlOutput('search_term_sgrp'),
-    br(), br(),
-    htmlOutput('search_term_sname'),
     downloadButton('download_trade',
                    'Download raw trade data'),
     downloadButton('download_landings',
