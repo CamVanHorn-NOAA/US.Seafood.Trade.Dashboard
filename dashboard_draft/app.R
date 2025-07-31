@@ -1931,6 +1931,9 @@ ui <- page_sidebar(
   
   sidebar = sidebar(
     title = 'Species Selection',
+    actionButton('reset_button', 'Reset All Filters',
+                 class = 'btn-warning',
+                 style = 'margin-bottom: 15px; width: 100%'),
     # search bar that outputs directions for how to filter for the searched 
     # species (if available)
     selectizeInput(inputId = 'search_term',
@@ -2159,7 +2162,19 @@ ui <- page_sidebar(
   
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
-  
+  # Reset Button ---------------------------------------------------------------
+  observeEvent(input$reset_button, {
+    updateSelectizeInput(session, 'search_term', selected = '')
+    updateSelectInput(session, 'ecol_cat', selected = 'All Species')
+    updateSelectInput(session, 'species_cat', selected = 'All Species')
+    updateSelectInput(session, 'species_grp', selected = 'All Species')
+    updateSelectInput(session, 'species_name', selected = 'All Species')
+    updateCheckboxInput(session, 'trade_button', value = F)
+    updateCheckboxInput(session, 'landings_button', value = F)
+    updateCheckboxInput(session, 'products_button', value = F)
+    update_switch(session = session, 'units', value = F)
+    update_switch(session = session, 'nominal', value = F)
+  })
   # Download buttons -----------------------------------------------------------
   # The following are a series of download buttons that provide the user the
     # ability to download pieces of the dashboard, organized by page and tab
