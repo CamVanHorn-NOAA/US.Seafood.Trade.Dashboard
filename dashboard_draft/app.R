@@ -1193,7 +1193,8 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
              aes(x = factor(YEAR),
                  # call for unique y value set earlier (see RLang)
                  y = !!y)) + 
-      geom_col(fill = 'black') +
+      geom_col(color = 'black',
+               fill = color) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label,
@@ -1297,15 +1298,17 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
                  y = value)) +
       geom_bar(aes(fill = name),
                stat = 'identity',
-               position = 'dodge') +
+               position = 'dodge',
+               color = 'black') +
       labs(x = '',
            # y = 'Billions (Real 2024 USD)',
            y = 'Millions (Real 2024 USD)',
            fill = '',
            title = paste0('Value Balance of ', species)) +
-      scale_fill_discrete(labels = c('Exports',
-                                     'Imports',
-                                     'Trade Balance')) +
+      scale_fill_manual(labels = c('Exports',
+                                   'Imports',
+                                   'Trade Balance'),
+                        values = c('#B3EDEF', '#1ECAD3', '#005761')) +
       coord_axes_inside(labels_inside = T) +
       scale_x_discrete(limits = factor(2004:2024)) +
       scale_y_continuous(labels = label_currency()) +
@@ -1737,7 +1740,8 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     ggplot(data = data,
            aes(x = factor(YEAR),
                y = !!y)) +
-    geom_col(fill = 'black') +
+    geom_col(color = 'black',
+             fill = '#853B00') +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                      limits = factor(2004:2023)) +
     scale_y_continuous(labels = label) +
@@ -1815,7 +1819,8 @@ plot_hi <- function(hi_data, species) {
               linewidth = 1.5) +
     geom_point(size = 2,
                color = 'black') +
-    scale_color_discrete(name = '') +
+    scale_color_discrete(name = '', 
+                         type = c('#003087', '#0085CA')) +
     labs(x = '',
          y = 'Index',
          title = paste0('Herfindahl Index of \n', species)) +
@@ -1852,7 +1857,8 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
              aes(x = factor(YEAR),
                  # divided by 1000 for thousand metric tons (volume metric)
                  y = APPARENT_SUPPLY / 1000)) +
-      geom_col(fill = 'black') +
+      geom_col(color = 'black',
+               fill = c('#008DA8')) +
       labs(x = '',
            y = ylab,
            title = paste0('Apparent Supply of \n', species)) +
@@ -1893,7 +1899,8 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
                  y = UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY)) +
-      geom_col(fill = 'black') +
+      geom_col(color = 'black',
+               fill = '#005E5E') +
       labs(x = '',
            y = 'Share of Apparent Supply',
            title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', species)) +
