@@ -2013,56 +2013,52 @@ ui <- page_sidebar(
       style = 'border: 3px solid #005761; border-radius: 12px;',
       navset_card_pill(title = 'Trade',
                        nav_panel(title = 'Market Summary',
-                                 fluidRow(
+                                 tooltip(
                                    withSpinner(
                                      plotOutput('balance'), 
-                                     type = 7)
+                                     type = 7),
                                  ),
-                                 fluidRow(
-                                   column(
+                                 layout_columns(
+                                   col_widths = c(6, 6),
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('trade_ratio'), 
                                        type = 7),
-                                     width = 6
-                                   ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('top5_trade'), 
                                        type = 7),
-                                     width = 6
-                                   )),
                                  downloadButton('download_page1',
                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
-                                 fluidRow(
-                                   column(
+                                 layout_columns(
+                                   col_widths = c(6, 6),
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('exp_value'), 
                                        type = 7),
-                                     width = 6
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('imp_value'), 
                                        type = 7),
-                                     width = 6
                                    )),
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Volume',
-                                 fluidRow(
-                                   column(
+                                 layout_columns(
+                                   col_widths = c(6, 6),
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('exp_volume'), 
                                        type = 7),
-                                     width = 6
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('imp_volume'), 
                                        type = 7),
-                                     width = 6
-                                   )),
+                                   )
+                                 ),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
                        # nav_panel(title = 'Price',
@@ -2082,46 +2078,39 @@ ui <- page_sidebar(
                        #           downloadButton('download_page4',
                        #                          'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
-                                 fluidRow(
-                                   column(
+                                 layout_columns(
+                                   col_widths = c(6, 6),
+                                   tooltip(
                                      withSpinner(
                                        # tableOutput('exp_mlti_table'),
                                        plotOutput('exp_mlti'),
                                        type = 7),
-                                     width = 6
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        # tableOutput('imp_mlti_table'), 
                                        plotOutput('imp_mlti'),
                                        type = 7),
-                                     width = 6
-                                   )),
-                                 fluidRow(
-                                   column(
                                      withSpinner(
                                        plotOutput('hi'), 
                                        type = 7),
-                                     width = 3
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('supply'), 
                                        type = 7),
-                                     width = 3
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('supply_ratio'), 
                                        type = 7),
-                                     width = 3
                                    ),
-                                   column(
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('supply_share'), 
                                        type = 7),
-                                     width = 3
-                                   )),
+                                   )
+                                 ),
                                  downloadButton('download_page4',
                                                 'Download these plots and their data'))))
   ),
@@ -2134,12 +2123,19 @@ ui <- page_sidebar(
                                    withSpinner(
                                      plotOutput('landings_value'),
                                      type = 7),
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('landings_value'),
+                                       type = 7),
+                                   ),
                                    downloadButton('download_landings_page1',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
-                                   withSpinner(
-                                     plotOutput('landings_volume'),
-                                     type = 7),
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('landings_volume'),
+                                       type = 7),
+                                   ),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data'))
                          # nav_panel(title = 'Price',
@@ -2156,21 +2152,27 @@ ui <- page_sidebar(
         style = 'border: 3px solid #681617; border-radius: 12px;',
         navset_card_pill(title = 'Processed Products',
                          nav_panel(title = 'Value',
-                                   withSpinner(
-                                     plotOutput('pp_value'),
-                                     type = 7),
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('pp_value'),
+                                       type = 7),
+                                   ),
                                    downloadButton('download_products_page1',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
-                                   withSpinner(
-                                     plotOutput('pp_volume'),
-                                     type = 7),
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('pp_volume'),
+                                       type = 7),
+                                   ),
                                    downloadButton('download_products_page2',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Price',
-                                   withSpinner(
-                                     plotOutput('pp_price'),
-                                     type = 7),
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('pp_price'),
+                                       type = 7),
+                                   ),
                                    downloadButton('download_products_page3',
                                                   'Download this plot and the data')))),
       width = 6))
