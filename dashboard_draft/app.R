@@ -2018,6 +2018,8 @@ ui <- page_sidebar(
                                      plotOutput('balance'), 
                                      type = 7),
                                    # textOutput('balance_tooltip'),
+                                   "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
+                                   placement = 'top'
                                  ),
                                  layout_columns(
                                    col_widths = c(6, 6),
@@ -2026,11 +2028,15 @@ ui <- page_sidebar(
                                        plotOutput('trade_ratio'), 
                                        type = 7),
                                      # textOutput('ratio_tooltip'),
+                                     "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported.",
+                                     placement = 'top'),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('top5_trade'), 
                                        type = 7),
                                      # textOutput('top5_tooltip'),
+                                     "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order.",
+                                     placement = 'top')),
                                  downloadButton('download_page1',
                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
@@ -2041,12 +2047,16 @@ ui <- page_sidebar(
                                        plotOutput('exp_value'), 
                                        type = 7),
                                      # textOutput('expval_tooltip'),
+                                     "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('imp_value'), 
                                        type = 7),
                                      # textOutput('impval_tooltip'),
+                                     "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points.",
+                                     placement = 'top'
                                    )),
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
@@ -2058,12 +2068,16 @@ ui <- page_sidebar(
                                        plotOutput('exp_volume'), 
                                        type = 7),
                                      # textOutput('expvol_tooltip'),
+                                     "Export volume reflects the total volume of product traded out of the U.S. into other countries.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('imp_volume'), 
                                        type = 7),
                                      # textOutput('impvol_tooltip')
+                                     "Import volume reflects the total volume of product traded into the U.S. from other countries.",
+                                     placement = 'top'
                                    )
                                  ),
                                  downloadButton('download_page3',
@@ -2093,12 +2107,16 @@ ui <- page_sidebar(
                                        plotOutput('exp_mlti'),
                                        type = 7),
                                      # textOutput('expmlti_tooltip'),
+                                     "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        # tableOutput('imp_mlti_table'), 
                                        plotOutput('imp_mlti'),
                                        type = 7),
+                                     "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
+                                     placement = 'top'
                                    )
                                  ),
                                  br(),
@@ -2109,24 +2127,32 @@ ui <- page_sidebar(
                                        plotOutput('hi'), 
                                        type = 7),
                                      # textOutput('hi_tooltip'),
+                                     "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply'), 
                                        type = 7),
                                      # textOutput('supply_tooltip')
+                                     "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply_ratio'), 
                                        type = 7),
                                      # textOutput('supplyratio_tooltip')
+                                     "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available.",
+                                     placement = 'top'
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply_share'), 
                                        type = 7),
                                      # textOutput('supplyshare_tooltip')
+                                     "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports.",
+                                     placement = 'top'
                                    )
                                  ),
                                  downloadButton('download_page4',
@@ -2143,6 +2169,8 @@ ui <- page_sidebar(
                                        plotOutput('landings_value'),
                                        type = 7),
                                      # textOutput('comvalue_tooltip')
+                                     "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points.",
+                                     placement = 'top'
                                    ),
                                    downloadButton('download_landings_page1',
                                                   'Download this plot and the data')),
@@ -2152,6 +2180,8 @@ ui <- page_sidebar(
                                        plotOutput('landings_volume'),
                                        type = 7),
                                      # textOutput('comvolume_tooltip')
+                                     "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S.",
+                                     placement = 'top'
                                    ),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data'))
@@ -2174,6 +2204,8 @@ ui <- page_sidebar(
                                        plotOutput('pp_value'),
                                        type = 7),
                                      # textOutput('ppvalue_tooltip')
+                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                     placement = 'top'
                                    ),
                                    downloadButton('download_products_page1',
                                                   'Download this plot and the data')),
@@ -2183,6 +2215,8 @@ ui <- page_sidebar(
                                        plotOutput('pp_volume'),
                                        type = 7),
                                      # textOutput('ppvolume_tooltip')
+                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                     placement = 'top'
                                    ),
                                    downloadButton('download_products_page2',
                                                   'Download this plot and the data')),
@@ -2192,6 +2226,8 @@ ui <- page_sidebar(
                                        plotOutput('pp_price'),
                                        type = 7),
                                      # textOutput('ppprice_tooltip')
+                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                     placement = 'top'
                                    ),
                                    downloadButton('download_products_page3',
                                                   'Download this plot and the data')))),
