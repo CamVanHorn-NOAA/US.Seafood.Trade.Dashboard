@@ -1935,6 +1935,16 @@ mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 # App --------------------------------------------------------------------------
 # Define UI --------------------------------------------------------------------
 ui <- page_sidebar(
+  # custom CSS for wider tooltips
+  tags$head(
+    tags$style(HTML("
+                    .tooltip-inner {
+                    max-width: 600px !important;
+                    width: auto !important;
+                    font-size: 16px !important;
+                    background-color: #283A38 !important;
+                    }"))
+  ),
   
   sidebar = sidebar(
     title = 'Species Selection',
