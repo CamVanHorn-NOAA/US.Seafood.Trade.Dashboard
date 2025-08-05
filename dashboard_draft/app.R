@@ -2017,6 +2017,7 @@ ui <- page_sidebar(
                                    withSpinner(
                                      plotOutput('balance'), 
                                      type = 7),
+                                   # textOutput('balance_tooltip'),
                                  ),
                                  layout_columns(
                                    col_widths = c(6, 6),
@@ -2024,10 +2025,12 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('trade_ratio'), 
                                        type = 7),
+                                     # textOutput('ratio_tooltip'),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('top5_trade'), 
                                        type = 7),
+                                     # textOutput('top5_tooltip'),
                                  downloadButton('download_page1',
                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
@@ -2037,11 +2040,13 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('exp_value'), 
                                        type = 7),
+                                     # textOutput('expval_tooltip'),
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('imp_value'), 
                                        type = 7),
+                                     # textOutput('impval_tooltip'),
                                    )),
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
@@ -2052,11 +2057,13 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('exp_volume'), 
                                        type = 7),
+                                     # textOutput('expvol_tooltip'),
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('imp_volume'), 
                                        type = 7),
+                                     # textOutput('impvol_tooltip')
                                    )
                                  ),
                                  downloadButton('download_page3',
@@ -2085,30 +2092,41 @@ ui <- page_sidebar(
                                        # tableOutput('exp_mlti_table'),
                                        plotOutput('exp_mlti'),
                                        type = 7),
+                                     # textOutput('expmlti_tooltip'),
                                    ),
                                    tooltip(
                                      withSpinner(
                                        # tableOutput('imp_mlti_table'), 
                                        plotOutput('imp_mlti'),
                                        type = 7),
+                                   )
+                                 ),
+                                 br(),
+                                 layout_columns(
+                                   col_widths = c(3, 3, 3, 3),
+                                   tooltip(
                                      withSpinner(
                                        plotOutput('hi'), 
                                        type = 7),
+                                     # textOutput('hi_tooltip'),
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply'), 
                                        type = 7),
+                                     # textOutput('supply_tooltip')
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply_ratio'), 
                                        type = 7),
+                                     # textOutput('supplyratio_tooltip')
                                    ),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('supply_share'), 
                                        type = 7),
+                                     # textOutput('supplyshare_tooltip')
                                    )
                                  ),
                                  downloadButton('download_page4',
@@ -2120,13 +2138,11 @@ ui <- page_sidebar(
         style = 'border: 3px solid #234515; border-radius: 12px;',
         navset_card_pill(title = 'Commercial Landings',
                          nav_panel(title = 'Value',
-                                   withSpinner(
-                                     plotOutput('landings_value'),
-                                     type = 7),
                                    tooltip(
                                      withSpinner(
                                        plotOutput('landings_value'),
                                        type = 7),
+                                     # textOutput('comvalue_tooltip')
                                    ),
                                    downloadButton('download_landings_page1',
                                                   'Download this plot and the data')),
@@ -2135,6 +2151,7 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('landings_volume'),
                                        type = 7),
+                                     # textOutput('comvolume_tooltip')
                                    ),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data'))
@@ -2156,6 +2173,7 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('pp_value'),
                                        type = 7),
+                                     # textOutput('ppvalue_tooltip')
                                    ),
                                    downloadButton('download_products_page1',
                                                   'Download this plot and the data')),
@@ -2164,6 +2182,7 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('pp_volume'),
                                        type = 7),
+                                     # textOutput('ppvolume_tooltip')
                                    ),
                                    downloadButton('download_products_page2',
                                                   'Download this plot and the data')),
@@ -2172,6 +2191,7 @@ ui <- page_sidebar(
                                      withSpinner(
                                        plotOutput('pp_price'),
                                        type = 7),
+                                     # textOutput('ppprice_tooltip')
                                    ),
                                    downloadButton('download_products_page3',
                                                   'Download this plot and the data')))),
