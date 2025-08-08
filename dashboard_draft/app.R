@@ -3086,8 +3086,18 @@ server <- function(input, output, session) {
   
   # creates trade balance plot (value)
   balance_plot <- reactive({
-    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
-               nominal = selected_value())
+    p <- plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
+                    nominal = selected_value())
+    
+    ggplotly(p, tooltip = 'text') %>%
+      layout(showlegend = F,
+             margin = list(l = 60), # without this, plot compresses to right
+             autosize = T,
+             xaxis = list(fixedrange = T),
+             yaxis = list(fixedrange = T)) %>%
+      config(displayModeBar = F,
+             scrollZoom = F,
+             doubleClick = F) 
   })
   
   # outputs trade balance plot (value)
