@@ -2024,7 +2024,7 @@ ui <- page_sidebar(
                        nav_panel(title = 'Market Summary',
                                  tooltip(
                                    withSpinner(
-                                     plotOutput('balance'), 
+                                     plotlyOutput('balance'), 
                                      type = 7),
                                    # textOutput('balance_tooltip'),
                                    "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
@@ -3091,7 +3091,7 @@ server <- function(input, output, session) {
   })
   
   # outputs trade balance plot (value)
-  output$balance <- renderPlot({
+  output$balance <- renderPlotly({
     trade_data_validation()
     validate(need(try(!is.na(balance_plot())),
                   'Data for this species is insufficient to produce this plot'))
