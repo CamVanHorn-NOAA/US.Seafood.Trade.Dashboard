@@ -1951,7 +1951,8 @@ ui <- page_sidebar(
                     width: auto !important;
                     font-size: 16px !important;
                     background-color: #283A38 !important;
-                    }"))
+                    }")),
+    tags$style(HTML("g.hovertext > path {opacity: .9;}"))
   ),
   
   sidebar = sidebar(
