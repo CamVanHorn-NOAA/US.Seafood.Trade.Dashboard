@@ -1291,12 +1291,19 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       # pivot longer so there are three groups: exports, imports, and balance
       pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
       # factor the column storing the groups
-      mutate(name = as.factor(name))
+      mutate(name = as.factor(name)) %>%
+      mutate(hover_text = paste(
+        "<span style='font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        paste0(YEAR, ' ', ifelse(name == 'TRADE_BALANCE', 
+                                 'Trade Balance', str_to_title(name))), 
+        "</span><br><br>", "<span style='font-size: 20px;'>",
+        paste0(scales::dollar(value), ' Million')))
     
     plot <- 
       ggplot(data = balance_data,
              aes(x = factor(YEAR),
-                 y = value)) +
+                 y = value,
+                 text = hover_text)) +
       geom_bar(aes(fill = name),
                stat = 'identity',
                position = 'dodge',
