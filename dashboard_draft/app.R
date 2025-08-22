@@ -3240,22 +3240,12 @@ server <- function(input, output, session) {
   
   # creates trade balance plot (value)
   balance_plot <- reactive({
-    p <- plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
+    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
                     nominal = selected_value())
-    
-    ggplotly(p, tooltip = 'text') %>%
-      layout(showlegend = F,
-             margin = list(l = 60), # without this, plot compresses to right
-             autosize = T,
-             xaxis = list(fixedrange = T),
-             yaxis = list(fixedrange = T)) %>%
-      config(displayModeBar = F,
-             scrollZoom = F,
-             doubleClick = F) 
   })
   
   # outputs trade balance plot (value)
-  output$balance <- renderPlotly({
+  output$balance <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(balance_plot())),
                   'Data for this species is insufficient to produce this plot'))
@@ -3265,7 +3255,7 @@ server <- function(input, output, session) {
   # creates export/import ratio plot
   ratio_plot <- reactive({
     plot_trade(trade_df(), 'RATIO', export = T, import = T, 
-               species = species_selection_trade())
+                    species = species_selection_trade())
   })
   
   # outputs export/import ratio plot
@@ -3289,8 +3279,8 @@ server <- function(input, output, session) {
   # creates top 5 net export plot
   top5_trade_plot <- reactive({
     plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
-                           species = species_selection_trade(), 
-                           nominal = selected_value())
+                                species = species_selection_trade(), 
+                                nominal = selected_value())
   })
   
   # outputs top 5 net export plot
@@ -3318,8 +3308,8 @@ server <- function(input, output, session) {
   # creates import value plot
   imp_value_plot <- reactive({
     plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
-               species = species_selection_trade(), nominal = selected_value())
-  })
+                    species = species_selection_trade(), nominal = selected_value())
+    })
   
   # outputs import value plot
   output$imp_value <- renderPlot({
@@ -3346,7 +3336,7 @@ server <- function(input, output, session) {
   # creates import volume plot
   imp_volume_plot <- reactive({
     plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
-               species = species_selection_trade())
+                    species = species_selection_trade())
   })
   
   # outputs import volume plot
@@ -3602,7 +3592,7 @@ server <- function(input, output, session) {
   # creates landings volume plot
   landings_volume_plot <- reactive({
     plot_landings(landings_df(), 'VOLUME', units = selected_units(),
-                  species = species_selection_landings())
+                       species = species_selection_landings())
   })
   
   # outputs landings volume plot
@@ -3843,7 +3833,7 @@ server <- function(input, output, session) {
   # creates processed products volume plot
   pp_volume_plot <- reactive({
     plot_spp_pp(pp_df(), 'VOLUME', units = selected_units(),
-                species = species_selection_products())
+                     species = species_selection_products())
   })
   
   # outputs processed products volume plot
@@ -3857,8 +3847,8 @@ server <- function(input, output, session) {
   # creates processed products price plot
   pp_price_plot <- reactive({
     plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
-                species = species_selection_products(),
-                nominal = selected_value())
+                     species = species_selection_products(),
+                     nominal = selected_value())
   })
   
   # outputs processed products price plot
