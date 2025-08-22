@@ -1940,6 +1940,30 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
   return(plot)
 }
 
+# tooltip function
+create_tooltip_icon <- function(line, point) {
+  # Create temporary PNG
+  temp_png <- tempfile(fileext = '.png')
+  
+  # Create larger plot for bigger icon (change icon size here)
+  png(temp_png, width = 40, height = 20, bg = 'transparent')
+  par(mar = c(0, 0, 0, 0))
+  plot(c(0, 1), c(0, 1), type = 'n', axes = F, xlab = '', ylab = '')
+  
+  # Draw the line (color specific)
+  lines(c(0.1, 0.9), c(0.5, 0.5), col = line, lwd = 4)
+  
+  # Draw point (shape specific)
+  points(0.5, 0.5, pch = point, col = 'black', cex = 1.5)
+  
+  dev.off()
+  
+  # Convert to base64 
+  icon_data <- base64enc::base64encode(temp_png)
+  unlink(temp_png) # cleans the file
+  
+  return(paste0("data:image/png;base64,", icon_data))
+}
 # Colors -----------------------------------------------------------------------
 # colors designed primarily for processed products at the moment
 colors <- c(nmfs_palette('coral')(6)[6:3], 
