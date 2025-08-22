@@ -1383,7 +1383,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal
     labs(x = '',
          y = ylab,
          fill = 'Year',
-         title = paste0('Net Export Value for Top 5 Trading Partners \nof ', 
+         title = paste0('Net Export Value for Top 5 Trading Partners of ', 
                         species)) +
     scale_y_continuous(labels = label) +
     theme_bw() +
@@ -1581,7 +1581,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       geom_line(aes(group = PRODUCT_NAME),
                 linewidth = 1.5) +
       geom_point(color = 'black',
-                 size = 1) +
+                 size = 1.5) +
       scale_color_manual(values = colors,
                          name = 'Product Condition') +
       labs(x = '',
@@ -1842,7 +1842,7 @@ plot_hi <- function(hi_data, species) {
               linewidth = 1.5) +
     geom_point(size = 2,
                color = 'black') +
-    scale_color_discrete(name = '', 
+    scale_color_discrete(name = NULL, 
                          type = c('#003087', '#0085CA')) +
     labs(x = '',
          y = 'Index',
