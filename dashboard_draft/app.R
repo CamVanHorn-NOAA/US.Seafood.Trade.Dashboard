@@ -969,10 +969,10 @@ calculate_hi <- function(species, nominal = F) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     group_by(YEAR) %>%
-    mutate(TOTAL_EXP_VALUE_YR = sum(exp_value),
-           TOTAL_IMP_VALUE_YR = sum(imp_value),
-           PROPORT_EXP_VALUE = exp_value / TOTAL_EXP_VALUE_YR,
-           PROPORT_IMP_VALUE = imp_value / TOTAL_IMP_VALUE_YR,
+    mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
+           TOTAL_IMP_VALUE_YR = sum(!!imp_value),
+           PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
+           PROPORT_IMP_VALUE = !!imp_value / TOTAL_IMP_VALUE_YR,
            PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
            PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
            EXP_HI = sum(PROPORT_EXP_SQUARED),
