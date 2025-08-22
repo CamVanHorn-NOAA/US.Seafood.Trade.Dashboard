@@ -1117,7 +1117,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
     
     if (units == 'IMPERIAL') {
       if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, 'PRICE_NOMINAL_PER_LB'))
+        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_LB'))
         y2 <- rlang::enquo(y2)
         
         max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_LB, na.rm = T)
