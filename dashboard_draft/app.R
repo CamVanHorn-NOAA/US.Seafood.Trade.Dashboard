@@ -96,6 +96,35 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
+tooltip_aes <- paste0(
+  "position: absolute; ",
+  "background-color: rgba(255, 255, 255, 0.95); ",
+  "border: 1px solid #ccc; ",
+  "border-radius: 10px; ",
+  "padding: 10px; ",
+  "padding-right: 25px; ",
+  "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
+  "z-index: 1000; ",
+  "max-width: 250px; ",
+  "min-width: 250px; "
+)
+
+close_button_aes <- paste0(
+  "position: absolute; ",
+  "top: 2px; ",
+  "right: 5px; ",
+  "background: transparent; ",
+  "border: none; ",
+  "color: #666; ",
+  "font-size: 18px; ",
+  "font-weight: bold; ",
+  "cursor: pointer; ",
+  "padding: 0; ",
+  "width: 20px; ",
+  "height: 20px; ",
+  "line-height: 18px; ",
+  "text-align: center; ")
+
 ###
 
 # Custom Functions -------------------------------------------------------------
@@ -969,10 +998,10 @@ calculate_hi <- function(species, nominal = F) {
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     group_by(YEAR) %>%
-    mutate(TOTAL_EXP_VALUE_YR = sum(exp_value),
-           TOTAL_IMP_VALUE_YR = sum(imp_value),
-           PROPORT_EXP_VALUE = exp_value / TOTAL_EXP_VALUE_YR,
-           PROPORT_IMP_VALUE = imp_value / TOTAL_IMP_VALUE_YR,
+    mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
+           TOTAL_IMP_VALUE_YR = sum(!!imp_value),
+           PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
+           PROPORT_IMP_VALUE = !!imp_value / TOTAL_IMP_VALUE_YR,
            PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
            PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
            EXP_HI = sum(PROPORT_EXP_SQUARED),
@@ -1112,12 +1141,13 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       }
       
       label2 <- label_currency(suffix = '/kg')
+      unit <- ' per kilogram'
       
     }
     
     if (units == 'IMPERIAL') {
       if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, 'PRICE_NOMINAL_PER_LB'))
+        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_LB'))
         y2 <- rlang::enquo(y2)
         
         max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_LB, na.rm = T)
@@ -1131,6 +1161,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       }
       
       label2 <- label_currency(suffix = '/lb')
+      unit <- ' per pound'
     }
     
     if (nominal == T) {
@@ -1372,15 +1403,16 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal
   }
   
   ggplot(data = data,
-         aes(x = factor(gsub(' ', '\n', COUNTRY_NAME)),
+         aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
              y = !!y, 
              fill = factor(YEAR))) +
-    geom_col(position = 'dodge') +
+    geom_col(position = 'dodge',
+             color = 'black') +
     scale_fill_nmfs(palette = 'oceans') +
     labs(x = '',
          y = ylab,
          fill = 'Year',
-         title = paste0('Net Export Value for Top 5 Trading Partners \nof ', 
+         title = paste0('Net Export Value for Top 5 Trading Partners of ', 
                         species)) +
     scale_y_continuous(labels = label) +
     theme_bw() +
@@ -1460,6 +1492,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     tlab <- 'Production Value of '
+    unit <- ' Million'
     
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
@@ -1475,6 +1508,12 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
       ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)  
     }
+    
+    new_data <- new_data %>%
+      select(YEAR, PRODUCT_NAME, PP_VALUE_2024USD, PP_NOMINAL_VALUE,
+             PP_VALUE_MILLIONS_2024USD, PP_VALUE_BILLIONS_2024USD, 
+             PP_VALUE_MILLIONS, PP_VALUE_BILLIONS) %>%
+      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'VOLUME') {
@@ -1485,6 +1524,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       ylab <- 'Metric Tons (Thousands)'
       label <- comma
       tlab <- 'Production Volume of '
+      unit <- ' Thousand Metric Tons'
       
       # calculate the total value per year to find upper limit
       yr_volume <- new_data %>%
@@ -1502,6 +1542,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       ylab <- 'Short Tons (Thousands)'
       label <- comma
       tlab <- 'Production Volume of '
+      unit <- ' Thousand Short Tons'
       
       # calculate the total value per year to find upper limit
       yr_volume <- new_data %>%
@@ -1512,6 +1553,11 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       
       ylim <- max(yr_volume$PP_VOLUME_THOUSAND_ST + 1)
     }
+    
+    new_data <- new_data %>%
+      select(YEAR, PRODUCT_NAME, PP_VOLUME_KG, PP_VOLUME_MT, PP_VOLUME_LB,
+             PP_VOLUME_ST, PP_VOLUME_THOUSAND_MT, PP_VOLUME_THOUSAND_ST) %>%
+      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'PRICE') {
@@ -1535,6 +1581,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       }
       
       label <- label_currency(suffix = '/kg')
+      unit <- ' per kilogram'
     }
     
     if (units == 'IMPERIAL') {
@@ -1553,15 +1600,17 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       }
       
       label <- label_currency(suffix = '/lb')
+      unit <- ' per pound'
     }
-    plot <- ggplot(data = new_data,
+    plot <- ggplot(data = new_data %>%
+                     mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME)),
                    aes(x = factor(YEAR),
                        y = !!y,
                        color = PRODUCT_NAME)) +
       geom_line(aes(group = PRODUCT_NAME),
                 linewidth = 1.5) +
       geom_point(color = 'black',
-                 size = 1) +
+                 size = 1.5) +
       scale_color_manual(values = colors,
                          name = 'Product Condition') +
       labs(x = '',
@@ -1587,7 +1636,8 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
                  aes(x = factor(YEAR),
                      y = !!y,
                      fill = PRODUCT_NAME)) +
-    geom_col(position = 'stack') +
+    geom_col(position = 'stack',
+             color = 'black') +
     scale_fill_manual(values = colors,
                       name = 'Product Condition') +
     labs(x = '',
@@ -1628,6 +1678,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
       }
       
       label2 <- label_currency(suffix = '/kg')
+      unit <- 'per kilogram'
     }
     
     if (units == 'IMPERIAL') {
@@ -1640,6 +1691,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
       }
       
       label2 <- label_currency(suffix = '/lb')
+      unit <- 'per pound'
     }
     
     if (nominal == T) {
@@ -1819,7 +1871,7 @@ plot_hi <- function(hi_data, species) {
               linewidth = 1.5) +
     geom_point(size = 2,
                color = 'black') +
-    scale_color_discrete(name = '', 
+    scale_color_discrete(name = NULL, 
                          type = c('#003087', '#0085CA')) +
     labs(x = '',
          y = 'Index',
@@ -1829,8 +1881,9 @@ plot_hi <- function(hi_data, species) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 15),
-          legend.position = 'top',
-          plot.title = element_text(size = 18))
+          legend.position = c(0.87, 0.93),
+          legend.box.background = element_rect(color = 'black', linetype = 'solid', size = 1),
+          plot.title = element_text(size = 16))
   
 }
 plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
@@ -1916,6 +1969,30 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
   return(plot)
 }
 
+# tooltip function
+create_tooltip_icon <- function(line, point) {
+  # Create temporary PNG
+  temp_png <- tempfile(fileext = '.png')
+  
+  # Create larger plot for bigger icon (change icon size here)
+  png(temp_png, width = 40, height = 20, bg = 'transparent')
+  par(mar = c(0, 0, 0, 0))
+  plot(c(0, 1), c(0, 1), type = 'n', axes = F, xlab = '', ylab = '')
+  
+  # Draw the line (color specific)
+  lines(c(0.1, 0.9), c(0.5, 0.5), col = line, lwd = 4)
+  
+  # Draw point (shape specific)
+  points(0.5, 0.5, pch = point, col = 'black', cex = 1.5)
+  
+  dev.off()
+  
+  # Convert to base64 
+  icon_data <- base64enc::base64encode(temp_png)
+  unlink(temp_png) # cleans the file
+  
+  return(paste0("data:image/png;base64,", icon_data))
+}
 # Colors -----------------------------------------------------------------------
 # colors designed primarily for processed products at the moment
 colors <- c(nmfs_palette('coral')(6)[6:3], 
@@ -1924,10 +2001,10 @@ colors <- c(nmfs_palette('coral')(6)[6:3],
             nmfs_cols()[42:39])
 
 names(colors) <- levels(factor(levels = c(
-  'FILLETS', 'STEAKS', 'SURIMI', 'SHUCKED MEATS',
-  'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
-  'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
-  'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+  'Fillets', 'Steaks', 'Surimi', 'Shucked Meats',
+  'Canned', 'Oil', 'Dressed', 'Smoked (Excl. Canned)', 'Chowders',
+  'Fish Sticks', 'Breaded Shrimp', 'Cakes/Patties',
+  'Other*', 'Other Industrial', 'Meal', 'Fish Portions')))
 
 # Because the countries will change based on the selected species,
   # the colors have no mapping
@@ -1943,6 +2020,16 @@ ui <- page_sidebar(
                     width: auto !important;
                     font-size: 16px !important;
                     background-color: #283A38 !important;
+                    }")),
+    tags$style(HTML("g.hovertext > path {opacity: .9;}")),
+    tags$style(HTML(".color-swatch {
+                      display: inline-block;
+                      width: 18px;
+                      height: 15px; 
+                      border: 1px solid #000; 
+                      border-radius: 3px;
+                      vertical-align: middle;
+                      margin-right: 8px;
                     }"))
   ),
   
@@ -2013,73 +2100,104 @@ ui <- page_sidebar(
       style = 'border: 3px solid #005761; border-radius: 12px;',
       navset_card_pill(title = 'Trade',
                        nav_panel(title = 'Market Summary',
-                                 tooltip(
-                                   withSpinner(
-                                     plotOutput('balance'), 
-                                     type = 7),
-                                   # textOutput('balance_tooltip'),
-                                   "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
-                                   placement = 'top'
+                                 div(
+                                   style = "position: relative;",
+                                   tooltip(
+                                     withSpinner(
+                                       plotOutput('balance',
+                                                  click = clickOpts('balance_plot_click'),
+                                                  height = "400px"), 
+                                       type = 7),
+                                     # textOutput('balance_tooltip'),
+                                     "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
+                                     placement = 'top'),
+                                   uiOutput('balance_click_overlay')
                                  ),
                                  layout_columns(
                                    col_widths = c(6, 6),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('trade_ratio'), 
-                                       type = 7),
-                                     # textOutput('ratio_tooltip'),
-                                     "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported.",
-                                     placement = 'top'),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('top5_trade'), 
-                                       type = 7),
-                                     # textOutput('top5_tooltip'),
-                                     "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order.",
-                                     placement = 'top')),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('trade_ratio',
+                                                    click = clickOpts('ratio_plot_click'),
+                                                    height = '400px'), 
+                                         type = 7),
+                                       # textOutput('ratio_tooltip'),
+                                       "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported.",
+                                       placement = 'top'),
+                                     uiOutput('ratio_click_overlay')),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('top5_trade',
+                                                    click = clickOpts('top5_plot_click'),
+                                                    height = '400px'), 
+                                         type = 7),
+                                       # textOutput('top5_tooltip'),
+                                       "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order.",
+                                       placement = 'top'),
+                                     uiOutput('top5_click_overlay'))),
                                  downloadButton('download_page1',
                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
                                  layout_columns(
                                    col_widths = c(6, 6),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('exp_value'), 
-                                       type = 7),
-                                     # textOutput('expval_tooltip'),
-                                     "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points.",
-                                     placement = 'top'
-                                   ),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('imp_value'), 
-                                       type = 7),
-                                     # textOutput('impval_tooltip'),
-                                     "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points.",
-                                     placement = 'top'
-                                   )),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('exp_value', 
+                                                    click = clickOpts("exp_value_plot_click"),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('expval_tooltip'),
+                                       "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points.",
+                                       placement = 'top'
+                                     ),
+                                     uiOutput("exp_value_click_overlay")),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('imp_value',
+                                                    click = clickOpts("imp_value_plot_click"),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('impval_tooltip'),
+                                       "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points.",
+                                       placement = 'top'),
+                                     uiOutput("imp_value_click_overlay"))),
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Volume',
                                  layout_columns(
                                    col_widths = c(6, 6),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('exp_volume'), 
-                                       type = 7),
-                                     # textOutput('expvol_tooltip'),
-                                     "Export volume reflects the total volume of product traded out of the U.S. into other countries.",
-                                     placement = 'top'
-                                   ),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('imp_volume'), 
-                                       type = 7),
-                                     # textOutput('impvol_tooltip')
-                                     "Import volume reflects the total volume of product traded into the U.S. from other countries.",
-                                     placement = 'top'
-                                   )
-                                 ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('exp_volume',
+                                                    click = clickOpts("exp_volume_plot_click"),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('expvol_tooltip'),
+                                       "Export volume reflects the total volume of product traded out of the U.S. into other countries.",
+                                       placement = 'top'),
+                                     uiOutput("exp_volume_click_overlay")),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('imp_volume',
+                                                    click = clickOpts("imp_volume_plot_click"),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('impvol_tooltip')
+                                       "Import volume reflects the total volume of product traded into the U.S. from other countries.",
+                                       placement = 'top'),
+                                     uiOutput('imp_volume_click_overlay'))),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
                        # nav_panel(title = 'Price',
@@ -2101,60 +2219,85 @@ ui <- page_sidebar(
                        nav_panel(title = 'Advanced Metrics',
                                  layout_columns(
                                    col_widths = c(6, 6),
-                                   tooltip(
-                                     withSpinner(
-                                       # tableOutput('exp_mlti_table'),
-                                       plotOutput('exp_mlti'),
-                                       type = 7),
-                                     # textOutput('expmlti_tooltip'),
-                                     "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
-                                     placement = 'top'
+                                   div(
+                                     # style argument keeps overlay positioned within the container
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         # tableOutput('exp_mlti_table'),
+                                         plotOutput('exp_mlti',
+                                                    click = clickOpts(id = 'exp_mlti_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('expmlti_tooltip'),
+                                       "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
+                                       placement = 'top'
+                                     ),
+                                     uiOutput('exp_mlti_click_overlay')),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         # tableOutput('imp_mlti_table'), 
+                                         plotOutput('imp_mlti',
+                                                    click = clickOpts(id = 'imp_mlti_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
+                                       placement = 'top'),
+                                     uiOutput('imp_mlti_click_overlay'))
                                    ),
-                                   tooltip(
-                                     withSpinner(
-                                       # tableOutput('imp_mlti_table'), 
-                                       plotOutput('imp_mlti'),
-                                       type = 7),
-                                     "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
-                                     placement = 'top'
-                                   )
-                                 ),
                                  br(),
                                  layout_columns(
                                    col_widths = c(3, 3, 3, 3),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('hi'), 
-                                       type = 7),
-                                     # textOutput('hi_tooltip'),
-                                     "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners.",
-                                     placement = 'top'
-                                   ),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('supply'), 
-                                       type = 7),
-                                     # textOutput('supply_tooltip')
-                                     "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade.",
-                                     placement = 'top'
-                                   ),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('supply_ratio'), 
-                                       type = 7),
-                                     # textOutput('supplyratio_tooltip')
-                                     "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available.",
-                                     placement = 'top'
-                                   ),
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('supply_share'), 
-                                       type = 7),
-                                     # textOutput('supplyshare_tooltip')
-                                     "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports.",
-                                     placement = 'top'
-                                   )
-                                 ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('hi',
+                                                    click = clickOpts(id = 'hi_plot_click'),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('hi_tooltip'),
+                                       "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners.",
+                                       placement = 'top'),
+                                     uiOutput('hi_click_overlay')),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('supply',
+                                                    click = clickOpts(id = "supply_plot_click"),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('supply_tooltip')
+                                       "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade.",
+                                       placement = 'top'),
+                                     uiOutput("supply_click_overlay")),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('supply_ratio',
+                                                    click = clickOpts(id = 'supply_ratio_plot_click'),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('supplyratio_tooltip')
+                                       "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available.",
+                                       placement = 'top'),
+                                     uiOutput('supply_ratio_click_overlay')),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('supply_share',
+                                                    click = clickOpts(id = 'supply_share_plot_click'),
+                                                    height = "500px"), 
+                                         type = 7),
+                                       # textOutput('supplyshare_tooltip')
+                                       "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports.",
+                                       placement = 'top'),
+                                     uiOutput('supply_share_click_overlay'))),
                                  downloadButton('download_page4',
                                                 'Download these plots and their data'))))
   ),
@@ -2164,25 +2307,33 @@ ui <- page_sidebar(
         style = 'border: 3px solid #234515; border-radius: 12px;',
         navset_card_pill(title = 'Commercial Landings',
                          nav_panel(title = 'Value',
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('landings_value'),
-                                       type = 7),
-                                     # textOutput('comvalue_tooltip')
-                                     "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points.",
-                                     placement = 'top'
-                                   ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('landings_value',
+                                                    click = clickOpts(id = 'landings_value_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('comvalue_tooltip')
+                                       "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points.",
+                                       placement = 'top'),
+                                     uiOutput('landings_value_click_overlay')),
                                    downloadButton('download_landings_page1',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('landings_volume'),
-                                       type = 7),
-                                     # textOutput('comvolume_tooltip')
-                                     "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S.",
-                                     placement = 'top'
-                                   ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('landings_volume',
+                                                    click = clickOpts(id = 'landings_volume_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('comvolume_tooltip')
+                                       "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S.",
+                                       placement = 'top'),
+                                     uiOutput('landings_volume_click_overlay')),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data'))
                          # nav_panel(title = 'Price',
@@ -2199,36 +2350,48 @@ ui <- page_sidebar(
         style = 'border: 3px solid #681617; border-radius: 12px;',
         navset_card_pill(title = 'Processed Products',
                          nav_panel(title = 'Value',
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('pp_value'),
-                                       type = 7),
-                                     # textOutput('ppvalue_tooltip')
-                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
-                                     placement = 'top'
-                                   ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('pp_value',
+                                                    click = clickOpts('pp_value_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('ppvalue_tooltip')
+                                       "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                       placement = 'top'),
+                                     uiOutput('pp_value_click_overlay')),
                                    downloadButton('download_products_page1',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('pp_volume'),
-                                       type = 7),
-                                     # textOutput('ppvolume_tooltip')
-                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
-                                     placement = 'top'
-                                   ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('pp_volume',
+                                                    click = clickOpts('pp_volume_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('ppvolume_tooltip')
+                                       "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                       placement = 'top'),
+                                     uiOutput('pp_volume_click_overlay')),
                                    downloadButton('download_products_page2',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Price',
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('pp_price'),
-                                       type = 7),
-                                     # textOutput('ppprice_tooltip')
-                                     "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
-                                     placement = 'top'
-                                   ),
+                                   div(
+                                     style = "position: relative;",
+                                     tooltip(
+                                       withSpinner(
+                                         plotOutput('pp_price',
+                                                    click = clickOpts('pp_price_plot_click'),
+                                                    height = "500px"),
+                                         type = 7),
+                                       # textOutput('ppprice_tooltip')
+                                       "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
+                                       placement = 'top'),
+                                     uiOutput('pp_price_click_overlay')),
                                    downloadButton('download_products_page3',
                                                   'Download this plot and the data')))),
       width = 6))
@@ -3078,7 +3241,7 @@ server <- function(input, output, session) {
   # creates trade balance plot (value)
   balance_plot <- reactive({
     plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
-               nominal = selected_value())
+                    nominal = selected_value())
   })
   
   # outputs trade balance plot (value)
@@ -3092,7 +3255,7 @@ server <- function(input, output, session) {
   # creates export/import ratio plot
   ratio_plot <- reactive({
     plot_trade(trade_df(), 'RATIO', export = T, import = T, 
-               species = species_selection_trade())
+                    species = species_selection_trade())
   })
   
   # outputs export/import ratio plot
@@ -3116,8 +3279,8 @@ server <- function(input, output, session) {
   # creates top 5 net export plot
   top5_trade_plot <- reactive({
     plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
-                           species = species_selection_trade(), 
-                           nominal = selected_value())
+                                species = species_selection_trade(), 
+                                nominal = selected_value())
   })
   
   # outputs top 5 net export plot
@@ -3145,8 +3308,8 @@ server <- function(input, output, session) {
   # creates import value plot
   imp_value_plot <- reactive({
     plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
-               species = species_selection_trade(), nominal = selected_value())
-  })
+                    species = species_selection_trade(), nominal = selected_value())
+    })
   
   # outputs import value plot
   output$imp_value <- renderPlot({
@@ -3173,7 +3336,7 @@ server <- function(input, output, session) {
   # creates import volume plot
   imp_volume_plot <- reactive({
     plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
-               species = species_selection_trade())
+                    species = species_selection_trade())
   })
   
   # outputs import volume plot
@@ -3429,7 +3592,7 @@ server <- function(input, output, session) {
   # creates landings volume plot
   landings_volume_plot <- reactive({
     plot_landings(landings_df(), 'VOLUME', units = selected_units(),
-                  species = species_selection_landings())
+                       species = species_selection_landings())
   })
   
   # outputs landings volume plot
@@ -3670,7 +3833,7 @@ server <- function(input, output, session) {
   # creates processed products volume plot
   pp_volume_plot <- reactive({
     plot_spp_pp(pp_df(), 'VOLUME', units = selected_units(),
-                species = species_selection_products())
+                     species = species_selection_products())
   })
   
   # outputs processed products volume plot
@@ -3684,8 +3847,8 @@ server <- function(input, output, session) {
   # creates processed products price plot
   pp_price_plot <- reactive({
     plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
-                species = species_selection_products(),
-                nominal = selected_value())
+                     species = species_selection_products(),
+                     nominal = selected_value())
   })
   
   # outputs processed products price plot
@@ -3814,6 +3977,1565 @@ server <- function(input, output, session) {
     supply_share_plot()
   })
   
+  # Plot-clicking tooltips -----------------------------------------------------
+  #' *Trade Balance Plot*
+  # Stores data point information and pixel coordinates where user clicked
+  balance_clicked_point <- reactiveVal(NULL)
+  
+  # Handle click events and store clicked point
+  observeEvent(input$balance_plot_click, {
+    
+    click_x <- input$balance_plot_click$x
+    
+    balance_data <- trade_df()
+    
+    balance_data <- balance_data %>%
+      rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
+             IMPORTS = IMP_VALUE_2024USD_MILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      # calculate trade balance value
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      # pivot longer so there are three groups: exports, imports, and balance
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      # factor the column storing the groups
+      mutate(name = as.factor(name))
+    
+    year_levels <- levels(factor(sort(unique(balance_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- balance_data[balance_data$YEAR == clicked_factor_year, ]
+      
+      balance_clicked_point(list(
+        data = click_point,
+        coords_css = input$balance_plot_click$coords_css))
+    } else {
+      balance_clicked_point(NULL)
+    }
+  })
+  
+  # allow user to exit out of tooltip
+  observeEvent(input$close_balance_tooltip, {
+    balance_clicked_point(NULL)
+  })
+  
+  # overlay the clicked point
+  output$balance_click_overlay <- renderUI({
+    click_info <- balance_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10 # offset to right of point
+    top_pos <- click_info$coords_css$y - 10 # offset above point
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = "close_balance_tooltip",
+        onclick = "Shiny.setInputValue('close_balance_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Exports:<br></span>", 
+        dollar(click_info$data$value[1]), " Million <br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Imports:<br></span>", 
+        dollar(click_info$data$value[2]), " Million <br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Trade Balance:<br></span>", 
+        dollar(click_info$data$value[3]), " Million <br>"
+      ))
+    )
+  })
+  
+  
+  
+  #' *Volume Ratio Plot*
+  ratio_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$ratio_plot_click, {
+    click_x <- input$ratio_plot_click$x
+    
+    ratio_data <- trade_df()
+    
+    year_levels <- levels(factor(sort(unique(ratio_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- ratio_data[ratio_data$YEAR == clicked_factor_year, ]
+      
+      ratio_clicked_point(list(
+        data = click_point,
+        coords_css = input$ratio_plot_click$coords_css))
+    } else {
+      ratio_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_ratio_tooltip, {
+    ratio_clicked_point(NULL)
+  })
+  
+  output$ratio_click_overlay <- renderUI({
+    click_info <- ratio_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = "close_ratio_tooltip",
+        onclick = "Shiny.setInputValue('close_ratio_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Export Volume:<br></span>", 
+        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons <br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Imports:<br></span>", 
+        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons <br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Ratio:<br></span>", 
+        (click_info$data$EXP_VOLUME_MT / click_info$data$IMP_VOLUME_MT)
+      ))
+    )
+  })
+  
+  
+  
+  #' *Top 5 Trade Plot*
+  top5_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$top5_plot_click, {
+    click_x <- round(input$top5_plot_click$x)
+    
+    top5_data <- top5_trade_df()
+    top5_data <- top5_data %>%
+      mutate(COUNTRY_NAME = gsub(' ', '\n', str_to_title(COUNTRY_NAME)))
+    
+    country_levels <- factor(sort(unique(top5_data$COUNTRY_NAME)))
+    clicked_country <- click_x
+    
+    if (click_x >= 1 && click_x <= 5) {
+      clicked_factor_country <- country_levels[clicked_country]
+      
+      click_point <- top5_data[top5_data$COUNTRY_NAME == clicked_factor_country, ]
+      
+      top5_clicked_point(list(
+        data = click_point,
+        coords_css = input$top5_plot_click$coords_css))
+    } else {
+      top5_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_top5_tooltip, {
+    top5_clicked_point(NULL)
+  })
+  
+  output$top5_click_overlay <- renderUI({
+    click_info <- top5_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    colors <- nmfs_palette('oceans')(5)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = "close_top5_tooltip",
+        onclick = "Shiny.setInputValue('close_top5_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$COUNTRY_NAME[1], ':', "</span><br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", colors[1], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "2020</span>", ': ',
+        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[1]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", colors[2], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "2021</span>", ': ',
+        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[2]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", colors[3], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "2022</span>", ': ',
+        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[3]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", colors[4], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "2023</span>", ': ',
+        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[4]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", colors[5], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "2024</span>", ': ',
+        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[5]), " Million <br>")))
+  })
+  
+  
+  
+  #' *Export Value*
+  exp_value_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$exp_value_plot_click, {
+    click_x <- input$exp_value_plot_click$x
+    
+    # store current data
+    trade_data <- trade_df()
+    
+    # require clicked year to be within range
+    year_levels <- levels(factor(trade_data$YEAR))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      # Get actual factor value
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      # Get data for clicked bar
+      click_point <- trade_data[trade_data$YEAR == clicked_factor_year, ]
+      
+      # store coords of clicked point
+      exp_value_clicked_point(list(
+        data = click_point,
+        coords_css = input$exp_value_plot_click$coords_css))
+    } else {
+      exp_value_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_exp_value_tooltip, {
+    exp_value_clicked_point(NULL)
+  })
+  
+  output$exp_value_click_overlay <- renderUI({
+    click_info <- exp_value_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    # keep tooltip within plot bounds
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # tooltip style
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes
+      ),
+      
+      # Close button
+      tags$button(
+        "x",
+        id = "close_exp_value_tooltip",
+        onclick = "Shiny.setInputValue('close_exp_value_tooltip', Math.random());",
+        style = close_button_aes
+      ), 
+      
+      # Tooltip info
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$EXP_VALUE_2024USD_MILLIONS), " Million<br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
+        "Export Price: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$EXP_PRICE_USD_PER_KG), " per kilogram")))
+  })
+  
+  
+  
+  #' *Import Value*
+  imp_value_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$imp_value_plot_click, {
+    click_x <- input$imp_value_plot_click$x
+    
+    trade_data <- trade_df()
+    
+    year_levels <- levels(factor(trade_data$YEAR))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- trade_data[trade_data$YEAR == clicked_factor_year, ]
+      
+      imp_value_clicked_point(list(
+        data = click_point,
+        coords_css = input$imp_value_plot_click$coords_css))
+    } else {
+      imp_value_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_imp_value_tooltip, {
+    imp_value_clicked_point(NULL)
+  })
+  
+  output$imp_value_click_overlay <- renderUI({
+    click_info <- imp_value_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      
+      tags$button(
+        "x",
+        id = "close_imp_value_tooltip",
+        onclick = "Shiny.setInputValue('close_imp_value_tooltip', Math.random());",
+        style = close_button_aes),
+      
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$IMP_VALUE_2024USD_MILLIONS), " Million<br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
+        "Import Price: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$IMP_PRICE_USD_PER_KG), " per kilogram")))
+  })
+  
+  
+  
+  #' *Export Volume*
+  exp_volume_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$exp_volume_plot_click, {
+    click_x <- input$exp_volume_plot_click$x
+    
+    # store current data
+    trade_data <- trade_df()
+    
+    # require clicked year to be within range
+    year_levels <- levels(factor(trade_data$YEAR))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      # Get actual factor value
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      # Get data for clicked bar
+      click_point <- trade_data[trade_data$YEAR == clicked_factor_year, ]
+      
+      # store coords of clicked point
+      exp_volume_clicked_point(list(
+        data = click_point,
+        coords_css = input$exp_volume_plot_click$coords_css))
+    } else {
+      exp_volume_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_exp_volume_tooltip, {
+    exp_volume_clicked_point(NULL)
+  })
+  
+  output$exp_volume_click_overlay <- renderUI({
+    click_info <- exp_volume_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    # keep tooltip within plot bounds
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # tooltip style
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes
+      ),
+      
+      # Close button
+      tags$button(
+        "x",
+        id = "close_exp_volume_tooltip",
+        onclick = "Shiny.setInputValue('close_exp_volume_tooltip', Math.random());",
+        style = close_button_aes
+      ), 
+      
+      # Tooltip info
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
+        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons")
+      ))
+  })
+  
+  
+  
+  #' *Import Volume*
+  imp_volume_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$imp_volume_plot_click, {
+    click_x <- input$imp_volume_plot_click$x
+    
+    # store current data
+    trade_data <- trade_df()
+    
+    # require clicked year to be within range
+    year_levels <- levels(factor(trade_data$YEAR))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      # Get actual factor value
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      # Get data for clicked bar
+      click_point <- trade_data[trade_data$YEAR == clicked_factor_year, ]
+      
+      # store coords of clicked point
+      imp_volume_clicked_point(list(
+        data = click_point,
+        coords_css = input$imp_volume_plot_click$coords_css))
+    } else {
+      imp_volume_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_imp_volume_tooltip, {
+    imp_volume_clicked_point(NULL)
+  })
+  
+  output$imp_volume_click_overlay <- renderUI({
+    click_info <- imp_volume_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    # keep tooltip within plot bounds
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # tooltip style
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes
+      ),
+      
+      # Close button
+      tags$button(
+        "x",
+        id = "close_imp_volume_tooltip",
+        onclick = "Shiny.setInputValue('close_imp_volume_tooltip', Math.random());",
+        style = close_button_aes
+      ), 
+      
+      # Tooltip info
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
+        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons")))
+  })
+  
+  
+  
+  #' *MLTI Exports*
+  # Stores data point information and pixel coordinates where user clicked
+  exp_mlti_clicked_point <- reactiveVal(NULL)
+  
+  # Handle click events and store clicked point
+  observeEvent(input$exp_mlti_plot_click, {
+
+    click_x <- input$exp_mlti_plot_click$x
+    
+    mlti_data <- exp_mlti_table_df()
+    
+    year_levels <- levels(factor(sort(unique(mlti_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    # require clicked year to be within range
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- mlti_data[mlti_data$YEAR == clicked_factor_year, ]
+      
+      exp_mlti_clicked_point(list(
+        data = click_point,
+        coords_css = input$exp_mlti_plot_click$coords_css))
+    } else {
+      exp_mlti_clicked_point(NULL)
+    }
+  })
+  
+  # allow user to exit out of tooltip
+  observeEvent(input$close_exp_mlti_tooltip, {
+    exp_mlti_clicked_point(NULL)
+  })
+  
+  # overlay the clicked point
+  output$exp_mlti_click_overlay <- renderUI({
+    click_info <- exp_mlti_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # SPECIFY POINT SHAPES
+    # First, get data
+    mlti_data <- exp_mlti_table_df()
+    # Next, get countries
+    countries <- unique(mlti_data$COUNTRY_NAME)
+    # Assign the shapes to these countries
+      # the countries are already sorted alphabetically in data
+    point_shapes <- c(16, 17, 15, 3, 7)
+    names(point_shapes) <- c(countries)
+    # set names for mlti_colors
+    new_mlti_colors <- mlti_colors
+    names(new_mlti_colors) <- c(countries)
+    # create all 5 icons
+    icon_1 <- create_tooltip_icon(new_mlti_colors[1], point_shapes[1])
+    icon_2 <- create_tooltip_icon(new_mlti_colors[2], point_shapes[2])
+    icon_3 <- create_tooltip_icon(new_mlti_colors[3], point_shapes[3])
+    icon_4 <- create_tooltip_icon(new_mlti_colors[4], point_shapes[4])
+    icon_5 <- create_tooltip_icon(new_mlti_colors[5], point_shapes[5])
+    
+    # Position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 10 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 10 # Offset above point
+    
+    # Prevent tooltip from being off screen
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # style the tooltip for clicked point
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = 'close_exp_mlti_tooltip',
+        onclick = "Shiny.setInputValue('close_exp_mlti_tooltip', Math.random());",
+        style = close_button_aes), 
+      HTML(paste0(
+        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[1]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
+        '<img src = "', icon_2, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[2]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[2], digits = 3), "<br>",
+        '<img src = "', icon_3, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[3]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[3], digits = 3), "<br>",
+        '<img src = "', icon_4, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[4]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[4], digits = 3), "<br>",
+        '<img src = "', icon_5, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[5]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[5], digits = 3), "<br>"
+      ))
+    )
+  })
+  
+  
+  
+  #' *MLTI Imports*
+  imp_mlti_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$imp_mlti_plot_click, {
+    
+    click_x <- input$imp_mlti_plot_click$x
+    
+    mlti_data <- imp_mlti_table_df()
+    
+    year_levels <- levels(factor(sort(unique(mlti_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- mlti_data[mlti_data$YEAR == clicked_factor_year, ]
+      
+      imp_mlti_clicked_point(list(
+        data = click_point,
+        coords_css = input$imp_mlti_plot_click$coords_css))
+    } else {
+      imp_mlti_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_imp_mlti_tooltip, {
+    imp_mlti_clicked_point(NULL)
+  })
+  
+  output$imp_mlti_click_overlay <- renderUI({
+    click_info <- imp_mlti_clicked_point()
+    
+    if(is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # SPECIFY POINT SHAPES
+    mlti_data <- imp_mlti_table_df()
+    
+    countries <- unique(mlti_data$COUNTRY_NAME)
+    
+    point_shapes <- c(16, 17, 15, 3, 7)
+    names(point_shapes) <- c(countries)
+    
+    new_mlti_colors <- mlti_colors
+    names(new_mlti_colors) <- c(countries)
+    
+    icon_1 <- create_tooltip_icon(new_mlti_colors[1], point_shapes[1])
+    icon_2 <- create_tooltip_icon(new_mlti_colors[2], point_shapes[2])
+    icon_3 <- create_tooltip_icon(new_mlti_colors[3], point_shapes[3])
+    icon_4 <- create_tooltip_icon(new_mlti_colors[4], point_shapes[4])
+    icon_5 <- create_tooltip_icon(new_mlti_colors[5], point_shapes[5])
+    
+    
+    left_pos <- click_info$coords_css$x + 10 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 10 # Offset above point
+
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = 'close_imp_mlti_tooltip',
+        onclick = "Shiny.setInputValue('close_imp_mlti_tooltip', Math.random());",
+        style = close_button_aes
+      ), 
+      HTML(paste0(
+        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[1]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
+        '<img src = "', icon_2, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[2]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[2], digits = 3), "<br>",
+        '<img src = "', icon_3, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[3]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[3], digits = 3), "<br>",
+        '<img src = "', icon_4, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[4]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[4], digits = 3), "<br>",
+        '<img src = "', icon_5, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "<strong>", str_to_title(click_info$data$COUNTRY_NAME[5]), "</strong><br/>",
+        "MLTI: ", round(click_info$data$MLTI[5], digits = 3), "<br>"
+      ))
+    )
+  })
+  
+  
+  
+  #' *Herfindahl Index*
+  hi_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$hi_plot_click, {
+    click_x <- input$hi_plot_click$x
+    
+    hi_data <- calculate_hi(species_selection_trade(), nominal = selected_value())
+    
+    year_levels <- levels(factor(sort(unique(hi_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- hi_data[hi_data$YEAR == clicked_factor_year, ]
+      
+      hi_clicked_point(list(
+        data = click_point,
+        coords_css = input$hi_plot_click$coords_css))
+    } else {
+      hi_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_hi_tooltip, {
+    hi_clicked_point(NULL)
+  })
+  
+  output$hi_click_overlay <- renderUI({
+    click_info <- hi_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # create legend icons
+    exp_icon <- create_tooltip_icon('#003087', 16)
+    imp_icon <- create_tooltip_icon('#0085CA', 16)
+    
+    left_pos <- click_info$coords_css$x + 10 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 10 # Offset above point
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = 'close_hi_tooltip',
+        onclick = "Shiny.setInputValue('close_hi_tooltip', Math.random());",
+        style = close_button_aes), 
+      HTML(paste0(
+        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        '<img src = "', exp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "Export: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
+        '<img src = "', imp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
+        "Import: ", round(click_info$data$IMP_HI, digits = 3)
+      ))
+    )
+  })
+  
+  
+  
+  #' *Apparent Supply*
+  supply_clicked_point <- reactiveVal(NULL)
+  
+  observe({
+    if (!is.null(input$supply_plot_click)) {
+      # Get clicked coordinates (bc it's a bar chart, different from exp_mlti)
+      click_x <- input$supply_plot_click$x
+      click_y <- input$supply_plot_click$y
+    
+      # Store current data
+      supply_data <- supply_df()
+      
+      # Factored x-axis for years requires extra wrangling
+      year_levels <- levels(factor(supply_data$YEAR))
+      clicked_year <- round(click_x)
+      
+      # require clicked year to be within range
+      if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+        # Get actual factor value
+        clicked_factor_year <- year_levels[clicked_year]
+        
+        # Get data for clicked bar
+        click_point <- supply_data[supply_data$YEAR == clicked_factor_year, ]
+        
+        # tooltip only shows when bar is clicked (y < supply)
+        if (click_y >= 0 && click_y <= click_point$APPARENT_SUPPLY) {
+          # store coords of clicked point
+          supply_clicked_point(list(
+            data = click_point,
+            coords_css = input$supply_plot_click$coords_css
+          ))
+        } else {
+          supply_clicked_point(NULL)
+        }
+      } else {
+        supply_clicked_point(NULL)
+      }
+    }
+  })
+  
+  observeEvent(input$close_supply_tooltip, {
+    supply_clicked_point(NULL)
+  })
+  
+  output$supply_click_overlay <- renderUI({
+    click_info <- supply_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    # keep tooltip within plot bounds
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # tooltip style
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      
+      # Close button
+      tags$button(
+        "x",
+        id = "close_supply_tooltip",
+        onclick = "Shiny.setInputValue('close_supply_tooltip', Math.random());",
+        style = close_button_aes), 
+      
+      # Tooltip info
+      HTML(paste0(
+        "<strong>", click_info$data$YEAR, ":", "</strong><br/>",
+        comma((click_info$data$APPARENT_SUPPLY / 1000)),
+        " Thousand ", ifelse(input$units == F, "Metric Tons", "Short Tons")
+      ))
+    )
+  })
+  
+  
+  
+  #' *Supply Ratio*
+  supply_ratio_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$supply_ratio_plot_click, {
+    click_x <- input$supply_ratio_plot_click$x
+    
+    supply_data <- supply_df()
+    
+    year_levels <- levels(factor(sort(unique(supply_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- supply_data[supply_data$YEAR == clicked_factor_year, ]
+      
+      supply_ratio_clicked_point(list(
+        data = click_point,
+        coords_css = input$supply_ratio_plot_click$coords_css))
+    } else {
+      supply_ratio_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_supply_ratio_tooltip, {
+    supply_ratio_clicked_point(NULL)
+  })
+  
+  output$supply_ratio_click_overlay <- renderUI({
+    click_info <- supply_ratio_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = 'close_supply_ratio_tooltip',
+        onclick = "Shiny.setInputValue('close_supply_ratio_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Apparent Supply", "</span>",  ":<br>",
+        comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Domestic Production Volume", "</span>", ":<br>",
+        comma(click_info$data$PP_VOLUME_MT), " Metric Tons <br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Ratio", "</span>", ":<br>",
+        round(click_info$data$APPARENT_SUPPLY_REL_US_PROD, digits = 3))))
+  })
+  
+  
+  
+  #' *Supply Share*
+  supply_share_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$supply_share_plot_click, {
+    click_x <- input$supply_share_plot_click$x
+    
+    supply_data <- supply_df()
+    
+    year_levels <- levels(factor(sort(unique(supply_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- supply_data[supply_data$YEAR == clicked_factor_year, ]
+      
+      supply_share_clicked_point(list(
+        data = click_point,
+        coords_css = input$supply_share_plot_click$coords_css))
+    } else {
+      supply_share_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_supply_share_tooltip, {
+    supply_share_clicked_point(NULL)
+  })
+  
+  output$supply_share_click_overlay <- renderUI({
+    click_info <- supply_share_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = 'close_supply_share_tooltip',
+        onclick = "Shiny.setInputValue('close_supply_share_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Unexported Domestic Production", "</span>",  ":<br>",
+        comma(abs(click_info$data$PP_VOLUME_MT - click_info$data$EXP_VOLUME_MT)), " Metric Tons <br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Apparent Supply", "</span>", ":<br>",
+        comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
+        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "Share", "</span>", ":<br>",
+        round(click_info$data$UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY * 100, digits = 3), "% of Apparent Supply")))
+  })
+  
+  
+  
+  #' *Landings Value*
+  landings_value_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$landings_value_plot_click, {
+    click_x <- input$landings_value_plot_click$x
+    
+    landings_data <- landings_df()
+    
+    year_levels <- levels(factor(sort(unique(landings_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- landings_data[landings_data$YEAR == clicked_factor_year, ]
+      
+      landings_value_clicked_point(list(
+        data = click_point,
+        coords_css = input$landings_value_plot_click$coords_css))
+    } else {
+      landings_value_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_landings_value_tooltip, {
+    landings_value_clicked_point(NULL)
+  })
+  
+  output$landings_value_click_overlay <- renderUI({
+    click_info <- landings_value_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = 'close_landings_value_tooltip',
+        onclick = "Shiny.setInputValue('close_landings_value_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$COM_VALUE_MILLIONS_2024USD), " Million<br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
+        "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
+        dollar(click_info$data$COM_PRICE_2024USD_PER_KG), " per kilogram")))
+  })
+  
+  
+  
+  #' *Landings Volume*
+  landings_volume_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$landings_volume_plot_click, {
+    click_x <- input$landings_volume_plot_click$x
+    
+    landings_data <- landings_df()
+    
+    year_levels <- levels(factor(sort(unique(landings_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- landings_data[landings_data$YEAR == clicked_factor_year, ]
+      
+      landings_volume_clicked_point(list(
+        data = click_point,
+        coords_css = input$landings_volume_plot_click$coords_css))
+    } else {
+      landings_volume_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_landings_value_tooltip, {
+    landings_volume_clicked_point(NULL)
+  })
+  
+  output$landings_volume_click_overlay <- renderUI({
+    click_info <- landings_volume_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    left_pos <- click_info$coords_css$x + 10
+    top_pos <- click_info$coords_css$y - 10
+    
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes),
+      tags$button(
+        "x",
+        id = 'close_landings_volume_tooltip',
+        onclick = "Shiny.setInputValue('close_landings_volume_tooltip', Math.random());",
+        style = close_button_aes),
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, ":", 
+        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Landed Volume: ", "</span><span style = 'font-size: 18px;'><br>",
+        comma(click_info$data$COM_VOLUME_MT), " Metric Tons")))
+  })
+  
+  
+  
+  #' *Processed Product Value*
+  pp_value_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$pp_value_plot_click, {
+    click_x <- input$pp_value_plot_click$x
+    
+    pp_data <- pp_df()
+    
+    year_levels <- levels(factor(sort(unique(pp_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- pp_data[pp_data$YEAR == clicked_factor_year, ]
+      
+      pp_value_clicked_point(list(
+        data = click_point,
+        coords_css = input$pp_value_plot_click$coords_css))
+    } else {
+      pp_value_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_pp_value_tooltip, {
+    pp_value_clicked_point(NULL)
+  })
+  
+  output$pp_value_click_overlay <- renderUI({
+    click_info <- pp_value_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # SPECIFY GROUPS
+    # First, get data
+    pp_data <- pp_df()
+    
+    # get the low proportions embedded in pp plot function
+    low_prop_types_value <- pp_data %>% 
+      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
+             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
+      filter(VALUE_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types_volume <- pp_data %>%
+      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
+      filter(VOLUME_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
+      distinct() %>%
+      pull(PRODUCT_NAME)
+    
+    # rename these low proportion types as 'OTHER*' and re-summarise
+    new_data <- pp_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      group_by(YEAR, PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
+             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
+             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
+             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
+             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
+    
+    # Next, get product forms
+    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    # Subset colors for these products
+    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[order(names(pp_colors))]
+    
+    filtered_new_data <- new_data %>% 
+      filter(YEAR == click_info$data$YEAR[1]) %>%
+      arrange(PRODUCT_NAME)
+    
+    # create icons (number will vary)
+    # begin with empty vector that will ultimately contain the full HTML code
+    pp_val_tooltip <- vector()
+    for (i in 1:length(pp_colors)) {
+      tooltip_color <- paste0(
+        "</span><span class = 'color-swatch' style = 'background-color: ", 
+        pp_colors[i], ";'>")
+      
+      tooltip_text <- paste0(
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        names(pp_colors)[i], "</span>: ")
+      
+      tooltip_data <- paste0(
+        dollar(filtered_new_data$PP_VALUE_MILLIONS_2024USD[i]), " Million <br>"
+      )
+      
+      pp_val_tooltip <- paste0(pp_val_tooltip, 
+                               tooltip_color, tooltip_text, tooltip_data)
+    }
+  
+    # Position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 20 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    
+    # Prevent tooltip from being off screen
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # style the tooltip for clicked point
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes,
+        "max-width: 350px; ",
+        "min-width: 350px; "),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = 'close_pp_value_tooltip',
+        onclick = "Shiny.setInputValue('close_pp_value_tooltip', Math.random());",
+        style = close_button_aes), 
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        pp_val_tooltip)))
+  })
+  
+  
+  
+  #' *Processed Product Volume*
+  pp_volume_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$pp_volume_plot_click, {
+    click_x <- input$pp_volume_plot_click$x
+    
+    pp_data <- pp_df()
+    
+    year_levels <- levels(factor(sort(unique(pp_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- pp_data[pp_data$YEAR == clicked_factor_year, ]
+      
+      pp_volume_clicked_point(list(
+        data = click_point,
+        coords_css = input$pp_volume_plot_click$coords_css))
+    } else {
+      pp_volume_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_pp_volume_tooltip, {
+    pp_volume_clicked_point(NULL)
+  })
+  
+  output$pp_volume_click_overlay <- renderUI({
+    click_info <- pp_volume_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # SPECIFY GROUPS
+    # First, get data
+    pp_data <- pp_df()
+    
+    # get the low proportions embedded in pp plot function
+    low_prop_types_value <- pp_data %>% 
+      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
+             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
+      filter(VALUE_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types_volume <- pp_data %>%
+      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
+      filter(VOLUME_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
+      distinct() %>%
+      pull(PRODUCT_NAME)
+    
+    # rename these low proportion types as 'OTHER*' and re-summarise
+    new_data <- pp_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      group_by(YEAR, PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
+             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
+             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
+             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
+             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
+    
+    # Next, get product forms
+    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    # Subset colors for these products
+    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[order(names(pp_colors))]
+    
+    filtered_new_data <- new_data %>% 
+      filter(YEAR == click_info$data$YEAR[1]) %>%
+      arrange(PRODUCT_NAME)
+    
+    # create icons (number will vary)
+    # begin with empty vector that will ultimately contain the full HTML code
+    pp_vol_tooltip <- vector()
+    for (i in 1:length(pp_colors)) {
+      tooltip_color <- paste0(
+        "</span><span class = 'color-swatch' style = 'background-color: ", 
+        pp_colors[i], ";'>")
+      
+      tooltip_text <- paste0(
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        names(pp_colors)[i], "</span>: ")
+      
+      tooltip_data <- paste0(
+        comma(filtered_new_data$PP_VOLUME_THOUSAND_MT[i]), " Thousand Metric Tons <br>"
+      )
+      
+      pp_vol_tooltip <- paste0(pp_vol_tooltip, 
+                               tooltip_color, tooltip_text, tooltip_data)
+    }
+    
+    # Position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 20 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    
+    # Prevent tooltip from being off screen
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # style the tooltip for clicked point
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes,
+        "max-width: 350px; ",
+        "min-width: 350px; "),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = 'close_pp_volume_tooltip',
+        onclick = "Shiny.setInputValue('close_pp_volume_tooltip', Math.random());",
+        style = close_button_aes), 
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        pp_vol_tooltip)))
+  })
+  
+  
+  
+  #' *Processed Product Price*
+  pp_price_clicked_point <- reactiveVal(NULL)
+  
+  observeEvent(input$pp_price_plot_click, {
+    click_x <- input$pp_price_plot_click$x
+    
+    pp_data <- pp_df()
+    
+    year_levels <- levels(factor(sort(unique(pp_data$YEAR))))
+    clicked_year <- round(click_x)
+    
+    if (clicked_year >= 1 && clicked_year <= length(year_levels)) {
+      clicked_factor_year <- year_levels[clicked_year]
+      
+      click_point <- pp_data[pp_data$YEAR == clicked_factor_year, ]
+      
+      pp_price_clicked_point(list(
+        data = click_point,
+        coords_css = input$pp_price_plot_click$coords_css))
+    } else {
+      pp_price_clicked_point(NULL)
+    }
+  })
+  
+  observeEvent(input$close_pp_price_tooltip, {
+    pp_price_clicked_point(NULL)
+  })
+  
+  output$pp_price_click_overlay <- renderUI({
+    click_info <- pp_price_clicked_point()
+    
+    if (is.null(click_info)) {
+      return(NULL)
+    }
+    
+    # SPECIFY GROUPS
+    # First, get data
+    pp_data <- pp_df()
+    
+    # get the low proportions embedded in pp plot function
+    low_prop_types_value <- pp_data %>% 
+      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
+             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
+      filter(VALUE_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types_volume <- pp_data %>%
+      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
+      group_by(PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
+             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
+      filter(VOLUME_SHARE < 0.02) %>%
+      select(PRODUCT_NAME)
+    
+    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
+      distinct() %>%
+      pull(PRODUCT_NAME)
+    
+    # rename these low proportion types as 'OTHER*' and re-summarise
+    new_data <- pp_data %>%
+      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                   'OTHER*', PRODUCT_NAME)) %>%
+      group_by(YEAR, PRODUCT_NAME) %>%
+      summarise(across(where(is.numeric), sum),
+                .groups = 'drop') %>%
+      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
+             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
+             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
+             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
+             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
+             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
+    
+    # Next, get product forms
+    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    # Subset colors for these products
+    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[order(names(pp_colors))]
+    
+    filtered_new_data <- new_data %>% 
+      filter(YEAR == click_info$data$YEAR[1]) %>%
+      arrange(PRODUCT_NAME)
+    
+    # create icons (number will vary)
+    # begin with empty vector that will ultimately contain the full HTML code
+    pp_price_tooltip <- vector()
+    for (i in 1:length(pp_colors)) {
+      tooltip_icon <- paste0(
+        '<img src = "', create_tooltip_icon(pp_colors[i], 16), 
+        '" class = "tooltip-icon" alt = "legend icon"/>')
+      
+      tooltip_text <- paste0(
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        names(pp_colors)[i], "</span>: ")
+      
+      tooltip_data <- paste0(
+        dollar(filtered_new_data$PP_PRICE_2024USD_PER_KG[i]), " per kilogram <br>"
+      )
+      
+      pp_price_tooltip <- paste0(pp_price_tooltip, 
+                                 tooltip_icon, tooltip_text, tooltip_data)
+    }
+    
+    # Position tooltip near clicked point
+    left_pos <- click_info$coords_css$x + 20 # Offset to right of point
+    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    
+    # Prevent tooltip from being off screen
+    left_pos <- max(10, left_pos)
+    top_pos <- max(10, top_pos)
+    
+    # style the tooltip for clicked point
+    div(
+      style = paste0(
+        "left: ", left_pos, "px;",
+        "top: ", top_pos, "px;",
+        tooltip_aes,
+        "max-width: 375px; ",
+        "min-width: 375px; "),
+      # tooltip close button
+      tags$button(
+        "x",
+        id = 'close_pp_price_tooltip',
+        onclick = "Shiny.setInputValue('close_pp_price_tooltip', Math.random());",
+        style = close_button_aes), 
+      HTML(paste0(
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR[1], ':', "</span><br>",
+        pp_price_tooltip)))
+  })
 }
 
 # Run the app
