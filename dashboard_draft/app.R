@@ -1852,8 +1852,9 @@ plot_hi <- function(hi_data, species) {
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
           legend.text = element_text(size = 15),
-          legend.position = 'top',
-          plot.title = element_text(size = 18))
+          legend.position = c(0.87, 0.93),
+          legend.box.background = element_rect(color = 'black', linetype = 'solid', size = 1),
+          plot.title = element_text(size = 16))
   
 }
 plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
