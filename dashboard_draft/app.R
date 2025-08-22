@@ -1992,7 +1992,16 @@ ui <- page_sidebar(
                     font-size: 16px !important;
                     background-color: #283A38 !important;
                     }")),
-    tags$style(HTML("g.hovertext > path {opacity: .9;}"))
+    tags$style(HTML("g.hovertext > path {opacity: .9;}")),
+    tags$style(HTML(".color-swatch {
+                      display: inline-block;
+                      width: 18px;
+                      height: 15px; 
+                      border: 1px solid #000; 
+                      border-radius: 3px;
+                      vertical-align: middle;
+                      margin-right: 8px;
+                    }"))
   ),
   
   sidebar = sidebar(
