@@ -96,6 +96,35 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
+tooltip_aes <- paste0(
+  "position: absolute; ",
+  "background-color: rgba(255, 255, 255, 0.95); ",
+  "border: 1px solid #ccc; ",
+  "border-radius: 10px; ",
+  "padding: 10px; ",
+  "padding-right: 25px; ",
+  "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
+  "z-index: 1000; ",
+  "max-width: 250px; ",
+  "min-width: 250px; "
+)
+
+close_button_aes <- paste0(
+  "position: absolute; ",
+  "top: 2px; ",
+  "right: 5px; ",
+  "background: transparent; ",
+  "border: none; ",
+  "color: #666; ",
+  "font-size: 18px; ",
+  "font-weight: bold; ",
+  "cursor: pointer; ",
+  "padding: 0; ",
+  "width: 20px; ",
+  "height: 20px; ",
+  "line-height: 18px; ",
+  "text-align: center; ")
+
 ###
 
 # Custom Functions -------------------------------------------------------------
