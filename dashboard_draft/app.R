@@ -1479,6 +1479,12 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
       ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)  
     }
+    
+    new_data <- new_data %>%
+      select(YEAR, PRODUCT_NAME, PP_VALUE_2024USD, PP_NOMINAL_VALUE,
+             PP_VALUE_MILLIONS_2024USD, PP_VALUE_BILLIONS_2024USD, 
+             PP_VALUE_MILLIONS, PP_VALUE_BILLIONS) %>%
+      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'VOLUME') {
@@ -1518,6 +1524,11 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       
       ylim <- max(yr_volume$PP_VOLUME_THOUSAND_ST + 1)
     }
+    
+    new_data <- new_data %>%
+      select(YEAR, PRODUCT_NAME, PP_VOLUME_KG, PP_VOLUME_MT, PP_VOLUME_LB,
+             PP_VOLUME_ST, PP_VOLUME_THOUSAND_MT, PP_VOLUME_THOUSAND_ST) %>%
+      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'PRICE') {
@@ -1562,7 +1573,8 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       label <- label_currency(suffix = '/lb')
       unit <- ' per pound'
     }
-    plot <- ggplot(data = new_data,
+    plot <- ggplot(data = new_data %>%
+                     mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME)),
                    aes(x = factor(YEAR),
                        y = !!y,
                        color = PRODUCT_NAME)) +
