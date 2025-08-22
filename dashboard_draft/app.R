@@ -1972,10 +1972,10 @@ colors <- c(nmfs_palette('coral')(6)[6:3],
             nmfs_cols()[42:39])
 
 names(colors) <- levels(factor(levels = c(
-  'FILLETS', 'STEAKS', 'SURIMI', 'SHUCKED MEATS',
-  'CANNED', 'OIL', 'DRESSED', 'SMOKED (EXCL. CANNED)', 'CHOWDERS',
-  'FISH STICKS', 'BREADED SHRIMP', 'CAKES/PATTIES',
-  'OTHER*', 'OTHER INDUSTRIAL', 'MEAL', 'FISH PORTIONS')))
+  'Fillets', 'Steaks', 'Surimi', 'Shucked Meats',
+  'Canned', 'Oil', 'Dressed', 'Smoked (Excl. Canned)', 'Chowders',
+  'Fish Sticks', 'Breaded Shrimp', 'Cakes/Patties',
+  'Other*', 'Other Industrial', 'Meal', 'Fish Portions')))
 
 # Because the countries will change based on the selected species,
   # the colors have no mapping
