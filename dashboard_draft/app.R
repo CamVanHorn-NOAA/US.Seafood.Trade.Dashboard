@@ -1374,7 +1374,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal
   }
   
   ggplot(data = data,
-         aes(x = factor(gsub(' ', '\n', COUNTRY_NAME)),
+         aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
              y = !!y, 
              fill = factor(YEAR))) +
     geom_col(position = 'dodge') +
