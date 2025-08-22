@@ -1463,6 +1463,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     tlab <- 'Production Value of '
+    unit <- ' Million'
     
     # calculate the total value per year to find upper limit
     yr_value <- new_data %>%
@@ -1488,6 +1489,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       ylab <- 'Metric Tons (Thousands)'
       label <- comma
       tlab <- 'Production Volume of '
+      unit <- ' Thousand Metric Tons'
       
       # calculate the total value per year to find upper limit
       yr_volume <- new_data %>%
@@ -1505,6 +1507,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       ylab <- 'Short Tons (Thousands)'
       label <- comma
       tlab <- 'Production Volume of '
+      unit <- ' Thousand Short Tons'
       
       # calculate the total value per year to find upper limit
       yr_volume <- new_data %>%
@@ -1538,6 +1541,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       }
       
       label <- label_currency(suffix = '/kg')
+      unit <- ' per kilogram'
     }
     
     if (units == 'IMPERIAL') {
@@ -1556,6 +1560,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       }
       
       label <- label_currency(suffix = '/lb')
+      unit <- ' per pound'
     }
     plot <- ggplot(data = new_data,
                    aes(x = factor(YEAR),
@@ -1632,6 +1637,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
       }
       
       label2 <- label_currency(suffix = '/kg')
+      unit <- 'per kilogram'
     }
     
     if (units == 'IMPERIAL') {
@@ -1644,6 +1650,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
       }
       
       label2 <- label_currency(suffix = '/lb')
+      unit <- 'per pound'
     }
     
     if (nominal == T) {
