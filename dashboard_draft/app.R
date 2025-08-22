@@ -1112,6 +1112,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       }
       
       label2 <- label_currency(suffix = '/kg')
+      unit <- ' per kilogram'
       
     }
     
@@ -1131,6 +1132,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       }
       
       label2 <- label_currency(suffix = '/lb')
+      unit <- ' per pound'
     }
     
     if (nominal == T) {
