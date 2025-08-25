@@ -228,35 +228,14 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
                     'SPECIES_CATEGORY',
                     ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
                            'SPECIES_GROUP',
-                           'SPECIES_NAME')))
-    )
-  # if species is not selected (default is ALL SPECIES), summarize all trade
-      # i.e., no filter_species needed
-  } else if (species == 'ALL SPECIES') {
-    summarized_data <- trade_table %>%
-      # select only necessary columns (exports, imports, year)
-      select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
-             IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
-      # replace NA values with 0 so that sums and averages are not NA
-      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                        EXP_VALUE_2024USD),
-             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                        IMP_VALUE_2024USD),
-             EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                    EXP_VOLUME_KG),
-             IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                    IMP_VOLUME_KG),
-             EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
-                                    EXP_VALUE_USD),
-             IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
-                                    IMP_VALUE_USD)) %>%
-      # group by YEAR to aggregate data within each year
-      group_by(YEAR) %>%
-      # sum all numeric columns within the group, drop groups at end
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # create columns of price per KG, value in millions/billions, 
-        # volume in metric tons
+                           'SPECIES_NAME'))))
+    # store level as object of quosure to work in dplyr pipe (via !!)
+    level <- rlang::enquo(which_level)
+  } else {
+    level <- NULL
+    species <- str_to_title(species)
+  }
+  
       mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
              EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
