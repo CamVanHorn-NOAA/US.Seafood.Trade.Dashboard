@@ -1075,34 +1075,6 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
   
-  # if both export and import are true, output is Net Export data
-  if (export == T & import == T) {
-    # calculate net export value in billions/millions, and net export volume
-    if (nominal == T) {
-      data <- data %>%
-        mutate(NET_VALUE_NOMINAL_BILLIONS = 
-                 EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
-               NET_VALUE_NOMINAL_MILLIONS =
-                 EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
-               NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-               NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-               NET_PRICE = EXP_PRICE_NOMINAL_PER_KG - IMP_PRICE_NOMINAL_PER_KG)
-    } else {
-      data <- data %>%
-        mutate(NET_VALUE_2024USD_BILLIONS = 
-                 EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-               NET_VALUE_2024USD_MILLIONS = 
-                 EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
-               NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-               NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-               NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
-    }
-    
-    # set shortform and longform values for plot labeling
-    shortform <- 'NET'
-    longform <- 'Net Export'
-  }
-  
   # set shortform and longform values for plot labeling if export
   if (export == T & import == F) {
     shortform <- 'EXP'
