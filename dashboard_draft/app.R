@@ -1092,57 +1092,23 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   # set labels and y values for plots of VALUE
   if (plot_format == 'VALUE') {
-    if (nominal == T) {
-      y <- as.symbol(paste0(shortform, '_VALUE_MILLIONS'))
-      y <- rlang::enquo(y)
-    } else {
-      # y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
-      y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
-      y <- rlang::enquo(y)
-    }
+    y <- as.symbol(paste0(shortform, '_VALUE_MILLIONS'))
+    y <- rlang::enquo(y)
     
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     
+    y2 <- as.symbol(paste0(shortform, '_PRICE'))
+    y2 <- rlang::enquo(y2)
+    
+    max_exp_price <- max(data$EXP_PRICE, na.rm = T)
+    max_imp_price <- max(data$IMP_PRICE, na.rm = T)
+    
     # the rate for price will depend on specified units
     if (units == 'METRIC') {
-      if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_KG'))
-        y2 <- rlang::enquo(y2)
-        
-        max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_KG, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_NOMINAL_PER_KG, na.rm = T)
-      } else {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-        y2 <- rlang::enquo(y2) 
-        
-        # Because we have two axes, we will need to normalize the second y-axis too
-        # This is more complex due to ggplot requiring a scaling factor for 
-        # the second y-axis.
-        max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
-      }
-      
       label2 <- label_currency(suffix = '/kg')
       unit <- ' per kilogram'
-      
-    }
-    
-    if (units == 'IMPERIAL') {
-      if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_LB'))
-        y2 <- rlang::enquo(y2)
-        
-        max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_LB, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_NOMINAL_PER_LB, na.rm = T)
-      } else {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_LB'))
-        y2 <- rlang::enquo(y2) 
-        
-        max_exp_price <- max(data$EXP_PRICE_USD_PER_LB, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_USD_PER_LB, na.rm = T)
-      }
-      
+    } else if (units == 'IMPERIAL') {
       label2 <- label_currency(suffix = '/lb')
       unit <- ' per pound'
     }
@@ -1150,19 +1116,13 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
     if (nominal == T) {
       ylab <- 'Millions (Nominal USD)'
       ylab2 <- 'Average Price (Nominal USD)'
-      
-      max_exp <- max(data$EXP_VALUE_MILLIONS, na.rm = T)
-      max_imp <- max(data$IMP_VALUE_MILLIONS, na.rm = T)
     } else {
-      # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
       ylab <- 'Millions (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)' 
-      
-      # normalize y-max for both export and import figures
-      # find maxes for both in a given year and retain the largest value
-      max_exp <- max(data$EXP_VALUE_2024USD_MILLIONS, na.rm = T)
-      max_imp <- max(data$IMP_VALUE_2024USD_MILLIONS, na.rm = T)
     }
+    
+    max_exp <- max(data$EXP_VALUE_MILLIONS, na.rm = T)
+    max_imp <- max(data$IMP_VALUE_MILLIONS, na.rm = T)
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     
@@ -1172,29 +1132,14 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   # set labels and y values for plots of VOLUME
   if (plot_format == 'VOLUME') {
-    # For units == metric
-    if (units == 'METRIC') {
-      y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
-      y <- rlang::enquo(y)
-      label <- comma
-      # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
-      ylab <- 'Metric Tons'
-      
-      # normalize y-max for both export and import figures
-      # find maxes for both in a given year and retain the largest value
-      max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
-      max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
-    }
+    y <- as.symbol(paste0(shortform, '_VOLUME'))
+    y <- rlang::enquo(y)
+    label <- comma
     
-    if (units == 'IMPERIAL') {
-      y <- as.symbol(paste0(shortform, '_VOLUME_ST'))
-      y <- rlang::enquo(y)
-      label <- comma
-      ylab <- 'Short Tons'
-      
-      max_exp <- max(data$EXP_VOLUME_ST, na.rm = T)
-      max_imp <- max(data$IMP_VOLUME_ST, na.rm = T)
-    }
+    max_exp <- max(data$EXP_VOLUME, na.rm = T)
+    max_imp <- max(data$IMP_VOLUME, na.rm = T)
+    
+    ylab <- ifelse(units == 'METRIC', 'Metric Tons', 'Short Tons')
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     tlab <- 'Volume'
