@@ -298,52 +298,18 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
       select(!c(EXP_VOLUME_KG, IMP_VOLUME_KG))
   }
   
-  summarized_data <- trade_table %>%
-    # below is identical to dplyr pipe above save for three distinctions:
-      # 1) filter_species used to include only data of specified species
-      # 2) retain column of the hierarchy level in which the species was found
-      # 3) group the data by Year AND species (this lets us keep the species
-        # in the data as a column)
-    filter_species(species) %>%
-    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                      EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                      IMP_VALUE_2024USD),
-           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                  EXP_VOLUME_KG),
-           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                  IMP_VOLUME_KG),
-           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
-                                  EXP_VALUE_USD),
-           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
-                                  IMP_VALUE_USD)) %>%
-    group_by(YEAR, !!level) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
-           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
-           EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
-           IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
-           EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
-           IMP_PRICE_USD_PER_LB = IMP_VALUE_2024USD / IMP_VOLUME_LB,
-           EXP_PRICE_NOMINAL_PER_KG = EXP_VALUE_USD / EXP_VOLUME_KG,
-           EXP_PRICE_NOMINAL_PER_LB = EXP_VALUE_USD / EXP_VOLUME_LB,
-           IMP_PRICE_NOMINAL_PER_KG = IMP_VALUE_USD / IMP_VOLUME_KG,
-           IMP_PRICE_NOMINAL_PER_LB = IMP_VALUE_USD / IMP_VOLUME_LB,
-           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-           EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-           EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-           IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-           EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-           IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
-           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
-           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
+  if (nominal == F) {
+    new_data <- new_data %>%
+      select(!c(EXP_VALUE_USD, IMP_VALUE_USD)) %>%
+      rename(EXP_VALUE = EXP_VALUE_2024USD,
+             IMP_VALUE = IMP_VALUE_2024USD)
+    
+  } else if (nominal == T) {
+    new_data <- new_data %>%
+      select(!c(EXP_VALUE_2024USD, IMP_VALUE_2024USD)) %>%
+      rename(EXP_VALUE = EXP_VALUE_USD,
+             IMP_VALUE = IMP_VALUE_USD)
+  }
   
   return(summarized_data)
 }
