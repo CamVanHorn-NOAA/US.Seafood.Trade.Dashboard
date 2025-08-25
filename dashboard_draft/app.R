@@ -205,7 +205,8 @@ filter_species <- function(data, species) {
 }
 
 ### summary + calculation functions
-summarize_trade_yr_spp <- function(trade_table, species) {
+summarize_trade_yr_spp <- function(trade_table, species, output.format, 
+                                   units = NULL, nominal = F) {
   # this function summarizes trade data by year and species of interest
   # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
   # species is a character vector of a species of interest
