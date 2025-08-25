@@ -3284,32 +3284,32 @@ server <- function(input, output, session) {
   })
   
   # creates export price plot
-  exp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', units = selected_units(), export = T, 
-               species = species_selection_trade())
-  })
-  
-  # outputs export price plot
-  output$exp_price <- renderPlot({
-    trade_data_validation()
-    validate(need(try(!is.na(exp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
-    exp_price_plot()
-  })
-  
-  # creates import price plot
-  imp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', units = selected_units(), import = T, 
-               species = species_selection_trade())
-  })
-  
-  # outputs import price plot
-  output$imp_price <- renderPlot({
-    trade_data_validation()
-    validate(need(try(!is.na(imp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
-    imp_price_plot()
-  })
+  # exp_price_plot <- reactive({
+  #   plot_trade(trade_df(), 'PRICE', units = selected_units(), export = T, 
+  #              species = species_selection_trade())
+  # })
+  # 
+  # # outputs export price plot
+  # output$exp_price <- renderPlot({
+  #   trade_data_validation()
+  #   validate(need(try(!is.na(exp_price_plot())),
+  #                 'Data for this species is insufficient to produce this plot'))
+  #   exp_price_plot()
+  # })
+  # 
+  # # creates import price plot
+  # imp_price_plot <- reactive({
+  #   plot_trade(trade_df(), 'PRICE', units = selected_units(), import = T, 
+  #              species = species_selection_trade())
+  # })
+  # 
+  # # outputs import price plot
+  # output$imp_price <- renderPlot({
+  #   trade_data_validation()
+  #   validate(need(try(!is.na(imp_price_plot())),
+  #                 'Data for this species is insufficient to produce this plot'))
+  #   imp_price_plot()
+  # })
   
   # landings -------------------------------------------------------------------
   
