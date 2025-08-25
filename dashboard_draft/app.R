@@ -1213,7 +1213,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       ggplot(data = data, 
              aes(x = factor(YEAR),
                  # calculate export / import volume ratio here
-                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
+                 y = RATIO)) +
       geom_line(aes(group = GROUP),
                 color = 'black',
                 linewidth = 1.5) +
@@ -1229,33 +1229,11 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
             plot.title = element_text(size = 18),
             axis.title = element_text(size = 15))
   } else {
-    # plot of BALANCE
-    # create trade balance data by including both export and import data
-    # rename value to exports and imports for display of groups on plot
-    if (nominal == T) {
-      balance_data <- data %>%
-        rename(EXPORTS = EXP_VALUE_MILLIONS,
-               IMPORTS = IMP_VALUE_MILLIONS)
-    } else {
-      balance_data <- data %>%
-        rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
-               IMPORTS = IMP_VALUE_2024USD_MILLIONS)
-    }
-
-    balance_data <- balance_data %>%
-      select(YEAR, EXPORTS, IMPORTS) %>%
-      # calculate trade balance value
-      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
-      # pivot longer so there are three groups: exports, imports, and balance
-      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      # factor the column storing the groups
-      mutate(name = as.factor(name))
-    
     plot <- 
-      ggplot(data = balance_data,
+      ggplot(data = data,
              aes(x = factor(YEAR),
-                 y = value)) +
-      geom_bar(aes(fill = name),
+                 y = VALUE_MILLIONS)) +
+      geom_bar(aes(fill = TRADE),
                stat = 'identity',
                position = 'dodge',
                color = 'black') +
