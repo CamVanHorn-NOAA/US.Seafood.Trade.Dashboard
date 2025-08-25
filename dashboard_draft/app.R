@@ -283,8 +283,20 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
     return(new_data)
   }
   
-  # store level as object of quosure to work in dplyr pipe (via !!)
-  level <- rlang::enquo(which_level)
+  if (units == 'METRIC') {
+    new_data <- summarized_data %>%
+      rename(EXP_VOLUME = EXP_VOLUME_KG,
+             IMP_VOLUME = IMP_VOLUME_KG) %>%
+      mutate(EXP_VOLUME_T = EXP_VOLUME / 1000,
+             IMP_VOLUME_T = IMP_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    new_data <- summarized_data %>%
+      mutate(EXP_VOLUME = EXP_VOLUME_KG * 2.20462, # convert kg to lbs
+             IMP_VOLUME = IMP_VOLUME_KG * 2.20462,
+             EXP_VOLUME_T = EXP_VOLUME / 2000, # calculate short tons
+             IMP_VOLUME_T = IMP_VOLUME / 2000) %>%
+      select(!c(EXP_VOLUME_KG, IMP_VOLUME_KG))
+  }
   
   summarized_data <- trade_table %>%
     # below is identical to dplyr pipe above save for three distinctions:
