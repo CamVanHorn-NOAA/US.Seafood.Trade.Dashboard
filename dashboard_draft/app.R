@@ -3923,18 +3923,7 @@ server <- function(input, output, session) {
     
     click_x <- input$balance_plot_click$x
     
-    balance_data <- trade_df()
-    
-    balance_data <- balance_data %>%
-      rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
-             IMPORTS = IMP_VALUE_2024USD_MILLIONS) %>%
-      select(YEAR, EXPORTS, IMPORTS) %>%
-      # calculate trade balance value
-      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
-      # pivot longer so there are three groups: exports, imports, and balance
-      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      # factor the column storing the groups
-      mutate(name = as.factor(name))
+    balance_data <- trade_balance_df()
     
     year_levels <- levels(factor(sort(unique(balance_data$YEAR))))
     clicked_year <- round(click_x)
@@ -3987,13 +3976,13 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Exports:<br></span>", 
-        dollar(click_info$data$value[1]), " Million <br>",
+        dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Imports:<br></span>", 
-        dollar(click_info$data$value[2]), " Million <br>",
+        dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Trade Balance:<br></span>", 
-        dollar(click_info$data$value[3]), " Million <br>"
+        dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
       ))
     )
   })
@@ -4006,7 +3995,7 @@ server <- function(input, output, session) {
   observeEvent(input$ratio_plot_click, {
     click_x <- input$ratio_plot_click$x
     
-    ratio_data <- trade_df()
+    ratio_data <- trade_volume_df()
     
     year_levels <- levels(factor(sort(unique(ratio_data$YEAR))))
     clicked_year <- round(click_x)
@@ -4056,15 +4045,15 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume:<br></span>", 
-        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$EXP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Imports:<br></span>", 
-        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$IMP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", "Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ratio:<br></span>", 
-        (click_info$data$EXP_VOLUME_MT / click_info$data$IMP_VOLUME_MT)
-      ))
-    )
+        click_info$data$RATIO)))
   })
   
   
@@ -4158,7 +4147,7 @@ server <- function(input, output, session) {
     click_x <- input$exp_value_plot_click$x
     
     # store current data
-    trade_data <- trade_df()
+    trade_data <- trade_value_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
@@ -4222,10 +4211,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$EXP_VALUE_2024USD_MILLIONS), " Million<br>",
+        dollar(click_info$data$EXP_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Export Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$EXP_PRICE_USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$EXP_PRICE), 
+        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
   })
   
   
@@ -4236,7 +4226,7 @@ server <- function(input, output, session) {
   observeEvent(input$imp_value_plot_click, {
     click_x <- input$imp_value_plot_click$x
     
-    trade_data <- trade_df()
+    trade_data <- trade_value_df()
     
     year_levels <- levels(factor(trade_data$YEAR))
     clicked_year <- round(click_x)
@@ -4288,10 +4278,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$IMP_VALUE_2024USD_MILLIONS), " Million<br>",
+        dollar(click_info$data$IMP_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Import Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$IMP_PRICE_USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$IMP_PRICE), 
+        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
   })
   
   
@@ -4303,7 +4294,7 @@ server <- function(input, output, session) {
     click_x <- input$exp_volume_plot_click$x
     
     # store current data
-    trade_data <- trade_df()
+    trade_data <- trade_volume_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
@@ -4367,8 +4358,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons")
-      ))
+        comma(click_info$data$EXP_VOLUME), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
   
@@ -4380,7 +4371,7 @@ server <- function(input, output, session) {
     click_x <- input$imp_volume_plot_click$x
     
     # store current data
-    trade_data <- trade_df()
+    trade_data <- trade_volume_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
@@ -4444,7 +4435,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons")))
+        comma(click_info$data$IMP_VOLUME), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
   
