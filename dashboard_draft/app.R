@@ -236,6 +236,28 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
     species <- str_to_title(species)
   }
   
+  summarized_data <- trade_table %>%
+    filter_species(species) %>%
+    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                      EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                      IMP_VALUE_2024USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG),
+           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
+                                  EXP_VALUE_USD),
+           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
+                                  IMP_VALUE_USD)) %>%
+    group_by(YEAR, !!level) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  if (output.format == 'FULL') {
+    new_data <- summarized_data %>%
       mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
              EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
@@ -258,7 +280,7 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
              IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
              EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
              IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
-    return(summarized_data)
+    return(new_data)
   }
   
   # store level as object of quosure to work in dplyr pipe (via !!)
