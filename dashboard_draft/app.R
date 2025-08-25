@@ -311,7 +311,38 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
              IMP_VALUE = IMP_VALUE_USD)
   }
   
-  return(summarized_data)
+  new_data <- new_data %>%
+    mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
+           EXP_VALUE_BILLIONS = EXP_VALUE / 1000000000,
+           IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
+           IMP_VALUE_BILLIONS = IMP_VALUE / 1000000000,
+           EXP_PRICE = EXP_VALUE / EXP_VOLUME,
+           IMP_PRICE = IMP_VALUE / IMP_VOLUME) 
+  
+  if (output.format == 'BALANCE') {
+    balance_data <- new_data %>%
+      rename(EXPORTS = EXP_VALUE_MILLIONS,
+             IMPORTS = IMP_VALUE_MILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      mutate(name = as.factor(name)) %>%
+      rename(VALUE_MILLIONS = value,
+             TRADE = name)
+    
+    return(balance_data)
+  } else if (output.format == 'VOLUME') {
+    ratio_data <- new_data %>%
+      select(YEAR, EXP_VOLUME, IMP_VOLUME) %>%
+      mutate(RATIO = EXP_VOLUME / IMP_VOLUME)
+    
+    return(ratio_data)
+  } else if (output.format == 'VALUE') {
+    value_data <- new_data %>%
+      select(YEAR, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, EXP_PRICE, IMP_PRICE)
+    
+    return(value_data)
+  } 
 }
 summarize_trade_ctry_yr_spp <- function(trade_table, species, 
                                         time.frame, value = F, volume = F,
