@@ -1285,7 +1285,7 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
   
   ggplot(data = data,
          aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
-             y = !!y, 
+             y = NET_VALUE_MILLIONS, 
              fill = factor(YEAR))) +
     geom_col(position = 'dodge',
              color = 'black') +
@@ -1295,7 +1295,7 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
          fill = 'Year',
          title = paste0('Net Export Value for Top 5 Trading Partners of ', 
                         species)) +
-    scale_y_continuous(labels = label) +
+    scale_y_continuous(labels = label_currency(suffix = 'M')) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
     theme(axis.text = element_text(size = 12),
