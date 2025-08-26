@@ -370,16 +370,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   }
   
   # coerce species to upper case to match data formatting
-  species <- toupper(species)
-  
-  # if no species is selected ('ALL SPECIES' is the default), do not filter for species
-  if (species == 'ALL SPECIES') {
-    filtered_data <- trade_table
-  } else {
-    # otherwise, filter trade table by species
-    filtered_data <- trade_table %>%
-      filter_species(species)
-  }
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
   
   # dplyr pipe to summarize exports and imports by year and country
   summarized_data <- filtered_data %>%
