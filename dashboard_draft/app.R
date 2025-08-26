@@ -373,9 +373,10 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   species <- ifelse(species == 'All Species', 'All Species', toupper(species))
   
   # dplyr pipe to summarize exports and imports by year and country
-  summarized_data <- filtered_data %>%
+  summarized_data <- trade_table %>%
+    filter_species(species) %>%
     # select only columns of interest: year, country, exports and imports
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG,
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     # filter data to be within the specified time frame
     filter(YEAR >= time.frame[1],
@@ -419,43 +420,44 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
     # pull() outputs the values in the specified field as a vector
     pull(COUNTRY_NAME)
   
-  # summarize trade data by top five countries during time period
-  # summarized_data is already filtered for the time period
-  final_data <- summarized_data %>%
-    # filter for the top 5 countries
-    filter(COUNTRY_NAME %in% top5) %>%
-    # calculate export and import values in millions/billions,
-    # calculate export and import volumes in metric tons,
-    # calculate net value and net volume by subtracting imports from exports
-    mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-           EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-           IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
-           NET_VALUE_2024USD_BILLIONS = 
-             EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-           NET_VALUE_NOMINAL_BILLIONS = 
-             EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
-           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-           EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-           IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-           NET_VALUE_2024USD_MILLIONS =
-             EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
-           NET_VALUE_NOMINAL_MILLIONS = 
-             EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
-           EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
-           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
-           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
-           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
-           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-           NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-           NET_PRICE_2024USD_PER_KG = 
-             (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
-             (EXP_VOLUME_KG - IMP_VOLUME_KG))
-  
-  return(final_data)
+  if (output.format == 'FULL') {
+    # summarize trade data by top five countries during time period
+    # summarized_data is already filtered for the time period
+    final_data <- summarized_data %>%
+      # filter for the top 5 countries
+      filter(COUNTRY_NAME %in% top5) %>%
+      # calculate export and import values in millions/billions,
+      # calculate export and import volumes in metric tons,
+      # calculate net value and net volume by subtracting imports from exports
+      mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+             IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+             EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
+             IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
+             NET_VALUE_2024USD_BILLIONS = 
+               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VALUE_NOMINAL_BILLIONS = 
+               EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
+             EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+             IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+             EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
+             IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
+             NET_VALUE_2024USD_MILLIONS =
+               EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
+             NET_VALUE_NOMINAL_MILLIONS = 
+               EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
+             EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
+             IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+             EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
+             IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
+             EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+             IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
+             NET_PRICE_2024USD_PER_KG = 
+               (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
+               (EXP_VOLUME_KG - IMP_VOLUME_KG))
+    
+    return(final_data)
 }
 summarize_pp_yr_spp <- function(product_data, species) {
   # this function summarizes processed product data by year and species of 
