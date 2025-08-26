@@ -458,6 +458,31 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
                (EXP_VOLUME_KG - IMP_VOLUME_KG))
     
     return(final_data)
+  }
+  
+  if (output.format == 'VALUE') {
+    final_data <- summarized_data %>%
+      filter(COUNTRY_NAME %in% top5)
+    
+    if (nominal == F) {
+       final_data <- final_data %>%
+        rename(EXP_VALUE = EXP_VALUE_2024USD,
+               IMP_VALUE = IMP_VALUE_2024USD)
+    } else if (nominal == T) {
+      final_data <- final_data %>%
+        rename(EXP_VALUE = EXP_VALUE_USD,
+               IMP_VALUE = IMP_VALUE_USD)
+    }
+    
+    final_data <- final_data %>%
+      select(YEAR, COUNTRY_NAME, EXP_VALUE, IMP_VALUE) %>%
+      mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
+             IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
+             NET_VALUE_MILLIONS = EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS)
+    
+    return(final_data)
+  }
+  
 }
 summarize_pp_yr_spp <- function(product_data, species) {
   # this function summarizes processed product data by year and species of 
