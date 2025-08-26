@@ -3188,9 +3188,9 @@ server <- function(input, output, session) {
   
   # creates top 5 net export plot
   top5_trade_plot <- reactive({
-    plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
-                                species = species_selection_trade(), 
-                                nominal = selected_value())
+    plot_trade_ctry_yr_spp(top5_trade_df(), 
+                           species = species_selection_trade(), 
+                           nominal = selected_value())
   })
   
   # outputs top 5 net export plot
