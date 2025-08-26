@@ -4103,23 +4103,23 @@ server <- function(input, output, session) {
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2020</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[1]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[1]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[2], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2021</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[2]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[2]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[3], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2022</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[3]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[3]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[4], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2023</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[4]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[4]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[5], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2024</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[5]), " Million <br>")))
+        dollar(click_info$data$NET_VALUE_MILLIONS[5]), " Million <br>")))
   })
   
   
