@@ -3168,12 +3168,21 @@ server <- function(input, output, session) {
   })
   
   # creates top 5 net export data
+  top5_trade_df_full <- reactive({
+    summarize_trade_ctry_yr_spp(
+      trade_filtered(),
+      species_selection_trade(),
+      output.format = 'FULL',
+      time.frame = c(2020, 2024),
+      nominal = selected_value())
+  })
+  
   top5_trade_df <- reactive({
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      output.format = 'VALUE',
       time.frame = c(2020, 2024),
-      value = T,
       nominal = selected_value())
   })
   
