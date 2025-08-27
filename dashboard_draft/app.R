@@ -4875,52 +4875,14 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    # extract first year for only one row per product, arrange alphabetically
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
@@ -5013,52 +4975,13 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
@@ -5152,52 +5075,13 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
