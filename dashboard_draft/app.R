@@ -4895,7 +4895,7 @@ server <- function(input, output, session) {
     # Next, get product forms
     products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
-    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
     # extract first year for only one row per product, arrange alphabetically
@@ -4995,7 +4995,7 @@ server <- function(input, output, session) {
     # Next, get product forms
     products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
-    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
     arranged_data <- pp_data %>% 
@@ -5095,7 +5095,7 @@ server <- function(input, output, session) {
     # Next, get product forms
     products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
-    pp_colors <- colors[names(colors) %in% products]
+    pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
     arranged_data <- pp_data %>% 
