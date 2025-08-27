@@ -3648,7 +3648,8 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection_trade(), units = selected_units())
+      species_selection_trade(), units = selected_units(),
+      nominal = selected_value())
     })
   
   # creates apparent supply plot
