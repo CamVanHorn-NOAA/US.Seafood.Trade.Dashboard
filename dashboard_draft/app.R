@@ -1237,7 +1237,7 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
              fill = factor(YEAR))) +
     geom_col(position = 'dodge',
              color = 'black') +
-    scale_fill_nmfs(palette = 'oceans') +
+    scale_fill_manual(values = top5_colors) +
     labs(x = '',
          y = ylab,
          fill = 'Year',
@@ -1684,6 +1684,8 @@ create_tooltip_icon <- function(line, point) {
 # Balance plot colors
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
+top5_colors <- c('#C6E6F0', '#5EB6D9', '#0085CA', '#003087', '#002364')
+names(top5_colors) <- levels(factor(levels = c(2020:2024)))
 landings_colors <- c('#853B00', '#FFAB38')
 
 # colors designed primarily for processed products at the moment
@@ -3889,8 +3891,6 @@ server <- function(input, output, session) {
     left_pos <- max(10, left_pos)
     top_pos <- max(10, top_pos)
     
-    colors <- nmfs_palette('oceans')(5)
-    
     div(
       style = paste0(
         "left: ", left_pos, "px;",
@@ -3904,23 +3904,23 @@ server <- function(input, output, session) {
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$COUNTRY_NAME[1], "</span><br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", colors[1], ";'>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2020</span>", ': ',
         dollar(click_info$data$NET_VALUE_MILLIONS[1]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", colors[2], ";'>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[2], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2021</span>", ': ',
         dollar(click_info$data$NET_VALUE_MILLIONS[2]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", colors[3], ";'>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[3], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2022</span>", ': ',
         dollar(click_info$data$NET_VALUE_MILLIONS[3]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", colors[4], ";'>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[4], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2023</span>", ': ',
         dollar(click_info$data$NET_VALUE_MILLIONS[4]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", colors[5], ";'>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[5], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2024</span>", ': ',
         dollar(click_info$data$NET_VALUE_MILLIONS[5]), " Million <br>")))
