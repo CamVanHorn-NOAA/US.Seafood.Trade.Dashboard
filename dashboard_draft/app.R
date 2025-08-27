@@ -4798,7 +4798,7 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$close_landings_value_tooltip, {
+  observeEvent(input$close_landings_volume_tooltip, {
     landings_volume_clicked_point(NULL)
   })
   
