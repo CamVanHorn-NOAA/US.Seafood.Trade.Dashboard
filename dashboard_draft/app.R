@@ -331,18 +331,15 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
              TRADE = name)
     
     return(balance_data)
-  } else if (output.format == 'VOLUME') {
-    ratio_data <- new_data %>%
-      select(YEAR, EXP_VOLUME, IMP_VOLUME) %>%
-      mutate(RATIO = EXP_VOLUME / IMP_VOLUME)
+  } else if (output.format %in% c('VALUE', 'VOLUME')) {
+    trade_data <- new_data %>%
+      select(YEAR, EXP_VALUE, IMP_VALUE, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, 
+             EXP_PRICE, IMP_PRICE, EXP_VOLUME_T, IMP_VOLUME_T, EXP_VOLUME,
+             IMP_VOLUME) %>%
+      mutate(RATIO = EXP_VOLUME_T / IMP_VOLUME_T)
     
-    return(ratio_data)
-  } else if (output.format == 'VALUE') {
-    value_data <- new_data %>%
-      select(YEAR, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, EXP_PRICE, IMP_PRICE)
-    
-    return(value_data)
-  } 
+    return(trade_data)
+  }
 }
 summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
                                         time.frame, nominal = F) {
