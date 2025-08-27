@@ -1397,72 +1397,32 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
-    # Overlayed Prices will depend on specified units
     if (units == 'METRIC') {
-      if (nominal == T) {
-        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_KG')
-        y2 <- rlang::enquo(y2)
-      } else {
-        y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
-        y2 <- rlang::enquo(y2) 
-      }
-      
       label2 <- label_currency(suffix = '/kg')
       unit <- 'per kilogram'
-    }
-    
-    if (units == 'IMPERIAL') {
-      if (nominal == T) {
-        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_LB')
-        y2 <- rlang::enquo(y2)
-      } else {
-        y2 <- as.symbol('COM_PRICE_2024USD_PER_LB')
-        y2 <- rlang::enquo(y2) 
-      }
-      
+    } else if (units == 'IMPERIAL') {
       label2 <- label_currency(suffix = '/lb')
       unit <- 'per pound'
     }
     
-    if (nominal == T) {
-      y <- as.symbol('COM_VALUE_MILLIONS')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Millions (Nominal USD)'
-      ylab2 <- 'Average Price (Nominal USD)'
-    } else {
-      # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
-      y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
-      y <- rlang::enquo(y)
-      
+    if (nominal == F) {
       ylab <- 'Millions (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)'
+    } else {
+      ylab <- 'Millions (Nominal USD)'
+      ylab2 <- 'Average Price (Nominal USD)'
     }
     
-    # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    
     tlab <- 'Ex-Vessel Value of '
   }
   
   # set labels for VOLUME plot
   if (plot.format == 'VOLUME') {
-    # format metric tons by thousands
-    data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
-    data$COM_VOLUME_THOUSAND_ST <- data$COM_VOLUME_ST / 1000
-    
     if (units == 'METRIC') {
-      y <- as.symbol('COM_VOLUME_THOUSAND_MT')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Metric Tons (Thousands)'
-    }
-    
-    if (units == 'IMPERIAL') {
-      y <- as.symbol('COM_VOLUME_THOUSAND_ST')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Short Tons (Thousands)'
+      ylab <- 'Metric Tons'
+    } else if (units == 'IMPERIAL') {
+      ylab <- 'Short Tons'
     }
     
     label <- comma
@@ -1477,13 +1437,13 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     
     # calculate scale factor (see plot_trade for details)
     max_value <- data %>%
-      slice_max(!!y, n = 1) %>%
-      select(!!y) %>%
+      slice_max(COM_VALUE, n = 1) %>%
+      select(COM_VALUE) %>%
       pull()
     
     max_price <- data %>%
-      slice_max(!!y2, n = 1) %>%
-      select(!!y2) %>%
+      slice_max(COM_PRICE, n = 1) %>%
+      select(COM_PRICE) %>%
       pull()
     
     scale_factor <- max_value / max_price
@@ -1491,14 +1451,14 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
-      geom_col(aes(y = !!y),
+      geom_col(aes(y = COM_VALUE),
                fill = '#853B00',
                color = 'black') +
-      geom_line(aes(y = !!y2 * scale_factor,
+      geom_line(aes(y = COM_PRICE * scale_factor,
                     group = GROUP),
                 color = '#FFAB38',
                 linewidth = 1.5) +
-      geom_point(aes(y = !!y2 * scale_factor),
+      geom_point(aes(y = COM_PRICE * scale_factor),
                  color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
@@ -1521,7 +1481,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
   plot <- 
     ggplot(data = data,
            aes(x = factor(YEAR),
-               y = !!y)) +
+               y = COM_VOLUME_T)) +
     geom_col(color = 'black',
              fill = '#853B00') +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
