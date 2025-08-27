@@ -3838,6 +3838,7 @@ server <- function(input, output, session) {
         "Imports", "</span>", ':<br>',
         comma(click_info$data$IMP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
+        '<img src = "', create_tooltip_icon('black', 16), '" class = "tooltip-icon" alt = "legend icon"/>',
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ratio", "</span>", ':<br>',
         round(click_info$data$RATIO, digits = 3))))
