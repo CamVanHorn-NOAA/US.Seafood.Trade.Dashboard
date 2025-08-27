@@ -1560,7 +1560,7 @@ plot_hi <- function(hi_data, species) {
     geom_point(size = 2,
                color = 'black') +
     scale_color_discrete(name = NULL, 
-                         type = c('#003087', '#0085CA')) +
+                         type = c(export_color, import_color)) +
     labs(x = '',
          y = 'Index',
          title = paste0('Herfindahl Index of \n', species)) +
