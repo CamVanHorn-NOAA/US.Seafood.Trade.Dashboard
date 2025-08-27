@@ -3511,12 +3511,22 @@ server <- function(input, output, session) {
                   'There is no available production data for this species'))
   })
   
-  # creates processed products data
+  # creates processed products data for download
+  pp_df_full <- reactive({
+    summarize_pp_yr_spp(
+      products_filtered(),
+      species_selection_products(),
+      full_data = T)
+    })
+  
+  # creates processed products data for plots
   pp_df <- reactive({
     summarize_pp_yr_spp(
       products_filtered(),
-      species_selection_products())
-    })
+      species_selection_products(),
+      units = selected_units(),
+      nominal = selected_value())
+  })
   
   # creates processed products value plot
   pp_value_plot <- reactive({
