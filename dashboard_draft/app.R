@@ -3704,7 +3704,7 @@ server <- function(input, output, session) {
     
     click_x <- input$balance_plot_click$x
     
-    balance_data <- trade_balance_df()
+    balance_data <- balance_df()
     
     year_levels <- levels(factor(sort(unique(balance_data$YEAR))))
     clicked_year <- round(click_x)
@@ -3776,7 +3776,7 @@ server <- function(input, output, session) {
   observeEvent(input$ratio_plot_click, {
     click_x <- input$ratio_plot_click$x
     
-    ratio_data <- trade_volume_df()
+    ratio_data <- trade_df()
     
     year_levels <- levels(factor(sort(unique(ratio_data$YEAR))))
     clicked_year <- round(click_x)
@@ -3928,7 +3928,7 @@ server <- function(input, output, session) {
     click_x <- input$exp_value_plot_click$x
     
     # store current data
-    trade_data <- trade_value_df()
+    trade_data <- trade_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
@@ -4007,7 +4007,7 @@ server <- function(input, output, session) {
   observeEvent(input$imp_value_plot_click, {
     click_x <- input$imp_value_plot_click$x
     
-    trade_data <- trade_value_df()
+    trade_data <- trade_df()
     
     year_levels <- levels(factor(trade_data$YEAR))
     clicked_year <- round(click_x)
@@ -4075,7 +4075,7 @@ server <- function(input, output, session) {
     click_x <- input$exp_volume_plot_click$x
     
     # store current data
-    trade_data <- trade_volume_df()
+    trade_data <- trade_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
@@ -4152,7 +4152,7 @@ server <- function(input, output, session) {
     click_x <- input$imp_volume_plot_click$x
     
     # store current data
-    trade_data <- trade_volume_df()
+    trade_data <- trade_df()
     
     # require clicked year to be within range
     year_levels <- levels(factor(trade_data$YEAR))
