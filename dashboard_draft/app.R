@@ -571,7 +571,8 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   return(new_data)
 }
-summarize_landings_yr_spp <- function(landings_data, species) {
+summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
+                                      units = NULL, nominal = F) {
   # this function summarizes landings data (not exclusively commercial) by 
     # year and species of interest
   # landings_data is a formatted data frame of FOSS landings data 
@@ -634,9 +635,31 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     return(summarized_data)
   }
   
+  if (nominal == F) {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS)) %>%
+      rename(COM_VALUE = DOLLARS_2024)
+  } else {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS_2024)) %>%
+      rename(COM_VALUE = DOLLARS)
+  }
+  
+  if (units == 'METRIC') {
+    summarized_data <- summarized_data %>%
+      rename(COM_VOLUME = KG) %>%
+      mutate(COM_VOLUME_T = COM_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    summarized_data <- summarized_data %>%
+      mutate(COM_VOLUME = KG * 2.20462, # convert kilgorams to pounds
+             COM_VOLUME_T = COM_VOLUME / 2000) # short tons are 2000 pounds
+  }
+  
+  summarized_data <- summarized_data %>%
+    mutate(COM_VALUE_MILLIONS = COM_VALUE / 1000000,
+           COM_PRICE = COM_VALUE / COM_VOLUME) 
   
   return(summarized_data)
-  
 }
 summarize_yr_spp <- function(species) {
   # this function utilizes the summary functions for trade, processed products,
