@@ -2925,19 +2925,19 @@ server <- function(input, output, session) {
     balance_plot()
   })
   
-  # creates trade volume data
-  trade_volume_df <- reactive({
+  # creates trade data for plots
+  trade_df <- reactive({
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
-      'VOLUME',
+      'VALUE',
       units = selected_units(),
       nominal = selected_value())
   })
   
   # creates export/import ratio plot
   ratio_plot <- reactive({
-    plot_trade(trade_volume_df(), 'RATIO', export = T, import = T, 
+    plot_trade(trade_df(), 'RATIO', export = T, import = T, 
                species = species_selection_trade())
   })
   
@@ -2949,7 +2949,7 @@ server <- function(input, output, session) {
     ratio_plot()
   })
   
-  # creates top 5 net export data
+  # creates top 5 net export data for download
   top5_trade_df_full <- reactive({
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
@@ -2959,6 +2959,7 @@ server <- function(input, output, session) {
       nominal = selected_value())
   })
   
+  # creates top 5 net export data for plots
   top5_trade_df <- reactive({
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
@@ -2983,19 +2984,9 @@ server <- function(input, output, session) {
     top5_trade_plot()
   })
   
-  # creates trade value data
-  trade_value_df <- reactive({
-    summarize_trade_yr_spp(
-      trade_filtered(),
-      species_selection_trade(),
-      'VALUE',
-      units = selected_units(),
-      nominal = selected_value())
-  })
-  
   # creates export value plot
   exp_value_plot <- reactive({
-    plot_trade(trade_value_df(), 'VALUE', units = selected_units(), export = T, 
+    plot_trade(trade_df(), 'VALUE', units = selected_units(), export = T, 
                species = species_selection_trade(), nominal = selected_value())
   })
   
@@ -3009,7 +3000,7 @@ server <- function(input, output, session) {
   
   # creates import value plot
   imp_value_plot <- reactive({
-    plot_trade(trade_value_df(), 'VALUE', units = selected_units(), import = T, 
+    plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
                species = species_selection_trade(), nominal = selected_value())
     })
   
@@ -3023,7 +3014,7 @@ server <- function(input, output, session) {
 
   # creates export volume plot
   exp_volume_plot <- reactive({
-    plot_trade(trade_volume_df(), 'VOLUME', units = selected_units(), export = T, 
+    plot_trade(trade_df(), 'VOLUME', units = selected_units(), export = T, 
                species = species_selection_trade())
   })
   
@@ -3037,7 +3028,7 @@ server <- function(input, output, session) {
 
   # creates import volume plot
   imp_volume_plot <- reactive({
-    plot_trade(trade_volume_df(), 'VOLUME', units = selected_units(), import = T, 
+    plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
                species = species_selection_trade())
   })
   
