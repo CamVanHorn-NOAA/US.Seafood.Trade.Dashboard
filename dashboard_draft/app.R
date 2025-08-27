@@ -1196,10 +1196,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
            y = 'Millions (Real 2024 USD)',
            fill = '',
            title = paste0('Value Balance of ', species)) +
-      scale_fill_manual(labels = c('Exports',
-                                   'Imports',
-                                   'Trade Balance'),
-                        values = c('#B3EDEF', '#1ECAD3', '#005761')) +
+      scale_fill_manual(values = balance_colors) +
       coord_axes_inside(labels_inside = T) +
       scale_x_discrete(limits = factor(2004:2024)) +
       scale_y_continuous(labels = label_currency()) +
@@ -1684,6 +1681,9 @@ create_tooltip_icon <- function(line, point) {
   return(paste0("data:image/png;base64,", icon_data))
 }
 # Colors -----------------------------------------------------------------------
+# Balance plot colors
+balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
+names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
 # colors designed primarily for processed products at the moment
 colors <- c(nmfs_palette('coral')(6)[6:3], 
             nmfs_palette('waves')(6)[6:2], 
