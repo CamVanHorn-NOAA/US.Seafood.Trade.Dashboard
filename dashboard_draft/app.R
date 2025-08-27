@@ -4139,7 +4139,7 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$EXP_VOLUME), 
+        comma(click_info$data$EXP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
@@ -4216,7 +4216,7 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$IMP_VOLUME), 
+        comma(click_info$data$IMP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
@@ -4634,7 +4634,7 @@ server <- function(input, output, session) {
         comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Domestic Production Volume", "</span>", ":<br>",
-        comma(click_info$data$PP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$PP_VOLUME_T), " Metric Tons <br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Ratio", "</span>", ":<br>",
         round(click_info$data$APPARENT_SUPPLY_REL_US_PROD, digits = 3))))
@@ -4698,7 +4698,7 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Unexported Domestic Production", "</span>",  ":<br>",
-        comma(abs(click_info$data$PP_VOLUME_MT - click_info$data$EXP_VOLUME_MT)), " Metric Tons <br>",
+        comma(abs(click_info$data$PP_VOLUME_T - click_info$data$EXP_VOLUME_T)), " Metric Tons <br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>", ":<br>",
         comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
@@ -4765,7 +4765,7 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$COM_VALUE_MILLIONS_2024USD), " Million<br>",
+        dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$COM_PRICE_2024USD_PER_KG), " per kilogram")))
@@ -4935,7 +4935,7 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(filtered_new_data$PP_VALUE_MILLIONS_2024USD[i]), " Million <br>"
+        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>"
       )
       
       pp_val_tooltip <- paste0(pp_val_tooltip, 
