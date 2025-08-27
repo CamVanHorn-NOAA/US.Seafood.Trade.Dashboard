@@ -525,34 +525,50 @@ summarize_pp_yr_spp <- function(product_data, species) {
     return(summarized_data)
   }
   
-  # identical to dplyr pipe above, save for filtering for a specified species
-  # only runs if species != 'ALL SPECIES'
-  product_data %>%
-    filter_species(species) %>%
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
+  if (nominal == F) {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS)) %>%
+      rename(PP_VALUE = DOLLARS_2024)
+  } else {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS_2024)) %>%
+      rename(PP_VALUE = DOLLARS)
+  }
+  
+  if (units == 'METRIC') {
+    summarized_data <- summarized_data %>%
+      rename(PP_VOLUME = KG) %>%
+      mutate(PP_VOLUME_T = PP_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    summarized_data <- summarized_data %>%
+      mutate(PP_VOLUME = KG * 2.20462, # convert kilgorams to pounds
+             PP_VOLUME_T = PP_VOLUME / 2000) # short tons are 2000 pounds
+  }
+  
+  low_prop_types <- summarized_data %>% 
+    select(PP_VALUE, PRODUCT_NAME) %>%
+    group_by(PRODUCT_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(TOTAL_VALUE = sum(PP_VALUE),
+           VALUE_SHARE = PP_VALUE / TOTAL_VALUE) %>%
+    filter(VALUE_SHARE < 0.02) %>%
+    select(PRODUCT_NAME) %>%
+    distinct() %>%
+    pull()
+  
+  # rename these low proportion types as 'OTHER*' and re-summarise
+  new_data <- summarized_data %>%
+    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                 'OTHER*', PRODUCT_NAME)) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(MT = KG / 1000,
-           LB = KG * 2.20462,
-           ST = LB / 2000,
-           MILLIONS_2024USD = DOLLARS_2024 / 1000000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
-           PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-           MILLIONS = DOLLARS / 1000000,
-           BILLIONS = DOLLARS / 1000000000,
-           PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-           PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-    rename(PP_VALUE_2024USD = DOLLARS_2024,
-           PP_VOLUME_MT = MT,
-           PP_VOLUME_LB = LB,
-           PP_VOLUME_ST = ST,
-           PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
-           PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
-           PP_VOLUME_KG = KG,
-           PP_NOMINAL_VALUE = DOLLARS,
-           PP_VALUE_MILLIONS = MILLIONS,
-           PP_VALUE_BILLIONS = BILLIONS)
+    mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
+           PP_PRICE = PP_VALUE / PP_VOLUME,
+           PRODUCT_NAME = str_to_title(PRODUCT_NAME))
+  
+  return(new_data)
 }
 summarize_landings_yr_spp <- function(landings_data, species) {
   # this function summarizes landings data (not exclusively commercial) by 
@@ -1304,48 +1320,6 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
-  
-  # we group product conditions of low proportions in the data (less than 2%)
-    # to a subgroup called 'OTHER*'
-  # find the low proportion types by value and volume and combine
-  low_prop_types_value <- processed_product_data %>% 
-    select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-           VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-    filter(VALUE_SHARE < 0.02) %>%
-    select(PRODUCT_NAME)
-  
-  low_prop_types_volume <- processed_product_data %>%
-    select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-           VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-    filter(VOLUME_SHARE < 0.02) %>%
-    select(PRODUCT_NAME)
-  
-  low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-    distinct() %>%
-    pull(PRODUCT_NAME)
-  
-  # rename these low proportion types as 'OTHER*' and re-summarise
-  new_data <- processed_product_data %>%
-    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                 'OTHER*', PRODUCT_NAME)) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-           PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-           PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-           PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-           PRODUCT_NAME = factor(PRODUCT_NAME),
-           PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-           PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
