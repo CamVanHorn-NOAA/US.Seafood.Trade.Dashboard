@@ -1265,88 +1265,34 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
+    y <- as.symbol('PP_VALUE_MILLIONS') 
+    y <- rlang::enquo(y)
+    
     if (nominal == T) {
-      y <- as.symbol('PP_VALUE_MILLIONS') 
-      y <- rlang::enquo(y)
-      
       ylab <- 'Millions (Nominal USD)'
     } else {
-      # y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
-      y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
-      y <- rlang::enquo(y)
-      # ylab <- 'Value (Billions, 2024 Real USD)'
       ylab <- 'Millions (2024 Real USD)'
     }
     
-    # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     tlab <- 'Production Value of '
-    unit <- ' Million'
-    
-    # calculate the total value per year to find upper limit
-    yr_value <- new_data %>%
-      # select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
-      select(YEAR, !!y) %>%
-      group_by(YEAR) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop')
-    
-    if (nominal == T) {
-      ylim <- max(yr_value$PP_VALUE_MILLIONS + 5)
-    } else {
-      # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
-      ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)  
-    }
-    
-    new_data <- new_data %>%
-      select(YEAR, PRODUCT_NAME, PP_VALUE_2024USD, PP_NOMINAL_VALUE,
-             PP_VALUE_MILLIONS_2024USD, PP_VALUE_BILLIONS_2024USD, 
-             PP_VALUE_MILLIONS, PP_VALUE_BILLIONS) %>%
-      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'VOLUME') {
+    y <- as.symbol('PP_VOLUME_T')
+    y <- rlang::enquo(y)
+    
     if (units == 'METRIC') {
-      # set labels for VOLUME plots
-      y <- as.symbol('PP_VOLUME_THOUSAND_MT')
-      y <- rlang::enquo(y)
-      ylab <- 'Metric Tons (Thousands)'
+      ylab <- 'Metric Tons'
       label <- comma
       tlab <- 'Production Volume of '
-      unit <- ' Thousand Metric Tons'
-      
-      # calculate the total value per year to find upper limit
-      yr_volume <- new_data %>%
-        select(YEAR, PP_VOLUME_THOUSAND_MT) %>%
-        group_by(YEAR) %>%
-        summarise(across(where(is.numeric), sum),
-                  .groups = 'drop') 
-      
-      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_MT + 1)
     }
     
     if (units == 'IMPERIAL') {
-      y <- as.symbol('PP_VOLUME_THOUSAND_ST')
-      y <- rlang::enquo(y)
-      ylab <- 'Short Tons (Thousands)'
+      ylab <- 'Short Tons'
       label <- comma
       tlab <- 'Production Volume of '
-      unit <- ' Thousand Short Tons'
-      
-      # calculate the total value per year to find upper limit
-      yr_volume <- new_data %>%
-        select(YEAR, PP_VOLUME_THOUSAND_ST) %>%
-        group_by(YEAR) %>%
-        summarise(across(where(is.numeric), sum),
-                  .groups = 'drop')
-      
-      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_ST + 1)
     }
-    
-    new_data <- new_data %>%
-      select(YEAR, PRODUCT_NAME, PP_VOLUME_KG, PP_VOLUME_MT, PP_VOLUME_LB,
-             PP_VOLUME_ST, PP_VOLUME_THOUSAND_MT, PP_VOLUME_THOUSAND_ST) %>%
-      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'PRICE') {
@@ -1356,45 +1302,29 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     # specify whether price is reported in per kg or per lb
     if (units == 'METRIC') {
       if (nominal == T) {
-        y <- as.symbol('PP_PRICE_NOMINAL_PER_KG')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_KG)
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        y <- as.symbol('PP_PRICE_2024USD_PER_KG')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_2024USD_PER_KG) 
         ylab <- 'Average Price (Real 2024 USD)'
       }
       
       label <- label_currency(suffix = '/kg')
-      unit <- ' per kilogram'
     }
     
     if (units == 'IMPERIAL') {
       if (nominal == T) {
-        y <- as.symbol('PP_PRICE_NOMINAL_PER_LB')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_LB)
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        y <- as.symbol('PP_PRICE_2024USD_PER_LB')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_2024USD_PER_LB) 
         ylab <- 'Average Price (Real 2024 USD)'
       }
       
       label <- label_currency(suffix = '/lb')
-      unit <- ' per pound'
     }
-    plot <- ggplot(data = new_data %>%
-                     mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME)),
+    
+    ymax <- max(processed_product_data$PP_PRICE) + 0.05*(max(processed_product_data$PP_PRICE))
+    
+    plot <- ggplot(data = processed_product_data,
                    aes(x = factor(YEAR),
-                       y = !!y,
+                       y = PP_PRICE,
                        color = PRODUCT_NAME)) +
       geom_line(aes(group = PRODUCT_NAME),
                 linewidth = 1.5) +
@@ -1407,7 +1337,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
            fill = 'Product Condition',
            title = paste0('Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
-      scale_y_continuous(limits = c(0, ymax + 0.5),
+      scale_y_continuous(limits = c(0, ymax),
                          expand = c(0, 0),
                          labels = label) +
       theme_bw() +
@@ -1420,8 +1350,19 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     return(plot)
   }
   
+  # find upper limit for value/volume plots
+  upper_limit <- processed_product_data %>%
+    select(YEAR, !!y) %>%
+    group_by(YEAR) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    filter(!!y == max(!!y)) %>%
+    pull(!!y)
+  
+  ylim <- upper_limit + 0.05*upper_limit
+  
   # plot for VALUE or VOLUME depending on plot.format
-  plot <- ggplot(data = new_data,
+  plot <- ggplot(data = processed_product_data,
                  aes(x = factor(YEAR),
                      y = !!y,
                      fill = PRODUCT_NAME)) +
