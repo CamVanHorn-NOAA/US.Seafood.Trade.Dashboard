@@ -3758,12 +3758,15 @@ server <- function(input, output, session) {
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$YEAR[1], "</span><br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Exports:<br></span>", 
         dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[2], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Imports:<br></span>", 
         dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
+        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[3], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Trade Balance:<br></span>", 
         dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
