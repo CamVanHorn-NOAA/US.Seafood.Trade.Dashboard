@@ -4844,9 +4844,10 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Landed Volume: ", "</span><span style = 'font-size: 18px;'><br>",
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", landings_colors[1], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Landed Volume", "</span><span style = 'font-size: 18px;'>", ':<br>',
         comma(click_info$data$COM_VOLUME_T), ifelse(selected_units() == 'METRIC', 
                                                     " Metric Tons", " Short Tons"))))
   })
