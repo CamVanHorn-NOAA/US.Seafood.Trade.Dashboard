@@ -1450,11 +1450,11 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
       ggplot(data = data,
              aes(x = factor(YEAR))) +
       geom_col(aes(y = COM_VALUE),
-               fill = '#853B00',
+               fill = landings_colors[1],
                color = 'black') +
       geom_line(aes(y = COM_PRICE * scale_factor,
                     group = GROUP),
-                color = '#FFAB38',
+                color = landings_colors[2],
                 linewidth = 1.5) +
       geom_point(aes(y = COM_PRICE * scale_factor),
                  color = 'black',
@@ -1481,7 +1481,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
            aes(x = factor(YEAR),
                y = COM_VOLUME_T)) +
     geom_col(color = 'black',
-             fill = '#853B00') +
+             fill = landings_colors[1]) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                      limits = factor(2004:2023)) +
     scale_y_continuous(labels = label) +
@@ -1684,6 +1684,8 @@ create_tooltip_icon <- function(line, point) {
 # Balance plot colors
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
+landings_colors <- c('#853B00', '#FFAB38')
+
 # colors designed primarily for processed products at the moment
 pp_colors <- c(nmfs_palette('coral')(6)[6:3], 
             nmfs_palette('waves')(6)[6:2], 
