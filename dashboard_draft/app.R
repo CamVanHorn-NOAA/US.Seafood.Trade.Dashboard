@@ -1085,12 +1085,12 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   # set labels and y values for plots of VOLUME
   if (plot_format == 'VOLUME') {
-    y <- as.symbol(paste0(shortform, '_VOLUME'))
+    y <- as.symbol(paste0(shortform, '_VOLUME_T'))
     y <- rlang::enquo(y)
     label <- comma
     
-    max_exp <- max(data$EXP_VOLUME, na.rm = T)
-    max_imp <- max(data$IMP_VOLUME, na.rm = T)
+    max_exp <- max(data$EXP_VOLUME_T, na.rm = T)
+    max_imp <- max(data$IMP_VOLUME_T, na.rm = T)
     
     ylab <- ifelse(units == 'METRIC', 'Metric Tons', 'Short Tons')
     
