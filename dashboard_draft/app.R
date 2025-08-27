@@ -2181,8 +2181,8 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
-      write.csv(top5_trade_df(), 'top5_trade_plot_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
+      write.csv(top5_trade_df_full(), 'top5_trade_plot_data.csv')
       
       # we are saving multiple files so they must be in a zip file
       # fname is filename that derives from the start of the function
@@ -2213,7 +2213,7 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
       
       zip(zipfile = fname, files = fs)
     },
@@ -2241,7 +2241,7 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
       
       zip(zipfile = fname, files = fs)
     },
@@ -2331,7 +2331,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_value.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_value.png', landings_value_plot(),
              width = 10,
              height = 8,
@@ -2354,7 +2354,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_volume.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_volume.png', landings_volume_plot(),
              width = 10,
              height = 8,
@@ -2377,7 +2377,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_price.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_price.png', landings_price_plot(),
              width = 10,
              height = 8,
@@ -2400,7 +2400,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_value.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_value.png', pp_value_plot(),
              width = 10,
              height = 8,
@@ -2423,7 +2423,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_volume.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_volume.png', pp_volume_plot(),
              width = 10,
              height = 8,
@@ -2446,7 +2446,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_price.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_price.png', pp_price_plot(),
              width = 10,
              height = 8,
@@ -2916,7 +2916,7 @@ server <- function(input, output, session) {
   })
 
   # creates full trade data
-  trade_df <- reactive({
+  trade_df_full <- reactive({
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
