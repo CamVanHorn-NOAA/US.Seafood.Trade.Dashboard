@@ -1328,7 +1328,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 1.5) +
-      scale_color_manual(values = colors,
+      scale_color_manual(values = pp_colors,
                          name = 'Product Condition') +
       labs(x = '',
            y = ylab,
@@ -1366,7 +1366,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
                      fill = PRODUCT_NAME)) +
     geom_col(position = 'stack',
              color = 'black') +
-    scale_fill_manual(values = colors,
+    scale_fill_manual(values = pp_colors,
                       name = 'Product Condition') +
     labs(x = '',
          y = ylab,
@@ -1685,12 +1685,12 @@ create_tooltip_icon <- function(line, point) {
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
 # colors designed primarily for processed products at the moment
-colors <- c(nmfs_palette('coral')(6)[6:3], 
+pp_colors <- c(nmfs_palette('coral')(6)[6:3], 
             nmfs_palette('waves')(6)[6:2], 
             nmfs_palette('crustacean')(6)[c(6, 4, 2)],
             nmfs_cols()[42:39])
 
-names(colors) <- levels(factor(levels = c(
+names(pp_colors) <- levels(factor(levels = c(
   'Fillets', 'Steaks', 'Surimi', 'Shucked Meats',
   'Canned', 'Oil', 'Dressed', 'Smoked (Excl. Canned)', 'Chowders',
   'Fish Sticks', 'Breaded Shrimp', 'Cakes/Patties',
