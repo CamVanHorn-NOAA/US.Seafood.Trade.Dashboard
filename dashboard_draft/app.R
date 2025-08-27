@@ -3760,15 +3760,15 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], "</span><br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Exports:<br></span>", 
+        "Exports</span>", ":<br>", 
         dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[2], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Imports:<br></span>", 
+        "Imports</span>", ":<br>",
         dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[3], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Trade Balance:<br></span>", 
+        "Trade Balance</span>", ":<br>",
         dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
       ))
     )
@@ -4780,11 +4780,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, "</span><br>", 
         "<span class = 'color-swatch' style = 'background-color: ", landings_colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        "Ex-Vessel Value", "</span><span style = 'font-size: 18px;'>", ":<br>",
         dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         '<img src = "', create_tooltip_icon(landings_colors[2], 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
+        "Ex-Vessel Price", "</span><span style = 'font-size: 18px;'>", ":<br>",
         dollar(click_info$data$COM_PRICE), ifelse(selected_units() == 'METRIC', 
                                                   " per kilogram", " per pound"))))
   })
