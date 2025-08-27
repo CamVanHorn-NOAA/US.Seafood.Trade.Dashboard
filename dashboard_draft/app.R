@@ -3260,12 +3260,22 @@ server <- function(input, output, session) {
                   'There is no available landings data for this species'))
   })
   
-  # creates landings data
+  # creates landings data for download
+  landings_df_full <- reactive({
+    summarize_landings_yr_spp(
+      landings_filtered(),
+      species_selection_landings(),
+      full_data = T)
+    })
+  
+  # creates landings data for plots
   landings_df <- reactive({
     summarize_landings_yr_spp(
       landings_filtered(),
-      species_selection_landings())
-    })
+      species_selection_landings(),
+      units = selected_units(),
+      nominal = selected_value())
+  })
   
   # creates landings value plot
   landings_value_plot <- reactive({
@@ -3285,7 +3295,7 @@ server <- function(input, output, session) {
   # creates landings volume plot
   landings_volume_plot <- reactive({
     plot_landings(landings_df(), 'VOLUME', units = selected_units(),
-                       species = species_selection_landings())
+                  species = species_selection_landings())
   })
   
   # outputs landings volume plot
