@@ -3754,7 +3754,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Exports:<br></span>", 
         dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
@@ -3823,7 +3823,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume:<br></span>", 
         comma(click_info$data$EXP_VOLUME_T), 
@@ -3896,7 +3896,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$COUNTRY_NAME[1], ':', "</span><br>",
+        click_info$data$COUNTRY_NAME[1], "</span><br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2020</span>", ': ',
@@ -3989,7 +3989,7 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
+        click_info$data$YEAR, 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$EXP_VALUE_MILLIONS), " Million<br>",
@@ -4056,7 +4056,7 @@ server <- function(input, output, session) {
       
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
+        click_info$data$YEAR, 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$IMP_VALUE_MILLIONS), " Million<br>",
@@ -4136,7 +4136,7 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
+        click_info$data$YEAR, 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
         comma(click_info$data$EXP_VOLUME_T), 
@@ -4213,7 +4213,7 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
+        click_info$data$YEAR, 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
         comma(click_info$data$IMP_VOLUME_T), 
@@ -4304,7 +4304,7 @@ server <- function(input, output, session) {
         style = close_button_aes), 
       HTML(paste0(
         "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
         "<strong>", str_to_title(click_info$data$COUNTRY_NAME[1]), "</strong><br/>",
         "MLTI: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
@@ -4401,7 +4401,7 @@ server <- function(input, output, session) {
       ), 
       HTML(paste0(
         "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
         "<strong>", str_to_title(click_info$data$COUNTRY_NAME[1]), "</strong><br/>",
         "MLTI: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
@@ -4480,7 +4480,7 @@ server <- function(input, output, session) {
         style = close_button_aes), 
       HTML(paste0(
         "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         '<img src = "', exp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
         "Export: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
         '<img src = "', imp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
@@ -4566,7 +4566,7 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<strong>", click_info$data$YEAR, ":", "</strong><br/>",
+        "<strong>", click_info$data$YEAR, "</strong><br/>",
         comma(click_info$data$APPARENT_SUPPLY),
         ifelse(input$units == F, " Metric Tons", " Short Tons")
       ))
@@ -4628,7 +4628,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>",  ":<br>",
         comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
@@ -4699,7 +4699,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Unexported Domestic Production", "</span>",  ":<br>",
         comma(abs(click_info$data$PP_VOLUME_T - click_info$data$EXP_VOLUME_T)), 
@@ -4770,8 +4770,8 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        click_info$data$YEAR, "</span><br>", 
         "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
@@ -4835,7 +4835,7 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, ":", 
+        click_info$data$YEAR, 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Landed Volume: ", "</span><span style = 'font-size: 18px;'><br>",
         comma(click_info$data$COM_VOLUME_T), ifelse(selected_units() == 'METRIC', 
@@ -4938,7 +4938,7 @@ server <- function(input, output, session) {
         style = close_button_aes), 
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         pp_val_tooltip)))
   })
   
@@ -5038,7 +5038,7 @@ server <- function(input, output, session) {
         style = close_button_aes), 
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         pp_vol_tooltip)))
   })
   
@@ -5138,7 +5138,7 @@ server <- function(input, output, session) {
         style = close_button_aes), 
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], ':', "</span><br>",
+        click_info$data$YEAR[1], "</span><br>",
         pp_price_tooltip)))
   })
 }
