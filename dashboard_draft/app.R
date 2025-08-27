@@ -2248,36 +2248,8 @@ server <- function(input, output, session) {
     contentType = 'application/zip'
   )
   
-  # download page 4 of trade data (price)
+  # download page 4 of trade data (advanced metrics)
   output$download_page4 <- downloadHandler(
-    filename = 'trade_price_page.zip',
-    content = function(fname) {
-      showModal(modalDialog('Downloading plots and data...', footer = NULL))
-      Sys.sleep(1)
-      on.exit(removeModal())
-      
-      tmpdir <- tempdir()
-      setwd(tempdir())
-      
-      fs <- c('export_price_plot.png', 'import_price_plot.png',
-              'trade_plots_data.csv')
-      ggsave('export_price_plot.png', exp_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('import_price_plot.png', imp_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
-      
-      zip(zipfile = fname, files = fs)
-    },
-    contentType = 'application/zip'
-  )
-  
-  # download page 5 of trade data (advanced metrics)
-  output$download_page5 <- downloadHandler(
     filename = 'trade_advanced_metrics_page.zip',
     content = function(fname) {
       showModal(modalDialog('Downloading plots and data...', footer = NULL))
