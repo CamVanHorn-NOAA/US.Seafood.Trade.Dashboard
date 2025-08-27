@@ -954,54 +954,13 @@ calculate_hi <- function(species, nominal = F) {
     imp_value <- rlang::enquo(imp_value)
   }
   
-  # if no species provided
-  if(species == 'All Species') {
-    # calculate index from trade data
-    hi_data <- trade_data %>%
-      # select only columns of interest
-      select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
-             EXP_VALUE_USD, IMP_VALUE_USD) %>%
-      # set export and import NAs to 0 to prevent NA as sum values
-      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
-                                        0, EXP_VALUE_2024USD),
-             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
-                                        0, IMP_VALUE_2024USD),
-             EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD) == T,
-                                    0, EXP_VALUE_USD),
-             IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
-                                    0, IMP_VALUE_USD)) %>%
-      # sum the total value by each country in each year
-      group_by(YEAR, COUNTRY_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      group_by(YEAR) %>%
-      # for each year,
-        # step 1: sum the export and import value
-        # step 2: calculate the proportion of export and import value for each
-          # country
-        # step 3: square the proportion of export and import value
-        # step 4: sum the squares to calculate the HI for exports and imports
-      mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
-             TOTAL_IMP_VALUE_YR = sum(!!imp_value),
-             PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
-             PROPORT_IMP_VALUE = !!imp_value / TOTAL_IMP_VALUE_YR,
-             PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
-             PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
-             EXP_HI = sum(PROPORT_EXP_SQUARED),
-             IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
-      # retain year and HI's of exports and imports
-      select(YEAR, EXP_HI, IMP_HI) %>%
-      # remove duplicate columns so there is one of each per year
-      distinct()
-    
-    return(hi_data)
-  }
-  
-  # duplicate the above steps, except now filter for species of interest
+  # calculate index from trade data
   hi_data <- trade_data %>%
     filter_species(species) %>%
+    # select only columns of interest
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
            EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    # set export and import NAs to 0 to prevent NA as sum values
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
                                       0, EXP_VALUE_2024USD),
            IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
@@ -1010,10 +969,17 @@ calculate_hi <- function(species, nominal = F) {
                                   0, EXP_VALUE_USD),
            IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
                                   0, IMP_VALUE_USD)) %>%
+    # sum the total value by each country in each year
     group_by(YEAR, COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     group_by(YEAR) %>%
+    # for each year,
+    # step 1: sum the export and import value
+    # step 2: calculate the proportion of export and import value for each
+    # country
+    # step 3: square the proportion of export and import value
+    # step 4: sum the squares to calculate the HI for exports and imports
     mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
            TOTAL_IMP_VALUE_YR = sum(!!imp_value),
            PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
@@ -1022,7 +988,9 @@ calculate_hi <- function(species, nominal = F) {
            PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
            EXP_HI = sum(PROPORT_EXP_SQUARED),
            IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
+    # retain year and HI's of exports and imports
     select(YEAR, EXP_HI, IMP_HI) %>%
+    # remove duplicate columns so there is one of each per year
     distinct()
   
   return(hi_data)
