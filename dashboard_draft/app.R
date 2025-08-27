@@ -4506,12 +4506,14 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_hi_tooltip', Math.random());",
         style = close_button_aes), 
       HTML(paste0(
-        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$YEAR[1], "</span><br>",
         '<img src = "', exp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "Export: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Exports</span>: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
         '<img src = "', imp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "Import: ", round(click_info$data$IMP_HI, digits = 3)
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        "Imports</span>: ", round(click_info$data$IMP_HI, digits = 3)
       ))
     )
   })
