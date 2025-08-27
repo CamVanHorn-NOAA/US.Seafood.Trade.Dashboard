@@ -326,7 +326,8 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
       select(YEAR, EXPORTS, IMPORTS) %>%
       mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
       pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      mutate(name = as.factor(name)) %>%
+      mutate(name = ifelse(name == 'TRADE_BALANCE', 'TRADE BALANCE', name),
+             name = as.factor(str_to_title(name))) %>%
       rename(VALUE_MILLIONS = value,
              TRADE = name)
     
