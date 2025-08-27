@@ -1590,16 +1590,15 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
     # here, we only need to specify how the figure is labeled
-    ylab <- ifelse(units == 'METRIC', 'Metric Tons (Thousands)',
-                   'Short Tons (Thousands)')
+    ylab <- ifelse(units == 'METRIC', 'Metric Tons',
+                   'Short Tons')
     plot <- 
       ggplot(data = supply_data %>%
                # we do not have landings or processing data for 2024 despite
                 # having so for trade data
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
-                 # divided by 1000 for thousand metric tons (volume metric)
-                 y = APPARENT_SUPPLY / 1000)) +
+                 y = APPARENT_SUPPLY)) +
       geom_col(color = 'black',
                fill = c('#008DA8')) +
       labs(x = '',
