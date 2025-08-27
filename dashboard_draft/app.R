@@ -661,7 +661,7 @@ summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
   
   return(summarized_data)
 }
-summarize_yr_spp <- function(species) {
+summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
   # this function utilizes the summary functions for trade, processed products,
     # and landings by year and species of interest and joins the data sets
     # produced by these functions
@@ -670,21 +670,25 @@ summarize_yr_spp <- function(species) {
   # species is a character vector of a species of interest
   
   # coerce species to uppercase to match data formatting
-  species <- toupper(species)
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
+  
   combined_data <- 
     # the order of joining is fairly irrelevant
-    left_join(left_join(summarize_trade_yr_spp(trade_data, species),
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species, 'VALUE',
+                                               units = units, nominal = nominal),
                         # for processed produccts, we must perform an additional
                           # step by removing the product name (condition) from
                           # the data to prevent duplicated data from subsequent
                           # joins
-                        summarize_pp_yr_spp(pp_data, species) %>%
+                        summarize_pp_yr_spp(pp_data, species, units = units,
+                                            nominal = nominal) %>%
                           select(!PRODUCT_NAME) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
-              summarize_landings_yr_spp(com_landings, species)) 
+              summarize_landings_yr_spp(com_landings, species, units = units,
+                                        nominal = nominal)) 
   
   return(combined_data)
 }
