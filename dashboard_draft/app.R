@@ -4567,8 +4567,8 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<strong>", click_info$data$YEAR, ":", "</strong><br/>",
-        comma((click_info$data$APPARENT_SUPPLY / 1000)),
-        " Thousand ", ifelse(input$units == F, "Metric Tons", "Short Tons")
+        comma(click_info$data$APPARENT_SUPPLY),
+        ifelse(input$units == F, " Metric Tons", " Short Tons")
       ))
     )
   })
@@ -4768,7 +4768,8 @@ server <- function(input, output, session) {
         dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$COM_PRICE_2024USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$COM_PRICE), ifelse(selected_units() == 'METRIC', 
+                                                  " per kilogram", " per pound"))))
   })
   
   
@@ -4829,7 +4830,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Landed Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$COM_VOLUME_MT), " Metric Tons")))
+        comma(click_info$data$COM_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons", " Short Tons"))))
   })
   
   
@@ -5073,8 +5075,9 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        comma(filtered_new_data$PP_VOLUME_THOUSAND_MT[i]), " Thousand Metric Tons <br>"
-      )
+        comma(arranged_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
+                                                    " Metric Tons <br>",
+                                                    " Short Tons <br>"))
       
       pp_vol_tooltip <- paste0(pp_vol_tooltip, 
                                tooltip_color, tooltip_text, tooltip_data)
@@ -5211,8 +5214,9 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(filtered_new_data$PP_PRICE_2024USD_PER_KG[i]), " per kilogram <br>"
-      )
+        dollar(arranged_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
+                                                  " per kilogram <br>",
+                                                  " per pound <br>"))
       
       pp_price_tooltip <- paste0(pp_price_tooltip, 
                                  tooltip_icon, tooltip_text, tooltip_data)
