@@ -481,7 +481,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   }
   
 }
-summarize_pp_yr_spp <- function(product_data, species) {
+summarize_pp_yr_spp <- function(product_data, species, full_data = F, 
+                                units = NULL, nominal = F) {
   # this function summarizes processed product data by year and species of 
     # interest
   # product_data is a formatted data frame of FOSS processed product data
