@@ -3831,16 +3831,16 @@ server <- function(input, output, session) {
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$YEAR[1], "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Export Volume:<br></span>", 
+        "Export Volume", "</span>", ':<br>',  
         comma(click_info$data$EXP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Imports:<br></span>", 
+        "Imports", "</span>", ':<br>',
         comma(click_info$data$IMP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Ratio:<br></span>", 
-        click_info$data$RATIO)))
+        "Ratio", "</span>", ':<br>',
+        round(click_info$data$RATIO, digits = 3))))
   })
   
   
