@@ -1599,7 +1599,7 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY)) +
       geom_col(color = 'black',
-               fill = c('#008DA8')) +
+               fill = c(supply_color)) +
       labs(x = '',
            y = ylab,
            title = paste0('Apparent Supply of \n', species)) +
@@ -1641,7 +1641,7 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
              aes(x = factor(YEAR),
                  y = UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY)) +
       geom_col(color = 'black',
-               fill = '#005E5E') +
+               fill = share_color) +
       labs(x = '',
            y = 'Share of Apparent Supply',
            title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', species)) +
@@ -1691,6 +1691,8 @@ export_color <- c('#003087')
 import_color <- c('#0085CA')
 trade_price_color <- c('#A6D4EC')
 landings_colors <- c('#853B00', '#FFAB38')
+supply_color <- c('#008DA8')
+share_color <- c('#005E5E')
 
 # colors designed primarily for processed products at the moment
 pp_colors <- c(nmfs_palette('coral')(6)[6:3], 
