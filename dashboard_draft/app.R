@@ -1889,22 +1889,6 @@ ui <- page_sidebar(
                                      uiOutput('imp_volume_click_overlay'))),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
-                       # nav_panel(title = 'Price',
-                       #           fluidRow(
-                       #             column(
-                       #               withSpinner(
-                       #                 plotOutput('exp_price'), 
-                       #                 type = 7),
-                       #               width = 6
-                       #             ),
-                       #             column(
-                       #               withSpinner(
-                       #                 plotOutput('imp_price'), 
-                       #                 type = 7),
-                       #               width = 6
-                       #             )),
-                       #           downloadButton('download_page4',
-                       #                          'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
                                  layout_columns(
                                    col_widths = c(6, 6),
