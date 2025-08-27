@@ -1033,13 +1033,13 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   if (export == T & import == F) {
     shortform <- 'EXP'
     longform <- 'Exports'
-    color <- '#003087'
+    color <- export_color
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Imports'
-    color <- '#0085CA'
+    color <- import_color
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
@@ -1140,7 +1140,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
                color = 'black') +
       geom_line(aes(y = !!y2 * scale_factor,
                     group = GROUP),
-                color = '#A6D4EC',
+                color = trade_price_color,
                 linewidth = 1.5) +
       geom_point(aes(y = !!y2 * scale_factor),
                  color = 'black',
@@ -1686,6 +1686,9 @@ balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
 top5_colors <- c('#C6E6F0', '#5EB6D9', '#0085CA', '#003087', '#002364')
 names(top5_colors) <- levels(factor(levels = c(2020:2024)))
+export_color <- c('#003087')
+import_color <- c('#0085CA')
+trade_price_color <- c('#A6D4EC')
 landings_colors <- c('#853B00', '#FFAB38')
 
 # colors designed primarily for processed products at the moment
@@ -3996,10 +3999,12 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", export_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$EXP_VALUE_MILLIONS), " Million<br>",
+        '<img src = "', create_tooltip_icon(trade_price_color, 16), '" class = "tooltip-icon" alt = "legend icon"/>',
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Export Price: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$EXP_PRICE), 
@@ -4063,10 +4068,12 @@ server <- function(input, output, session) {
       
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", import_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$IMP_VALUE_MILLIONS), " Million<br>",
+        '<img src = "', create_tooltip_icon(trade_price_color, 16), '" class = "tooltip-icon" alt = "legend icon"/>',
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Import Price: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$IMP_PRICE), 
@@ -4143,8 +4150,9 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", export_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
         comma(click_info$data$EXP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
@@ -4220,8 +4228,9 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", import_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
         comma(click_info$data$IMP_VOLUME_T), 
         ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
