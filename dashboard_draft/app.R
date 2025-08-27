@@ -3531,6 +3531,7 @@ server <- function(input, output, session) {
   # creates processed products value plot
   pp_value_plot <- reactive({
     plot_spp_pp(pp_df(), 'VALUE', 
+                units = selected_units(),
                 species = species_selection_products(),
                 nominal = selected_value())
   })
@@ -3545,8 +3546,9 @@ server <- function(input, output, session) {
   
   # creates processed products volume plot
   pp_volume_plot <- reactive({
-    plot_spp_pp(pp_df(), 'VOLUME', units = selected_units(),
-                     species = species_selection_products())
+    plot_spp_pp(pp_df(), 'VOLUME', 
+                units = selected_units(),
+                species = species_selection_products())
   })
   
   # outputs processed products volume plot
@@ -3559,9 +3561,10 @@ server <- function(input, output, session) {
   
   # creates processed products price plot
   pp_price_plot <- reactive({
-    plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
-                     species = species_selection_products(),
-                     nominal = selected_value())
+    plot_spp_pp(pp_df(), 'PRICE', 
+                units = selected_units(),
+                species = species_selection_products(),
+                nominal = selected_value())
   })
   
   # outputs processed products price plot
