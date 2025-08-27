@@ -591,55 +591,14 @@ summarize_landings_yr_spp <- function(landings_data, species) {
                     'SPECIES_CATEGORY',
                     ifelse(species %in% unique(landings_data$SPECIES_GROUP), 
                            'SPECIES_GROUP',
-                           'SPECIES_NAME')))
-    )
-  } else if (species == 'ALL SPECIES') {
-    # for the default case (no species provided), summarize all landings data
-    summarized_data <- landings_data %>%
-      # remove confidential data as to only represent public data
-        # this removes species whose data is exclusively confidential
-      # filter out data that do not provide a value or volume
-      filter(CONFIDENTIALITY != 'Confidential',
-             !is.na(DOLLARS),
-             !is.na(KG)) %>%
-      # select only necessary columns (year, value, volume)
-      select(YEAR, KG, DOLLARS_2024, DOLLARS) %>%
-      # group by year
-      group_by(YEAR) %>%
-      # sum values across all numeric columns (i.e., value and volume)
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # convert KG to metric tons and dollars to millions/billions
-      mutate(MT = KG / 1000,
-             LB = KG * 2.20462,
-             ST = LB / 2000,
-             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
-             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-             MILLIONS = DOLLARS / 1000000,
-             BILLIONS = DOLLARS / 1000000000,
-             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
-             COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-             COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-      # add COM (commercial) as well as volume or value as column prefix
-        # this will benefit table joinings later
-      rename(COM_VOLUME_KG = KG,
-             COM_VOLUME_MT = MT,
-             COM_VOLUME_LB = LB,
-             COM_VOLUME_ST = ST,
-             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
-             COM_VALUE_MILLIONS = MILLIONS,
-             COM_VALUE_BILLIONS = BILLIONS)
+                           'SPECIES_NAME'))))
     
-    return(summarized_data)
+    level <- rlang::enquo(which_level)
+  } else {
+    level <- NULL
+    species <- str_to_title(species)
   }
-  # for all other cases (i.e., when a species is provided) 
-  # set the hierarchy level found above as object of type quosure (see RLang)
-  level <- rlang::enquo(which_level)
   
-  # an identical dplyr pipe from that above save for one difference:
-    # group by Year AND the hierarchy level to retain species name
   summarized_data <- landings_data %>%
     filter_species(species) %>%
     filter(CONFIDENTIALITY != 'Confidential',
@@ -648,26 +607,33 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     select(YEAR, !!level, KG, DOLLARS_2024, DOLLARS) %>%
     group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(MT = KG / 1000,
-           LB = KG * 2.20462,
-           ST = LB / 2000,
-           MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
-           BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-           COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-           COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
-           MILLIONS = DOLLARS / 1000000,
-           BILLIONS = DOLLARS / 1000000000,
-           COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-           COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-    rename(COM_VOLUME_KG = KG,
-           COM_VOLUME_MT = MT,
-           COM_VOLUME_LB = LB,
-           COM_VOLUME_ST = ST,
-           COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-           COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
-           COM_VALUE_MILLIONS = MILLIONS,
-           COM_VALUE_BILLIONS = BILLIONS) 
+              .groups = 'drop')
+  
+  if (full_data == T) {
+    summarized_data <- summarized_data %>%
+      mutate(MT = KG / 1000,
+             LB = KG * 2.20462,
+             ST = LB / 2000,
+             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
+             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
+             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             MILLIONS = DOLLARS / 1000000,
+             BILLIONS = DOLLARS / 1000000000,
+             COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+             COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
+      rename(COM_VOLUME_KG = KG,
+             COM_VOLUME_MT = MT,
+             COM_VOLUME_LB = LB,
+             COM_VOLUME_ST = ST,
+             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
+             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
+             COM_VALUE_MILLIONS = MILLIONS,
+             COM_VALUE_BILLIONS = BILLIONS) 
+    
+    return(summarized_data)
+  }
+  
   
   return(summarized_data)
   
