@@ -4777,11 +4777,13 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         click_info$data$YEAR, "</span><br>", 
+        "<span class = 'color-swatch' style = 'background-color: ", landings_colors[1], ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
+        '<img src = "', create_tooltip_icon(landings_colors[2], 16), '" class = "tooltip-icon" alt = "legend icon"/>',
         "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
         dollar(click_info$data$COM_PRICE), ifelse(selected_units() == 'METRIC', 
                                                   " per kilogram", " per pound"))))
