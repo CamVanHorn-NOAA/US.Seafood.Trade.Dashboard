@@ -4597,7 +4597,11 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<strong>", click_info$data$YEAR, "</strong><br/>",
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
+        click_info$data$YEAR, "</span><br>",
+        "<span class = 'color-swatch' style = 'background-color: ", supply_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
+        'Apparent Supply', "</span>: ",
         comma(click_info$data$APPARENT_SUPPLY),
         ifelse(input$units == F, " Metric Tons", " Short Tons")
       ))
@@ -4658,19 +4662,19 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_supply_ratio_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$YEAR[1], "</span><br>",
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>",  ":<br>",
         comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
                                                        " Metric Tons <br>",
                                                        " Short Tons <br>"),
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Domestic Production Volume", "</span>", ":<br>",
         comma(click_info$data$PP_VOLUME_T), ifelse(selected_units() == 'METRIC',
                                                    " Metric Tons <br>",
                                                    " Short Tons <br>"),
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        '<img src = "', create_tooltip_icon('black', 16), '" class = "tooltip-icon" alt = "legend icon"/>',
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ratio", "</span>", ":<br>",
         round(click_info$data$APPARENT_SUPPLY_REL_US_PROD, digits = 3))))
   })
@@ -4729,19 +4733,20 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_supply_share_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 18px; font-weight: bold; text-decoration: underline;'>", 
+        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
         click_info$data$YEAR[1], "</span><br>",
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Unexported Domestic Production", "</span>",  ":<br>",
         comma(abs(click_info$data$PP_VOLUME_T - click_info$data$EXP_VOLUME_T)), 
         ifelse(selected_units() == 'METRIC', 
                " Metric Tons <br>", " Short Tons <br>"),
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>", ":<br>",
         comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
                                                        " Metric Tons <br>",
                                                        " Short Tons <br>"),
-        "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
+        "<span class = 'color-swatch' style = 'background-color: ", share_color, ";'>",
+        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Share", "</span>", ":<br>",
         round(click_info$data$UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY * 100, digits = 3), "% of Apparent Supply")))
   })
