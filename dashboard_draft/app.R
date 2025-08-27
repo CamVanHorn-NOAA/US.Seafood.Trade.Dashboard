@@ -489,35 +489,30 @@ summarize_pp_yr_spp <- function(product_data, species) {
   # species is a character vector of a species of interest
   
   # coerce species to upper case to match data formatting
-  species <- toupper(species)
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
   
-  # if no species is provided (default is 'ALL SPECIES'), summarize data without 
-    # filtering for a species
-  if (species == 'ALL SPECIES') {
-    summarized_data <- product_data %>%
-      # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
-        # volume (KG), and value (DOLLARS_2024)
-      select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
-      # group by year and the product condition (PRODUCT_NAME)
-      group_by(YEAR, PRODUCT_NAME) %>%
-      # sum all numeric columns (i.e., value and volume), drop groups
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # convert kilograms to metric tons
-      # convert value to billions and millions
+  summarized_data <- product_data %>%
+    filter_species(species) %>%
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
+    group_by(YEAR, PRODUCT_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  if (full_data == 'FULL') {
+    summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
              LB = KG * 2.20462,
              ST = LB / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
              MILLIONS = DOLLARS / 1000000,
              BILLIONS = DOLLARS / 1000000000,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-      # rename columns to label value, volume, and PP (processed product) prefix
       rename(PP_VALUE_2024USD = DOLLARS_2024,
-             PP_VOLUME_MT = MT, 
+             PP_VOLUME_MT = MT,
              PP_VOLUME_LB = LB,
              PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
