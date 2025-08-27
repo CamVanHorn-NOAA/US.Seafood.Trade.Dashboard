@@ -205,7 +205,8 @@ filter_species <- function(data, species) {
 }
 
 ### summary + calculation functions
-summarize_trade_yr_spp <- function(trade_table, species) {
+summarize_trade_yr_spp <- function(trade_table, species, output.format, 
+                                   units = NULL, nominal = F) {
   # this function summarizes trade data by year and species of interest
   # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
   # species is a character vector of a species of interest
@@ -227,35 +228,36 @@ summarize_trade_yr_spp <- function(trade_table, species) {
                     'SPECIES_CATEGORY',
                     ifelse(species %in% unique(trade_table$SPECIES_GROUP), 
                            'SPECIES_GROUP',
-                           'SPECIES_NAME')))
-    )
-  # if species is not selected (default is ALL SPECIES), summarize all trade
-      # i.e., no filter_species needed
-  } else if (species == 'ALL SPECIES') {
-    summarized_data <- trade_table %>%
-      # select only necessary columns (exports, imports, year)
-      select(YEAR, EXP_VALUE_2024USD, EXP_VOLUME_KG, IMP_VALUE_2024USD,
-             IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
-      # replace NA values with 0 so that sums and averages are not NA
-      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                        EXP_VALUE_2024USD),
-             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                        IMP_VALUE_2024USD),
-             EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                    EXP_VOLUME_KG),
-             IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                    IMP_VOLUME_KG),
-             EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
-                                    EXP_VALUE_USD),
-             IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
-                                    IMP_VALUE_USD)) %>%
-      # group by YEAR to aggregate data within each year
-      group_by(YEAR) %>%
-      # sum all numeric columns within the group, drop groups at end
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # create columns of price per KG, value in millions/billions, 
-        # volume in metric tons
+                           'SPECIES_NAME'))))
+    # store level as object of quosure to work in dplyr pipe (via !!)
+    level <- rlang::enquo(which_level)
+  } else {
+    level <- NULL
+    species <- str_to_title(species)
+  }
+  
+  summarized_data <- trade_table %>%
+    filter_species(species) %>%
+    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
+                                      EXP_VALUE_2024USD),
+           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
+                                      IMP_VALUE_2024USD),
+           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
+                                  EXP_VOLUME_KG),
+           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
+                                  IMP_VOLUME_KG),
+           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
+                                  EXP_VALUE_USD),
+           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
+                                  IMP_VALUE_USD)) %>%
+    group_by(YEAR, !!level) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  if (output.format == 'FULL') {
+    new_data <- summarized_data %>%
       mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
              EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
@@ -278,64 +280,69 @@ summarize_trade_yr_spp <- function(trade_table, species) {
              IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
              EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
              IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
-    return(summarized_data)
+    return(new_data)
   }
   
-  # store level as object of quosure to work in dplyr pipe (via !!)
-  level <- rlang::enquo(which_level)
+  if (units == 'METRIC') {
+    new_data <- summarized_data %>%
+      rename(EXP_VOLUME = EXP_VOLUME_KG,
+             IMP_VOLUME = IMP_VOLUME_KG) %>%
+      mutate(EXP_VOLUME_T = EXP_VOLUME / 1000,
+             IMP_VOLUME_T = IMP_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    new_data <- summarized_data %>%
+      mutate(EXP_VOLUME = EXP_VOLUME_KG * 2.20462, # convert kg to lbs
+             IMP_VOLUME = IMP_VOLUME_KG * 2.20462,
+             EXP_VOLUME_T = EXP_VOLUME / 2000, # calculate short tons
+             IMP_VOLUME_T = IMP_VOLUME / 2000) %>%
+      select(!c(EXP_VOLUME_KG, IMP_VOLUME_KG))
+  }
   
-  summarized_data <- trade_table %>%
-    # below is identical to dplyr pipe above save for three distinctions:
-      # 1) filter_species used to include only data of specified species
-      # 2) retain column of the hierarchy level in which the species was found
-      # 3) group the data by Year AND species (this lets us keep the species
-        # in the data as a column)
-    filter_species(species) %>%
-    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                      EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                      IMP_VALUE_2024USD),
-           EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
-                                  EXP_VOLUME_KG),
-           IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
-                                  IMP_VOLUME_KG),
-           EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
-                                  EXP_VALUE_USD),
-           IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
-                                  IMP_VALUE_USD)) %>%
-    group_by(YEAR, !!level) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
-           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
-           EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
-           IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
-           EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
-           IMP_PRICE_USD_PER_LB = IMP_VALUE_2024USD / IMP_VOLUME_LB,
-           EXP_PRICE_NOMINAL_PER_KG = EXP_VALUE_USD / EXP_VOLUME_KG,
-           EXP_PRICE_NOMINAL_PER_LB = EXP_VALUE_USD / EXP_VOLUME_LB,
-           IMP_PRICE_NOMINAL_PER_KG = IMP_VALUE_USD / IMP_VOLUME_KG,
-           IMP_PRICE_NOMINAL_PER_LB = IMP_VALUE_USD / IMP_VOLUME_LB,
-           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-           EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-           EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-           IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-           EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-           IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
-           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
-           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
+  if (nominal == F) {
+    new_data <- new_data %>%
+      select(!c(EXP_VALUE_USD, IMP_VALUE_USD)) %>%
+      rename(EXP_VALUE = EXP_VALUE_2024USD,
+             IMP_VALUE = IMP_VALUE_2024USD)
+    
+  } else if (nominal == T) {
+    new_data <- new_data %>%
+      select(!c(EXP_VALUE_2024USD, IMP_VALUE_2024USD)) %>%
+      rename(EXP_VALUE = EXP_VALUE_USD,
+             IMP_VALUE = IMP_VALUE_USD)
+  }
   
-  return(summarized_data)
+  new_data <- new_data %>%
+    mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
+           EXP_VALUE_BILLIONS = EXP_VALUE / 1000000000,
+           IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
+           IMP_VALUE_BILLIONS = IMP_VALUE / 1000000000,
+           EXP_PRICE = EXP_VALUE / EXP_VOLUME,
+           IMP_PRICE = IMP_VALUE / IMP_VOLUME) 
+  
+  if (output.format == 'BALANCE') {
+    balance_data <- new_data %>%
+      rename(EXPORTS = EXP_VALUE_MILLIONS,
+             IMPORTS = IMP_VALUE_MILLIONS) %>%
+      select(YEAR, EXPORTS, IMPORTS) %>%
+      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
+      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
+      mutate(name = as.factor(name)) %>%
+      rename(VALUE_MILLIONS = value,
+             TRADE = name)
+    
+    return(balance_data)
+  } else if (output.format %in% c('VALUE', 'VOLUME')) {
+    trade_data <- new_data %>%
+      select(YEAR, EXP_VALUE, IMP_VALUE, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, 
+             EXP_PRICE, IMP_PRICE, EXP_VOLUME_T, IMP_VOLUME_T, EXP_VOLUME,
+             IMP_VOLUME) %>%
+      mutate(RATIO = EXP_VOLUME_T / IMP_VOLUME_T)
+    
+    return(trade_data)
+  }
 }
-summarize_trade_ctry_yr_spp <- function(trade_table, species, 
-                                        time.frame, value = F, volume = F,
-                                        nominal = F) {
+summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
+                                        time.frame, nominal = F) {
   # this function summarizes trade data by year and species of interest
     # within the top 5 trading partners of the U.S. for that species during
     # the specified period of time
@@ -347,48 +354,26 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
   # volume is logical that specifies if the function should output summaries by
     # trade volume, set to FALSE by default
   
-  # Both value and volume cannot be FALSE so user must specify one
-  if (value == F & volume == F) {
-    stop('Please designate either value or volume as TRUE')
-  }
-  # Both value and volume cannot be TRUE so user must choose one
-  if (value == T & volume == T) {
-    stop('Please designate either value or volume as FALSE')
-  }
-  
   # Function only proceeds if either value OR volume are T
   # store which column ('field') to summarize by as object of type symbol, then 
     # as type quosure to function within dplyr pipe 
       # (see RLang package for more details)
-  if (value == T) {
-    if (nominal == T) {
-      field <- as.symbol('TOTAL_NOMINAL_TRADE_VALUE')
-      field <- rlang::enquo(field)
-    } else {
-      field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
-      field <- rlang::enquo(field)
-    }
+  if (nominal == T) {
+    field <- as.symbol('TOTAL_NOMINAL_TRADE_VALUE')
+    field <- rlang::enquo(field)
   } else {
-    field <- as.symbol('TOTAL_TRADE_VOLUME')
+    field <- as.symbol('TOTAL_REAL_TRADE_VALUE')
     field <- rlang::enquo(field)
   }
   
   # coerce species to upper case to match data formatting
-  species <- toupper(species)
-  
-  # if no species is selected ('ALL SPECIES' is the default), do not filter for species
-  if (species == 'ALL SPECIES') {
-    filtered_data <- trade_table
-  } else {
-    # otherwise, filter trade table by species
-    filtered_data <- trade_table %>%
-      filter_species(species)
-  }
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
   
   # dplyr pipe to summarize exports and imports by year and country
-  summarized_data <- filtered_data %>%
+  summarized_data <- trade_table %>%
+    filter_species(species) %>%
     # select only columns of interest: year, country, exports and imports
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
+    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG,
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     # filter data to be within the specified time frame
     filter(YEAR >= time.frame[1],
@@ -432,45 +417,72 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species,
     # pull() outputs the values in the specified field as a vector
     pull(COUNTRY_NAME)
   
-  # summarize trade data by top five countries during time period
-  # summarized_data is already filtered for the time period
-  final_data <- summarized_data %>%
-    # filter for the top 5 countries
-    filter(COUNTRY_NAME %in% top5) %>%
-    # calculate export and import values in millions/billions,
-    # calculate export and import volumes in metric tons,
-    # calculate net value and net volume by subtracting imports from exports
-    mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-           IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-           EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-           IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
-           NET_VALUE_2024USD_BILLIONS = 
-             EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-           NET_VALUE_NOMINAL_BILLIONS = 
-             EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
-           EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-           IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-           EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-           IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-           NET_VALUE_2024USD_MILLIONS =
-             EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
-           NET_VALUE_NOMINAL_MILLIONS = 
-             EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
-           EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
-           IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
-           EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
-           IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
-           EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
-           IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
-           NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-           NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-           NET_PRICE_2024USD_PER_KG = 
-             (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
-             (EXP_VOLUME_KG - IMP_VOLUME_KG))
+  if (output.format == 'FULL') {
+    # summarize trade data by top five countries during time period
+    # summarized_data is already filtered for the time period
+    final_data <- summarized_data %>%
+      # filter for the top 5 countries
+      filter(COUNTRY_NAME %in% top5) %>%
+      # calculate export and import values in millions/billions,
+      # calculate export and import volumes in metric tons,
+      # calculate net value and net volume by subtracting imports from exports
+      mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
+             IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
+             EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
+             IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
+             NET_VALUE_2024USD_BILLIONS = 
+               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
+             NET_VALUE_NOMINAL_BILLIONS = 
+               EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
+             EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
+             IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
+             EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
+             IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
+             NET_VALUE_2024USD_MILLIONS =
+               EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
+             NET_VALUE_NOMINAL_MILLIONS = 
+               EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
+             EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
+             IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+             EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
+             IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
+             EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
+             IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+             NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
+             NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
+             NET_PRICE_2024USD_PER_KG = 
+               (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
+               (EXP_VOLUME_KG - IMP_VOLUME_KG))
+    
+    return(final_data)
+  }
   
-  return(final_data)
+  if (output.format == 'VALUE') {
+    final_data <- summarized_data %>%
+      filter(COUNTRY_NAME %in% top5)
+    
+    if (nominal == F) {
+       final_data <- final_data %>%
+        rename(EXP_VALUE = EXP_VALUE_2024USD,
+               IMP_VALUE = IMP_VALUE_2024USD)
+    } else if (nominal == T) {
+      final_data <- final_data %>%
+        rename(EXP_VALUE = EXP_VALUE_USD,
+               IMP_VALUE = IMP_VALUE_USD)
+    }
+    
+    final_data <- final_data %>%
+      select(YEAR, COUNTRY_NAME, EXP_VALUE, IMP_VALUE) %>%
+      mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
+             IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
+             NET_VALUE_MILLIONS = EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS)
+    
+    return(final_data)
+  }
+  
 }
-summarize_pp_yr_spp <- function(product_data, species) {
+summarize_pp_yr_spp <- function(product_data, species, full_data = F, 
+                                units = NULL, nominal = F) {
   # this function summarizes processed product data by year and species of 
     # interest
   # product_data is a formatted data frame of FOSS processed product data
@@ -478,35 +490,30 @@ summarize_pp_yr_spp <- function(product_data, species) {
   # species is a character vector of a species of interest
   
   # coerce species to upper case to match data formatting
-  species <- toupper(species)
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
   
-  # if no species is provided (default is 'ALL SPECIES'), summarize data without 
-    # filtering for a species
-  if (species == 'ALL SPECIES') {
-    summarized_data <- product_data %>%
-      # select only necessary columns: year, PRODUCT_NAME (e.g., canned), 
-        # volume (KG), and value (DOLLARS_2024)
-      select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
-      # group by year and the product condition (PRODUCT_NAME)
-      group_by(YEAR, PRODUCT_NAME) %>%
-      # sum all numeric columns (i.e., value and volume), drop groups
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # convert kilograms to metric tons
-      # convert value to billions and millions
+  summarized_data <- product_data %>%
+    filter_species(species) %>%
+    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
+    group_by(YEAR, PRODUCT_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop')
+  
+  if (full_data == 'FULL') {
+    summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
              LB = KG * 2.20462,
              ST = LB / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
              MILLIONS = DOLLARS / 1000000,
              BILLIONS = DOLLARS / 1000000000,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-      # rename columns to label value, volume, and PP (processed product) prefix
       rename(PP_VALUE_2024USD = DOLLARS_2024,
-             PP_VOLUME_MT = MT, 
+             PP_VOLUME_MT = MT,
              PP_VOLUME_LB = LB,
              PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
@@ -519,36 +526,53 @@ summarize_pp_yr_spp <- function(product_data, species) {
     return(summarized_data)
   }
   
-  # identical to dplyr pipe above, save for filtering for a specified species
-  # only runs if species != 'ALL SPECIES'
-  product_data %>%
-    filter_species(species) %>%
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
+  if (nominal == F) {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS)) %>%
+      rename(PP_VALUE = DOLLARS_2024)
+  } else {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS_2024)) %>%
+      rename(PP_VALUE = DOLLARS)
+  }
+  
+  if (units == 'METRIC') {
+    summarized_data <- summarized_data %>%
+      rename(PP_VOLUME = KG) %>%
+      mutate(PP_VOLUME_T = PP_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    summarized_data <- summarized_data %>%
+      mutate(PP_VOLUME = KG * 2.20462, # convert kilgorams to pounds
+             PP_VOLUME_T = PP_VOLUME / 2000) # short tons are 2000 pounds
+  }
+  
+  low_prop_types <- summarized_data %>% 
+    select(PP_VALUE, PRODUCT_NAME) %>%
+    group_by(PRODUCT_NAME) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    mutate(TOTAL_VALUE = sum(PP_VALUE),
+           VALUE_SHARE = PP_VALUE / TOTAL_VALUE) %>%
+    filter(VALUE_SHARE < 0.02) %>%
+    select(PRODUCT_NAME) %>%
+    distinct() %>%
+    pull()
+  
+  # rename these low proportion types as 'OTHER*' and re-summarise
+  new_data <- summarized_data %>%
+    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
+                                 'OTHER*', PRODUCT_NAME)) %>%
     group_by(YEAR, PRODUCT_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(MT = KG / 1000,
-           LB = KG * 2.20462,
-           ST = LB / 2000,
-           MILLIONS_2024USD = DOLLARS_2024 / 1000000,
-           BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
-           PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-           MILLIONS = DOLLARS / 1000000,
-           BILLIONS = DOLLARS / 1000000000,
-           PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-           PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-    rename(PP_VALUE_2024USD = DOLLARS_2024,
-           PP_VOLUME_MT = MT,
-           PP_VOLUME_LB = LB,
-           PP_VOLUME_ST = ST,
-           PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
-           PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
-           PP_VOLUME_KG = KG,
-           PP_NOMINAL_VALUE = DOLLARS,
-           PP_VALUE_MILLIONS = MILLIONS,
-           PP_VALUE_BILLIONS = BILLIONS)
+    mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
+           PP_PRICE = PP_VALUE / PP_VOLUME,
+           PRODUCT_NAME = str_to_title(PRODUCT_NAME))
+  
+  return(new_data)
 }
-summarize_landings_yr_spp <- function(landings_data, species) {
+summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
+                                      units = NULL, nominal = F) {
   # this function summarizes landings data (not exclusively commercial) by 
     # year and species of interest
   # landings_data is a formatted data frame of FOSS landings data 
@@ -568,55 +592,14 @@ summarize_landings_yr_spp <- function(landings_data, species) {
                     'SPECIES_CATEGORY',
                     ifelse(species %in% unique(landings_data$SPECIES_GROUP), 
                            'SPECIES_GROUP',
-                           'SPECIES_NAME')))
-    )
-  } else if (species == 'ALL SPECIES') {
-    # for the default case (no species provided), summarize all landings data
-    summarized_data <- landings_data %>%
-      # remove confidential data as to only represent public data
-        # this removes species whose data is exclusively confidential
-      # filter out data that do not provide a value or volume
-      filter(CONFIDENTIALITY != 'Confidential',
-             !is.na(DOLLARS),
-             !is.na(KG)) %>%
-      # select only necessary columns (year, value, volume)
-      select(YEAR, KG, DOLLARS_2024, DOLLARS) %>%
-      # group by year
-      group_by(YEAR) %>%
-      # sum values across all numeric columns (i.e., value and volume)
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      # convert KG to metric tons and dollars to millions/billions
-      mutate(MT = KG / 1000,
-             LB = KG * 2.20462,
-             ST = LB / 2000,
-             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
-             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-             MILLIONS = DOLLARS / 1000000,
-             BILLIONS = DOLLARS / 1000000000,
-             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
-             COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-             COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-      # add COM (commercial) as well as volume or value as column prefix
-        # this will benefit table joinings later
-      rename(COM_VOLUME_KG = KG,
-             COM_VOLUME_MT = MT,
-             COM_VOLUME_LB = LB,
-             COM_VOLUME_ST = ST,
-             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
-             COM_VALUE_MILLIONS = MILLIONS,
-             COM_VALUE_BILLIONS = BILLIONS)
+                           'SPECIES_NAME'))))
     
-    return(summarized_data)
+    level <- rlang::enquo(which_level)
+  } else {
+    level <- NULL
+    species <- str_to_title(species)
   }
-  # for all other cases (i.e., when a species is provided) 
-  # set the hierarchy level found above as object of type quosure (see RLang)
-  level <- rlang::enquo(which_level)
   
-  # an identical dplyr pipe from that above save for one difference:
-    # group by Year AND the hierarchy level to retain species name
   summarized_data <- landings_data %>%
     filter_species(species) %>%
     filter(CONFIDENTIALITY != 'Confidential',
@@ -625,31 +608,60 @@ summarize_landings_yr_spp <- function(landings_data, species) {
     select(YEAR, !!level, KG, DOLLARS_2024, DOLLARS) %>%
     group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(MT = KG / 1000,
-           LB = KG * 2.20462,
-           ST = LB / 2000,
-           MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
-           BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
-           COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-           COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
-           MILLIONS = DOLLARS / 1000000,
-           BILLIONS = DOLLARS / 1000000000,
-           COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-           COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
-    rename(COM_VOLUME_KG = KG,
-           COM_VOLUME_MT = MT,
-           COM_VOLUME_LB = LB,
-           COM_VOLUME_ST = ST,
-           COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-           COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
-           COM_VALUE_MILLIONS = MILLIONS,
-           COM_VALUE_BILLIONS = BILLIONS) 
+              .groups = 'drop')
+  
+  if (full_data == T) {
+    summarized_data <- summarized_data %>%
+      mutate(MT = KG / 1000,
+             LB = KG * 2.20462,
+             ST = LB / 2000,
+             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
+             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
+             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
+             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             MILLIONS = DOLLARS / 1000000,
+             BILLIONS = DOLLARS / 1000000000,
+             COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
+             COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
+      rename(COM_VOLUME_KG = KG,
+             COM_VOLUME_MT = MT,
+             COM_VOLUME_LB = LB,
+             COM_VOLUME_ST = ST,
+             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
+             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
+             COM_VALUE_MILLIONS = MILLIONS,
+             COM_VALUE_BILLIONS = BILLIONS) 
+    
+    return(summarized_data)
+  }
+  
+  if (nominal == F) {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS)) %>%
+      rename(COM_VALUE = DOLLARS_2024)
+  } else {
+    summarized_data <- summarized_data %>%
+      select(!c(DOLLARS_2024)) %>%
+      rename(COM_VALUE = DOLLARS)
+  }
+  
+  if (units == 'METRIC') {
+    summarized_data <- summarized_data %>%
+      rename(COM_VOLUME = KG) %>%
+      mutate(COM_VOLUME_T = COM_VOLUME / 1000)
+  } else if (units == 'IMPERIAL') {
+    summarized_data <- summarized_data %>%
+      mutate(COM_VOLUME = KG * 2.20462, # convert kilgorams to pounds
+             COM_VOLUME_T = COM_VOLUME / 2000) # short tons are 2000 pounds
+  }
+  
+  summarized_data <- summarized_data %>%
+    mutate(COM_VALUE_MILLIONS = COM_VALUE / 1000000,
+           COM_PRICE = COM_VALUE / COM_VOLUME) 
   
   return(summarized_data)
-  
 }
-summarize_yr_spp <- function(species) {
+summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
   # this function utilizes the summary functions for trade, processed products,
     # and landings by year and species of interest and joins the data sets
     # produced by these functions
@@ -658,21 +670,25 @@ summarize_yr_spp <- function(species) {
   # species is a character vector of a species of interest
   
   # coerce species to uppercase to match data formatting
-  species <- toupper(species)
+  species <- ifelse(species == 'All Species', 'All Species', toupper(species))
+  
   combined_data <- 
     # the order of joining is fairly irrelevant
-    left_join(left_join(summarize_trade_yr_spp(trade_data, species),
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species, 'VALUE',
+                                               units = units, nominal = nominal),
                         # for processed produccts, we must perform an additional
                           # step by removing the product name (condition) from
                           # the data to prevent duplicated data from subsequent
                           # joins
-                        summarize_pp_yr_spp(pp_data, species) %>%
+                        summarize_pp_yr_spp(pp_data, species, units = units,
+                                            nominal = nominal) %>%
                           select(!PRODUCT_NAME) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
-              summarize_landings_yr_spp(com_landings, species)) 
+              summarize_landings_yr_spp(com_landings, species, units = units,
+                                        nominal = nominal)) 
   
   return(combined_data)
 }
@@ -938,54 +954,13 @@ calculate_hi <- function(species, nominal = F) {
     imp_value <- rlang::enquo(imp_value)
   }
   
-  # if no species provided
-  if(species == 'All Species') {
-    # calculate index from trade data
-    hi_data <- trade_data %>%
-      # select only columns of interest
-      select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
-             EXP_VALUE_USD, IMP_VALUE_USD) %>%
-      # set export and import NAs to 0 to prevent NA as sum values
-      mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
-                                        0, EXP_VALUE_2024USD),
-             IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
-                                        0, IMP_VALUE_2024USD),
-             EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD) == T,
-                                    0, EXP_VALUE_USD),
-             IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
-                                    0, IMP_VALUE_USD)) %>%
-      # sum the total value by each country in each year
-      group_by(YEAR, COUNTRY_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      group_by(YEAR) %>%
-      # for each year,
-        # step 1: sum the export and import value
-        # step 2: calculate the proportion of export and import value for each
-          # country
-        # step 3: square the proportion of export and import value
-        # step 4: sum the squares to calculate the HI for exports and imports
-      mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
-             TOTAL_IMP_VALUE_YR = sum(!!imp_value),
-             PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
-             PROPORT_IMP_VALUE = !!imp_value / TOTAL_IMP_VALUE_YR,
-             PROPORT_EXP_SQUARED = PROPORT_EXP_VALUE^2,
-             PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
-             EXP_HI = sum(PROPORT_EXP_SQUARED),
-             IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
-      # retain year and HI's of exports and imports
-      select(YEAR, EXP_HI, IMP_HI) %>%
-      # remove duplicate columns so there is one of each per year
-      distinct()
-    
-    return(hi_data)
-  }
-  
-  # duplicate the above steps, except now filter for species of interest
+  # calculate index from trade data
   hi_data <- trade_data %>%
     filter_species(species) %>%
+    # select only columns of interest
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
            EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    # set export and import NAs to 0 to prevent NA as sum values
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
                                       0, EXP_VALUE_2024USD),
            IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
@@ -994,10 +969,17 @@ calculate_hi <- function(species, nominal = F) {
                                   0, EXP_VALUE_USD),
            IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
                                   0, IMP_VALUE_USD)) %>%
+    # sum the total value by each country in each year
     group_by(YEAR, COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     group_by(YEAR) %>%
+    # for each year,
+    # step 1: sum the export and import value
+    # step 2: calculate the proportion of export and import value for each
+    # country
+    # step 3: square the proportion of export and import value
+    # step 4: sum the squares to calculate the HI for exports and imports
     mutate(TOTAL_EXP_VALUE_YR = sum(!!exp_value),
            TOTAL_IMP_VALUE_YR = sum(!!imp_value),
            PROPORT_EXP_VALUE = !!exp_value / TOTAL_EXP_VALUE_YR,
@@ -1006,53 +988,35 @@ calculate_hi <- function(species, nominal = F) {
            PROPORT_IMP_SQUARED = PROPORT_IMP_VALUE^2,
            EXP_HI = sum(PROPORT_EXP_SQUARED),
            IMP_HI = sum(PROPORT_IMP_SQUARED)) %>%
+    # retain year and HI's of exports and imports
     select(YEAR, EXP_HI, IMP_HI) %>%
+    # remove duplicate columns so there is one of each per year
     distinct()
   
   return(hi_data)
 }
-calculate_supply_metrics <- function(species, units) {
+calculate_supply_metrics <- function(species, units = NULL, nominal = F) {
   # this function calculates three metrics that we visualize:
     # apparent supply, apparent supply relative to domestic production, and
     # unexported domestic production relative to apparent supply
   # the function relies on summarize_yr_spp for data formatting
   # species is a character vector of a species of interest
-  if (units == 'METRIC') {
-    data <- summarize_yr_spp(species) %>%
-      # calculate apparent supply by summing domestic production and imports 
-      # and subtracting export volume
-      # calculate apparent supply relative to domestic production by dividing
-      # apparent supply by domestic production
-      # calculate unexported domestic production relative to apparent supply by
-      # dividing the absolute value of the difference of domestic production and
-      # export volume by apparent supply
-      mutate(APPARENT_SUPPLY = (PP_VOLUME_MT - EXP_VOLUME_MT) + IMP_VOLUME_MT,
-             APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_MT,
-             UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-               abs(PP_VOLUME_MT - EXP_VOLUME_MT) / APPARENT_SUPPLY) 
-  }
   
-  if (units == 'IMPERIAL') {
-    data <- summarize_yr_spp(species) %>%
-      mutate(APPARENT_SUPPLY = (PP_VOLUME_ST - EXP_VOLUME_ST) + IMP_VOLUME_ST,
-             APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_ST,
-             UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-               abs(PP_VOLUME_ST - EXP_VOLUME_ST) / APPARENT_SUPPLY)
-  }
+  data <- summarize_yr_spp(species, units = units, nominal = nominal) %>%
+    # calculate apparent supply by summing domestic production and imports 
+    # and subtracting export volume
+    # calculate apparent supply relative to domestic production by dividing
+    # apparent supply by domestic production
+    # calculate unexported domestic production relative to apparent supply by
+    # dividing the absolute value of the difference of domestic production and
+    # export volume by apparent supply
+    mutate(APPARENT_SUPPLY = (PP_VOLUME_T - EXP_VOLUME_T) + IMP_VOLUME_T,
+           APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_T,
+           UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
+             abs(PP_VOLUME_T - EXP_VOLUME_T) / APPARENT_SUPPLY,
+           SPECIES = species) 
   
-  # if no species is provided, add column for species to be 'ALL SPECIES'
-  if(species == 'All Species') {
-    data <- data %>%
-      mutate(SPECIES = 'All Species')
-    
-    return(data)
-  } else {
-    # otherwise rename the column specifying the species to 'SPECIES'
-    data <- data %>%
-      rename(SPECIES = 2)
-    
-    return(data)
-  }
+  return(data)
 }
 
 # plot functions
@@ -1063,34 +1027,6 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   # 'VALUE', 'VOLUME', 'PRICE', 'BALANCE', 'RATIO'
   # export is logical that specifies if the output should be for export data
   # import is logical that specifies if the output should be for import data
-  
-  # if both export and import are true, output is Net Export data
-  if (export == T & import == T) {
-    # calculate net export value in billions/millions, and net export volume
-    if (nominal == T) {
-      data <- data %>%
-        mutate(NET_VALUE_NOMINAL_BILLIONS = 
-                 EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
-               NET_VALUE_NOMINAL_MILLIONS =
-                 EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
-               NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-               NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-               NET_PRICE = EXP_PRICE_NOMINAL_PER_KG - IMP_PRICE_NOMINAL_PER_KG)
-    } else {
-      data <- data %>%
-        mutate(NET_VALUE_2024USD_BILLIONS = 
-                 EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-               NET_VALUE_2024USD_MILLIONS = 
-                 EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
-               NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
-               NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-               NET_PRICE = EXP_PRICE_USD_PER_KG - IMP_PRICE_USD_PER_KG)
-    }
-    
-    # set shortform and longform values for plot labeling
-    shortform <- 'NET'
-    longform <- 'Net Export'
-  }
   
   # set shortform and longform values for plot labeling if export
   if (export == T & import == F) {
@@ -1109,57 +1045,23 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   # set labels and y values for plots of VALUE
   if (plot_format == 'VALUE') {
-    if (nominal == T) {
-      y <- as.symbol(paste0(shortform, '_VALUE_MILLIONS'))
-      y <- rlang::enquo(y)
-    } else {
-      # y <- as.symbol(paste0(shortform, '_VALUE_2024USD_BILLIONS'))
-      y <- as.symbol(paste0(shortform, '_VALUE_2024USD_MILLIONS'))
-      y <- rlang::enquo(y)
-    }
+    y <- as.symbol(paste0(shortform, '_VALUE_MILLIONS'))
+    y <- rlang::enquo(y)
     
     # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     
+    y2 <- as.symbol(paste0(shortform, '_PRICE'))
+    y2 <- rlang::enquo(y2)
+    
+    max_exp_price <- max(data$EXP_PRICE, na.rm = T)
+    max_imp_price <- max(data$IMP_PRICE, na.rm = T)
+    
     # the rate for price will depend on specified units
     if (units == 'METRIC') {
-      if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_KG'))
-        y2 <- rlang::enquo(y2)
-        
-        max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_KG, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_NOMINAL_PER_KG, na.rm = T)
-      } else {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_KG'))
-        y2 <- rlang::enquo(y2) 
-        
-        # Because we have two axes, we will need to normalize the second y-axis too
-        # This is more complex due to ggplot requiring a scaling factor for 
-        # the second y-axis.
-        max_exp_price <- max(data$EXP_PRICE_USD_PER_KG, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_USD_PER_KG, na.rm = T)
-      }
-      
       label2 <- label_currency(suffix = '/kg')
       unit <- ' per kilogram'
-      
-    }
-    
-    if (units == 'IMPERIAL') {
-      if (nominal == T) {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_NOMINAL_PER_LB'))
-        y2 <- rlang::enquo(y2)
-        
-        max_exp_price <- max(data$EXP_PRICE_NOMINAL_PER_LB, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_NOMINAL_PER_LB, na.rm = T)
-      } else {
-        y2 <- as.symbol(paste0(shortform, '_PRICE_USD_PER_LB'))
-        y2 <- rlang::enquo(y2) 
-        
-        max_exp_price <- max(data$EXP_PRICE_USD_PER_LB, na.rm = T)
-        max_imp_price <- max(data$IMP_PRICE_USD_PER_LB, na.rm = T)
-      }
-      
+    } else if (units == 'IMPERIAL') {
       label2 <- label_currency(suffix = '/lb')
       unit <- ' per pound'
     }
@@ -1167,19 +1069,13 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
     if (nominal == T) {
       ylab <- 'Millions (Nominal USD)'
       ylab2 <- 'Average Price (Nominal USD)'
-      
-      max_exp <- max(data$EXP_VALUE_MILLIONS, na.rm = T)
-      max_imp <- max(data$IMP_VALUE_MILLIONS, na.rm = T)
     } else {
-      # ylab <- paste0('Total ', longform, ' Value (Real 2024 USD)')
       ylab <- 'Millions (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)' 
-      
-      # normalize y-max for both export and import figures
-      # find maxes for both in a given year and retain the largest value
-      max_exp <- max(data$EXP_VALUE_2024USD_MILLIONS, na.rm = T)
-      max_imp <- max(data$IMP_VALUE_2024USD_MILLIONS, na.rm = T)
     }
+    
+    max_exp <- max(data$EXP_VALUE_MILLIONS, na.rm = T)
+    max_imp <- max(data$IMP_VALUE_MILLIONS, na.rm = T)
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     
@@ -1189,29 +1085,14 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   # set labels and y values for plots of VOLUME
   if (plot_format == 'VOLUME') {
-    # For units == metric
-    if (units == 'METRIC') {
-      y <- as.symbol(paste0(shortform, '_VOLUME_MT'))
-      y <- rlang::enquo(y)
-      label <- comma
-      # ylab <- paste0('Total ', longform, ' Volume (Metric Tons)')
-      ylab <- 'Metric Tons'
-      
-      # normalize y-max for both export and import figures
-      # find maxes for both in a given year and retain the largest value
-      max_exp <- max(data$EXP_VOLUME_MT, na.rm = T)
-      max_imp <- max(data$IMP_VOLUME_MT, na.rm = T)
-    }
+    y <- as.symbol(paste0(shortform, '_VOLUME_T'))
+    y <- rlang::enquo(y)
+    label <- comma
     
-    if (units == 'IMPERIAL') {
-      y <- as.symbol(paste0(shortform, '_VOLUME_ST'))
-      y <- rlang::enquo(y)
-      label <- comma
-      ylab <- 'Short Tons'
-      
-      max_exp <- max(data$EXP_VOLUME_ST, na.rm = T)
-      max_imp <- max(data$IMP_VOLUME_ST, na.rm = T)
-    }
+    max_exp <- max(data$EXP_VOLUME_T, na.rm = T)
+    max_imp <- max(data$IMP_VOLUME_T, na.rm = T)
+    
+    ylab <- ifelse(units == 'METRIC', 'Metric Tons', 'Short Tons')
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     tlab <- 'Volume'
@@ -1285,7 +1166,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
       ggplot(data = data, 
              aes(x = factor(YEAR),
                  # calculate export / import volume ratio here
-                 y = (EXP_VOLUME_MT / IMP_VOLUME_MT))) +
+                 y = RATIO)) +
       geom_line(aes(group = GROUP),
                 color = 'black',
                 linewidth = 1.5) +
@@ -1301,33 +1182,11 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
             plot.title = element_text(size = 18),
             axis.title = element_text(size = 15))
   } else {
-    # plot of BALANCE
-    # create trade balance data by including both export and import data
-    # rename value to exports and imports for display of groups on plot
-    if (nominal == T) {
-      balance_data <- data %>%
-        rename(EXPORTS = EXP_VALUE_MILLIONS,
-               IMPORTS = IMP_VALUE_MILLIONS)
-    } else {
-      balance_data <- data %>%
-        rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
-               IMPORTS = IMP_VALUE_2024USD_MILLIONS)
-    }
-
-    balance_data <- balance_data %>%
-      select(YEAR, EXPORTS, IMPORTS) %>%
-      # calculate trade balance value
-      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
-      # pivot longer so there are three groups: exports, imports, and balance
-      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      # factor the column storing the groups
-      mutate(name = as.factor(name))
-    
     plot <- 
-      ggplot(data = balance_data,
+      ggplot(data = data,
              aes(x = factor(YEAR),
-                 y = value)) +
-      geom_bar(aes(fill = name),
+                 y = VALUE_MILLIONS)) +
+      geom_bar(aes(fill = TRADE),
                stat = 'identity',
                position = 'dodge',
                color = 'black') +
@@ -1362,49 +1221,21 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   return(plot)
 }
-plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal = F) {
+plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
   # this function plots trade among the top five trading partners for a species
     # using data generated by summarize_trade_ctry_yr_spp
   # value is logical that specifies if the data is formatted for value
   # volume is logical that specifies if the data is formatted for volume
   
-  # stop function if neither value nor volume are true
-  if (value == F & volume == F) {
-    stop('Please specify which plot to create by setting either value or volume to T')
-  }
-  # stop function if both value and volume are true
-  if (value == T & volume == T) {
-    stop('Please specify only one plot to create')
-  }
-  
-  # set plot labels for value plot
-  if (value == T) {
-    if (nominal == T) {
-      y <- as.symbol('NET_VALUE_NOMINAL_MILLIONS')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Millions (Nominal USD)'
-    } else {
-      # y <- as.symbol('NET_VALUE_2024USD_BILLIONS')
-      y <- as.symbol('NET_VALUE_2024USD_MILLIONS')
-      y <- rlang::enquo(y)
-      
-      # ylab <- 'Net Export Value (Real 2024 USD, Billions)'
-      ylab <- 'Millions (Real 2024 USD)'
-    }
-    # label <- label_currency(suffix = 'B')
-    label <- label_currency(suffix = 'M')
+  if (nominal == T) {
+    ylab <- 'Millions (Nominal USD)'
   } else {
-    # set plot labels for volume plot
-    y <- as.symbol('NET_VOLUME_MT')
-    y <- rlang::enquo(y)
-    label <- comma
-    ylab <- 'Net Export Volume (Metric Tons)'
+    ylab <- 'Millions (Real 2024 USD)'
   }
   
   ggplot(data = data,
          aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
-             y = !!y, 
+             y = NET_VALUE_MILLIONS, 
              fill = factor(YEAR))) +
     geom_col(position = 'dodge',
              color = 'black') +
@@ -1414,7 +1245,7 @@ plot_trade_ctry_yr_spp <- function(data, value = F, volume = F, species, nominal
          fill = 'Year',
          title = paste0('Net Export Value for Top 5 Trading Partners of ', 
                         species)) +
-    scale_y_continuous(labels = label) +
+    scale_y_continuous(labels = label_currency(suffix = 'M')) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
     theme(axis.text = element_text(size = 12),
@@ -1432,132 +1263,36 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
   
-  # we group product conditions of low proportions in the data (less than 2%)
-    # to a subgroup called 'OTHER*'
-  # find the low proportion types by value and volume and combine
-  low_prop_types_value <- processed_product_data %>% 
-    select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-           VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-    filter(VALUE_SHARE < 0.02) %>%
-    select(PRODUCT_NAME)
-  
-  low_prop_types_volume <- processed_product_data %>%
-    select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-           VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-    filter(VOLUME_SHARE < 0.02) %>%
-    select(PRODUCT_NAME)
-  
-  low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-    distinct() %>%
-    pull(PRODUCT_NAME)
-  
-  # rename these low proportion types as 'OTHER*' and re-summarise
-  new_data <- processed_product_data %>%
-    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                 'OTHER*', PRODUCT_NAME)) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
-    summarise(across(where(is.numeric), sum),
-              .groups = 'drop') %>%
-    mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-           PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-           PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-           PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-           PRODUCT_NAME = factor(PRODUCT_NAME),
-           PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-           PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-  
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
+    y <- as.symbol('PP_VALUE_MILLIONS') 
+    y <- rlang::enquo(y)
+    
     if (nominal == T) {
-      y <- as.symbol('PP_VALUE_MILLIONS') 
-      y <- rlang::enquo(y)
-      
       ylab <- 'Millions (Nominal USD)'
     } else {
-      # y <- as.symbol('PP_VALUE_BILLIONS_2024USD')
-      y <- as.symbol('PP_VALUE_MILLIONS_2024USD')
-      y <- rlang::enquo(y)
-      # ylab <- 'Value (Billions, 2024 Real USD)'
       ylab <- 'Millions (2024 Real USD)'
     }
     
-    # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
     tlab <- 'Production Value of '
-    unit <- ' Million'
-    
-    # calculate the total value per year to find upper limit
-    yr_value <- new_data %>%
-      # select(YEAR, PP_VALUE_BILLIONS_2024USD) %>%
-      select(YEAR, !!y) %>%
-      group_by(YEAR) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop')
-    
-    if (nominal == T) {
-      ylim <- max(yr_value$PP_VALUE_MILLIONS + 5)
-    } else {
-      # ylim <- max(yr_value$PP_VALUE_BILLIONS_2024USD)
-      ylim <- max(yr_value$PP_VALUE_MILLIONS_2024USD + 5)  
-    }
-    
-    new_data <- new_data %>%
-      select(YEAR, PRODUCT_NAME, PP_VALUE_2024USD, PP_NOMINAL_VALUE,
-             PP_VALUE_MILLIONS_2024USD, PP_VALUE_BILLIONS_2024USD, 
-             PP_VALUE_MILLIONS, PP_VALUE_BILLIONS) %>%
-      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'VOLUME') {
+    y <- as.symbol('PP_VOLUME_T')
+    y <- rlang::enquo(y)
+    
     if (units == 'METRIC') {
-      # set labels for VOLUME plots
-      y <- as.symbol('PP_VOLUME_THOUSAND_MT')
-      y <- rlang::enquo(y)
-      ylab <- 'Metric Tons (Thousands)'
+      ylab <- 'Metric Tons'
       label <- comma
       tlab <- 'Production Volume of '
-      unit <- ' Thousand Metric Tons'
-      
-      # calculate the total value per year to find upper limit
-      yr_volume <- new_data %>%
-        select(YEAR, PP_VOLUME_THOUSAND_MT) %>%
-        group_by(YEAR) %>%
-        summarise(across(where(is.numeric), sum),
-                  .groups = 'drop') 
-      
-      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_MT + 1)
     }
     
     if (units == 'IMPERIAL') {
-      y <- as.symbol('PP_VOLUME_THOUSAND_ST')
-      y <- rlang::enquo(y)
-      ylab <- 'Short Tons (Thousands)'
+      ylab <- 'Short Tons'
       label <- comma
       tlab <- 'Production Volume of '
-      unit <- ' Thousand Short Tons'
-      
-      # calculate the total value per year to find upper limit
-      yr_volume <- new_data %>%
-        select(YEAR, PP_VOLUME_THOUSAND_ST) %>%
-        group_by(YEAR) %>%
-        summarise(across(where(is.numeric), sum),
-                  .groups = 'drop')
-      
-      ylim <- max(yr_volume$PP_VOLUME_THOUSAND_ST + 1)
     }
-    
-    new_data <- new_data %>%
-      select(YEAR, PRODUCT_NAME, PP_VOLUME_KG, PP_VOLUME_MT, PP_VOLUME_LB,
-             PP_VOLUME_ST, PP_VOLUME_THOUSAND_MT, PP_VOLUME_THOUSAND_ST) %>%
-      mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME))
   }
   
   if (plot.format == 'PRICE') {
@@ -1567,45 +1302,29 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     # specify whether price is reported in per kg or per lb
     if (units == 'METRIC') {
       if (nominal == T) {
-        y <- as.symbol('PP_PRICE_NOMINAL_PER_KG')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_KG)
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        y <- as.symbol('PP_PRICE_2024USD_PER_KG')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_2024USD_PER_KG) 
         ylab <- 'Average Price (Real 2024 USD)'
       }
       
       label <- label_currency(suffix = '/kg')
-      unit <- ' per kilogram'
     }
     
     if (units == 'IMPERIAL') {
       if (nominal == T) {
-        y <- as.symbol('PP_PRICE_NOMINAL_PER_LB')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_NOMINAL_PER_LB)
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        y <- as.symbol('PP_PRICE_2024USD_PER_LB')
-        y <- rlang::enquo(y)
-        
-        ymax <- max(new_data$PP_PRICE_2024USD_PER_LB) 
         ylab <- 'Average Price (Real 2024 USD)'
       }
       
       label <- label_currency(suffix = '/lb')
-      unit <- ' per pound'
     }
-    plot <- ggplot(data = new_data %>%
-                     mutate(PRODUCT_NAME = str_to_title(PRODUCT_NAME)),
+    
+    ymax <- max(processed_product_data$PP_PRICE) + 0.05*(max(processed_product_data$PP_PRICE))
+    
+    plot <- ggplot(data = processed_product_data,
                    aes(x = factor(YEAR),
-                       y = !!y,
+                       y = PP_PRICE,
                        color = PRODUCT_NAME)) +
       geom_line(aes(group = PRODUCT_NAME),
                 linewidth = 1.5) +
@@ -1618,7 +1337,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
            fill = 'Product Condition',
            title = paste0('Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
-      scale_y_continuous(limits = c(0, ymax + 0.5),
+      scale_y_continuous(limits = c(0, ymax),
                          expand = c(0, 0),
                          labels = label) +
       theme_bw() +
@@ -1631,8 +1350,19 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     return(plot)
   }
   
+  # find upper limit for value/volume plots
+  upper_limit <- processed_product_data %>%
+    select(YEAR, !!y) %>%
+    group_by(YEAR) %>%
+    summarise(across(where(is.numeric), sum),
+              .groups = 'drop') %>%
+    filter(!!y == max(!!y)) %>%
+    pull(!!y)
+  
+  ylim <- upper_limit + 0.05*upper_limit
+  
   # plot for VALUE or VOLUME depending on plot.format
-  plot <- ggplot(data = new_data,
+  plot <- ggplot(data = processed_product_data,
                  aes(x = factor(YEAR),
                      y = !!y,
                      fill = PRODUCT_NAME)) +
@@ -1667,72 +1397,32 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
-    # Overlayed Prices will depend on specified units
     if (units == 'METRIC') {
-      if (nominal == T) {
-        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_KG')
-        y2 <- rlang::enquo(y2)
-      } else {
-        y2 <- as.symbol('COM_PRICE_2024USD_PER_KG')
-        y2 <- rlang::enquo(y2) 
-      }
-      
       label2 <- label_currency(suffix = '/kg')
       unit <- 'per kilogram'
-    }
-    
-    if (units == 'IMPERIAL') {
-      if (nominal == T) {
-        y2 <- as.symbol('COM_PRICE_NOMINAL_PER_LB')
-        y2 <- rlang::enquo(y2)
-      } else {
-        y2 <- as.symbol('COM_PRICE_2024USD_PER_LB')
-        y2 <- rlang::enquo(y2) 
-      }
-      
+    } else if (units == 'IMPERIAL') {
       label2 <- label_currency(suffix = '/lb')
       unit <- 'per pound'
     }
     
-    if (nominal == T) {
-      y <- as.symbol('COM_VALUE_MILLIONS')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Millions (Nominal USD)'
-      ylab2 <- 'Average Price (Nominal USD)'
-    } else {
-      # y <- as.symbol('COM_VALUE_BILLIONS_2024USD')
-      y <- as.symbol('COM_VALUE_MILLIONS_2024USD')
-      y <- rlang::enquo(y)
-      
+    if (nominal == F) {
       ylab <- 'Millions (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)'
+    } else {
+      ylab <- 'Millions (Nominal USD)'
+      ylab2 <- 'Average Price (Nominal USD)'
     }
     
-    # label <- label_currency(suffix = 'B')
     label <- label_currency(suffix = 'M')
-    
     tlab <- 'Ex-Vessel Value of '
   }
   
   # set labels for VOLUME plot
   if (plot.format == 'VOLUME') {
-    # format metric tons by thousands
-    data$COM_VOLUME_THOUSAND_MT <- data$COM_VOLUME_MT / 1000
-    data$COM_VOLUME_THOUSAND_ST <- data$COM_VOLUME_ST / 1000
-    
     if (units == 'METRIC') {
-      y <- as.symbol('COM_VOLUME_THOUSAND_MT')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Metric Tons (Thousands)'
-    }
-    
-    if (units == 'IMPERIAL') {
-      y <- as.symbol('COM_VOLUME_THOUSAND_ST')
-      y <- rlang::enquo(y)
-      
-      ylab <- 'Short Tons (Thousands)'
+      ylab <- 'Metric Tons'
+    } else if (units == 'IMPERIAL') {
+      ylab <- 'Short Tons'
     }
     
     label <- comma
@@ -1747,13 +1437,13 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     
     # calculate scale factor (see plot_trade for details)
     max_value <- data %>%
-      slice_max(!!y, n = 1) %>%
-      select(!!y) %>%
+      slice_max(COM_VALUE, n = 1) %>%
+      select(COM_VALUE) %>%
       pull()
     
     max_price <- data %>%
-      slice_max(!!y2, n = 1) %>%
-      select(!!y2) %>%
+      slice_max(COM_PRICE, n = 1) %>%
+      select(COM_PRICE) %>%
       pull()
     
     scale_factor <- max_value / max_price
@@ -1761,14 +1451,14 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
-      geom_col(aes(y = !!y),
+      geom_col(aes(y = COM_VALUE),
                fill = '#853B00',
                color = 'black') +
-      geom_line(aes(y = !!y2 * scale_factor,
+      geom_line(aes(y = COM_PRICE * scale_factor,
                     group = GROUP),
                 color = '#FFAB38',
                 linewidth = 1.5) +
-      geom_point(aes(y = !!y2 * scale_factor),
+      geom_point(aes(y = COM_PRICE * scale_factor),
                  color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
@@ -1791,7 +1481,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
   plot <- 
     ggplot(data = data,
            aes(x = factor(YEAR),
-               y = !!y)) +
+               y = COM_VOLUME_T)) +
     geom_col(color = 'black',
              fill = '#853B00') +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
@@ -1900,16 +1590,15 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
     # here, we only need to specify how the figure is labeled
-    ylab <- ifelse(units == 'METRIC', 'Metric Tons (Thousands)',
-                   'Short Tons (Thousands)')
+    ylab <- ifelse(units == 'METRIC', 'Metric Tons',
+                   'Short Tons')
     plot <- 
       ggplot(data = supply_data %>%
                # we do not have landings or processing data for 2024 despite
                 # having so for trade data
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
-                 # divided by 1000 for thousand metric tons (volume metric)
-                 y = APPARENT_SUPPLY / 1000)) +
+                 y = APPARENT_SUPPLY)) +
       geom_col(color = 'black',
                fill = c('#008DA8')) +
       labs(x = '',
@@ -2200,22 +1889,6 @@ ui <- page_sidebar(
                                      uiOutput('imp_volume_click_overlay'))),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
-                       # nav_panel(title = 'Price',
-                       #           fluidRow(
-                       #             column(
-                       #               withSpinner(
-                       #                 plotOutput('exp_price'), 
-                       #                 type = 7),
-                       #               width = 6
-                       #             ),
-                       #             column(
-                       #               withSpinner(
-                       #                 plotOutput('imp_price'), 
-                       #                 type = 7),
-                       #               width = 6
-                       #             )),
-                       #           downloadButton('download_page4',
-                       #                          'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
                                  layout_columns(
                                    col_widths = c(6, 6),
@@ -2412,6 +2085,24 @@ server <- function(input, output, session) {
     updateCheckboxInput(session, 'products_button', value = F)
     update_switch(session = session, 'units', value = F)
     update_switch(session = session, 'nominal', value = F)
+    balance_clicked_point(NULL)
+    ratio_clicked_point(NULL)
+    top5_clicked_point(NULL)
+    exp_value_clicked_point(NULL)
+    imp_value_clicked_point(NULL)
+    exp_volume_clicked_point(NULL)
+    imp_volume_clicked_point(NULL)
+    exp_mlti_clicked_point(NULL)
+    imp_mlti_clicked_point(NULL)
+    hi_clicked_point(NULL)
+    supply_clicked_point(NULL)
+    supply_ratio_clicked_point(NULL)
+    supply_share_clicked_point(NULL)
+    landings_value_clicked_point(NULL)
+    landings_volume_clicked_point(NULL)
+    pp_value_clicked_point(NULL)
+    pp_volume_clicked_point(NULL)
+    pp_price_clicked_point(NULL)
   })
   # Download buttons -----------------------------------------------------------
   # The following are a series of download buttons that provide the user the
@@ -2490,8 +2181,8 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
-      write.csv(top5_trade_df(), 'top5_trade_plot_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
+      write.csv(top5_trade_df_full(), 'top5_trade_plot_data.csv')
       
       # we are saving multiple files so they must be in a zip file
       # fname is filename that derives from the start of the function
@@ -2522,7 +2213,7 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
       
       zip(zipfile = fname, files = fs)
     },
@@ -2550,43 +2241,15 @@ server <- function(input, output, session) {
              width = 10,
              height = 8,
              device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
+      write.csv(trade_df_full(), 'trade_plots_data.csv')
       
       zip(zipfile = fname, files = fs)
     },
     contentType = 'application/zip'
   )
   
-  # download page 4 of trade data (price)
+  # download page 4 of trade data (advanced metrics)
   output$download_page4 <- downloadHandler(
-    filename = 'trade_price_page.zip',
-    content = function(fname) {
-      showModal(modalDialog('Downloading plots and data...', footer = NULL))
-      Sys.sleep(1)
-      on.exit(removeModal())
-      
-      tmpdir <- tempdir()
-      setwd(tempdir())
-      
-      fs <- c('export_price_plot.png', 'import_price_plot.png',
-              'trade_plots_data.csv')
-      ggsave('export_price_plot.png', exp_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('import_price_plot.png', imp_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      write.csv(trade_df(), 'trade_plots_data.csv')
-      
-      zip(zipfile = fname, files = fs)
-    },
-    contentType = 'application/zip'
-  )
-  
-  # download page 5 of trade data (advanced metrics)
-  output$download_page5 <- downloadHandler(
     filename = 'trade_advanced_metrics_page.zip',
     content = function(fname) {
       showModal(modalDialog('Downloading plots and data...', footer = NULL))
@@ -2640,7 +2303,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_value.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_value.png', landings_value_plot(),
              width = 10,
              height = 8,
@@ -2663,7 +2326,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_volume.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_volume.png', landings_volume_plot(),
              width = 10,
              height = 8,
@@ -2686,7 +2349,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_price.png')
-      write.csv(landings_df(), 'commercial_landings_plots_data.csv')
+      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
       ggsave('landings_price.png', landings_price_plot(),
              width = 10,
              height = 8,
@@ -2709,7 +2372,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_value.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_value.png', pp_value_plot(),
              width = 10,
              height = 8,
@@ -2732,7 +2395,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_volume.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_volume.png', pp_volume_plot(),
              width = 10,
              height = 8,
@@ -2755,7 +2418,7 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_price.png')
-      write.csv(pp_df(), 'products_plots_data.csv')
+      write.csv(pp_df_full(), 'products_plots_data.csv')
       ggsave('products_price.png', pp_price_plot(),
              width = 10,
              height = 8,
@@ -3224,13 +2887,23 @@ server <- function(input, output, session) {
     new_data
   })
 
-  # creates trade data
-  trade_df <- reactive({
+  # creates full trade data
+  trade_df_full <- reactive({
     summarize_trade_yr_spp(
       trade_filtered(),
-      species_selection_trade()
-      )
+      species_selection_trade(),
+      'FULL')
     })
+  
+  # creates trade balance data
+  balance_df <- reactive({
+    summarize_trade_yr_spp(
+      trade_filtered(),
+      species_selection_trade(),
+      'BALANCE',
+      units = selected_units(),
+      nominal = selected_value())
+  })
   
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
@@ -3240,8 +2913,8 @@ server <- function(input, output, session) {
   
   # creates trade balance plot (value)
   balance_plot <- reactive({
-    plot_trade(trade_df(), 'BALANCE', species = species_selection_trade(), 
-                    nominal = selected_value())
+    plot_trade(balance_df(), 'BALANCE', species = species_selection_trade(), 
+               nominal = selected_value())
   })
   
   # outputs trade balance plot (value)
@@ -3252,10 +2925,20 @@ server <- function(input, output, session) {
     balance_plot()
   })
   
+  # creates trade data for plots
+  trade_df <- reactive({
+    summarize_trade_yr_spp(
+      trade_filtered(),
+      species_selection_trade(),
+      'VALUE',
+      units = selected_units(),
+      nominal = selected_value())
+  })
+  
   # creates export/import ratio plot
   ratio_plot <- reactive({
     plot_trade(trade_df(), 'RATIO', export = T, import = T, 
-                    species = species_selection_trade())
+               species = species_selection_trade())
   })
   
   # outputs export/import ratio plot
@@ -3266,21 +2949,31 @@ server <- function(input, output, session) {
     ratio_plot()
   })
   
-  # creates top 5 net export data
+  # creates top 5 net export data for download
+  top5_trade_df_full <- reactive({
+    summarize_trade_ctry_yr_spp(
+      trade_filtered(),
+      species_selection_trade(),
+      output.format = 'FULL',
+      time.frame = c(2020, 2024),
+      nominal = selected_value())
+  })
+  
+  # creates top 5 net export data for plots
   top5_trade_df <- reactive({
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      output.format = 'VALUE',
       time.frame = c(2020, 2024),
-      value = T,
       nominal = selected_value())
   })
   
   # creates top 5 net export plot
   top5_trade_plot <- reactive({
-    plot_trade_ctry_yr_spp(top5_trade_df(), value = T, 
-                                species = species_selection_trade(), 
-                                nominal = selected_value())
+    plot_trade_ctry_yr_spp(top5_trade_df(), 
+                           species = species_selection_trade(), 
+                           nominal = selected_value())
   })
   
   # outputs top 5 net export plot
@@ -3308,7 +3001,7 @@ server <- function(input, output, session) {
   # creates import value plot
   imp_value_plot <- reactive({
     plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
-                    species = species_selection_trade(), nominal = selected_value())
+               species = species_selection_trade(), nominal = selected_value())
     })
   
   # outputs import value plot
@@ -3336,7 +3029,7 @@ server <- function(input, output, session) {
   # creates import volume plot
   imp_volume_plot <- reactive({
     plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
-                    species = species_selection_trade())
+               species = species_selection_trade())
   })
   
   # outputs import volume plot
@@ -3348,32 +3041,32 @@ server <- function(input, output, session) {
   })
   
   # creates export price plot
-  exp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', units = selected_units(), export = T, 
-               species = species_selection_trade())
-  })
-  
-  # outputs export price plot
-  output$exp_price <- renderPlot({
-    trade_data_validation()
-    validate(need(try(!is.na(exp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
-    exp_price_plot()
-  })
-  
-  # creates import price plot
-  imp_price_plot <- reactive({
-    plot_trade(trade_df(), 'PRICE', units = selected_units(), import = T, 
-               species = species_selection_trade())
-  })
-  
-  # outputs import price plot
-  output$imp_price <- renderPlot({
-    trade_data_validation()
-    validate(need(try(!is.na(imp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
-    imp_price_plot()
-  })
+  # exp_price_plot <- reactive({
+  #   plot_trade(trade_df(), 'PRICE', units = selected_units(), export = T, 
+  #              species = species_selection_trade())
+  # })
+  # 
+  # # outputs export price plot
+  # output$exp_price <- renderPlot({
+  #   trade_data_validation()
+  #   validate(need(try(!is.na(exp_price_plot())),
+  #                 'Data for this species is insufficient to produce this plot'))
+  #   exp_price_plot()
+  # })
+  # 
+  # # creates import price plot
+  # imp_price_plot <- reactive({
+  #   plot_trade(trade_df(), 'PRICE', units = selected_units(), import = T, 
+  #              species = species_selection_trade())
+  # })
+  # 
+  # # outputs import price plot
+  # output$imp_price <- renderPlot({
+  #   trade_data_validation()
+  #   validate(need(try(!is.na(imp_price_plot())),
+  #                 'Data for this species is insufficient to produce this plot'))
+  #   imp_price_plot()
+  # })
   
   # landings -------------------------------------------------------------------
   
@@ -3567,12 +3260,22 @@ server <- function(input, output, session) {
                   'There is no available landings data for this species'))
   })
   
-  # creates landings data
+  # creates landings data for download
+  landings_df_full <- reactive({
+    summarize_landings_yr_spp(
+      landings_filtered(),
+      species_selection_landings(),
+      full_data = T)
+    })
+  
+  # creates landings data for plots
   landings_df <- reactive({
     summarize_landings_yr_spp(
       landings_filtered(),
-      species_selection_landings())
-    })
+      species_selection_landings(),
+      units = selected_units(),
+      nominal = selected_value())
+  })
   
   # creates landings value plot
   landings_value_plot <- reactive({
@@ -3592,7 +3295,7 @@ server <- function(input, output, session) {
   # creates landings volume plot
   landings_volume_plot <- reactive({
     plot_landings(landings_df(), 'VOLUME', units = selected_units(),
-                       species = species_selection_landings())
+                  species = species_selection_landings())
   })
   
   # outputs landings volume plot
@@ -3808,16 +3511,27 @@ server <- function(input, output, session) {
                   'There is no available production data for this species'))
   })
   
-  # creates processed products data
+  # creates processed products data for download
+  pp_df_full <- reactive({
+    summarize_pp_yr_spp(
+      products_filtered(),
+      species_selection_products(),
+      full_data = T)
+    })
+  
+  # creates processed products data for plots
   pp_df <- reactive({
     summarize_pp_yr_spp(
       products_filtered(),
-      species_selection_products())
-    })
+      species_selection_products(),
+      units = selected_units(),
+      nominal = selected_value())
+  })
   
   # creates processed products value plot
   pp_value_plot <- reactive({
     plot_spp_pp(pp_df(), 'VALUE', 
+                units = selected_units(),
                 species = species_selection_products(),
                 nominal = selected_value())
   })
@@ -3832,8 +3546,9 @@ server <- function(input, output, session) {
   
   # creates processed products volume plot
   pp_volume_plot <- reactive({
-    plot_spp_pp(pp_df(), 'VOLUME', units = selected_units(),
-                     species = species_selection_products())
+    plot_spp_pp(pp_df(), 'VOLUME', 
+                units = selected_units(),
+                species = species_selection_products())
   })
   
   # outputs processed products volume plot
@@ -3846,9 +3561,10 @@ server <- function(input, output, session) {
   
   # creates processed products price plot
   pp_price_plot <- reactive({
-    plot_spp_pp(pp_df(), 'PRICE', units = selected_units(),
-                     species = species_selection_products(),
-                     nominal = selected_value())
+    plot_spp_pp(pp_df(), 'PRICE', 
+                units = selected_units(),
+                species = species_selection_products(),
+                nominal = selected_value())
   })
   
   # outputs processed products price plot
@@ -3932,7 +3648,8 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection_trade(), units = selected_units())
+      species_selection_trade(), units = selected_units(),
+      nominal = selected_value())
     })
   
   # creates apparent supply plot
@@ -3987,18 +3704,7 @@ server <- function(input, output, session) {
     
     click_x <- input$balance_plot_click$x
     
-    balance_data <- trade_df()
-    
-    balance_data <- balance_data %>%
-      rename(EXPORTS = EXP_VALUE_2024USD_MILLIONS,
-             IMPORTS = IMP_VALUE_2024USD_MILLIONS) %>%
-      select(YEAR, EXPORTS, IMPORTS) %>%
-      # calculate trade balance value
-      mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
-      # pivot longer so there are three groups: exports, imports, and balance
-      pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
-      # factor the column storing the groups
-      mutate(name = as.factor(name))
+    balance_data <- balance_df()
     
     year_levels <- levels(factor(sort(unique(balance_data$YEAR))))
     clicked_year <- round(click_x)
@@ -4051,13 +3757,13 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Exports:<br></span>", 
-        dollar(click_info$data$value[1]), " Million <br>",
+        dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Imports:<br></span>", 
-        dollar(click_info$data$value[2]), " Million <br>",
+        dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Trade Balance:<br></span>", 
-        dollar(click_info$data$value[3]), " Million <br>"
+        dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
       ))
     )
   })
@@ -4120,15 +3826,15 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume:<br></span>", 
-        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$EXP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Imports:<br></span>", 
-        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$IMP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ratio:<br></span>", 
-        (click_info$data$EXP_VOLUME_MT / click_info$data$IMP_VOLUME_MT)
-      ))
-    )
+        click_info$data$RATIO)))
   })
   
   
@@ -4194,23 +3900,23 @@ server <- function(input, output, session) {
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[1], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2020</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[1]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[1]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[2], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2021</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[2]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[2]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[3], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2022</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[3]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[3]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[4], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2023</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[4]), " Million <br>",
+        dollar(click_info$data$NET_VALUE_MILLIONS[4]), " Million <br>",
         "</span><span class = 'color-swatch' style = 'background-color: ", colors[5], ";'>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "2024</span>", ': ',
-        dollar(click_info$data$NET_VALUE_2024USD_MILLIONS[5]), " Million <br>")))
+        dollar(click_info$data$NET_VALUE_MILLIONS[5]), " Million <br>")))
   })
   
   
@@ -4286,10 +3992,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$EXP_VALUE_2024USD_MILLIONS), " Million<br>",
+        dollar(click_info$data$EXP_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Export Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$EXP_PRICE_USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$EXP_PRICE), 
+        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
   })
   
   
@@ -4352,10 +4059,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$IMP_VALUE_2024USD_MILLIONS), " Million<br>",
+        dollar(click_info$data$IMP_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Import Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$IMP_PRICE_USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$IMP_PRICE), 
+        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
   })
   
   
@@ -4431,8 +4139,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$EXP_VOLUME_MT), " Metric Tons")
-      ))
+        comma(click_info$data$EXP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
   
@@ -4508,7 +4216,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$IMP_VOLUME_MT), " Metric Tons")))
+        comma(click_info$data$IMP_VOLUME_T), 
+        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
   })
   
   
@@ -4858,8 +4567,8 @@ server <- function(input, output, session) {
       # Tooltip info
       HTML(paste0(
         "<strong>", click_info$data$YEAR, ":", "</strong><br/>",
-        comma((click_info$data$APPARENT_SUPPLY / 1000)),
-        " Thousand ", ifelse(input$units == F, "Metric Tons", "Short Tons")
+        comma(click_info$data$APPARENT_SUPPLY),
+        ifelse(input$units == F, " Metric Tons", " Short Tons")
       ))
     )
   })
@@ -4922,10 +4631,14 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>",  ":<br>",
-        comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
+        comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
+                                                       " Metric Tons <br>",
+                                                       " Short Tons <br>"),
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Domestic Production Volume", "</span>", ":<br>",
-        comma(click_info$data$PP_VOLUME_MT), " Metric Tons <br>",
+        comma(click_info$data$PP_VOLUME_T), ifelse(selected_units() == 'METRIC',
+                                                   " Metric Tons <br>",
+                                                   " Short Tons <br>"),
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Ratio", "</span>", ":<br>",
         round(click_info$data$APPARENT_SUPPLY_REL_US_PROD, digits = 3))))
@@ -4989,10 +4702,14 @@ server <- function(input, output, session) {
         click_info$data$YEAR[1], ':', "</span><br>",
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Unexported Domestic Production", "</span>",  ":<br>",
-        comma(abs(click_info$data$PP_VOLUME_MT - click_info$data$EXP_VOLUME_MT)), " Metric Tons <br>",
+        comma(abs(click_info$data$PP_VOLUME_T - click_info$data$EXP_VOLUME_T)), 
+        ifelse(selected_units() == 'METRIC', 
+               " Metric Tons <br>", " Short Tons <br>"),
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Apparent Supply", "</span>", ":<br>",
-        comma(click_info$data$APPARENT_SUPPLY), " Metric Tons <br>",
+        comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
+                                                       " Metric Tons <br>",
+                                                       " Short Tons <br>"),
         "</span><span style = 'font-size: 16px; font-style: italic; text-decoration: underline;'>",
         "Share", "</span>", ":<br>",
         round(click_info$data$UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY * 100, digits = 3), "% of Apparent Supply")))
@@ -5056,10 +4773,11 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Ex-Vessel Value: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$COM_VALUE_MILLIONS_2024USD), " Million<br>",
+        dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
         "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
         "Ex-Vessel Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$COM_PRICE_2024USD_PER_KG), " per kilogram")))
+        dollar(click_info$data$COM_PRICE), ifelse(selected_units() == 'METRIC', 
+                                                  " per kilogram", " per pound"))))
   })
   
   
@@ -5088,7 +4806,7 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$close_landings_value_tooltip, {
+  observeEvent(input$close_landings_volume_tooltip, {
     landings_volume_clicked_point(NULL)
   })
   
@@ -5120,7 +4838,8 @@ server <- function(input, output, session) {
         click_info$data$YEAR, ":", 
         "</span><br><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
         "Landed Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$COM_VOLUME_MT), " Metric Tons")))
+        comma(click_info$data$COM_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons", " Short Tons"))))
   })
   
   
@@ -5164,52 +4883,14 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    # extract first year for only one row per product, arrange alphabetically
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
@@ -5226,7 +4907,7 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(filtered_new_data$PP_VALUE_MILLIONS_2024USD[i]), " Million <br>"
+        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>"
       )
       
       pp_val_tooltip <- paste0(pp_val_tooltip, 
@@ -5302,52 +4983,13 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
@@ -5364,8 +5006,9 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        comma(filtered_new_data$PP_VOLUME_THOUSAND_MT[i]), " Thousand Metric Tons <br>"
-      )
+        comma(arranged_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
+                                                    " Metric Tons <br>",
+                                                    " Short Tons <br>"))
       
       pp_vol_tooltip <- paste0(pp_vol_tooltip, 
                                tooltip_color, tooltip_text, tooltip_data)
@@ -5440,52 +5083,13 @@ server <- function(input, output, session) {
     # First, get data
     pp_data <- pp_df()
     
-    # get the low proportions embedded in pp plot function
-    low_prop_types_value <- pp_data %>% 
-      select(PP_VALUE_BILLIONS_2024USD, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VALUE = sum(PP_VALUE_BILLIONS_2024USD),
-             VALUE_SHARE = PP_VALUE_BILLIONS_2024USD / TOTAL_VALUE) %>%
-      filter(VALUE_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types_volume <- pp_data %>%
-      select(PP_VOLUME_MT, PRODUCT_NAME) %>%
-      group_by(PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(TOTAL_VOLUME = sum(PP_VOLUME_MT),
-             VOLUME_SHARE = PP_VOLUME_MT / TOTAL_VOLUME) %>%
-      filter(VOLUME_SHARE < 0.02) %>%
-      select(PRODUCT_NAME)
-    
-    low_prop_types <- bind_rows(low_prop_types_value, low_prop_types_volume) %>%
-      distinct() %>%
-      pull(PRODUCT_NAME)
-    
-    # rename these low proportion types as 'OTHER*' and re-summarise
-    new_data <- pp_data %>%
-      mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                   'OTHER*', PRODUCT_NAME)) %>%
-      group_by(YEAR, PRODUCT_NAME) %>%
-      summarise(across(where(is.numeric), sum),
-                .groups = 'drop') %>%
-      mutate(PP_PRICE_2024USD_PER_KG = PP_VALUE_2024USD / PP_VOLUME_KG,
-             PP_PRICE_2024USD_PER_LB = PP_VALUE_2024USD / PP_VOLUME_LB,
-             PP_VOLUME_THOUSAND_MT = PP_VOLUME_MT / 1000,
-             PP_VOLUME_THOUSAND_ST = PP_VOLUME_ST / 1000,
-             PP_NOMINAL_PRICE_2024USD_PER_KG = PP_NOMINAL_VALUE / PP_VOLUME_KG,
-             PP_NOMINAL_PRICE_2024USD_PER_LB = PP_NOMINAL_VALUE / PP_VOLUME_LB)
-    
     # Next, get product forms
-    products <- unique(str_to_title(new_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
     # Subset colors for these products
     pp_colors <- colors[names(colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
-    filtered_new_data <- new_data %>% 
+    arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
       arrange(PRODUCT_NAME)
     
@@ -5502,8 +5106,9 @@ server <- function(input, output, session) {
         names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(filtered_new_data$PP_PRICE_2024USD_PER_KG[i]), " per kilogram <br>"
-      )
+        dollar(arranged_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
+                                                  " per kilogram <br>",
+                                                  " per pound <br>"))
       
       pp_price_tooltip <- paste0(pp_price_tooltip, 
                                  tooltip_icon, tooltip_text, tooltip_data)
