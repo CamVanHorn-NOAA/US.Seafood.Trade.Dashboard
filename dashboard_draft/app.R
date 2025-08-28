@@ -125,6 +125,12 @@ close_button_aes <- paste0(
   "line-height: 18px; ",
   "text-align: center; ")
 
+tooltip_heading <- paste0(
+  "</span><span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>")
+
+tooltip_subheading <- paste0(
+  "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>")
+
 ###
 
 # Custom Functions -------------------------------------------------------------
