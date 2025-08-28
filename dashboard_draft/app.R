@@ -3777,19 +3777,12 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_balance_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[1], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Exports</span>", ":<br>", 
+        tooltip_heading, click_info$data$YEAR[1], "</span><br>",
+        tooltip_color_icon(balance_colors[1]), tooltip_subheading, "Exports</span>", ":<br>", 
         dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[2], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Imports</span>", ":<br>",
+        tooltip_color_icon(balance_colors[2]), tooltip_subheading, "Imports</span>", ":<br>",
         dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", balance_colors[3], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Trade Balance</span>", ":<br>",
+        tooltip_color_icon(balance_colors[3]), tooltip_subheading, "Trade Balance</span>", ":<br>",
         dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
       ))
     )
@@ -3849,19 +3842,16 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_ratio_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Export Volume", "</span>", ':<br>',  
-        comma(click_info$data$EXP_VOLUME_T), 
-        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Imports", "</span>", ':<br>',
-        comma(click_info$data$IMP_VOLUME_T), 
-        ifelse(selected_units() == 'METRIC', " Metric Tons <br>", " Short Tons <br>"),
-        '<img src = "', create_tooltip_icon('black', 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Ratio", "</span>", ':<br>',
+        tooltip_heading, click_info$data$YEAR[1], "<br>",
+        tooltip_subheading, "Export Volume", "</span>", ':<br>',  
+        comma(click_info$data$EXP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons <br>", 
+                                                    " Short Tons <br>"),
+        tooltip_subheading, "Imports", "</span>", ':<br>',
+        comma(click_info$data$IMP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons <br>", 
+                                                    " Short Tons <br>"),
+        tooltip_line_icon('black', 16), tooltip_subheading, "Ratio</span>:<br>",
         round(click_info$data$RATIO, digits = 3))))
   })
   
@@ -3921,27 +3911,17 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_top5_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$COUNTRY_NAME[1], "</span><br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[1], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "2020</span>", ': ',
+        tooltip_heading, 
+        click_info$data$COUNTRY_NAME[1], "<br>",
+        tooltip_color_icon(top5_colors[1]), tooltip_subheading, "2020</span>: ",
         dollar(click_info$data$NET_VALUE_MILLIONS[1]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[2], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "2021</span>", ': ',
+        tooltip_color_icon(top5_colors[2]), tooltip_subheading, "2021</span>: ",
         dollar(click_info$data$NET_VALUE_MILLIONS[2]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[3], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "2022</span>", ': ',
+        tooltip_color_icon(top5_colors[3]), tooltip_subheading, "2022</span>: ",
         dollar(click_info$data$NET_VALUE_MILLIONS[3]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[4], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "2023</span>", ': ',
+        tooltip_color_icon(top5_colors[4]), tooltip_subheading, "2023</span>: ",
         dollar(click_info$data$NET_VALUE_MILLIONS[4]), " Million <br>",
-        "</span><span class = 'color-swatch' style = 'background-color: ", top5_colors[5], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "2024</span>", ': ',
+        tooltip_color_icon(top5_colors[5]), tooltip_subheading, "2024</span>: ",
         dollar(click_info$data$NET_VALUE_MILLIONS[5]), " Million <br>")))
   })
   
@@ -4014,17 +3994,13 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", export_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Export Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(export_color), tooltip_subheading, "Export Value</span>:<br>",
         dollar(click_info$data$EXP_VALUE_MILLIONS), " Million<br>",
-        '<img src = "', create_tooltip_icon(trade_price_color, 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        "Export Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$EXP_PRICE), 
-        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
+        tooltip_line_icon(trade_price_color, 16), tooltip_subheading, "Export Price</span>:<br>",
+        dollar(click_info$data$EXP_PRICE), ifelse(selected_units() == 'METRIC', 
+                                                  " per kilogram", 
+                                                  " per pound"))))
   })
   
   
@@ -4083,17 +4059,13 @@ server <- function(input, output, session) {
         style = close_button_aes),
       
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", import_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Import Value: ", "</span><span style = 'font-size: 18px;'><br>",
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(import_color), tooltip_subheading, "Import Value</span>:<br>",
         dollar(click_info$data$IMP_VALUE_MILLIONS), " Million<br>",
-        '<img src = "', create_tooltip_icon(trade_price_color, 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        "Import Price: ", "</span><span style = 'font-size: 18px;'><br>",
-        dollar(click_info$data$IMP_PRICE), 
-        ifelse(selected_units() == 'METRIC', " per kilogram", " per pound"))))
+        tooltip_line_icon(trade_price_color, 16), tooltip_subheading, "Import Price</span>:<br>",
+        dollar(click_info$data$IMP_PRICE), ifelse(selected_units() == 'METRIC', 
+                                                  " per kilogram", 
+                                                  " per pound"))))
   })
   
   
@@ -4165,13 +4137,11 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", export_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Export Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$EXP_VOLUME_T), 
-        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(export_color), tooltip_subheading, "Export Volume</span>:<br>",
+        comma(click_info$data$EXP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons", 
+                                                    " Short Tons"))))
   })
   
   
@@ -4243,13 +4213,11 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", import_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Import Volume: ", "</span><span style = 'font-size: 18px;'><br>",
-        comma(click_info$data$IMP_VOLUME_T), 
-        ifelse(selected_units() == 'METRIC', " Metric Tons", " Short Tons"))))
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(import_color), tooltip_subheading, "Import Volume</span>:<br>",
+        comma(click_info$data$IMP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
+                                                    " Metric Tons", 
+                                                    " Short Tons"))))
   })
   
   
@@ -4308,11 +4276,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     # create all 5 icons
-    icon_1 <- create_tooltip_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- create_tooltip_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- create_tooltip_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- create_tooltip_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- create_tooltip_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
@@ -4335,28 +4303,18 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_exp_mlti_tooltip', Math.random());",
         style = close_button_aes), 
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[1]), "</span>: ",
-        round(click_info$data$MLTI[1], digits = 3), "<br>",
-        '<img src = "', icon_2, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[2]), "</span>: ",
-        round(click_info$data$MLTI[2], digits = 3), "<br>",
-        '<img src = "', icon_3, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[3]), "</span>: ",
-        round(click_info$data$MLTI[3], digits = 3), "<br>",
-        '<img src = "', icon_4, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[4]), "</span>: ",
-        round(click_info$data$MLTI[4], digits = 3), "<br>",
-        '<img src = "', icon_5, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[5]), "</span>: ",
-        round(click_info$data$MLTI[5], digits = 3)
+        tooltip_heading, 
+        click_info$data$YEAR[1], "<br>",
+        icon_1, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[1]), 
+          "</span>: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
+        icon_2, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[2]), 
+          "</span>: ", round(click_info$data$MLTI[2], digits = 3), "<br>",
+        icon_3, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[3]), 
+          "</span>: ", round(click_info$data$MLTI[3], digits = 3), "<br>",
+        icon_4, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[4]), 
+          "</span>: ", round(click_info$data$MLTI[4], digits = 3), "<br>",
+        icon_5, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[5]), 
+          "</span>: ", round(click_info$data$MLTI[5], digits = 3)
       ))
     )
   })
@@ -4410,11 +4368,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     
-    icon_1 <- create_tooltip_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- create_tooltip_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- create_tooltip_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- create_tooltip_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- create_tooltip_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
     
     
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
@@ -4437,28 +4395,17 @@ server <- function(input, output, session) {
         style = close_button_aes
       ), 
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        '<img src = "', icon_1, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[1]), "</span>: ",
-        round(click_info$data$MLTI[1], digits = 3), "<br>",
-        '<img src = "', icon_2, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[2]), "</span>: ",
-        round(click_info$data$MLTI[2], digits = 3), "<br>",
-        '<img src = "', icon_3, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[3]), "</span>: ",
-        round(click_info$data$MLTI[3], digits = 3), "<br>",
-        '<img src = "', icon_4, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[4]), "</span>: ",
-        round(click_info$data$MLTI[4], digits = 3), "<br>",
-        '<img src = "', icon_5, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "<span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        str_to_title(click_info$data$COUNTRY_NAME[5]), "</span>: ",
-        round(click_info$data$MLTI[5], digits = 3)
+        tooltip_heading, click_info$data$YEAR[1], "<br>",
+        icon_1, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[1]), 
+          "</span>: ", round(click_info$data$MLTI[1], digits = 3), "<br>",
+        icon_2, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[2]), 
+          "</span>: ", round(click_info$data$MLTI[2], digits = 3), "<br>",
+        icon_3, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[3]), 
+          "</span>: ", round(click_info$data$MLTI[3], digits = 3), "<br>",
+        icon_4, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[4]), 
+          "</span>: ", round(click_info$data$MLTI[4], digits = 3), "<br>",
+        icon_5, tooltip_subheading, str_to_title(click_info$data$COUNTRY_NAME[5]), 
+          "</span>: ", round(click_info$data$MLTI[5], digits = 3)
       ))
     )
   })
@@ -4501,8 +4448,8 @@ server <- function(input, output, session) {
     }
     
     # create legend icons
-    exp_icon <- create_tooltip_icon('#003087', 16)
-    imp_icon <- create_tooltip_icon('#0085CA', 16)
+    exp_icon <- tooltip_line_icon('#003087', 16)
+    imp_icon <- tooltip_line_icon('#0085CA', 16)
     
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
     top_pos <- click_info$coords_css$y - 10 # Offset above point
@@ -4521,14 +4468,9 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_hi_tooltip', Math.random());",
         style = close_button_aes), 
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        '<img src = "', exp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Exports</span>: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
-        '<img src = "', imp_icon, '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Imports</span>: ", round(click_info$data$IMP_HI, digits = 3)
+        tooltip_heading, click_info$data$YEAR[1], "<br>",
+        exp_icon, tooltip_subheading, "Exports</span>: ", round(click_info$data$EXP_HI, digits = 3), "<br>",
+        imp_icon, tooltip_subheading, "Imports</span>: ", round(click_info$data$IMP_HI, digits = 3)
       ))
     )
   })
@@ -4610,13 +4552,11 @@ server <- function(input, output, session) {
       
       # Tooltip info
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", supply_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        'Apparent Supply', "</span>: ",
-        comma(click_info$data$APPARENT_SUPPLY),
-        ifelse(input$units == F, " Metric Tons", " Short Tons")
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(supply_color), tooltip_subheading, "Apparent Supply</span>: ",
+          comma(click_info$data$APPARENT_SUPPLY), ifelse(input$units == F, 
+                                                         " Metric Tons", 
+                                                         " Short Tons")
       ))
     )
   })
@@ -4675,20 +4615,16 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_supply_ratio_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        click_info$data$YEAR[1], "</span><br>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Apparent Supply", "</span>",  ":<br>",
+        tooltip_heading, click_info$data$YEAR[1], "<br>",
+        tooltip_subheading, "Apparent Supply</span>:<br>",
         comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
                                                        " Metric Tons <br>",
                                                        " Short Tons <br>"),
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Domestic Production Volume", "</span>", ":<br>",
+        tooltip_subheading, "Domestic Production Volume</span>:<br>",
         comma(click_info$data$PP_VOLUME_T), ifelse(selected_units() == 'METRIC',
                                                    " Metric Tons <br>",
                                                    " Short Tons <br>"),
-        '<img src = "', create_tooltip_icon('black', 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Ratio", "</span>", ":<br>",
+        tooltip_line_icon('black', 16), tooltip_subheading, "Ratio</span>:<br>",
         round(click_info$data$APPARENT_SUPPLY_REL_US_PROD, digits = 3))))
   })
   
@@ -4746,22 +4682,18 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_supply_share_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Unexported Domestic Production", "</span>",  ":<br>",
+        tooltip_heading, click_info$data$YEAR[1], "<br>",
+        tooltip_subheading, "Unexported Domestic Production</span>:<br>",
         comma(abs(click_info$data$PP_VOLUME_T - click_info$data$EXP_VOLUME_T)), 
-        ifelse(selected_units() == 'METRIC', 
-               " Metric Tons <br>", " Short Tons <br>"),
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Apparent Supply", "</span>", ":<br>",
+          ifelse(selected_units() == 'METRIC', 
+                 " Metric Tons <br>", " Short Tons <br>"),
+        tooltip_subheading, "Apparent Supply</span>:<br>",
         comma(click_info$data$APPARENT_SUPPLY), ifelse(selected_units() == 'METRIC',
                                                        " Metric Tons <br>",
                                                        " Short Tons <br>"),
-        "<span class = 'color-swatch' style = 'background-color: ", share_color, ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Share", "</span>", ":<br>",
-        round(click_info$data$UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY * 100, digits = 3), "% of Apparent Supply")))
+        tooltip_color_icon(share_color), tooltip_subheading, "Share</span>:<br>",
+        round(click_info$data$UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY * 100, digits = 3), 
+          "% of Apparent Supply")))
   })
   
   
@@ -4818,17 +4750,13 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_landings_value_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>", 
-        "<span class = 'color-swatch' style = 'background-color: ", landings_colors[1], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Ex-Vessel Value", "</span><span style = 'font-size: 18px;'>", ":<br>",
+        tooltip_heading, click_info$data$YEAR, "<br>", 
+        tooltip_color_icon(landings_colors[1]), tooltip_subheading, "Ex-Vessel Value</span>:<br>",
         dollar(click_info$data$COM_VALUE_MILLIONS), " Million<br>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>", 
-        '<img src = "', create_tooltip_icon(landings_colors[2], 16), '" class = "tooltip-icon" alt = "legend icon"/>',
-        "Ex-Vessel Price", "</span><span style = 'font-size: 18px;'>", ":<br>",
+        tooltip_line_icon(landings_colors[2], 16), tooltip_subheading, "Ex-Vessel Price</span>:<br>",
         dollar(click_info$data$COM_PRICE), ifelse(selected_units() == 'METRIC', 
-                                                  " per kilogram", " per pound"))))
+                                                  " per kilogram", 
+                                                  " per pound"))))
   })
   
   
@@ -4885,13 +4813,11 @@ server <- function(input, output, session) {
         onclick = "Shiny.setInputValue('close_landings_volume_tooltip', Math.random());",
         style = close_button_aes),
       HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR, "</span><br>",
-        "<span class = 'color-swatch' style = 'background-color: ", landings_colors[1], ";'>",
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        "Landed Volume", "</span><span style = 'font-size: 18px;'>", ':<br>',
+        tooltip_heading, click_info$data$YEAR, "<br>",
+        tooltip_color_icon(landings_colors[1]), tooltip_subheading, "Landed Volume</span>:<br>",
         comma(click_info$data$COM_VOLUME_T), ifelse(selected_units() == 'METRIC', 
-                                                    " Metric Tons", " Short Tons"))))
+                                                    " Metric Tons", 
+                                                    " Short Tons"))))
   })
   
   
@@ -4950,20 +4876,14 @@ server <- function(input, output, session) {
     # begin with empty vector that will ultimately contain the full HTML code
     pp_val_tooltip <- vector()
     for (i in 1:length(pp_colors)) {
-      tooltip_color <- paste0(
-        "</span><span class = 'color-swatch' style = 'background-color: ", 
-        pp_colors[i], ";'>")
+      tooltip_color <- paste0(tooltip_color_icon(pp_colors[i]))
       
-      tooltip_text <- paste0(
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        names(pp_colors)[i], "</span>: ")
+      tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>"
-      )
+        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>")
       
-      pp_val_tooltip <- paste0(pp_val_tooltip, 
-                               tooltip_color, tooltip_text, tooltip_data)
+      pp_val_tooltip <- paste0(pp_val_tooltip, tooltip_color, tooltip_text, tooltip_data)
     }
   
     # Position tooltip near clicked point
@@ -4988,10 +4908,8 @@ server <- function(input, output, session) {
         id = 'close_pp_value_tooltip',
         onclick = "Shiny.setInputValue('close_pp_value_tooltip', Math.random());",
         style = close_button_aes), 
-      HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        pp_val_tooltip)))
+      HTML(paste0(tooltip_heading, click_info$data$YEAR[1], "<br>", 
+                  pp_val_tooltip)))
   })
   
   
@@ -5049,21 +4967,16 @@ server <- function(input, output, session) {
     # begin with empty vector that will ultimately contain the full HTML code
     pp_vol_tooltip <- vector()
     for (i in 1:length(pp_colors)) {
-      tooltip_color <- paste0(
-        "</span><span class = 'color-swatch' style = 'background-color: ", 
-        pp_colors[i], ";'>")
+      tooltip_color <- paste0(tooltip_color_icon(pp_colors[i]))
       
-      tooltip_text <- paste0(
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        names(pp_colors)[i], "</span>: ")
+      tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
         comma(arranged_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
                                                     " Metric Tons <br>",
                                                     " Short Tons <br>"))
       
-      pp_vol_tooltip <- paste0(pp_vol_tooltip, 
-                               tooltip_color, tooltip_text, tooltip_data)
+      pp_vol_tooltip <- paste0(pp_vol_tooltip, tooltip_color, tooltip_text, tooltip_data)
     }
     
     # Position tooltip near clicked point
@@ -5088,10 +5001,8 @@ server <- function(input, output, session) {
         id = 'close_pp_volume_tooltip',
         onclick = "Shiny.setInputValue('close_pp_volume_tooltip', Math.random());",
         style = close_button_aes), 
-      HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        pp_vol_tooltip)))
+      HTML(paste0(tooltip_heading, click_info$data$YEAR[1], "<br>",
+                  pp_vol_tooltip)))
   })
   
   
@@ -5149,21 +5060,16 @@ server <- function(input, output, session) {
     # begin with empty vector that will ultimately contain the full HTML code
     pp_price_tooltip <- vector()
     for (i in 1:length(pp_colors)) {
-      tooltip_icon <- paste0(
-        '<img src = "', create_tooltip_icon(pp_colors[i], 16), 
-        '" class = "tooltip-icon" alt = "legend icon"/>')
+      tooltip_icon <- paste0(tooltip_line_icon(pp_colors[i], 16))
       
-      tooltip_text <- paste0(
-        "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>",
-        names(pp_colors)[i], "</span>: ")
+      tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
         dollar(arranged_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
                                                   " per kilogram <br>",
                                                   " per pound <br>"))
       
-      pp_price_tooltip <- paste0(pp_price_tooltip, 
-                                 tooltip_icon, tooltip_text, tooltip_data)
+      pp_price_tooltip <- paste0(pp_price_tooltip, tooltip_icon, tooltip_text, tooltip_data)
     }
     
     # Position tooltip near clicked point
@@ -5188,10 +5094,8 @@ server <- function(input, output, session) {
         id = 'close_pp_price_tooltip',
         onclick = "Shiny.setInputValue('close_pp_price_tooltip', Math.random());",
         style = close_button_aes), 
-      HTML(paste0(
-        "<span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>", 
-        click_info$data$YEAR[1], "</span><br>",
-        pp_price_tooltip)))
+      HTML(paste0(tooltip_heading, click_info$data$YEAR[1], "<br>",
+                  pp_price_tooltip)))
   })
 }
 
