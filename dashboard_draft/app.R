@@ -1827,8 +1827,8 @@ ui <- page_sidebar(
                                      placement = 'top'),
                                    uiOutput('balance_click_overlay')
                                  ),
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
@@ -1854,10 +1854,10 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('top5_click_overlay'))),
                                  downloadButton('download_page1',
-                                               'Download these plots and their data')),
+                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
@@ -1886,8 +1886,8 @@ ui <- page_sidebar(
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Volume',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
@@ -1915,8 +1915,8 @@ ui <- page_sidebar(
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      # style argument keeps overlay positioned within the container
                                      style = "position: relative; min-width: 600px; width: 100%;",
@@ -1946,8 +1946,8 @@ ui <- page_sidebar(
                                      uiOutput('imp_mlti_click_overlay'))
                                    ),
                                  br(),
-                                 layout_columns(
-                                   col_widths = c(3, 3, 3, 3),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px",
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
@@ -2083,8 +2083,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('pp_price_click_overlay')),
                                    downloadButton('download_products_page3',
-                                                  'Download this plot and the data')))),
-      width = 6))
+                                                  'Download this plot and the data'))))))
 )
       
   
