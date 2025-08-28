@@ -1810,26 +1810,27 @@ ui <- page_sidebar(
   ),
   fluidRow(
     div(
-      style = 'border: 3px solid #005761; border-radius: 12px;',
+      style = 'border: 3px solid #005761; border-radius: 12px;
+               min-width: 800px; width: 100%; display: flex; flex-direction: column;',
       navset_card_pill(title = 'Trade',
                        nav_panel(title = 'Market Summary',
                                  div(
-                                   style = "position: relative;",
+                                   style = "position: relative; min-width: 1200px;",
                                    tooltip(
                                      withSpinner(
                                        plotOutput('balance',
                                                   click = clickOpts('balance_plot_click'),
-                                                  height = "400px"), 
+                                                  height = "400px", width = "100%"), 
                                        type = 7),
                                      # textOutput('balance_tooltip'),
                                      "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
                                      placement = 'top'),
                                    uiOutput('balance_click_overlay')
                                  ),
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('trade_ratio',
@@ -1841,7 +1842,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('ratio_click_overlay')),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('top5_trade',
@@ -1853,12 +1854,12 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('top5_click_overlay'))),
                                  downloadButton('download_page1',
-                                               'Download these plots and their data')),
+                                                'Download these plots and their data')),
                        nav_panel(title = 'Value',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('exp_value', 
@@ -1871,7 +1872,7 @@ ui <- page_sidebar(
                                      ),
                                      uiOutput("exp_value_click_overlay")),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('imp_value',
@@ -1885,10 +1886,10 @@ ui <- page_sidebar(
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Volume',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('exp_volume',
@@ -1900,7 +1901,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput("exp_volume_click_overlay")),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('imp_volume',
@@ -1914,11 +1915,11 @@ ui <- page_sidebar(
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
-                                 layout_columns(
-                                   col_widths = c(6, 6),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      # style argument keeps overlay positioned within the container
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          # tableOutput('exp_mlti_table'),
@@ -1932,7 +1933,7 @@ ui <- page_sidebar(
                                      ),
                                      uiOutput('exp_mlti_click_overlay')),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
                                        withSpinner(
                                          # tableOutput('imp_mlti_table'), 
@@ -1945,10 +1946,10 @@ ui <- page_sidebar(
                                      uiOutput('imp_mlti_click_overlay'))
                                    ),
                                  br(),
-                                 layout_columns(
-                                   col_widths = c(3, 3, 3, 3),
+                                 div(
+                                   style = "flex: 1; display: flex; gap: 15px",
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('hi',
@@ -1960,7 +1961,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('hi_click_overlay')),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('supply',
@@ -1972,7 +1973,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput("supply_click_overlay")),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('supply_ratio',
@@ -1984,7 +1985,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('supply_ratio_click_overlay')),
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('supply_share',
@@ -1999,13 +2000,14 @@ ui <- page_sidebar(
                                                 'Download these plots and their data'))))
   ),
   fluidRow(
-    column(
+    div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
       div(
-        style = 'border: 3px solid #234515; border-radius: 12px;',
+        style = 'border: 3px solid #234515; border-radius: 12px;
+                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
         navset_card_pill(title = 'Commercial Landings',
                          nav_panel(title = 'Value',
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('landings_value',
@@ -2020,7 +2022,7 @@ ui <- page_sidebar(
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('landings_volume',
@@ -2032,23 +2034,14 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('landings_volume_click_overlay')),
                                    downloadButton('download_landings_page2',
-                                                  'Download this plot and the data'))
-                         # nav_panel(title = 'Price',
-                         #           withSpinner(
-                         #             plotOutput('landings_price'),
-                         #             type = 7),
-                         #           downloadButton('download_landings_page3',
-                         #                          'Download this plot and the data'))
-                         )),
-      width = 6
-    ),
-    column(
+                                                  'Download this plot and the data')))),
       div(
-        style = 'border: 3px solid #681617; border-radius: 12px;',
+        style = 'border: 3px solid #681617; border-radius: 12px;
+                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
         navset_card_pill(title = 'Processed Products',
                          nav_panel(title = 'Value',
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('pp_value',
@@ -2063,7 +2056,7 @@ ui <- page_sidebar(
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('pp_volume',
@@ -2078,7 +2071,7 @@ ui <- page_sidebar(
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Price',
                                    div(
-                                     style = "position: relative;",
+                                     style = "position: relative; min-width: 600px; width: 100%",
                                      tooltip(
                                        withSpinner(
                                          plotOutput('pp_price',
@@ -2090,8 +2083,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('pp_price_click_overlay')),
                                    downloadButton('download_products_page3',
-                                                  'Download this plot and the data')))),
-      width = 6))
+                                                  'Download this plot and the data'))))))
 )
       
   
