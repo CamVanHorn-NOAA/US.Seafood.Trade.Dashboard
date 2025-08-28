@@ -3778,11 +3778,11 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         tooltip_heading, click_info$data$YEAR[1], "</span><br>",
-        tooltip_color_icon(balance_colors[1]), tooltip_subheading, "Exports</span>", ":<br>", 
+        tooltip_color_icon(balance_colors[1]), tooltip_subheading, "Exports</span>:<br>", 
         dollar(click_info$data$VALUE_MILLIONS[1]), " Million <br>",
-        tooltip_color_icon(balance_colors[2]), tooltip_subheading, "Imports</span>", ":<br>",
+        tooltip_color_icon(balance_colors[2]), tooltip_subheading, "Imports</span>:<br>",
         dollar(click_info$data$VALUE_MILLIONS[2]), " Million <br>",
-        tooltip_color_icon(balance_colors[3]), tooltip_subheading, "Trade Balance</span>", ":<br>",
+        tooltip_color_icon(balance_colors[3]), tooltip_subheading, "Trade Balance</span>:<br>",
         dollar(click_info$data$VALUE_MILLIONS[3]), " Million <br>"
       ))
     )
@@ -3843,11 +3843,11 @@ server <- function(input, output, session) {
         style = close_button_aes),
       HTML(paste0(
         tooltip_heading, click_info$data$YEAR[1], "<br>",
-        tooltip_subheading, "Export Volume", "</span>", ':<br>',  
+        tooltip_subheading, "Export Volume</span>:<br>",  
         comma(click_info$data$EXP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
                                                     " Metric Tons <br>", 
                                                     " Short Tons <br>"),
-        tooltip_subheading, "Imports", "</span>", ':<br>',
+        tooltip_subheading, "Imports</span>:<br>",
         comma(click_info$data$IMP_VOLUME_T), ifelse(selected_units() == 'METRIC', 
                                                     " Metric Tons <br>", 
                                                     " Short Tons <br>"),
