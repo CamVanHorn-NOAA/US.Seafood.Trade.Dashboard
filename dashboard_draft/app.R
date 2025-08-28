@@ -2000,9 +2000,10 @@ ui <- page_sidebar(
                                                 'Download these plots and their data'))))
   ),
   fluidRow(
-    column(
+    div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
       div(
-        style = 'border: 3px solid #234515; border-radius: 12px;',
+        style = 'border: 3px solid #234515; border-radius: 12px;
+                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
         navset_card_pill(title = 'Commercial Landings',
                          nav_panel(title = 'Value',
                                    div(
@@ -2045,7 +2046,8 @@ ui <- page_sidebar(
     ),
     column(
       div(
-        style = 'border: 3px solid #681617; border-radius: 12px;',
+        style = 'border: 3px solid #681617; border-radius: 12px;
+                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
         navset_card_pill(title = 'Processed Products',
                          nav_panel(title = 'Value',
                                    div(
