@@ -1664,7 +1664,7 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
 }
 
 # tooltip function
-create_tooltip_icon <- function(line, point) {
+tooltip_line_icon <- function(line, point) {
   # Create temporary PNG
   temp_png <- tempfile(fileext = '.png')
   
@@ -1685,7 +1685,14 @@ create_tooltip_icon <- function(line, point) {
   icon_data <- base64enc::base64encode(temp_png)
   unlink(temp_png) # cleans the file
   
-  return(paste0("data:image/png;base64,", icon_data))
+  icon <- paste0("data:image/png;base64,", icon_data)
+  
+  return(paste0('</span><img src = "', icon, 
+                '" class = "tooltip-icon" alt = "legend icon"/>'))
+}
+tooltip_color_icon <- function(color) {
+  paste0("</span><span class = 'color-swatch' style = 'background-color: ", 
+         color, ";'>")
 }
 # Colors -----------------------------------------------------------------------
 # Balance plot colors
