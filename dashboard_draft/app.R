@@ -1810,7 +1810,8 @@ ui <- page_sidebar(
   ),
   fluidRow(
     div(
-      style = 'border: 3px solid #005761; border-radius: 12px;',
+      style = 'border: 3px solid #005761; border-radius: 12px;
+               min-width: 800px; width: 100%; display: flex; flex-direction: column;',
       navset_card_pill(title = 'Trade',
                        nav_panel(title = 'Market Summary',
                                  div(
