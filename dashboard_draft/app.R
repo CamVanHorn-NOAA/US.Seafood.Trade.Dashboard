@@ -2034,17 +2034,7 @@ ui <- page_sidebar(
                                        placement = 'top'),
                                      uiOutput('landings_volume_click_overlay')),
                                    downloadButton('download_landings_page2',
-                                                  'Download this plot and the data'))
-                         # nav_panel(title = 'Price',
-                         #           withSpinner(
-                         #             plotOutput('landings_price'),
-                         #             type = 7),
-                         #           downloadButton('download_landings_page3',
-                         #                          'Download this plot and the data'))
-                         )),
-      width = 6
-    ),
-    column(
+                                                  'Download this plot and the data')))),
       div(
         style = 'border: 3px solid #681617; border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
