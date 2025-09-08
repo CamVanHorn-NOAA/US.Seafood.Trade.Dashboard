@@ -125,22 +125,26 @@ foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
 # Processed Products & Species Metadata ----------------------------------------
 # read csv's
-foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+# foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ]
+# 
+# foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ]
+# 
+# # combine data (stack)
+# foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
+# 
+# # read csv of Species metadata
+# pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
+#   select(!X)
 
-foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+# Above are FOSS processed products; below is direct from database
+  # 'Direct' meaning downloaded initially from our database
 
-# combine data (stack)
-foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
-
-# read csv of Species metadata
-pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
-  select(!X)
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
