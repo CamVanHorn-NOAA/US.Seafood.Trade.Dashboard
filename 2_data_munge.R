@@ -194,7 +194,7 @@ trade_data <- full_join(exports_smry, imports_smry)
 
 # Processed Products -----------------------------------------------------------
 # Data formatting
-pp_data <- foss_pp %>%
+pp_data <- pp_processed %>%
   # connect groups from map
   left_join(pp_map) %>%
   mutate(YEAR = as.numeric(YEAR),
