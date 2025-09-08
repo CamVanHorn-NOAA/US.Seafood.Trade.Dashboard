@@ -222,7 +222,13 @@ landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
 # this sheet was developed by the same effort described above
   # however, with a lack of available scientific names and specified common
   # names, this map contains more NAs and generic maps
-pp_map <- read.csv('pp_mapping_sheet.csv')
+# pp_map <- read.csv('pp_mapping_sheet.csv')
+
+# Above contains the mapping sheet for FOSS processed products
+# Below contains the mapping sheet for database processed products
+pp_form_map <- read.csv('pp_form_map.csv')
+pp_map <- read.csv('pp_db_map.csv') %>%
+  left_join(pp_form_map)
 
 #####################
 ### SAVE THE DATA ###
