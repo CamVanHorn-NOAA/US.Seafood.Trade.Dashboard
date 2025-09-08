@@ -144,6 +144,20 @@ foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
 # Above are FOSS processed products; below is direct from database
   # 'Direct' meaning downloaded initially from our database
+pp_address <- read.csv('pp_address.csv') %>%
+  mutate(STATE = STATE_ABRV,
+         STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
+                        ifelse(STATE == 'GU', 'GUAM',
+                               ifelse(STATE == 'PR', 'PUERTO RICO',
+                                      ifelse(STATE == 'AS', 'AMERICAN SAMOA',
+                                             STATE)))))
+
+# Merge address data with pp_processed csv
+pp_processed <- read.csv('pp_processed.csv') %>%
+  filter(YEAR >= 2004) %>%
+  left_join(pp_address %>%
+              select(PP_IDNUM, STATE_ABRV) %>%
+              rename(STATE = STATE_ABRV))
 
 
 # Commercial Landings ----------------------------------------------------------
