@@ -578,7 +578,15 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
               .groups = 'drop') %>%
     mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
            PP_PRICE = PP_VALUE / PP_VOLUME,
-           PRODUCT_FORM = str_to_title(PRODUCT_FORM))
+           PRODUCT_FORM = factor(str_to_title(PRODUCT_FORM),
+                                 levels = c(
+                                   'Fillets', 'Surimi', 'Steaks', 'Meat',
+                                   'Breaded Product', 'Meal', 'Cakes & Patties', 'Ready-To-Eat',
+                                   'Dressed', 'Smoked', 'Whole', 'Unaltered',
+                                   'Canned', 'Roe / Caviar', 'Oil', 'Dried',
+                                   'Shucked Meat', 'Peeled', 'Headless', 'Sections',
+                                   'Tails', 'Body Parts', 'Claws', 'Fins',
+                                   'Not For Human Consumption', 'Not Specified', 'Other*')))
   
   return(new_data)
 }
@@ -1723,12 +1731,12 @@ pp_colors <- c('#853B00', '#DB6015', '#FF8400', '#FFAB38',
 # They are organized here in the same order and line as 'colors' above
 names(pp_colors) <- levels(factor(levels = c(
   'Fillets', 'Surimi', 'Steaks', 'Meat',
-  'Breaded Product', 'Meal', 'Cakes & Patties', 'Ready-to-Eat',
+  'Breaded Product', 'Meal', 'Cakes & Patties', 'Ready-To-Eat',
   'Dressed', 'Smoked', 'Whole', 'Unaltered',
   'Canned', 'Roe / Caviar', 'Oil', 'Dried',
   'Shucked Meat', 'Peeled', 'Headless', 'Sections',
   'Tails', 'Body Parts', 'Claws', 'Fins',
-  'Not For Human Consumption', 'Not Specified', 'Other')))
+  'Not For Human Consumption', 'Not Specified', 'Other*')))
 
 # Because the countries will change based on the selected species,
   # the colors have no mapping
