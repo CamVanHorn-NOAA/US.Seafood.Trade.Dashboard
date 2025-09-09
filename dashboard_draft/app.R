@@ -21,7 +21,8 @@ if(!require("shinycssloaders")) install.packages("shinycssloaders")
 source("nmfs_cols.R")
 
 # Pull Data (most recent version)
-load('seafood_trade_data_munge_05_12_25.RData')
+# load('seafood_trade_data_munge_05_12_25.RData')
+load('seafood_trade_data_munge_09_08_25.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
