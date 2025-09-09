@@ -693,7 +693,7 @@ summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
                           # joins
                         summarize_pp_yr_spp(pp_data, species, units = units,
                                             nominal = nominal) %>%
-                          select(!PRODUCT_NAME) %>%
+                          select(!PRODUCT_FORM) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
@@ -1333,8 +1333,8 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     plot <- ggplot(data = processed_product_data,
                    aes(x = factor(YEAR),
                        y = PP_PRICE,
-                       color = PRODUCT_NAME)) +
-      geom_line(aes(group = PRODUCT_NAME),
+                       color = PRODUCT_FORM)) +
+      geom_line(aes(group = PRODUCT_FORM),
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 1.5) +
@@ -1373,7 +1373,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   plot <- ggplot(data = processed_product_data,
                  aes(x = factor(YEAR),
                      y = !!y,
-                     fill = PRODUCT_NAME)) +
+                     fill = PRODUCT_FORM)) +
     geom_col(position = 'stack',
              color = 'black') +
     scale_fill_manual(values = pp_colors,
@@ -4858,7 +4858,7 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
@@ -4866,7 +4866,7 @@ server <- function(input, output, session) {
     # extract first year for only one row per product, arrange alphabetically
     arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+      arrange(PRODUCT_FORM)
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -4950,14 +4950,14 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
     arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+      arrange(PRODUCT_FORM)
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -5043,14 +5043,14 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
     pp_colors <- pp_colors[order(names(pp_colors))]
     
     arranged_data <- pp_data %>% 
       filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+      arrange(PRODUCT_FORM)
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
