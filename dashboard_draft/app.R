@@ -514,19 +514,18 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   if (full_data == 'FULL') {
     summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
-             LB = KG * 2.20462,
-             ST = LB / 2000,
+             ST = POUNDS / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / POUNDS,
              MILLIONS = DOLLARS / 1000000,
              BILLIONS = DOLLARS / 1000000000,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-             PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
+             PP_PRICE_NOMINAL_PER_LB = DOLLARS / POUNDS) %>%
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT,
-             PP_VOLUME_LB = LB,
+             PP_VOLUME_LB = POUNDS,
              PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
              PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
@@ -559,27 +558,27 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   }
   
   low_prop_types <- summarized_data %>% 
-    select(PP_VALUE, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
+    select(PP_VALUE, PRODUCT_FORM) %>%
+    group_by(PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(TOTAL_VALUE = sum(PP_VALUE),
            VALUE_SHARE = PP_VALUE / TOTAL_VALUE) %>%
     filter(VALUE_SHARE < 0.02) %>%
-    select(PRODUCT_NAME) %>%
+    select(PRODUCT_FORM) %>%
     distinct() %>%
     pull()
   
   # rename these low proportion types as 'OTHER*' and re-summarise
   new_data <- summarized_data %>%
-    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                 'OTHER*', PRODUCT_NAME)) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
+    mutate(PRODUCT_FORM = ifelse(PRODUCT_FORM %in% c('OTHER', low_prop_types),
+                                 'OTHER*', PRODUCT_FORM)) %>%
+    group_by(YEAR, PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
            PP_PRICE = PP_VALUE / PP_VOLUME,
-           PRODUCT_NAME = str_to_title(PRODUCT_NAME))
+           PRODUCT_FORM = str_to_title(PRODUCT_FORM))
   
   return(new_data)
 }
