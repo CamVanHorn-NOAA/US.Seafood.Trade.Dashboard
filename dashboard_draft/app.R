@@ -502,8 +502,12 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   summarized_data <- product_data %>%
     filter_species(species) %>%
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
+    select(YEAR, PRODUCT_FORM, KG, DOLLARS_2024, DOLLARS, POUNDS) %>%
+    mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
+           DOLLARS_2024 = ifelse(is.na(DOLLARS_2024), 0, DOLLARS_2024),
+           KG = ifelse(is.na(KG), 0, KG),
+           POUNDS = ifelse(is.na(POUNDS), 0, POUNDS)) %>%
+    group_by(YEAR, PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop')
   
