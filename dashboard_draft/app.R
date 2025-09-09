@@ -1712,16 +1712,23 @@ supply_color <- c('#008DA8')
 share_color <- c('#005E5E')
 
 # colors designed primarily for processed products at the moment
-pp_colors <- c(nmfs_palette('coral')(6)[6:3], 
-            nmfs_palette('waves')(6)[6:2], 
-            nmfs_palette('crustacean')(6)[c(6, 4, 2)],
-            nmfs_cols()[42:39])
+pp_colors <- c('#853B00', '#DB6015', '#FF8400', '#FFAB38', 
+               '#A8821B', '#DDBB25', '#F0D302', '#FFFF65', 
+               '#B1DC6B', '#76BC21', '#4B8320', '#365E17',
+               '#005E5E', '#00797F', '#1EBEC7', '#90DFE3',
+               '#5EB6D9', '#0085CA', '#003087', '#002364',
+               '#001743', '#3B469A', '#5761C0', '#737BE6',
+               '#9A9A9A', '#646464', '#323C46')
 
+# They are organized here in the same order and line as 'colors' above
 names(pp_colors) <- levels(factor(levels = c(
-  'Fillets', 'Steaks', 'Surimi', 'Shucked Meats',
-  'Canned', 'Oil', 'Dressed', 'Smoked (Excl. Canned)', 'Chowders',
-  'Fish Sticks', 'Breaded Shrimp', 'Cakes/Patties',
-  'Other*', 'Other Industrial', 'Meal', 'Fish Portions')))
+  'FILLETS', 'SURIMI', 'STEAKS', 'MEAT',
+  'BREADED PRODUCT', 'MEAL', 'CAKES & PATTIES', 'READY-TO-EAT',
+  'DRESSED', 'SMOKED', 'WHOLE', 'UNALTERED',
+  'CANNED', 'ROE / CAVIAR', 'OIL', 'DRIED',
+  'SHUCKED MEAT', 'PEELED', 'HEADLESS', 'SECTIONS',
+  'TAILS', 'BODY PARTS', 'CLAWS', 'FINS',
+  'NOT FOR HUMAN CONSUMPTION', 'NOT SPECIFIED', 'OTHER')))
 
 # Because the countries will change based on the selected species,
   # the colors have no mapping
