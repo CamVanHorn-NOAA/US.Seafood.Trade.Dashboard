@@ -21,7 +21,8 @@ if(!require("shinycssloaders")) install.packages("shinycssloaders")
 source("nmfs_cols.R")
 
 # Pull Data (most recent version)
-load('seafood_trade_data_munge_05_12_25.RData')
+# load('seafood_trade_data_munge_05_12_25.RData')
+load('seafood_trade_data_munge_09_08_25.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
@@ -501,27 +502,30 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   summarized_data <- product_data %>%
     filter_species(species) %>%
-    select(YEAR, PRODUCT_NAME, KG, DOLLARS_2024, DOLLARS) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
+    select(YEAR, PRODUCT_FORM, KG, DOLLARS_2024, DOLLARS, POUNDS) %>%
+    mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
+           DOLLARS_2024 = ifelse(is.na(DOLLARS_2024), 0, DOLLARS_2024),
+           KG = ifelse(is.na(KG), 0, KG),
+           POUNDS = ifelse(is.na(POUNDS), 0, POUNDS)) %>%
+    group_by(YEAR, PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop')
   
   if (full_data == 'FULL') {
     summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
-             LB = KG * 2.20462,
-             ST = LB / 2000,
+             ST = POUNDS / 2000,
              MILLIONS_2024USD = DOLLARS_2024 / 1000000,
              BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / POUNDS,
              MILLIONS = DOLLARS / 1000000,
              BILLIONS = DOLLARS / 1000000000,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
-             PP_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
+             PP_PRICE_NOMINAL_PER_LB = DOLLARS / POUNDS) %>%
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT,
-             PP_VOLUME_LB = LB,
+             PP_VOLUME_LB = POUNDS,
              PP_VOLUME_ST = ST,
              PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
              PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
@@ -554,27 +558,35 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   }
   
   low_prop_types <- summarized_data %>% 
-    select(PP_VALUE, PRODUCT_NAME) %>%
-    group_by(PRODUCT_NAME) %>%
+    select(PP_VALUE, PRODUCT_FORM) %>%
+    group_by(PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(TOTAL_VALUE = sum(PP_VALUE),
            VALUE_SHARE = PP_VALUE / TOTAL_VALUE) %>%
     filter(VALUE_SHARE < 0.02) %>%
-    select(PRODUCT_NAME) %>%
+    select(PRODUCT_FORM) %>%
     distinct() %>%
     pull()
   
   # rename these low proportion types as 'OTHER*' and re-summarise
   new_data <- summarized_data %>%
-    mutate(PRODUCT_NAME = ifelse(PRODUCT_NAME %in% c('OTHER', low_prop_types),
-                                 'OTHER*', PRODUCT_NAME)) %>%
-    group_by(YEAR, PRODUCT_NAME) %>%
+    mutate(PRODUCT_FORM = ifelse(PRODUCT_FORM %in% c('OTHER', low_prop_types),
+                                 'OTHER*', PRODUCT_FORM)) %>%
+    group_by(YEAR, PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
     mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
            PP_PRICE = PP_VALUE / PP_VOLUME,
-           PRODUCT_NAME = str_to_title(PRODUCT_NAME))
+           PRODUCT_FORM = factor(str_to_title(PRODUCT_FORM),
+                                 levels = c(
+                                   'Fillets', 'Surimi', 'Steaks', 'Meat',
+                                   'Breaded Product', 'Meal', 'Cakes & Patties', 'Ready-To-Eat',
+                                   'Dressed', 'Smoked', 'Whole', 'Unaltered',
+                                   'Canned', 'Roe / Caviar', 'Oil', 'Dried',
+                                   'Shucked Meat', 'Peeled', 'Headless', 'Sections',
+                                   'Tails', 'Body Parts', 'Claws', 'Fins',
+                                   'Not For Human Consumption', 'Not Specified', 'Other*')))
   
   return(new_data)
 }
@@ -689,7 +701,7 @@ summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
                           # joins
                         summarize_pp_yr_spp(pp_data, species, units = units,
                                             nominal = nominal) %>%
-                          select(!PRODUCT_NAME) %>%
+                          select(!PRODUCT_FORM) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
@@ -1329,8 +1341,8 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     plot <- ggplot(data = processed_product_data,
                    aes(x = factor(YEAR),
                        y = PP_PRICE,
-                       color = PRODUCT_NAME)) +
-      geom_line(aes(group = PRODUCT_NAME),
+                       color = PRODUCT_FORM)) +
+      geom_line(aes(group = PRODUCT_FORM),
                 linewidth = 1.5) +
       geom_point(color = 'black',
                  size = 1.5) +
@@ -1369,7 +1381,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   plot <- ggplot(data = processed_product_data,
                  aes(x = factor(YEAR),
                      y = !!y,
-                     fill = PRODUCT_NAME)) +
+                     fill = PRODUCT_FORM)) +
     geom_col(position = 'stack',
              color = 'black') +
     scale_fill_manual(values = pp_colors,
@@ -1708,16 +1720,23 @@ supply_color <- c('#008DA8')
 share_color <- c('#005E5E')
 
 # colors designed primarily for processed products at the moment
-pp_colors <- c(nmfs_palette('coral')(6)[6:3], 
-            nmfs_palette('waves')(6)[6:2], 
-            nmfs_palette('crustacean')(6)[c(6, 4, 2)],
-            nmfs_cols()[42:39])
+pp_colors <- c('#853B00', '#DB6015', '#FF8400', '#FFAB38', 
+               '#A8821B', '#DDBB25', '#F0D302', '#FFFF65', 
+               '#B1DC6B', '#76BC21', '#4B8320', '#365E17',
+               '#005E5E', '#00797F', '#1EBEC7', '#90DFE3',
+               '#5EB6D9', '#0085CA', '#003087', '#002364',
+               '#001743', '#3B469A', '#5761C0', '#737BE6',
+               '#9A9A9A', '#646464', '#323C46')
 
+# They are organized here in the same order and line as 'colors' above
 names(pp_colors) <- levels(factor(levels = c(
-  'Fillets', 'Steaks', 'Surimi', 'Shucked Meats',
-  'Canned', 'Oil', 'Dressed', 'Smoked (Excl. Canned)', 'Chowders',
-  'Fish Sticks', 'Breaded Shrimp', 'Cakes/Patties',
-  'Other*', 'Other Industrial', 'Meal', 'Fish Portions')))
+  'Fillets', 'Surimi', 'Steaks', 'Meat',
+  'Breaded Product', 'Meal', 'Cakes & Patties', 'Ready-To-Eat',
+  'Dressed', 'Smoked', 'Whole', 'Unaltered',
+  'Canned', 'Roe / Caviar', 'Oil', 'Dried',
+  'Shucked Meat', 'Peeled', 'Headless', 'Sections',
+  'Tails', 'Body Parts', 'Claws', 'Fins',
+  'Not For Human Consumption', 'Not Specified', 'Other*')))
 
 # Because the countries will change based on the selected species,
   # the colors have no mapping
@@ -4854,15 +4873,14 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
     # extract first year for only one row per product, arrange alphabetically
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -4873,14 +4891,14 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>")
+        dollar(filtered_data$PP_VALUE_MILLIONS[i]), " Million <br>")
       
       pp_val_tooltip <- paste0(pp_val_tooltip, tooltip_color, tooltip_text, tooltip_data)
     }
   
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)
@@ -4946,14 +4964,13 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -4964,7 +4981,7 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        comma(arranged_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
+        comma(filtered_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
                                                     " Metric Tons <br>",
                                                     " Short Tons <br>"))
       
@@ -4973,7 +4990,7 @@ server <- function(input, output, session) {
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)
@@ -5039,14 +5056,13 @@ server <- function(input, output, session) {
     pp_data <- pp_df()
     
     # Next, get product forms
-    products <- unique(str_to_title(pp_data$PRODUCT_NAME))
+    products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_NAME)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -5057,7 +5073,7 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(arranged_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
+        dollar(filtered_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
                                                   " per kilogram <br>",
                                                   " per pound <br>"))
       
@@ -5066,7 +5082,7 @@ server <- function(input, output, session) {
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)

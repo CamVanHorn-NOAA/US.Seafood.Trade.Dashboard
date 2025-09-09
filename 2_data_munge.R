@@ -194,7 +194,7 @@ trade_data <- full_join(exports_smry, imports_smry)
 
 # Processed Products -----------------------------------------------------------
 # Data formatting
-pp_data <- foss_pp %>%
+pp_data <- pp_processed %>%
   # connect groups from map
   left_join(pp_map) %>%
   mutate(YEAR = as.numeric(YEAR),
@@ -202,10 +202,10 @@ pp_data <- foss_pp %>%
          DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
          # convert pounds to kilograms in separate column
          KG = POUNDS * 0.45359237) %>%
-  arrange(YEAR, SPECIES, PRODUCT_NAME) %>%
-  # reorder columns so species is left of PRODUCT_NAME for ease of viewing
-  select(YEAR, SPECIES, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
-         ECOLOGICAL_CATEGORY, PRODUCT_NAME, POUNDS, DOLLARS, KG) %>%
+  arrange(YEAR, SPECIES_NAME, PRODUCT_FORM) %>%
+  # reorder columns so species is left of PRODUCT_FORM for ease of viewing
+  select(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+         ECOLOGICAL_CATEGORY, PRODUCT_FORM, POUNDS, DOLLARS, KG) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
          DOLLARS_PER_LB = DOLLARS / POUNDS,

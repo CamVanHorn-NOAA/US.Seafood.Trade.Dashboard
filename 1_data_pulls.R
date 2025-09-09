@@ -125,22 +125,40 @@ foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
 
 # Processed Products & Species Metadata ----------------------------------------
 # read csv's
-foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+# foss_pp_1523 <- read.csv('foss_pp_15-23.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ]
+# 
+# foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ]
+# 
+# # combine data (stack)
+# foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
+# 
+# # read csv of Species metadata
+# pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
+#   select(!X)
 
-foss_pp_0414 <- read.csv('foss_pp_04-14.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ]
+# Above are FOSS processed products; below is direct from database
+  # 'Direct' meaning downloaded initially from our database
+pp_address <- read.csv('pp_address.csv') %>%
+  mutate(STATE = STATE_ABRV,
+         STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
+                        ifelse(STATE == 'GU', 'GUAM',
+                               ifelse(STATE == 'PR', 'PUERTO RICO',
+                                      ifelse(STATE == 'AS', 'AMERICAN SAMOA',
+                                             STATE)))))
 
-# combine data (stack)
-foss_pp <- bind_rows(foss_pp_0414, foss_pp_1523)
+# Merge address data with pp_processed csv
+pp_processed <- read.csv('pp_processed.csv') %>%
+  filter(YEAR >= 2004) %>%
+  left_join(pp_address %>%
+              select(PP_IDNUM, STATE_ABRV) %>%
+              rename(STATE = STATE_ABRV))
 
-# read csv of Species metadata
-pp_landings_map <- read.csv('pp_com_landings_mapping.csv') %>%
-  select(!X)
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
@@ -204,7 +222,13 @@ landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
 # this sheet was developed by the same effort described above
   # however, with a lack of available scientific names and specified common
   # names, this map contains more NAs and generic maps
-pp_map <- read.csv('pp_mapping_sheet.csv')
+# pp_map <- read.csv('pp_mapping_sheet.csv')
+
+# Above contains the mapping sheet for FOSS processed products
+# Below contains the mapping sheet for database processed products
+pp_form_map <- read.csv('pp_form_map.csv')
+pp_map <- read.csv('pp_db_map.csv') %>%
+  left_join(pp_form_map)
 
 #####################
 ### SAVE THE DATA ###
@@ -217,8 +241,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 
 # create the file
   # NOTE: add new data to this list upon creation in this script
-save(list = c('foss_exports', 'foss_imports', 'foss_pp', 'def_index',
-              'species_ref', 'foss_com_landings', 'pp_landings_map',
+save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
+              'species_ref', 'foss_com_landings', 
               'trade_map', 'landings_map', 'pp_map'),
      file = file_name)
 
