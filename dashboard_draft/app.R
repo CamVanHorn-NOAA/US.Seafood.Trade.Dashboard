@@ -4898,7 +4898,7 @@ server <- function(input, output, session) {
   
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)
@@ -4990,7 +4990,7 @@ server <- function(input, output, session) {
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)
@@ -5082,7 +5082,7 @@ server <- function(input, output, session) {
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 20 # Offset to right of point
-    top_pos <- click_info$coords_css$y - 20 # Offset above point
+    top_pos <- click_info$coords_css$y - 150 # Offset above point
     
     # Prevent tooltip from being off screen
     left_pos <- max(10, left_pos)
