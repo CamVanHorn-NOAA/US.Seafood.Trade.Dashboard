@@ -4876,12 +4876,11 @@ server <- function(input, output, session) {
     products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
     # extract first year for only one row per product, arrange alphabetically
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_FORM)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -4892,7 +4891,7 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(arranged_data$PP_VALUE_MILLIONS[i]), " Million <br>")
+        dollar(filtered_data$PP_VALUE_MILLIONS[i]), " Million <br>")
       
       pp_val_tooltip <- paste0(pp_val_tooltip, tooltip_color, tooltip_text, tooltip_data)
     }
@@ -4968,11 +4967,10 @@ server <- function(input, output, session) {
     products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_FORM)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -4983,7 +4981,7 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        comma(arranged_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
+        comma(filtered_data$PP_VOLUME_T[i]), ifelse(selected_units() == 'METRIC',
                                                     " Metric Tons <br>",
                                                     " Short Tons <br>"))
       
@@ -5061,11 +5059,10 @@ server <- function(input, output, session) {
     products <- unique(str_to_title(pp_data$PRODUCT_FORM))
     # Subset colors for these products
     pp_colors <- pp_colors[names(pp_colors) %in% products]
-    pp_colors <- pp_colors[order(names(pp_colors))]
+    pp_colors <- pp_colors[names(pp_colors)]
     
-    arranged_data <- pp_data %>% 
-      filter(YEAR == click_info$data$YEAR[1]) %>%
-      arrange(PRODUCT_FORM)
+    filtered_data <- pp_data %>% 
+      filter(YEAR == click_info$data$YEAR[1])
     
     # create icons (number will vary)
     # begin with empty vector that will ultimately contain the full HTML code
@@ -5076,7 +5073,7 @@ server <- function(input, output, session) {
       tooltip_text <- paste0(tooltip_subheading, names(pp_colors)[i], "</span>: ")
       
       tooltip_data <- paste0(
-        dollar(arranged_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
+        dollar(filtered_data$PP_PRICE[i]), ifelse(selected_units() == 'METRIC',
                                                   " per kilogram <br>",
                                                   " per pound <br>"))
       
