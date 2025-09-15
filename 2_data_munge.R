@@ -41,6 +41,29 @@ load(data_file$NAME)
 # clean environment
 rm(data_file)
 
+# Regional designations --------------------------------------------------------
+# FEUS 2022 source for regions: https://s3.amazonaws.com/media.fisheries.noaa.gov/2024-11/FEUS-2022-SPO248B.pdf
+norpac <- c('AK', 'ALASKA')
+pac <- c('CA', 'CALIFORNIA', 'OR', 'OREGON', 'WA', 'WASHINGTON')
+pacisl <- c('HI', 'HAWAII', 'AS', 'CM', 'MP', 'GU')
+neweng <- c('CT', 'CONNECTICUT', 'ME', 'MAINE', 'MA', 'MASSACHUSETTS', 'NH', 
+            'NEW HAMPSHIRE', 'RI', 'RHODE ISLAND')
+midatl <- c('DE', 'DELAWARE', 'MD', 'MARYLAND', 'NJ', 'NEW JERSEY', 'NY',
+            'NEW YORK', 'VA', 'VIRGINIA', 'PA', 'PENNSYLVANIA', 'DC')
+souatl <- c('GA', 'GEORGIA', 'NC', 'NORTH CAROLINA', 'SC', 'SOUTH CAROLINA',
+            'FL-E', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
+gulf <- c('AL', 'ALABAMA', 'LA', 'LOUISIANA', 'MS', 'MISSISSIPPI', 'TX', 'TEXAS',
+          'FL-W')
+# We are adding a Great Lakes region that is city-based, not state-based like
+  # the FEUS. State exceptions include OH and MI, which are considered great
+  # lake states
+grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN')
+# great lakes cities are defined as cities within 75 miles of the nearest great
+  # lake
+grlake_cities <- great_lakes_cities %>%
+  mutate(MILES_TO_LAKE = as.numeric(MILES_TO_LAKE)) %>%
+  filter(MILES_TO_LAKE <= 75)
+
 ##########################
 ### DATA SUMMARIZATION ###
 ##########################
