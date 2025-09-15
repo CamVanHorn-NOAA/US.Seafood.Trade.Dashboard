@@ -224,7 +224,7 @@ filter_region <- function(data, region) {
 }
 
 ### summary + calculation functions
-summarize_trade_yr_spp <- function(trade_table, species, output.format, 
+summarize_trade_yr_spp <- function(trade_table, species, region, output.format, 
                                    units = NULL, nominal = F) {
   # this function summarizes trade data by year and species of interest
   # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
@@ -257,6 +257,7 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
   
   summarized_data <- trade_table %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
@@ -361,7 +362,7 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
     return(trade_data)
   }
 }
-summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
+summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.format,
                                         time.frame, nominal = F) {
   # this function summarizes trade data by year and species of interest
     # within the top 5 trading partners of the U.S. for that species during
@@ -392,6 +393,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   # dplyr pipe to summarize exports and imports by year and country
   summarized_data <- trade_table %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     # select only columns of interest: year, country, exports and imports
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG,
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
@@ -501,7 +503,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   }
   
 }
-summarize_pp_yr_spp <- function(product_data, species, full_data = F, 
+summarize_pp_yr_spp <- function(product_data, species, region, full_data = F, 
                                 units = NULL, nominal = F) {
   # this function summarizes processed product data by year and species of 
     # interest
@@ -514,6 +516,7 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   summarized_data <- product_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     select(YEAR, PRODUCT_FORM, KG, DOLLARS_2024, DOLLARS, POUNDS) %>%
     mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
            DOLLARS_2024 = ifelse(is.na(DOLLARS_2024), 0, DOLLARS_2024),
@@ -602,7 +605,7 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   return(new_data)
 }
-summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
+summarize_landings_yr_spp <- function(landings_data, species, region, full_data = F,
                                       units = NULL, nominal = F) {
   # this function summarizes landings data (not exclusively commercial) by 
     # year and species of interest
@@ -633,6 +636,7 @@ summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
   
   summarized_data <- landings_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     filter(CONFIDENTIALITY != 'Confidential',
            !is.na(DOLLARS),
            !is.na(KG)) %>%
@@ -692,7 +696,7 @@ summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
   
   return(summarized_data)
 }
-summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
+summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
   # this function utilizes the summary functions for trade, processed products,
     # and landings by year and species of interest and joins the data sets
     # produced by these functions
@@ -705,25 +709,25 @@ summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
   
   combined_data <- 
     # the order of joining is fairly irrelevant
-    left_join(left_join(summarize_trade_yr_spp(trade_data, species, 'VALUE',
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species, region, 'VALUE',
                                                units = units, nominal = nominal),
                         # for processed produccts, we must perform an additional
                           # step by removing the product name (condition) from
                           # the data to prevent duplicated data from subsequent
                           # joins
-                        summarize_pp_yr_spp(pp_data, species, units = units,
+                        summarize_pp_yr_spp(pp_data, species, region, units = units,
                                             nominal = nominal) %>%
                           select(!PRODUCT_FORM) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
-              summarize_landings_yr_spp(com_landings, species, units = units,
+              summarize_landings_yr_spp(com_landings, species, region, units = units,
                                         nominal = nominal)) 
   
   return(combined_data)
 }
-calculate_mlti <- function(species, exports = F, imports = F, nominal = F) {
+calculate_mlti <- function(species, region, exports = F, imports = F, nominal = F) {
   # this function calculates the multi-lateral Lowe trade index (MLTI) among
   # the top 5 trading countries for a given species, either for imports
   # or exports
@@ -772,6 +776,7 @@ calculate_mlti <- function(species, exports = F, imports = F, nominal = F) {
     # step 1: filter trade data for species of interest
     spp_data <- trade_data %>%
       filter_species(species) %>%
+      filter_region(region) %>%
       # do not include absent values
       filter(is.na(!!which_value) == F)
     
@@ -969,7 +974,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   
   return(mlti_data)
 }
-calculate_hi <- function(species, nominal = F) {
+calculate_hi <- function(species, region, nominal = F) {
   # this function calculates the herfindahl trade index for a species of interest
   # species is a character vector of a species of interest
   
@@ -988,6 +993,7 @@ calculate_hi <- function(species, nominal = F) {
   # calculate index from trade data
   hi_data <- trade_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     # select only columns of interest
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
            EXP_VALUE_USD, IMP_VALUE_USD) %>%
@@ -1026,14 +1032,14 @@ calculate_hi <- function(species, nominal = F) {
   
   return(hi_data)
 }
-calculate_supply_metrics <- function(species, units = NULL, nominal = F) {
+calculate_supply_metrics <- function(species, region, units = NULL, nominal = F) {
   # this function calculates three metrics that we visualize:
     # apparent supply, apparent supply relative to domestic production, and
     # unexported domestic production relative to apparent supply
   # the function relies on summarize_yr_spp for data formatting
   # species is a character vector of a species of interest
   
-  data <- summarize_yr_spp(species, units = units, nominal = nominal) %>%
+  data <- summarize_yr_spp(species, region, units = units, nominal = nominal) %>%
     # calculate apparent supply by summing domestic production and imports 
     # and subtracting export volume
     # calculate apparent supply relative to domestic production by dividing
