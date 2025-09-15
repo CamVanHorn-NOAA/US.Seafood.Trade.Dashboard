@@ -170,7 +170,24 @@ pp_address <- read.csv('pp_address.csv') %>%
                         ifelse(STATE == 'GU', 'GUAM',
                                ifelse(STATE == 'PR', 'PUERTO RICO',
                                       ifelse(STATE == 'AS', 'AMERICAN SAMOA',
-                                             STATE)))))
+                                             STATE)))),
+         PLANT_CITY = ifelse(PLANT_CITY == 'BOZEMEN', 'BOZEMAN', PLANT_CITY),
+         STATE = ifelse(PLANT_CITY == 'SAN FRANCISCO', 'CA', STATE),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST QUOQUE', 'EAST QUOGUE', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST SEATAUKUT', 'EAST SETAUKET', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GLEN FALLS', 'GLENS FALLS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Hodgkins', 'HODGKINS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT LAUDERDALE', 'FORT LAUDERDALE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT PIERCE', 'FORT PIERCE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Jacksonville', 'JACKSONVILLE',
+                             PLANT_CITY),
+         PLANT_STATE_ABRV = ifelse(PLANT_CITY == 'IRVINGTON', 'AL', PLANT_STATE_ABRV))
 
 # Merge address data with pp_processed csv
 pp_processed <- read.csv('pp_processed.csv') %>%
