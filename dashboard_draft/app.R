@@ -2136,6 +2136,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, 'species_cat', selected = 'All Species')
     updateSelectInput(session, 'species_grp', selected = 'All Species')
     updateSelectInput(session, 'species_name', selected = 'All Species')
+    updateSelectizeInput(session, 'region', selected = '')
     updateCheckboxInput(session, 'trade_button', value = F)
     updateCheckboxInput(session, 'landings_button', value = F)
     updateCheckboxInput(session, 'products_button', value = F)
