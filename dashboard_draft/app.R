@@ -2981,6 +2981,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       'BALANCE',
       units = selected_units(),
       nominal = selected_value())
@@ -3011,6 +3012,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       'VALUE',
       units = selected_units(),
       nominal = selected_value())
@@ -3045,6 +3047,7 @@ server <- function(input, output, session) {
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       output.format = 'VALUE',
       time.frame = c(2020, 2024),
       nominal = selected_value())
@@ -3354,6 +3357,7 @@ server <- function(input, output, session) {
     summarize_landings_yr_spp(
       landings_filtered(),
       species_selection_landings(),
+      input$region,
       units = selected_units(),
       nominal = selected_value())
   })
@@ -3605,6 +3609,7 @@ server <- function(input, output, session) {
     summarize_pp_yr_spp(
       products_filtered(),
       species_selection_products(),
+      input$region,
       units = selected_units(),
       nominal = selected_value())
   })
@@ -3660,7 +3665,8 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), exports = T, nominal = selected_value())
+    calculate_mlti(species_selection_trade(), input$region,
+                   exports = T, nominal = selected_value())
   })
   
   # outputs MLTI export table
@@ -3687,7 +3693,8 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), imports = T, nominal = selected_value())
+    calculate_mlti(species_selection_trade(), input$region,
+                   imports = T, nominal = selected_value())
   })
   
   # outputs MLTI import table
@@ -3714,7 +3721,8 @@ server <- function(input, output, session) {
   
   # creates HI plot
   hi_plot <- reactive({
-    plot_hi(calculate_hi(species_selection_trade(), nominal = selected_value()), 
+    plot_hi(calculate_hi(species_selection_trade(), input$region,
+                         nominal = selected_value()), 
             species = species_selection_trade())
   })
   
@@ -3729,8 +3737,8 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection_trade(), units = selected_units(),
-      nominal = selected_value())
+      species_selection_trade(), input$region, 
+      units = selected_units(), nominal = selected_value())
     })
   
   # creates apparent supply plot
