@@ -2973,6 +2973,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      region = '',
       'FULL')
     })
   
@@ -3037,6 +3038,7 @@ server <- function(input, output, session) {
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      region = '',
       output.format = 'FULL',
       time.frame = c(2020, 2024),
       nominal = selected_value())
@@ -3349,6 +3351,7 @@ server <- function(input, output, session) {
     summarize_landings_yr_spp(
       landings_filtered(),
       species_selection_landings(),
+      region = '',
       full_data = T)
     })
   
@@ -3601,6 +3604,7 @@ server <- function(input, output, session) {
     summarize_pp_yr_spp(
       products_filtered(),
       species_selection_products(),
+      region = '',
       full_data = T)
     })
   
