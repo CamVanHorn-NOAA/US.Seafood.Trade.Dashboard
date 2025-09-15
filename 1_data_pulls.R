@@ -83,7 +83,12 @@ foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
     # removed from the string
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
   setNames(.[1, ]) %>%
@@ -93,7 +98,12 @@ foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
 foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
@@ -108,7 +118,12 @@ foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
   setNames(.[1, ]) %>%
@@ -118,7 +133,12 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
 foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
