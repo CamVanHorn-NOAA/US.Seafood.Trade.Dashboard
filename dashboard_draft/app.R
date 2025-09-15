@@ -31,9 +31,9 @@ com_landings <- com_landings %>%
 # create matrix of all categorization terms available in the data
 categorization_matrix <- bind_rows(trade_data, com_landings, pp_data) %>%
   select(SPECIES_NAME, SPECIES_GROUP, 
-         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, REGION) %>%
   group_by(SPECIES_NAME, SPECIES_GROUP, 
-           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, REGION) %>%
   distinct() %>%
   ungroup()
 
@@ -2486,20 +2486,38 @@ server <- function(input, output, session) {
   
   # species filter and search inputs -------------------------------------------
   # define search bar terms
-  updateSelectizeInput(session = session,
-                       'search_term',
-                       choices = 
-                         c('', sort(c(categorization_matrix %>%
-                                        select(SPECIES_NAME) %>%
-                                        distinct() %>%
-                                        filter(!is.na(SPECIES_NAME)) %>%
-                                        mutate(SPECIES_NAME = 
-                                                 str_to_title(SPECIES_NAME)) %>%
-                                        pull()))),
-                       options = list(
-                         placeholder = 'Type here...'
-                       ),
-                       server = T)
+  
+  output$filter_0 <- renderUI({
+    species_list <- c('', sort(c(categorization_matrix %>%
+                                   filter_region(input$region) %>%
+                                   select(SPECIES_NAME) %>%
+                                   distinct() %>%
+                                   filter(!is.na(SPECIES_NAME)) %>%
+                                   mutate(SPECIES_NAME = 
+                                            str_to_title(SPECIES_NAME)) %>%
+                                   pull())))
+    
+    selectizeInput('search_term', 
+                'Search for a Species',
+                species_list,
+                options = list(
+                  placeholder = 'Type here...'
+                ))
+  })
+  # updateSelectizeInput(session = session,
+  #                      'search_term',
+  #                      choices = 
+  #                        c('', sort(c(categorization_matrix %>%
+  #                                       select(SPECIES_NAME) %>%
+  #                                       distinct() %>%
+  #                                       filter(!is.na(SPECIES_NAME)) %>%
+  #                                       mutate(SPECIES_NAME = 
+  #                                                str_to_title(SPECIES_NAME)) %>%
+  #                                       pull()))),
+  #                      options = list(
+  #                        placeholder = 'Type here...'
+  #                      ),
+  #                      server = T)
 
   search_cats <- reactive({
     categorization_matrix %>%
