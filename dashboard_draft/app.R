@@ -210,6 +210,18 @@ filter_species <- function(data, species) {
     # investigate the data at different resolutions (e.g., all tunas compared
     # to just Yellowfin Tuna)
 }
+filter_region <- function(data, region) {
+  # This filter is used in all summary functions to filter for selected regions
+  # Data is any data frame with a field specifying the data's region of origin
+  # Region is a character vector meant to match how region is specified in data
+  if (region == '' | is.null(region)) {
+    return(data)
+  }
+  
+  new_data <- data %>%
+    filter(REGION == region)
+  return(new_data)
+}
 
 ### summary + calculation functions
 summarize_trade_yr_spp <- function(trade_table, species, output.format, 
