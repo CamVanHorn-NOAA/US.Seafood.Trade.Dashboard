@@ -254,7 +254,26 @@ pp_data <- pp_processed %>%
          DOLLARS_PER_KG = DOLLARS / KG,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  # split florida by east and west
+  left_join(florida_coast_map %>%
+              rename(CITY = PLANT_CITY,
+                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
+              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
+  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
+  select(!FLORIDA_STATE) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
+         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
+         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
+         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
+         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION),
+         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
+                           CITY %in% grlake_cities$PLANT_CITY,
+                         'GREAT_LAKES', REGION))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
