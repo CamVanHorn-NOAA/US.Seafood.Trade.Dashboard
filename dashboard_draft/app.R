@@ -1784,9 +1784,10 @@ ui <- page_sidebar(
                  style = 'margin-bottom: 15px; width: 100%'),
     # search bar that outputs directions for how to filter for the searched 
     # species (if available)
-    selectizeInput(inputId = 'search_term',
-                   label = 'Search for a Species',
-                   choices = NULL),
+    # selectizeInput(inputId = 'search_term',
+    #                label = 'Search for a Species',
+    #                choices = NULL),
+    uiOutput('filter_0'),
     uiOutput('filter_1'),
     # these outputs only appear once a selection is made for the prior input
       # this means filter_4 only appears once filter_3 has input, which only
