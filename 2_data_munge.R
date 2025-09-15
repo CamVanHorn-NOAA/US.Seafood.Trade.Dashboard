@@ -291,7 +291,16 @@ com_landings <- foss_com_landings %>%
          KG = POUNDS * 0.45359237,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
+         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
+         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
+         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
+         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION))
 
 #####################
 ### SAVE THE DATA ###
