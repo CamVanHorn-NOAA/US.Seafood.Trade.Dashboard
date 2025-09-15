@@ -209,7 +209,26 @@ imports_smry <- imports_smry %>%
 
 # full_join the tables to account for countries or customs districts that 
   # exclusively import or export
-trade_data <- full_join(exports_smry, imports_smry) 
+trade_data <- full_join(exports_smry, imports_smry) %>%
+  # split florida by east and west
+  left_join(florida_coast_map %>%
+              rename(US_CUSTOMS_DISTRICT = PLANT_CITY,
+                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
+              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
+  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
+  select(!FLORIDA_STATE) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
+         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
+         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
+         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
+         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
+         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION),
+         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
+                           US_CUSTOMS_DISTRICT %in% grlake_cities$PLANT_CITY,
+                         'GREAT_LAKES', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
   # for every year from 2004 - 2024
