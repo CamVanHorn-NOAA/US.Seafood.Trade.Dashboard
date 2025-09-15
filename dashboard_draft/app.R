@@ -1794,6 +1794,14 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
+    selectizeInput(inputId = 'region',
+                   label = 'Alternatively, select a FEUS Region',
+                   choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
+                               'New England', 'Mid-Atlantic', 'South Atlantic',
+                               'Gulf', 'Great Lakes'),
+                   options = list(
+                     placeholder = 'Type here...'
+                   )),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
