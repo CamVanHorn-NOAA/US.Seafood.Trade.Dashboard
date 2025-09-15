@@ -218,17 +218,17 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
   mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
   select(!FLORIDA_STATE) %>%
   # add regions
-  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
-         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
-         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
-         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
-         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
-         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION),
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            US_CUSTOMS_DISTRICT %in% grlake_cities$PLANT_CITY,
-                         'GREAT_LAKES', REGION)) 
+                         'Great Lakes', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
   # for every year from 2004 - 2024
@@ -263,17 +263,17 @@ pp_data <- pp_processed %>%
   mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
   select(!FLORIDA_STATE) %>%
   # add regions
-  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
-         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
-         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
-         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
-         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
-         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION),
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            CITY %in% grlake_cities$PLANT_CITY,
-                         'GREAT_LAKES', REGION))
+                         'Great Lakes', REGION))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
@@ -293,14 +293,14 @@ com_landings <- foss_com_landings %>%
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
   select(-INDEX) %>%
   # add regions
-  mutate(REGION = ifelse(STATE %in% norpac, 'NORTH_PACIFIC', NA),
-         REGION = ifelse(STATE %in% pac, 'PACIFIC', REGION),
-         REGION = ifelse(STATE %in% pacisl, 'WEST_PACIFIC', REGION),
-         REGION = ifelse(STATE %in% neweng, 'NEW_ENGLAND', REGION),
-         REGION = ifelse(STATE %in% midatl, 'MID-ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% souatl, 'SOUTH_ATLANTIC', REGION),
-         REGION = ifelse(STATE %in% gulf, 'GULF', REGION),
-         REGION = ifelse(STATE %in% grlake, 'GREAT_LAKES', REGION))
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION))
 
 #####################
 ### SAVE THE DATA ###
