@@ -268,6 +268,12 @@ pp_form_map <- read.csv('pp_form_map.csv')
 pp_map <- read.csv('pp_db_map.csv') %>%
   left_join(pp_form_map)
 
+# map to assign coasts to florida cities
+florida_coast_map <- read.csv('florida_city_map.csv')
+
+# map to assign great lakes cities
+great_lakes_cities <- read.csv('gl_border_state_cities.csv')
+
 #####################
 ### SAVE THE DATA ###
 #####################
