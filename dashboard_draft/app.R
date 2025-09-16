@@ -1496,8 +1496,8 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     
     # calculate scale factor (see plot_trade for details)
     max_value <- data %>%
-      slice_max(COM_VALUE, n = 1) %>%
-      select(COM_VALUE) %>%
+      slice_max(COM_VALUE_MILLIONS, n = 1) %>%
+      select(COM_VALUE_MILLIONS) %>%
       pull()
     
     max_price <- data %>%
@@ -1510,7 +1510,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
-      geom_col(aes(y = COM_VALUE),
+      geom_col(aes(y = COM_VALUE_MILLIONS),
                fill = landings_colors[1],
                color = 'black') +
       geom_line(aes(y = COM_PRICE * scale_factor,
