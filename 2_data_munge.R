@@ -41,6 +41,29 @@ load(data_file$NAME)
 # clean environment
 rm(data_file)
 
+# Regional designations --------------------------------------------------------
+# FEUS 2022 source for regions: https://s3.amazonaws.com/media.fisheries.noaa.gov/2024-11/FEUS-2022-SPO248B.pdf
+norpac <- c('AK', 'ALASKA')
+pac <- c('CA', 'CALIFORNIA', 'OR', 'OREGON', 'WA', 'WASHINGTON')
+pacisl <- c('HI', 'HAWAII', 'AS', 'CM', 'MP', 'GU')
+neweng <- c('CT', 'CONNECTICUT', 'ME', 'MAINE', 'MA', 'MASSACHUSETTS', 'NH', 
+            'NEW HAMPSHIRE', 'RI', 'RHODE ISLAND')
+midatl <- c('DE', 'DELAWARE', 'MD', 'MARYLAND', 'NJ', 'NEW JERSEY', 'NY',
+            'NEW YORK', 'VA', 'VIRGINIA', 'PA', 'PENNSYLVANIA', 'DC')
+souatl <- c('GA', 'GEORGIA', 'NC', 'NORTH CAROLINA', 'SC', 'SOUTH CAROLINA',
+            'FL-E', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
+gulf <- c('AL', 'ALABAMA', 'LA', 'LOUISIANA', 'MS', 'MISSISSIPPI', 'TX', 'TEXAS',
+          'FL-W')
+# We are adding a Great Lakes region that is city-based, not state-based like
+  # the FEUS. State exceptions include OH and MI, which are considered great
+  # lake states
+grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN')
+# great lakes cities are defined as cities within 75 miles of the nearest great
+  # lake
+grlake_cities <- great_lakes_cities %>%
+  mutate(MILES_TO_LAKE = as.numeric(MILES_TO_LAKE)) %>%
+  filter(MILES_TO_LAKE <= 75)
+
 ##########################
 ### DATA SUMMARIZATION ###
 ##########################
@@ -89,10 +112,10 @@ exports <- foss_exports %>%
 # First piece: summarise # of product types exported by year, 
   # country name (exported to), customs district (exported from)
 exports_products_smry <- exports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
          PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
          SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
            FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
            SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(EXP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
@@ -101,11 +124,11 @@ exports_products_smry <- exports %>%
 # Second piece: summarise value and volume of exports by year, 
   # country name (exported to), customs district (exported from)
 exports_price_smry <- exports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
          VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, GROUP_NAME, GROUP_TS, 
          GROUP_CBP, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY,
          ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, 
            FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
            SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
@@ -143,21 +166,21 @@ imports <- foss_imports %>%
 
 # Data summarizing
 imports_products_smry <- imports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
          PRODUCT_NAME, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME, 
          SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT,
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
            FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
            SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 imports_price_smry <- imports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, FAO_COUNTRY_CODE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
          VALUE_USD, VOLUME_KG, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
          IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP,
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, 
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
            FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
            SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
@@ -186,7 +209,26 @@ imports_smry <- imports_smry %>%
 
 # full_join the tables to account for countries or customs districts that 
   # exclusively import or export
-trade_data <- full_join(exports_smry, imports_smry) 
+trade_data <- full_join(exports_smry, imports_smry) %>%
+  # split florida by east and west
+  left_join(florida_coast_map %>%
+              rename(US_CUSTOMS_DISTRICT = PLANT_CITY,
+                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
+              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
+  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
+  select(!FLORIDA_STATE) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
+         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
+                           US_CUSTOMS_DISTRICT %in% grlake_cities$PLANT_CITY,
+                         'Great Lakes', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
   # for every year from 2004 - 2024
@@ -204,7 +246,7 @@ pp_data <- pp_processed %>%
          KG = POUNDS * 0.45359237) %>%
   arrange(YEAR, SPECIES_NAME, PRODUCT_FORM) %>%
   # reorder columns so species is left of PRODUCT_FORM for ease of viewing
-  select(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
+  select(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, STATE, CITY,
          ECOLOGICAL_CATEGORY, PRODUCT_FORM, POUNDS, DOLLARS, KG) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
@@ -212,7 +254,26 @@ pp_data <- pp_processed %>%
          DOLLARS_PER_KG = DOLLARS / KG,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  # split florida by east and west
+  left_join(florida_coast_map %>%
+              rename(CITY = PLANT_CITY,
+                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
+              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
+  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
+  select(!FLORIDA_STATE) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
+         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
+                           CITY %in% grlake_cities$PLANT_CITY,
+                         'Great Lakes', REGION))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
@@ -230,7 +291,16 @@ com_landings <- foss_com_landings %>%
          KG = POUNDS * 0.45359237,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION))
 
 #####################
 ### SAVE THE DATA ###

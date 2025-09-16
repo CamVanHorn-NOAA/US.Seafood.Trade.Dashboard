@@ -22,7 +22,7 @@ source("nmfs_cols.R")
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_09_08_25.RData')
+load('seafood_trade_data_munge_09_15_25.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
@@ -31,9 +31,9 @@ com_landings <- com_landings %>%
 # create matrix of all categorization terms available in the data
 categorization_matrix <- bind_rows(trade_data, com_landings, pp_data) %>%
   select(SPECIES_NAME, SPECIES_GROUP, 
-         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+         SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, REGION) %>%
   group_by(SPECIES_NAME, SPECIES_GROUP, 
-           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+           SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, REGION) %>%
   distinct() %>%
   ungroup()
 
@@ -210,9 +210,21 @@ filter_species <- function(data, species) {
     # investigate the data at different resolutions (e.g., all tunas compared
     # to just Yellowfin Tuna)
 }
+filter_region <- function(data, region) {
+  # This filter is used in all summary functions to filter for selected regions
+  # Data is any data frame with a field specifying the data's region of origin
+  # Region is a character vector meant to match how region is specified in data
+  if (region == '' | is.null(region)) {
+    return(data)
+  }
+  
+  new_data <- data %>%
+    filter(REGION == region)
+  return(new_data)
+}
 
 ### summary + calculation functions
-summarize_trade_yr_spp <- function(trade_table, species, output.format, 
+summarize_trade_yr_spp <- function(trade_table, species, region, output.format, 
                                    units = NULL, nominal = F) {
   # this function summarizes trade data by year and species of interest
   # trade_table is a formatted data frame of FOSS trade data (see 2_data_munge.R)
@@ -245,6 +257,7 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
   
   summarized_data <- trade_table %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
@@ -349,7 +362,7 @@ summarize_trade_yr_spp <- function(trade_table, species, output.format,
     return(trade_data)
   }
 }
-summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
+summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.format,
                                         time.frame, nominal = F) {
   # this function summarizes trade data by year and species of interest
     # within the top 5 trading partners of the U.S. for that species during
@@ -380,6 +393,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   # dplyr pipe to summarize exports and imports by year and country
   summarized_data <- trade_table %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     # select only columns of interest: year, country, exports and imports
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG,
            IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
@@ -489,7 +503,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, output.format,
   }
   
 }
-summarize_pp_yr_spp <- function(product_data, species, full_data = F, 
+summarize_pp_yr_spp <- function(product_data, species, region, full_data = F, 
                                 units = NULL, nominal = F) {
   # this function summarizes processed product data by year and species of 
     # interest
@@ -502,6 +516,7 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   summarized_data <- product_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     select(YEAR, PRODUCT_FORM, KG, DOLLARS_2024, DOLLARS, POUNDS) %>%
     mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
            DOLLARS_2024 = ifelse(is.na(DOLLARS_2024), 0, DOLLARS_2024),
@@ -590,7 +605,7 @@ summarize_pp_yr_spp <- function(product_data, species, full_data = F,
   
   return(new_data)
 }
-summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
+summarize_landings_yr_spp <- function(landings_data, species, region, full_data = F,
                                       units = NULL, nominal = F) {
   # this function summarizes landings data (not exclusively commercial) by 
     # year and species of interest
@@ -621,6 +636,7 @@ summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
   
   summarized_data <- landings_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     filter(CONFIDENTIALITY != 'Confidential',
            !is.na(DOLLARS),
            !is.na(KG)) %>%
@@ -680,7 +696,7 @@ summarize_landings_yr_spp <- function(landings_data, species, full_data = F,
   
   return(summarized_data)
 }
-summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
+summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
   # this function utilizes the summary functions for trade, processed products,
     # and landings by year and species of interest and joins the data sets
     # produced by these functions
@@ -693,25 +709,25 @@ summarize_yr_spp <- function(species, units = NULL,  nominal = F) {
   
   combined_data <- 
     # the order of joining is fairly irrelevant
-    left_join(left_join(summarize_trade_yr_spp(trade_data, species, 'VALUE',
+    left_join(left_join(summarize_trade_yr_spp(trade_data, species, region, 'VALUE',
                                                units = units, nominal = nominal),
                         # for processed produccts, we must perform an additional
                           # step by removing the product name (condition) from
                           # the data to prevent duplicated data from subsequent
                           # joins
-                        summarize_pp_yr_spp(pp_data, species, units = units,
+                        summarize_pp_yr_spp(pp_data, species, region, units = units,
                                             nominal = nominal) %>%
                           select(!PRODUCT_FORM) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
-              summarize_landings_yr_spp(com_landings, species, units = units,
+              summarize_landings_yr_spp(com_landings, species, region, units = units,
                                         nominal = nominal)) 
   
   return(combined_data)
 }
-calculate_mlti <- function(species, exports = F, imports = F, nominal = F) {
+calculate_mlti <- function(species, region, exports = F, imports = F, nominal = F) {
   # this function calculates the multi-lateral Lowe trade index (MLTI) among
   # the top 5 trading countries for a given species, either for imports
   # or exports
@@ -760,6 +776,7 @@ calculate_mlti <- function(species, exports = F, imports = F, nominal = F) {
     # step 1: filter trade data for species of interest
     spp_data <- trade_data %>%
       filter_species(species) %>%
+      filter_region(region) %>%
       # do not include absent values
       filter(is.na(!!which_value) == F)
     
@@ -957,7 +974,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   
   return(mlti_data)
 }
-calculate_hi <- function(species, nominal = F) {
+calculate_hi <- function(species, region, nominal = F) {
   # this function calculates the herfindahl trade index for a species of interest
   # species is a character vector of a species of interest
   
@@ -976,6 +993,7 @@ calculate_hi <- function(species, nominal = F) {
   # calculate index from trade data
   hi_data <- trade_data %>%
     filter_species(species) %>%
+    filter_region(region) %>%
     # select only columns of interest
     select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
            EXP_VALUE_USD, IMP_VALUE_USD) %>%
@@ -1014,14 +1032,14 @@ calculate_hi <- function(species, nominal = F) {
   
   return(hi_data)
 }
-calculate_supply_metrics <- function(species, units = NULL, nominal = F) {
+calculate_supply_metrics <- function(species, region, units = NULL, nominal = F) {
   # this function calculates three metrics that we visualize:
     # apparent supply, apparent supply relative to domestic production, and
     # unexported domestic production relative to apparent supply
   # the function relies on summarize_yr_spp for data formatting
   # species is a character vector of a species of interest
   
-  data <- summarize_yr_spp(species, units = units, nominal = nominal) %>%
+  data <- summarize_yr_spp(species, region, units = units, nominal = nominal) %>%
     # calculate apparent supply by summing domestic production and imports 
     # and subtracting export volume
     # calculate apparent supply relative to domestic production by dividing
@@ -1039,7 +1057,7 @@ calculate_supply_metrics <- function(species, units = NULL, nominal = F) {
 }
 
 # plot functions
-plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, species, nominal = F) {
+plot_trade <- function(data, region, plot_format, units = NULL, export = F, import = F, species, nominal = F) {
   # this function has the power to generate multiple plot types of trade data
   # data is formatted trade data from summarize_trade_yr_spp
   # plot_format is a character vector that currently accepts these inputs:
@@ -1052,12 +1070,18 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
     shortform <- 'EXP'
     longform <- 'Exports'
     color <- export_color
+    if (region != '') {
+      region_text <- paste0(' from the ', region)
+    } else {region_text <- ''}
   }
   # set shortform and longform values for plot labeling if import
   if (import == T & export == F) {
     shortform <- 'IMP'
     longform <- 'Imports'
     color <- import_color
+    if (region != '') {
+      region_text <- paste0(' to the ', region)
+    } else {region_text <- ''}
   }
   # coerce plot_format to uppercase to work within function
   plot_format <- toupper(plot_format)
@@ -1132,7 +1156,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
                          limits = c(0, y_max)) +
       labs(x = '',
            y = ylab,
-           title = paste0(species, ' ', longform)) +
+           title = paste0(species, ' ', longform, region_text)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             plot.title = element_text(size = 18),
@@ -1171,7 +1195,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
                          sec.axis = sec_axis(~./scale_factor, name = ylab2,
                                              labels = label2)) +
       labs(x = '',
-           title = paste0(species, ' ', longform)) +
+           title = paste0(species, ' ', longform, region_text)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             plot.title = element_text(size = 18),
@@ -1180,6 +1204,9 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
     data$GROUP <- 'group'
+    if (region != '') {
+      region_text <- paste0(' traded in the ', region)
+    } else {region_text <- ''}
     
     plot <- 
       ggplot(data = data, 
@@ -1195,12 +1222,16 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
                        limits = factor(2004:2024)) +
       labs(x = '', 
            y = 'Export / Import',
-           title = paste0('Volume Ratio of ', species)) +
+           title = paste0('Volume Ratio of ', species, region_text)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             plot.title = element_text(size = 18),
             axis.title = element_text(size = 15))
   } else {
+    if (region != '') {
+      region_text <- paste0(' traded in the ', region)
+    } else {region_text <- ''}
+    
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
@@ -1213,7 +1244,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
            # y = 'Billions (Real 2024 USD)',
            y = 'Millions (Real 2024 USD)',
            fill = '',
-           title = paste0('Value Balance of ', species)) +
+           title = paste0('Value Balance of ', species, region_text)) +
       scale_fill_manual(values = balance_colors) +
       coord_axes_inside(labels_inside = T) +
       scale_x_discrete(limits = factor(2004:2024)) +
@@ -1237,7 +1268,7 @@ plot_trade <- function(data, plot_format, units = NULL, export = F, import = F, 
   
   return(plot)
 }
-plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
+plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
   # this function plots trade among the top five trading partners for a species
     # using data generated by summarize_trade_ctry_yr_spp
   # value is logical that specifies if the data is formatted for value
@@ -1249,6 +1280,10 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
     ylab <- 'Millions (Real 2024 USD)'
   }
   
+  if (region != '') {
+    region_text <- paste0(' with the ', region)
+  } else {region_text <- ''}
+  
   ggplot(data = data,
          aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
              y = NET_VALUE_MILLIONS, 
@@ -1259,8 +1294,8 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
     labs(x = '',
          y = ylab,
          fill = 'Year',
-         title = paste0('Net Export Value for Top 5 Trading Partners of ', 
-                        species)) +
+         title = paste0('Net Export Value of ', species, 
+                        ' for the \nTop 5 Trading Partners', region_text)) +
     scale_y_continuous(labels = label_currency(suffix = 'M')) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
@@ -1270,7 +1305,7 @@ plot_trade_ctry_yr_spp <- function(data, species, nominal = F) {
           legend.text = element_text(size = 12),
           plot.title = element_text(size = 18))
 }
-plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, species, nominal = F) {
+plot_spp_pp <- function(processed_product_data, region, plot.format, units = NULL, species, nominal = F) {
   # function that plots processed product data 
   # processed_product_data is data formatted by summarize_pp_yr_spp
   # plot.format is a character vector of three inputs:
@@ -1278,6 +1313,10 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
+  
+  if (region != '') {
+    region_text <- paste0(region, ' ')
+  } else {region_text <- ''}
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
@@ -1351,7 +1390,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
       labs(x = '',
            y = ylab,
            fill = 'Product Condition',
-           title = paste0('Production Price of ', species)) +
+           title = paste0(region_text, 'Production Price of ', species)) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(limits = c(0, ymax),
                          expand = c(0, 0),
@@ -1389,7 +1428,7 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
     labs(x = '',
          y = ylab,
          fill = 'Product Condition',
-         title = paste0(tlab, species)) +
+         title = paste0(region_text, tlab, species)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     scale_y_continuous(limits = c(0, ylim), 
                        expand = c(0, 0),
@@ -1403,13 +1442,17 @@ plot_spp_pp <- function(processed_product_data, plot.format, units = NULL, speci
   
   return(plot)
 }
-plot_landings <- function(data, plot.format, units = NULL, species, nominal = F) {
+plot_landings <- function(data, region, plot.format, units = NULL, species, nominal = F) {
   # this function plots landings data formatted by summarize_landings_yr_spp
   # plot.format is a character vector that accepts inputs of VALUE, VOLUME
   # and PRICE
   
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
+  
+  if (region != '') {
+    region_text <- paste0(region, ' ')
+  } else {region_text <- ''}
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
@@ -1453,8 +1496,8 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     
     # calculate scale factor (see plot_trade for details)
     max_value <- data %>%
-      slice_max(COM_VALUE, n = 1) %>%
-      select(COM_VALUE) %>%
+      slice_max(COM_VALUE_MILLIONS, n = 1) %>%
+      select(COM_VALUE_MILLIONS) %>%
       pull()
     
     max_price <- data %>%
@@ -1467,7 +1510,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
-      geom_col(aes(y = COM_VALUE),
+      geom_col(aes(y = COM_VALUE_MILLIONS),
                fill = landings_colors[1],
                color = 'black') +
       geom_line(aes(y = COM_PRICE * scale_factor,
@@ -1484,7 +1527,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
                          sec.axis = sec_axis(~./scale_factor, name = ylab2,
                                              labels = label2)) +
       labs(x = '',
-           title = paste0(tlab, species)) +
+           title = paste0(region_text, tlab, species)) +
       theme_bw() +
       theme(axis.text = element_text(size = 12),
             axis.title = element_text(size = 15),
@@ -1505,7 +1548,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
     scale_y_continuous(labels = label) +
     labs(x = '',
          y = ylab,
-         title = paste0(tlab, species)) +
+         title = paste0(region_text, tlab, species)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 15),
@@ -1513,7 +1556,7 @@ plot_landings <- function(data, plot.format, units = NULL, species, nominal = F)
   
   return(plot)
 }
-plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
+plot_mlti <- function(mlti_data, region, exports = F, imports = F, species) {
   # this function generates a plot of MLTI data with countries distinct by
     # color and point shape
   # mlti_data is a data set formatted by calculate_mlti
@@ -1524,6 +1567,11 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
   if (exports == F & imports == F) {
     stop('Please set "exports" or "imports" to "T"')
   }
+  
+  if (region != '') {
+    region_text <- paste0(ifelse(exports == T, ' from the ', ' to the '),
+                          region)
+  } else {region_text <- ''}
   
   # set label for plot based on exports logical
   label <- ifelse(exports == T, 'Export', 'Import')
@@ -1544,7 +1592,7 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
     geom_hline(yintercept = 1, color = 'black') +
     labs(x = '',
          y = 'Multilateral Trade Index',
-         title = paste0(label, 's of ', species),
+         title = paste0(label, 's of ', species, region_text),
          color = '',
          shape = '') +
     theme_bw() +
@@ -1557,9 +1605,13 @@ plot_mlti <- function(mlti_data, exports = F, imports = F, species) {
           legend.key.size = unit(2, 'line'),
           strip.background = element_rect(fill = 'black'))
 }
-plot_hi <- function(hi_data, species) {
+plot_hi <- function(hi_data, region, species) {
   # this function generates a line plot that compares HI for exports and imports
   # hi_data is a data set formatted by calculate_hi
+  
+  if (region != '') {
+    region_text <- paste0(' traded in the ', region)
+  } else {region_text <- ''}
   
   # format the data by renaming columns for plot labels
   format_hi_data <- hi_data %>%
@@ -1581,7 +1633,7 @@ plot_hi <- function(hi_data, species) {
                          type = c(export_color, import_color)) +
     labs(x = '',
          y = 'Index',
-         title = paste0('Herfindahl Index of \n', species)) +
+         title = paste0('Herfindahl Index of \n', species, region_text)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = 12),
@@ -1593,7 +1645,7 @@ plot_hi <- function(hi_data, species) {
           plot.title = element_text(size = 16))
   
 }
-plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
+plot_supply_metrics <- function(supply_data, region, metric, units = NULL, species) {
   # this function generates three types of plots 
   # supply_data is data formatted by calculate_supply_metrics in tandem with
     # summarize_yr_spp
@@ -1604,6 +1656,9 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
     # SHARE outputs plots of Unexported domestic production relative to 
       # apparent supply
   
+  if (region != '') {
+    region_text <- paste0(' in the ', region)
+  } else {region_text <- ''}
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
     # here, we only need to specify how the figure is labeled
@@ -1620,7 +1675,7 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
                fill = c(supply_color)) +
       labs(x = '',
            y = ylab,
-           title = paste0('Apparent Supply of \n', species)) +
+           title = paste0('Apparent Supply of \n', species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
@@ -1643,7 +1698,7 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
       labs(x = '',
            y = 'Ratio',
            title = paste0('Apparent Supply of \n', species, 
-                          '\nRelative to Domestic \nProduction')) +
+                          '\nRelative to Domestic \nProduction', region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
@@ -1662,7 +1717,8 @@ plot_supply_metrics <- function(supply_data, metric, units = NULL, species) {
                fill = share_color) +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', species)) +
+           title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', 
+                          species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent()) +
@@ -1772,9 +1828,10 @@ ui <- page_sidebar(
                  style = 'margin-bottom: 15px; width: 100%'),
     # search bar that outputs directions for how to filter for the searched 
     # species (if available)
-    selectizeInput(inputId = 'search_term',
-                   label = 'Search for a Species',
-                   choices = NULL),
+    # selectizeInput(inputId = 'search_term',
+    #                label = 'Search for a Species',
+    #                choices = NULL),
+    uiOutput('filter_0'),
     uiOutput('filter_1'),
     # these outputs only appear once a selection is made for the prior input
       # this means filter_4 only appears once filter_3 has input, which only
@@ -1782,6 +1839,14 @@ ui <- page_sidebar(
     uiOutput('filter_2'),
     uiOutput('filter_3'),
     uiOutput('filter_4'),
+    selectizeInput(inputId = 'region',
+                   label = 'Alternatively, select a FEUS Region',
+                   choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
+                               'New England', 'Mid-Atlantic', 'South Atlantic',
+                               'Gulf', 'Great Lakes'),
+                   options = list(
+                     placeholder = 'Type here...'
+                   )),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
@@ -2115,6 +2180,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, 'species_cat', selected = 'All Species')
     updateSelectInput(session, 'species_grp', selected = 'All Species')
     updateSelectInput(session, 'species_name', selected = 'All Species')
+    updateSelectizeInput(session, 'region', selected = '')
     updateCheckboxInput(session, 'trade_button', value = F)
     updateCheckboxInput(session, 'landings_button', value = F)
     updateCheckboxInput(session, 'products_button', value = F)
@@ -2466,20 +2532,38 @@ server <- function(input, output, session) {
   
   # species filter and search inputs -------------------------------------------
   # define search bar terms
-  updateSelectizeInput(session = session,
-                       'search_term',
-                       choices = 
-                         c('', sort(c(categorization_matrix %>%
-                                        select(SPECIES_NAME) %>%
-                                        distinct() %>%
-                                        filter(!is.na(SPECIES_NAME)) %>%
-                                        mutate(SPECIES_NAME = 
-                                                 str_to_title(SPECIES_NAME)) %>%
-                                        pull()))),
-                       options = list(
-                         placeholder = 'Type here...'
-                       ),
-                       server = T)
+  
+  output$filter_0 <- renderUI({
+    species_list <- c('', sort(c(categorization_matrix %>%
+                                   filter_region(input$region) %>%
+                                   select(SPECIES_NAME) %>%
+                                   distinct() %>%
+                                   filter(!is.na(SPECIES_NAME)) %>%
+                                   mutate(SPECIES_NAME = 
+                                            str_to_title(SPECIES_NAME)) %>%
+                                   pull())))
+    
+    selectizeInput('search_term', 
+                'Search for a Species',
+                species_list,
+                options = list(
+                  placeholder = 'Type here...'
+                ))
+  })
+  # updateSelectizeInput(session = session,
+  #                      'search_term',
+  #                      choices = 
+  #                        c('', sort(c(categorization_matrix %>%
+  #                                       select(SPECIES_NAME) %>%
+  #                                       distinct() %>%
+  #                                       filter(!is.na(SPECIES_NAME)) %>%
+  #                                       mutate(SPECIES_NAME = 
+  #                                                str_to_title(SPECIES_NAME)) %>%
+  #                                       pull()))),
+  #                      options = list(
+  #                        placeholder = 'Type here...'
+  #                      ),
+  #                      server = T)
 
   search_cats <- reactive({
     categorization_matrix %>%
@@ -2927,6 +3011,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      region = '',
       'FULL')
     })
   
@@ -2935,6 +3020,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       'BALANCE',
       units = selected_units(),
       nominal = selected_value())
@@ -2948,8 +3034,8 @@ server <- function(input, output, session) {
   
   # creates trade balance plot (value)
   balance_plot <- reactive({
-    plot_trade(balance_df(), 'BALANCE', species = species_selection_trade(), 
-               nominal = selected_value())
+    plot_trade(balance_df(), input$region, 'BALANCE', 
+               species = species_selection_trade(), nominal = selected_value())
   })
   
   # outputs trade balance plot (value)
@@ -2965,6 +3051,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       'VALUE',
       units = selected_units(),
       nominal = selected_value())
@@ -2972,7 +3059,7 @@ server <- function(input, output, session) {
   
   # creates export/import ratio plot
   ratio_plot <- reactive({
-    plot_trade(trade_df(), 'RATIO', export = T, import = T, 
+    plot_trade(trade_df(), input$region, 'RATIO', export = T, import = T, 
                species = species_selection_trade())
   })
   
@@ -2989,6 +3076,7 @@ server <- function(input, output, session) {
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      region = '',
       output.format = 'FULL',
       time.frame = c(2020, 2024),
       nominal = selected_value())
@@ -2999,6 +3087,7 @@ server <- function(input, output, session) {
     summarize_trade_ctry_yr_spp(
       trade_filtered(),
       species_selection_trade(),
+      input$region,
       output.format = 'VALUE',
       time.frame = c(2020, 2024),
       nominal = selected_value())
@@ -3008,7 +3097,7 @@ server <- function(input, output, session) {
   top5_trade_plot <- reactive({
     plot_trade_ctry_yr_spp(top5_trade_df(), 
                            species = species_selection_trade(), 
-                           nominal = selected_value())
+                           input$region, nominal = selected_value())
   })
   
   # outputs top 5 net export plot
@@ -3021,7 +3110,7 @@ server <- function(input, output, session) {
   
   # creates export value plot
   exp_value_plot <- reactive({
-    plot_trade(trade_df(), 'VALUE', units = selected_units(), export = T, 
+    plot_trade(trade_df(), input$region, 'VALUE', units = selected_units(), export = T, 
                species = species_selection_trade(), nominal = selected_value())
   })
   
@@ -3035,7 +3124,7 @@ server <- function(input, output, session) {
   
   # creates import value plot
   imp_value_plot <- reactive({
-    plot_trade(trade_df(), 'VALUE', units = selected_units(), import = T, 
+    plot_trade(trade_df(), input$region, 'VALUE', units = selected_units(), import = T, 
                species = species_selection_trade(), nominal = selected_value())
     })
   
@@ -3049,7 +3138,7 @@ server <- function(input, output, session) {
 
   # creates export volume plot
   exp_volume_plot <- reactive({
-    plot_trade(trade_df(), 'VOLUME', units = selected_units(), export = T, 
+    plot_trade(trade_df(), input$region, 'VOLUME', units = selected_units(), export = T, 
                species = species_selection_trade())
   })
   
@@ -3063,7 +3152,7 @@ server <- function(input, output, session) {
 
   # creates import volume plot
   imp_volume_plot <- reactive({
-    plot_trade(trade_df(), 'VOLUME', units = selected_units(), import = T, 
+    plot_trade(trade_df(), input$region, 'VOLUME', units = selected_units(), import = T, 
                species = species_selection_trade())
   })
   
@@ -3300,6 +3389,7 @@ server <- function(input, output, session) {
     summarize_landings_yr_spp(
       landings_filtered(),
       species_selection_landings(),
+      region = '',
       full_data = T)
     })
   
@@ -3308,13 +3398,14 @@ server <- function(input, output, session) {
     summarize_landings_yr_spp(
       landings_filtered(),
       species_selection_landings(),
+      input$region,
       units = selected_units(),
       nominal = selected_value())
   })
   
   # creates landings value plot
   landings_value_plot <- reactive({
-    plot_landings(landings_df(), 'VALUE', units = selected_units(),
+    plot_landings(landings_df(), input$region, 'VALUE', units = selected_units(),
                   species = species_selection_landings(),
                   nominal = selected_value())
   })
@@ -3329,7 +3420,7 @@ server <- function(input, output, session) {
   
   # creates landings volume plot
   landings_volume_plot <- reactive({
-    plot_landings(landings_df(), 'VOLUME', units = selected_units(),
+    plot_landings(landings_df(), input$region, 'VOLUME', units = selected_units(),
                   species = species_selection_landings())
   })
   
@@ -3343,7 +3434,7 @@ server <- function(input, output, session) {
   
   # creates landings price plot
   landings_price_plot <- reactive({
-    plot_landings(landings_df(), 'PRICE', units = selected_units(), 
+    plot_landings(landings_df(), input$region, 'PRICE', units = selected_units(), 
                   species = species_selection_landings())
   })
   
@@ -3551,6 +3642,7 @@ server <- function(input, output, session) {
     summarize_pp_yr_spp(
       products_filtered(),
       species_selection_products(),
+      region = '',
       full_data = T)
     })
   
@@ -3559,13 +3651,14 @@ server <- function(input, output, session) {
     summarize_pp_yr_spp(
       products_filtered(),
       species_selection_products(),
+      input$region,
       units = selected_units(),
       nominal = selected_value())
   })
   
   # creates processed products value plot
   pp_value_plot <- reactive({
-    plot_spp_pp(pp_df(), 'VALUE', 
+    plot_spp_pp(pp_df(), input$region, 'VALUE', 
                 units = selected_units(),
                 species = species_selection_products(),
                 nominal = selected_value())
@@ -3581,7 +3674,7 @@ server <- function(input, output, session) {
   
   # creates processed products volume plot
   pp_volume_plot <- reactive({
-    plot_spp_pp(pp_df(), 'VOLUME', 
+    plot_spp_pp(pp_df(), input$region, 'VOLUME', 
                 units = selected_units(),
                 species = species_selection_products())
   })
@@ -3596,7 +3689,7 @@ server <- function(input, output, session) {
   
   # creates processed products price plot
   pp_price_plot <- reactive({
-    plot_spp_pp(pp_df(), 'PRICE', 
+    plot_spp_pp(pp_df(), input$region, 'PRICE', 
                 units = selected_units(),
                 species = species_selection_products(),
                 nominal = selected_value())
@@ -3614,7 +3707,8 @@ server <- function(input, output, session) {
   
   # creates MLTI export table
   exp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), exports = T, nominal = selected_value())
+    calculate_mlti(species_selection_trade(), input$region,
+                   exports = T, nominal = selected_value())
   })
   
   # outputs MLTI export table
@@ -3627,7 +3721,7 @@ server <- function(input, output, session) {
   
   # creates MLTI export plot
   exp_mlti_plot <- reactive({
-    plot_mlti(exp_mlti_table_df(), 
+    plot_mlti(exp_mlti_table_df(), input$region,
               exports = T, species = species_selection_trade())
   })
   
@@ -3641,7 +3735,8 @@ server <- function(input, output, session) {
   
   # creates MLTI import table
   imp_mlti_table_df <- reactive({
-    calculate_mlti(species_selection_trade(), imports = T, nominal = selected_value())
+    calculate_mlti(species_selection_trade(), input$region,
+                   imports = T, nominal = selected_value())
   })
   
   # outputs MLTI import table
@@ -3654,7 +3749,7 @@ server <- function(input, output, session) {
   
   # creates MLTI import plot
   imp_mlti_plot <- reactive({
-    plot_mlti(imp_mlti_table_df(), 
+    plot_mlti(imp_mlti_table_df(), input$region,
               imports = T, species = species_selection_trade())
   })
   
@@ -3668,8 +3763,9 @@ server <- function(input, output, session) {
   
   # creates HI plot
   hi_plot <- reactive({
-    plot_hi(calculate_hi(species_selection_trade(), nominal = selected_value()), 
-            species = species_selection_trade())
+    plot_hi(calculate_hi(species_selection_trade(), input$region,
+                         nominal = selected_value()), 
+            input$region, species = species_selection_trade())
   })
   
   # outputs HI plot
@@ -3683,13 +3779,13 @@ server <- function(input, output, session) {
   # creates supply metric data
   supply_df <- reactive({
     calculate_supply_metrics(
-      species_selection_trade(), units = selected_units(),
-      nominal = selected_value())
+      species_selection_trade(), input$region, 
+      units = selected_units(), nominal = selected_value())
     })
   
   # creates apparent supply plot
   supply_plot <- reactive({
-    plot_supply_metrics(supply_df(), 'SUPPLY', units = selected_units(),
+    plot_supply_metrics(supply_df(), input$region, 'SUPPLY', units = selected_units(),
                         species = species_selection_trade())
   })
   
@@ -3703,7 +3799,7 @@ server <- function(input, output, session) {
   
   # creates apparent supply (ratio) plot
   supply_ratio_plot <- reactive({
-    plot_supply_metrics(supply_df(), 'RATIO', 
+    plot_supply_metrics(supply_df(), input$region, 'RATIO', 
                         species = species_selection_trade())
   })
   
@@ -3717,7 +3813,7 @@ server <- function(input, output, session) {
   
   # creates apparent supply (share) plot
   supply_share_plot <- reactive({
-    plot_supply_metrics(supply_df(), 'SHARE', 
+    plot_supply_metrics(supply_df(), input$region, 'SHARE', 
                         species = species_selection_trade())
   })
   

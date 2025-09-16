@@ -83,7 +83,12 @@ foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
     # removed from the string
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
   setNames(.[1, ]) %>%
@@ -93,7 +98,12 @@ foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
 foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
@@ -108,7 +118,12 @@ foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
   setNames(.[1, ]) %>%
@@ -118,7 +133,12 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
   .[-1, ] %>%
   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
                              str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER))
+                             HTS_NUMBER),
+         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                        nchar(US_CUSTOMS_DISTRICT)),
+         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
 foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
@@ -150,14 +170,32 @@ pp_address <- read.csv('pp_address.csv') %>%
                         ifelse(STATE == 'GU', 'GUAM',
                                ifelse(STATE == 'PR', 'PUERTO RICO',
                                       ifelse(STATE == 'AS', 'AMERICAN SAMOA',
-                                             STATE)))))
+                                             STATE)))),
+         PLANT_CITY = ifelse(PLANT_CITY == 'BOZEMEN', 'BOZEMAN', PLANT_CITY),
+         STATE = ifelse(PLANT_CITY == 'SAN FRANCISCO', 'CA', STATE),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST QUOQUE', 'EAST QUOGUE', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST SEATAUKUT', 'EAST SETAUKET', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GLEN FALLS', 'GLENS FALLS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Hodgkins', 'HODGKINS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT LAUDERDALE', 'FORT LAUDERDALE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT PIERCE', 'FORT PIERCE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Jacksonville', 'JACKSONVILLE',
+                             PLANT_CITY),
+         PLANT_STATE_ABRV = ifelse(PLANT_CITY == 'IRVINGTON', 'AL', PLANT_STATE_ABRV))
 
 # Merge address data with pp_processed csv
 pp_processed <- read.csv('pp_processed.csv') %>%
   filter(YEAR >= 2004) %>%
   left_join(pp_address %>%
-              select(PP_IDNUM, STATE_ABRV) %>%
-              rename(STATE = STATE_ABRV))
+              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV) %>%
+              rename(STATE = PLANT_STATE_ABRV,
+                     CITY = PLANT_CITY))
 
 
 # Commercial Landings ----------------------------------------------------------
@@ -230,6 +268,12 @@ pp_form_map <- read.csv('pp_form_map.csv')
 pp_map <- read.csv('pp_db_map.csv') %>%
   left_join(pp_form_map)
 
+# map to assign coasts to florida cities
+florida_coast_map <- read.csv('florida_city_map.csv')
+
+# map to assign great lakes cities
+great_lakes_cities <- read.csv('gl_border_state_cities.csv')
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -242,8 +286,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 # create the file
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
-              'species_ref', 'foss_com_landings', 
-              'trade_map', 'landings_map', 'pp_map'),
+              'species_ref', 'foss_com_landings', 'florida_coast_map',
+              'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map'),
      file = file_name)
 
 # upload to google drive
