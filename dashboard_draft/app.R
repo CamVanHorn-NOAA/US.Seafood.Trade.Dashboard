@@ -1900,17 +1900,19 @@ ui <- page_sidebar(
                        nav_panel(title = 'Market Summary',
                                  div(
                                    style = "position: relative; min-width: 1200px;",
-                                   tooltip(
-                                     withSpinner(
-                                       plotOutput('balance',
-                                                  click = clickOpts('balance_plot_click'),
-                                                  height = "400px", width = "100%"), 
-                                       type = 7),
-                                     # textOutput('balance_tooltip'),
-                                     "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported.",
-                                     placement = 'top'),
-                                   uiOutput('balance_click_overlay')
-                                 ),
+                                   withSpinner(
+                                     plotOutput('balance',
+                                                click = clickOpts('balance_plot_click'),
+                                                height = "400px", width = "100%"), 
+                                     type = 7),
+                                   # textOutput('balance_tooltip'),
+                                   uiOutput('balance_click_overlay'),
+                                   div(
+                                     style = "position: absolute; top: 0px; left: 68px",
+                                     tooltip(
+                                       icon("info-circle"),
+                                       "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported."
+                                     ))),
                                  div(
                                    style = "flex: 1; display: flex; gap: 15px;",
                                    div(
