@@ -1987,16 +1987,19 @@ ui <- page_sidebar(
                                    style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('exp_volume',
-                                                    click = clickOpts("exp_volume_plot_click"),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('expvol_tooltip'),
-                                       "Export volume reflects the total volume of product traded out of the U.S. into other countries.",
-                                       placement = 'top'),
-                                     uiOutput("exp_volume_click_overlay")),
+                                     withSpinner(
+                                       plotOutput('exp_volume',
+                                                  click = clickOpts("exp_volume_plot_click"),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('expvol_tooltip'),
+                                     uiOutput("exp_volume_click_overlay"),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Export volume reflects the total volume of product traded out of the U.S. into other countries."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
