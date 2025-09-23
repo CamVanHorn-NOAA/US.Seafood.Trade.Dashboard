@@ -2057,16 +2057,19 @@ ui <- page_sidebar(
                                    style = "flex: 1; display: flex; gap: 15px",
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('hi',
-                                                    click = clickOpts(id = 'hi_plot_click'),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('hi_tooltip'),
-                                       "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners.",
-                                       placement = 'top'),
-                                     uiOutput('hi_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('hi',
+                                                  click = clickOpts(id = 'hi_plot_click'),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('hi_tooltip'),
+                                     uiOutput('hi_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 10px; left: 26px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
