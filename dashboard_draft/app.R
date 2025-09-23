@@ -1917,16 +1917,19 @@ ui <- page_sidebar(
                                    style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('trade_ratio',
-                                                    click = clickOpts('ratio_plot_click'),
-                                                    height = '400px'), 
-                                         type = 7),
-                                       # textOutput('ratio_tooltip'),
-                                       "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported.",
-                                       placement = 'top'),
-                                     uiOutput('ratio_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('trade_ratio',
+                                                  click = clickOpts('ratio_plot_click'),
+                                                  height = '400px'), 
+                                       type = 7),
+                                     # textOutput('ratio_tooltip'),
+                                     uiOutput('ratio_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 20px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
