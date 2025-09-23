@@ -2072,16 +2072,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('supply',
-                                                    click = clickOpts(id = "supply_plot_click"),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('supply_tooltip')
-                                       "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade.",
-                                       placement = 'top'),
-                                     uiOutput("supply_click_overlay")),
+                                     withSpinner(
+                                       plotOutput('supply',
+                                                  click = clickOpts(id = "supply_plot_click"),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('supply_tooltip')
+                                     uiOutput("supply_click_overlay"),
+                                     div(
+                                       style = "position: absolute; top: 10px; left: 35px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
