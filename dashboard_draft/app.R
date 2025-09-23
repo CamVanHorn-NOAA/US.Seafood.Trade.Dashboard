@@ -1932,16 +1932,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('top5_trade',
-                                                    click = clickOpts('top5_plot_click'),
-                                                    height = '400px'), 
-                                         type = 7),
-                                       # textOutput('top5_tooltip'),
-                                       "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order.",
-                                       placement = 'top'),
-                                     uiOutput('top5_click_overlay'))),
+                                     withSpinner(
+                                       plotOutput('top5_trade',
+                                                  click = clickOpts('top5_plot_click'),
+                                                  height = '400px'), 
+                                       type = 7),
+                                     # textOutput('top5_tooltip'),
+                                     uiOutput('top5_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 10px; left: 52px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order."
+                                       )))),
                                  downloadButton('download_page1',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Value',
