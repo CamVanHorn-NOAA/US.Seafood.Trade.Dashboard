@@ -2087,16 +2087,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('supply_ratio',
-                                                    click = clickOpts(id = 'supply_ratio_plot_click'),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('supplyratio_tooltip')
-                                       "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available.",
-                                       placement = 'top'),
-                                     uiOutput('supply_ratio_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('supply_ratio',
+                                                  click = clickOpts(id = 'supply_ratio_plot_click'),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('supplyratio_tooltip')
+                                     uiOutput('supply_ratio_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 27px; left: 18px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
                                      tooltip(
