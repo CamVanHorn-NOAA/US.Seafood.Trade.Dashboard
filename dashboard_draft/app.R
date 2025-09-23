@@ -2185,16 +2185,19 @@ ui <- page_sidebar(
                          nav_panel(title = 'Volume',
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('pp_volume',
-                                                    click = clickOpts('pp_volume_plot_click'),
-                                                    height = "500px"),
-                                         type = 7),
-                                       # textOutput('ppvolume_tooltip')
-                                       "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value.",
-                                       placement = 'top'),
-                                     uiOutput('pp_volume_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('pp_volume',
+                                                  click = clickOpts('pp_volume_plot_click'),
+                                                  height = "500px"),
+                                       type = 7),
+                                     # textOutput('ppvolume_tooltip')
+                                     uiOutput('pp_volume_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
+                                       ))),
                                    downloadButton('download_products_page2',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Price',
