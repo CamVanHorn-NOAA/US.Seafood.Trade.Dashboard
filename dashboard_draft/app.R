@@ -2002,16 +2002,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('imp_volume',
-                                                    click = clickOpts("imp_volume_plot_click"),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('impvol_tooltip')
-                                       "Import volume reflects the total volume of product traded into the U.S. from other countries.",
-                                       placement = 'top'),
-                                     uiOutput('imp_volume_click_overlay'))),
+                                     withSpinner(
+                                       plotOutput('imp_volume',
+                                                  click = clickOpts("imp_volume_plot_click"),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('impvol_tooltip')
+                                     uiOutput('imp_volume_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Import volume reflects the total volume of product traded into the U.S. from other countries."
+                                       )))),
                                  downloadButton('download_page3',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Advanced Metrics',
