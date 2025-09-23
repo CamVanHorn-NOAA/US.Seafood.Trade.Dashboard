@@ -2102,16 +2102,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 300px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('supply_share',
-                                                    click = clickOpts(id = 'supply_share_plot_click'),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('supplyshare_tooltip')
-                                       "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports.",
-                                       placement = 'top'),
-                                     uiOutput('supply_share_click_overlay'))),
+                                     withSpinner(
+                                       plotOutput('supply_share',
+                                                  click = clickOpts(id = 'supply_share_plot_click'),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('supplyshare_tooltip')
+                                     uiOutput('supply_share_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 27px; left: 25px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
+                                       )))),
                                  downloadButton('download_page4',
                                                 'Download these plots and their data'))))
   ),
