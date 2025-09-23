@@ -1967,16 +1967,19 @@ ui <- page_sidebar(
                                        ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('imp_value',
-                                                    click = clickOpts("imp_value_plot_click"),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('impval_tooltip'),
-                                       "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points.",
-                                       placement = 'top'),
-                                     uiOutput("imp_value_click_overlay"))),
+                                     withSpinner(
+                                       plotOutput('imp_value',
+                                                  click = clickOpts("imp_value_plot_click"),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('impval_tooltip'),
+                                     uiOutput("imp_value_click_overlay"),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points."
+                                       )))),
                                  downloadButton('download_page2',
                                                 'Download these plots and their data')),
                        nav_panel(title = 'Volume',
