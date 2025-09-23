@@ -2145,16 +2145,19 @@ ui <- page_sidebar(
                          nav_panel(title = 'Volume',
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('landings_volume',
-                                                    click = clickOpts(id = 'landings_volume_plot_click'),
-                                                    height = "500px"),
-                                         type = 7),
-                                       # textOutput('comvolume_tooltip')
-                                       "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S.",
-                                       placement = 'top'),
-                                     uiOutput('landings_volume_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('landings_volume',
+                                                  click = clickOpts(id = 'landings_volume_plot_click'),
+                                                  height = "500px"),
+                                       type = 7),
+                                     # textOutput('comvolume_tooltip')
+                                     uiOutput('landings_volume_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
+                                       ))),
                                    downloadButton('download_landings_page2',
                                                   'Download this plot and the data')))),
       div(
