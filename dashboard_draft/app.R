@@ -1952,17 +1952,19 @@ ui <- page_sidebar(
                                    style = "flex: 1; display: flex; gap: 15px;",
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('exp_value', 
-                                                    click = clickOpts("exp_value_plot_click"),
-                                                    height = "500px"), 
-                                         type = 7),
-                                       # textOutput('expval_tooltip'),
-                                       "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points.",
-                                       placement = 'top'
-                                     ),
-                                     uiOutput("exp_value_click_overlay")),
+                                     withSpinner(
+                                       plotOutput('exp_value', 
+                                                  click = clickOpts("exp_value_plot_click"),
+                                                  height = "500px"), 
+                                       type = 7),
+                                     # textOutput('expval_tooltip'),
+                                     uiOutput("exp_value_click_overlay"),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 57px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
