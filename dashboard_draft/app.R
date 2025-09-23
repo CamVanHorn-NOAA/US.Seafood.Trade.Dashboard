@@ -2127,16 +2127,19 @@ ui <- page_sidebar(
                          nav_panel(title = 'Value',
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%",
-                                     tooltip(
-                                       withSpinner(
-                                         plotOutput('landings_value',
-                                                    click = clickOpts(id = 'landings_value_plot_click'),
-                                                    height = "500px"),
-                                         type = 7),
-                                       # textOutput('comvalue_tooltip')
-                                       "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points.",
-                                       placement = 'top'),
-                                     uiOutput('landings_value_click_overlay')),
+                                     withSpinner(
+                                       plotOutput('landings_value',
+                                                  click = clickOpts(id = 'landings_value_plot_click'),
+                                                  height = "500px"),
+                                       type = 7),
+                                     # textOutput('comvalue_tooltip')
+                                     uiOutput('landings_value_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 50px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
+                                       ))),
                                    downloadButton('download_landings_page1',
                                                   'Download this plot and the data')),
                          nav_panel(title = 'Volume',
