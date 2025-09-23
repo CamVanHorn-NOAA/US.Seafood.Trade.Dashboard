@@ -2023,18 +2023,20 @@ ui <- page_sidebar(
                                    div(
                                      # style argument keeps overlay positioned within the container
                                      style = "position: relative; min-width: 600px; width: 100%;",
-                                     tooltip(
-                                       withSpinner(
-                                         # tableOutput('exp_mlti_table'),
-                                         plotOutput('exp_mlti',
-                                                    click = clickOpts(id = 'exp_mlti_plot_click'),
-                                                    height = "500px"),
-                                         type = 7),
-                                       # textOutput('expmlti_tooltip'),
-                                       "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base.",
-                                       placement = 'top'
-                                     ),
-                                     uiOutput('exp_mlti_click_overlay')),
+                                     withSpinner(
+                                       # tableOutput('exp_mlti_table'),
+                                       plotOutput('exp_mlti',
+                                                  click = clickOpts(id = 'exp_mlti_plot_click'),
+                                                  height = "500px"),
+                                       type = 7),
+                                     # textOutput('expmlti_tooltip'),
+                                     uiOutput('exp_mlti_click_overlay'),
+                                     div(
+                                       style = "position: absolute; top: 0px; left: 35px",
+                                       tooltip(
+                                         icon("info-circle"),
+                                         "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
+                                       ))),
                                    div(
                                      style = "position: relative; min-width: 600px; width: 100%;",
                                      tooltip(
