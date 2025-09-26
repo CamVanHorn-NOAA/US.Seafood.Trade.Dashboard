@@ -1,0 +1,117 @@
+---
+title: "Species Classification Hierarchy"
+format: html
+editor: visual
+---
+
+Several sources collect federal fisheries data along the supply chain using nonuniform methods. This generates variability in how species information is reported, which poses a barrier to comparing how catch, processing, and trade of a species varies through time. We thus standardized species identification and organization across our data sets by creating a classification hierarchy consisting of four levels: (1) ecological category, (2) species category, (3) species group, and (4) species name (Figure 1). The first two levels primarily reflect species conglomerates (i.e., collections of species organized by specific shared characteristics), and the final two levels primarily reflect species identification. This effort increases the power of the data set by enabling investigation of seafood characteristics at different degrees of species classification (e.g., Albacore Tuna, pacific tunas, or all tunas).
+
+```{mermaid}
+%%| label: fig-simple
+%%| fig-cap: "Flow chart of the classification hierarchy."
+flowchart LR
+  A[Ecological Category] --> B[Species Category]
+  B --> C[Species Group]
+  C --> D[Species Name]
+
+```
+
+We organized our hierarchy as a progressive filter, where the first level (ecological category) is intentionally broad and each progressive level gains specificity until the final level (species name). Ecological categories reflect shared habitat, taxonomic, or anatomic characteristics of animal and plant species collected by fisheries either intentionally or as bycatch. Species categories within an ecological category begin to assign species information; this can be specific for relatively diverse or economically valuable species groups (e.g., rockfish, shrimp) or collective of species conglomerates (e.g., cods and haddocks; groupers and snappers). Species groups within a species category provide further nuance to a species classification without specifying the exact species. For diverse species categories, examples include oyster, sea bass, barracuda, and grenadier. For economically valuable species groups, however, we specify endemic oceans and regions to enhance analytical power. Examples of these species groups include Pacific salmon, Hawaii tuna, and Gulf-Atlantic shrimp. Finally, species names are the most specific attribution possible that have a scientific name, such as skipjack tuna (*Katsuwonus pelamis*), chinook salmon (*Oncorhynchus tshawytscha*), and brown shrimp (*Penaeus aztecus*). Figure 2 below illustrates an example of species classifications.
+
+```{mermaid}
+%%| label: fig-simple
+%%| fig-cap: "Flow chart of the classification hierarchy detailed with example species."
+
+flowchart LR
+  A[Crustaceans] --> B[Lobsters]
+  A --> C[Crabs]
+  B --> D[Pacific Lobster]
+  B --> E[South Atlantic / Gulf Lobster]
+  C --> F[Pacific Crab]
+  C --> G[Atlantic Crab]
+  D --> H[California Spiny Lobster]
+  D --> I[Banded Spiny Lobster]
+  E --> J[Caribbean Spiny Lobster]
+  E --> K[Spotted Spiny Lobster]
+  F --> L[Dungeness Crab]
+  F --> M[Snow Crab]
+  G --> N[Jonah Crab]
+  G --> O[Blue Crab]
+
+```
+
+Classification often required some background knowledge on the species' taxonomy and ecology, which was not always known. To ensure accurate classification, we resourced species metadata from the public repository [FishBase](www.fishbase.org), an international biodiversity information system that stores taxonomic, biological, and ecological information as well as geographic distributions of tens of thousands of fish species globally (Froese & Pauly 2025; for non-fish species, we used the similar repository [SeaLifeBase](www.sealifebase.org); Palomares & Pauly 2025). Our primary uses of FishBase and SeaLifeBase involved researching habitat (e.g., if fishes were demersally distributed or commonly found in reef habitats), distribution (e.g., if fishes were endemic to the Pacific or Atlantic), taxonomy (e.g., if fishes belonged to families of Jacks, Snappers, or Rockfishes), and common lengths.
+
+We categorized species beginning with ecological category due to many instances of product labels providing insufficient information to attribute a species name or even species group. Below, we define each of these ecological categories (alphabetically) and provide some examples of classifications for each hierarchy level contained therein.
+
+Aquatic Plants
+
+:   All plant species that appear in aquatic environments. In fisheries data, this is exclusively seaweeds and algaes such as rockweed seaweed, sugar kelp seaweed, and irish moss seaweed. <br><br>
+
+Cartilaginous Fishes
+
+:   Fish species whose skeletal structure is made primarily or entirely of cartilage. Categorically, these include sharks, rays, skates, and chimaeras, which include species such as thresher sharks, stingrays, starry skates, and banded guitarfish, respectively. <br><br>
+
+Crustaceans
+
+:   Invertebrate species that belong to the sub-phylum *Crustacea*. Categorically, crustaceans include many economically important species such as crabs, lobsters, and shrimps, as well as freshwater prawns and krill. We separated economically important crustaceans by their oceanic distribution (Pacific or Atlantic); for shrimps and lobsters, we grouped Gulf species with Atlantic species. <br><br>
+
+Diadromous Fishes
+
+:   Fish species that exhibit diadromous behavior, or those whose life histories involve migration between marine and freshwater environments. These can be catadromous species, such as American eels (*Anguilla rostrate*), that are born in marine environments, migrate to freshwater habitat until they reach sexual maturity, and return to marine environments to spawn. They can also be anadromous species, such as salmonids, that are born in freshwater environments, migrate to marine environments until they reach sexual maturity, and return to freshwater environments to spawn. Anadromous fish species are far more common than catadromous species and also make up highly valuable fisheries. Categorically, anadromous fishes include salmons, some trouts, and many sturgeons. They can include demersal fishes (such as sturgeon) that spend most of their life history near the benthos. Salmon are some of the most highly demanded fish species domestically, thus we split them into two groups based on their oceanic distribution (Pacific or Atlantic). While Atlantic salmon are also a species (*Salmo salar*), Pacific salmon are more diverse and include Chinook, Coho (*Oncorhynchus kisutch*), and Sockeye (*Oncorhynchus nerka*). <br><br>
+
+Echinoderms
+
+:   Invertebrate species that belong to the phylum *Echinodermata*. Categorically, echinoderms include sea cucumbers, sea urchins, and starfishes, among other species groups. In domestic fisheries, many echinoderms are not described to the species level, though some sea cucumbers (Florida Sea Cucumber *Holothuria floridana*), sea urchins (Slate Pencil Urchin *Eucidaris tribuloides*), and starfishes (Basket star *Astrophyton muricatum*, Black Brittle Star *Ophiocoma echinata*) are exceptions. <br><br>
+
+Freshwater Fishes
+
+:   Fishes that exclusively inhabit freshwater environments. Domestic freshwater fisheries are diverse and include many fish species categorized by their taxonomy (Cyprinids, such as carp, or Cichlids, such as tilapia), habitat (demersal fishes, such as catfish), or conglomerate (Bass, such as white bass). We grouped species that exist beyond these categories (e.g., pike, perch, some trouts) into an 'Other Species' category. <br><br>
+
+Groundfishes
+
+:   Fishes that occupy demersal environments and are often classified as Groundfishes in Fishery Management Plans (FMPs). While these fishes are inherently demersal and are thus categorized as such (e.g., Monkfish, Roughy), many belong to larger species conglomerates (e.g., Flatfishes, Rockfishes), are closely related (e.g., Cods and Haddocks, or Pollock and Hake), or are economically significant in the North Pacific while not belonging to aforementioned conglomerates (e.g., Sablefish *Anoplopoma fimbria*, Lingcod *Ophiodon elongatus*, Atka Mackerel *Pleurogrammus monopterygius*). The high diversity and economic significance of Flatfishes motivated us to split their categorization by oceanic distribution (Pacific or Atlantic); some flatfish products did not provide sufficient species information (e.g., 'Halibut', 'Plaice', or 'Sole') and were thus placed in a generic 'Flatfishes' category. <br><br>
+
+Large Coastals
+
+:   Fishes who primarily inhabit marine environments near the coast, otherwise defined as the marine environment over the continental shelf, and are commonly longer than 60 centimeters (as defined in FishBase). For fishes to be classified as coastal, their distributions could not extend to offshore pelagic waters. Examples include reef fishes such as triggerfishes and parrotfishes, groupers, and some demersal fishes such as drums and weakfish. Fishes classified as Large Coastals are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br>
+
+Large Pelagics
+
+:   Fishes who primarily inhabit pelagic marine environments, otherwise defined as offshore, that swim in the water column (i.e., not on the benthos), and are commonly longer than 60 centimeters (as defined in FishBase). For fishes to be classified as pelagic, their distributions could not overlap with coastal environments. Examples include Jacks and Mackerels, Tunas, and Billfishes. Fishes classified as Large Pelagics are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br>
+
+Marine Mammals
+
+:   Mammals exclusive to the marine environment. In federal fisheries, marine mammals are exclusively caught as bycatch, which is minimal. Marine mammal species information is not available in the data. <br><br>
+
+Molluscs
+
+:   Invertebrate species that belong to the phylum *Mollusca*. Categorically, molluscs include many economically important species such as squids, octopuses, and bivalves as well as other shellfish species including conches and snails. Bivalves are species characterized by a hinged pair of calcified half-shells and include oysters, clams, and mussels. <br><br>
+
+Other Animals
+
+:   Animal species otherwise not exclusively endemic to marine or aquatic environments. In fisheries data, these are largely reptiles and amphibians. <br><br>
+
+Other Marine Fishes
+
+:   Fish species endemic to marine environments otherwise not classifiable as Cartilaginous fishes, Diadromous fishes, large coastals, large pelagics, small coastals, or small pelagics. Fishes classified here largely have low economic value, including several demersal fishes such as goosefish, barrelfish, and eels, as well as sea bass, marine catfish, and lumpfish. <br><br>
+
+Other Marine Invertebrates
+
+:   Invertebrates species endemic to marine environments otherwise not classifiable as Crustaceans, Echinoderms, or Molluscs. Species classified here include sponges, jellyfishes, worms, and corals. <br><br>
+
+Other Plants
+
+:   Plant species otherwise not endemic to aquatic environments. <br><br>
+
+Small Coastals
+
+:   Fishes who primarily inhabit marine environments near the coast, otherwise defined as the marine environment over the continental shelf, and are commonly no longer than 60 centimeters (as defined in FishBase). For fishes to be classified as coastal, their distributions could not extend to offshore pelagic waters. Examples include reef fishes such as butterflyfishes and damselfishes, some schooling baitfishes, and some demersal fishes such as porgies and croakers. Fishes classified as Small Coastals are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br>
+
+Small Pelagics
+
+:   Fishes who primarily inhabit pelagic marine environments, otherwise defined as offshore, that swim in the water column (i.e., not on the benthos), and are commonly no longer than 60 centimeters (as defined in FishBase). For fishes to be classified as pelagic, their distributions could not overlap with coastal environments. Examples include schooling baitfishes such as menhaden, sardine, and milkfish, as well as butterfish. Fishes classified as Small Pelagics are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br>
+
+Uncategorized
+
+:   Fisheries products whose labels do not provide sufficient information to assign any level of species classification.
