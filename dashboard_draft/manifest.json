@@ -377,6 +377,33 @@
         "Built": "R 4.3.3; ; 2025-02-08 04:19:17 UTC; windows"
       }
     },
+    "bsicons": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "bsicons",
+        "Title": "Easily Work with 'Bootstrap' Icons",
+        "Version": "0.1.2",
+        "Authors@R": "c(\n    person(\"Carson\", \"Sievert\", , \"carson@posit.co\", role = c(\"cre\", \"aut\"),\n           comment = c(ORCID = \"0000-0002-4958-2844\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")),\n    person(\"Mark\", \"Otto\", role = \"cph\",\n           comment = \"Bootstrap icons maintainer\")\n  )",
+        "Description": "Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R\n    Markdown' documents. More generally, icons can be inserted in any\n    'htmltools' document through inline 'SVG'.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/rstudio/bsicons",
+        "BugReports": "https://github.com/rstudio/bsicons/issues",
+        "Depends": "R (>= 2.10)",
+        "Imports": "cli, htmltools, rlang, utils",
+        "Suggests": "bslib, processx, testthat, webshot2, withr",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-11-03 23:29:00 UTC; cpsievert",
+        "Author": "Carson Sievert [cre, aut] (<https://orcid.org/0000-0002-4958-2844>),\n  Posit Software, PBC [cph, fnd],\n  Mark Otto [cph] (Bootstrap icons maintainer)",
+        "Maintainer": "Carson Sievert <carson@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-11-04 00:30:05 UTC",
+        "Built": "R 4.3.3; ; 2025-04-07 01:06:42 UTC; windows"
+      }
+    },
     "bslib": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -700,7 +727,7 @@
         "Package": "curl",
         "Type": "Package",
         "Title": "A Modern and Flexible Web Client for R",
-        "Version": "6.2.0",
+        "Version": "6.2.2",
         "Authors@R": "c(\n    person(\"Jeroen\", \"Ooms\", role = c(\"aut\", \"cre\"), email = \"jeroenooms@gmail.com\",\n      comment = c(ORCID = \"0000-0002-4035-0289\")),\n    person(\"Hadley\", \"Wickham\", role = \"ctb\"),\n    person(\"Posit Software, PBC\", role = \"cph\"))",
         "Description": "Bindings to 'libcurl' <https://curl.se/libcurl/> for performing fully\n    configurable HTTP/FTP requests where responses can be processed in memory, on\n    disk, or streaming via the callback or connection interfaces. Some knowledge\n    of 'libcurl' is recommended; for a more-user-friendly web client see the \n    'httr2' package which builds on this package with http specific tools and logic.",
         "License": "MIT + file LICENSE",
@@ -714,12 +741,12 @@
         "Encoding": "UTF-8",
         "Language": "en-US",
         "NeedsCompilation": "yes",
-        "Packaged": "2025-01-23 12:31:51 UTC; jeroen",
+        "Packaged": "2025-03-23 13:24:53 UTC; jeroen",
         "Author": "Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>),\n  Hadley Wickham [ctb],\n  Posit Software, PBC [cph]",
         "Maintainer": "Jeroen Ooms <jeroenooms@gmail.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2025-01-23 18:40:02 UTC",
-        "Built": "R 4.3.3; x86_64-w64-mingw32; 2025-02-08 01:40:09 UTC; windows",
+        "Date/Publication": "2025-03-24 07:00:02 UTC",
+        "Built": "R 4.3.3; x86_64-w64-mingw32; 2025-04-07 00:22:37 UTC; windows",
         "Archs": "x64"
       }
     },
@@ -1167,7 +1194,7 @@
       "Repository": "https://cran.rstudio.com",
       "description": {
         "Package": "ggplot2",
-        "Version": "3.5.1",
+        "Version": "3.5.2",
         "Title": "Create Elegant Data Visualisations Using the Grammar of Graphics",
         "Authors@R": "c(\n    person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = \"aut\",\n           comment = c(ORCID = \"0000-0003-4757-117X\")),\n    person(\"Winston\", \"Chang\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-1576-2126\")),\n    person(\"Lionel\", \"Henry\", role = \"aut\"),\n    person(\"Thomas Lin\", \"Pedersen\", , \"thomas.pedersen@posit.co\", role = c(\"aut\", \"cre\"),\n           comment = c(ORCID = \"0000-0002-5147-4711\")),\n    person(\"Kohske\", \"Takahashi\", role = \"aut\"),\n    person(\"Claus\", \"Wilke\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-7470-9261\")),\n    person(\"Kara\", \"Woo\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-5125-4188\")),\n    person(\"Hiroaki\", \"Yutani\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-3385-7233\")),\n    person(\"Dewey\", \"Dunnington\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-9415-4582\")),\n    person(\"Teun\", \"van den Brand\", role = \"aut\",\n           comment = c(ORCID = \"0000-0002-9335-7468\")),\n    person(\"Posit, PBC\", role = c(\"cph\", \"fnd\"))\n  )",
         "Description": "A system for 'declaratively' creating graphics, based on \"The\n    Grammar of Graphics\". You provide the data, tell 'ggplot2' how to map\n    variables to aesthetics, what graphical primitives to use, and it\n    takes care of the details.",
@@ -1183,15 +1210,15 @@
         "Config/testthat/edition": "3",
         "Encoding": "UTF-8",
         "LazyData": "true",
-        "RoxygenNote": "7.3.1",
+        "RoxygenNote": "7.3.2",
         "Collate": "'ggproto.R' 'ggplot-global.R' 'aaa-.R'\n'aes-colour-fill-alpha.R' 'aes-evaluation.R'\n'aes-group-order.R' 'aes-linetype-size-shape.R'\n'aes-position.R' 'compat-plyr.R' 'utilities.R' 'aes.R'\n'utilities-checks.R' 'legend-draw.R' 'geom-.R'\n'annotation-custom.R' 'annotation-logticks.R' 'geom-polygon.R'\n'geom-map.R' 'annotation-map.R' 'geom-raster.R'\n'annotation-raster.R' 'annotation.R' 'autolayer.R' 'autoplot.R'\n'axis-secondary.R' 'backports.R' 'bench.R' 'bin.R' 'coord-.R'\n'coord-cartesian-.R' 'coord-fixed.R' 'coord-flip.R'\n'coord-map.R' 'coord-munch.R' 'coord-polar.R'\n'coord-quickmap.R' 'coord-radial.R' 'coord-sf.R'\n'coord-transform.R' 'data.R' 'docs_layer.R' 'facet-.R'\n'facet-grid-.R' 'facet-null.R' 'facet-wrap.R' 'fortify-lm.R'\n'fortify-map.R' 'fortify-multcomp.R' 'fortify-spatial.R'\n'fortify.R' 'stat-.R' 'geom-abline.R' 'geom-rect.R'\n'geom-bar.R' 'geom-bin2d.R' 'geom-blank.R' 'geom-boxplot.R'\n'geom-col.R' 'geom-path.R' 'geom-contour.R' 'geom-count.R'\n'geom-crossbar.R' 'geom-segment.R' 'geom-curve.R'\n'geom-defaults.R' 'geom-ribbon.R' 'geom-density.R'\n'geom-density2d.R' 'geom-dotplot.R' 'geom-errorbar.R'\n'geom-errorbarh.R' 'geom-freqpoly.R' 'geom-function.R'\n'geom-hex.R' 'geom-histogram.R' 'geom-hline.R' 'geom-jitter.R'\n'geom-label.R' 'geom-linerange.R' 'geom-point.R'\n'geom-pointrange.R' 'geom-quantile.R' 'geom-rug.R' 'geom-sf.R'\n'geom-smooth.R' 'geom-spoke.R' 'geom-text.R' 'geom-tile.R'\n'geom-violin.R' 'geom-vline.R' 'ggplot2-package.R'\n'grob-absolute.R' 'grob-dotstack.R' 'grob-null.R' 'grouping.R'\n'theme-elements.R' 'guide-.R' 'guide-axis.R'\n'guide-axis-logticks.R' 'guide-axis-stack.R'\n'guide-axis-theta.R' 'guide-legend.R' 'guide-bins.R'\n'guide-colorbar.R' 'guide-colorsteps.R' 'guide-custom.R'\n'layer.R' 'guide-none.R' 'guide-old.R' 'guides-.R'\n'guides-grid.R' 'hexbin.R' 'import-standalone-obj-type.R'\n'import-standalone-types-check.R' 'labeller.R' 'labels.R'\n'layer-sf.R' 'layout.R' 'limits.R' 'margins.R' 'performance.R'\n'plot-build.R' 'plot-construction.R' 'plot-last.R' 'plot.R'\n'position-.R' 'position-collide.R' 'position-dodge.R'\n'position-dodge2.R' 'position-identity.R' 'position-jitter.R'\n'position-jitterdodge.R' 'position-nudge.R' 'position-stack.R'\n'quick-plot.R' 'reshape-add-margins.R' 'save.R' 'scale-.R'\n'scale-alpha.R' 'scale-binned.R' 'scale-brewer.R'\n'scale-colour.R' 'scale-continuous.R' 'scale-date.R'\n'scale-discrete-.R' 'scale-expansion.R' 'scale-gradient.R'\n'scale-grey.R' 'scale-hue.R' 'scale-identity.R'\n'scale-linetype.R' 'scale-linewidth.R' 'scale-manual.R'\n'scale-shape.R' 'scale-size.R' 'scale-steps.R' 'scale-type.R'\n'scale-view.R' 'scale-viridis.R' 'scales-.R' 'stat-align.R'\n'stat-bin.R' 'stat-bin2d.R' 'stat-bindot.R' 'stat-binhex.R'\n'stat-boxplot.R' 'stat-contour.R' 'stat-count.R'\n'stat-density-2d.R' 'stat-density.R' 'stat-ecdf.R'\n'stat-ellipse.R' 'stat-function.R' 'stat-identity.R'\n'stat-qq-line.R' 'stat-qq.R' 'stat-quantilemethods.R'\n'stat-sf-coordinates.R' 'stat-sf.R' 'stat-smooth-methods.R'\n'stat-smooth.R' 'stat-sum.R' 'stat-summary-2d.R'\n'stat-summary-bin.R' 'stat-summary-hex.R' 'stat-summary.R'\n'stat-unique.R' 'stat-ydensity.R' 'summarise-plot.R'\n'summary.R' 'theme.R' 'theme-defaults.R' 'theme-current.R'\n'utilities-break.R' 'utilities-grid.R' 'utilities-help.R'\n'utilities-matrix.R' 'utilities-patterns.R'\n'utilities-resolution.R' 'utilities-tidy-eval.R' 'zxx.R'\n'zzz.R'",
         "NeedsCompilation": "no",
-        "Packaged": "2024-04-22 10:39:16 UTC; thomas",
+        "Packaged": "2025-04-08 10:58:01 UTC; thomas",
         "Author": "Hadley Wickham [aut] (<https://orcid.org/0000-0003-4757-117X>),\n  Winston Chang [aut] (<https://orcid.org/0000-0002-1576-2126>),\n  Lionel Henry [aut],\n  Thomas Lin Pedersen [aut, cre]\n    (<https://orcid.org/0000-0002-5147-4711>),\n  Kohske Takahashi [aut],\n  Claus Wilke [aut] (<https://orcid.org/0000-0002-7470-9261>),\n  Kara Woo [aut] (<https://orcid.org/0000-0002-5125-4188>),\n  Hiroaki Yutani [aut] (<https://orcid.org/0000-0002-3385-7233>),\n  Dewey Dunnington [aut] (<https://orcid.org/0000-0002-9415-4582>),\n  Teun van den Brand [aut] (<https://orcid.org/0000-0002-9335-7468>),\n  Posit, PBC [cph, fnd]",
         "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
         "Repository": "CRAN",
-        "Date/Publication": "2024-04-23 08:00:08 UTC",
-        "Built": "R 4.3.3; ; 2025-02-08 03:29:54 UTC; windows"
+        "Date/Publication": "2025-04-09 09:40:10 UTC",
+        "Built": "R 4.3.2; ; 2025-08-14 19:32:00 UTC; windows"
       }
     },
     "glue": {
@@ -3372,7 +3399,367 @@
   },
   "files": {
     "app.R": {
-      "checksum": "104c2c030f481639ef6aecc0dfc675b8"
+      "checksum": "0f5371177b79e506b2e490fc7143580f"
+    },
+    "dashboard_calc_metrics.html": {
+      "checksum": "3b3bf2aa09fd5c806eb24963fa4d36e7"
+    },
+    "dashboard_calc_metrics.qmd": {
+      "checksum": "6d0ac918461d6e1bc2e95ec308170752"
+    },
+    "dashboard_calc_metrics_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_calc_metrics_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_calc_metrics_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_calc_metrics_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_calc_metrics_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_calc_metrics_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_contact_us.html": {
+      "checksum": "f27cf1d85d24963b2e6a0b580a852d42"
+    },
+    "dashboard_contact_us.qmd": {
+      "checksum": "15af25ce2e2da44efc46991ddf819a27"
+    },
+    "dashboard_contact_us_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_contact_us_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_contact_us_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_contact_us_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_contact_us_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_data_collection.html": {
+      "checksum": "904c42167e9354e533b28002129fed32"
+    },
+    "dashboard_data_collection.qmd": {
+      "checksum": "565aea690240fccdd835f0ed972c5373"
+    },
+    "dashboard_data_collection_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_data_collection_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_data_collection_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_data_collection_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_data_collection_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_data_collection_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_data_management.html": {
+      "checksum": "0488e4b50028e6e79a815137672b1918"
+    },
+    "dashboard_data_management.qmd": {
+      "checksum": "f992610362e8b35d11d5c6e0f7eca6c1"
+    },
+    "dashboard_data_management_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_data_management_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_data_management_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_data_management_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_data_management_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_data_management_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_data_management_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_data_management_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_data_management_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_data_management_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_data_management_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_data_sourcing.html": {
+      "checksum": "3b492e73bf0e1b33ccef5fc15274d26f"
+    },
+    "dashboard_data_sourcing.qmd": {
+      "checksum": "9e22ff9df0723d58bb4b33fbcbb28ede"
+    },
+    "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_data_sourcing_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_data_sourcing_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_data_sourcing_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_intro.html": {
+      "checksum": "3c52a5cc3d7fe1bb68065ef145fc6423"
+    },
+    "dashboard_intro.qmd": {
+      "checksum": "34124e7e3ef825e3e6b9814943ac1902"
+    },
+    "dashboard_intro_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_intro_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_intro_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_intro_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_intro_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_intro_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_intro_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_intro_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_intro_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_intro_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_intro_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_region_doc.html": {
+      "checksum": "61af9b7344f9fd5b3a60219bbd0e22d5"
+    },
+    "dashboard_region_doc.qmd": {
+      "checksum": "218e2afc95558aef4a2087e0d522a2a7"
+    },
+    "dashboard_region_doc_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_region_doc_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_region_doc_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_region_doc_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_region_doc_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_resources.html": {
+      "checksum": "d7384fcb95cc9563f69170ab2c4dfc5b"
+    },
+    "dashboard_resources.qmd": {
+      "checksum": "e2d0ae5bcbe44fe68fb1df127766e09c"
+    },
+    "dashboard_resources_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_resources_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_resources_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_resources_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_resources_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_resources_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_resources_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_resources_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_resources_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_resources_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_resources_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "dashboard_species_classification.html": {
+      "checksum": "eaaaf427017a4c13b1fc3e83a52e384b"
+    },
+    "dashboard_species_classification.qmd": {
+      "checksum": "6989f6067835a785d1e994a3921ed91c"
+    },
+    "dashboard_species_classification_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+    },
+    "dashboard_species_classification_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+    },
+    "dashboard_species_classification_files/libs/bootstrap/bootstrap.min.css": {
+      "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
+    },
+    "dashboard_species_classification_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+    },
+    "dashboard_species_classification_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "ad98572d415d2f2452845a6068a913c0"
+    },
+    "dashboard_species_classification_files/libs/quarto-diagram/mermaid-init.js": {
+      "checksum": "e307dff1d72cef282ee340cd99ca5061"
+    },
+    "dashboard_species_classification_files/libs/quarto-diagram/mermaid.css": {
+      "checksum": "0aeecd8a816e25e43a41943c6146c2b7"
+    },
+    "dashboard_species_classification_files/libs/quarto-diagram/mermaid.min.js": {
+      "checksum": "39d86f31f283d9b1ae19d604102bda48"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/popper.min.js": {
+      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/quarto-syntax-highlighting.css": {
+      "checksum": "099cd394577c915952e100d918f76f84"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/quarto.js": {
+      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "dashboard_species_classification_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
     },
     "nmfs_cols.R": {
       "checksum": "3319cae28b424f32a1d67037f1aa005d"
@@ -3380,8 +3767,26 @@
     "seafood_trade_data_munge_03_13_25.RData": {
       "checksum": "6abeddd0fa58556c8626fa3ddf8a6196"
     },
-    "seafood_trade_data_munge_04_30_25.RData": {
-      "checksum": "be4c5a7f746bd49f687f2e28286a8215"
+    "seafood_trade_data_munge_05_12_25.RData": {
+      "checksum": "73842bcedc6a79e04a73a790ac0d142b"
+    },
+    "seafood_trade_data_munge_09_08_25.RData": {
+      "checksum": "8bcece2d3da78231e6be3d76c5cacd69"
+    },
+    "seafood_trade_data_munge_09_15_25.RData": {
+      "checksum": "d77ea93f59cd44280981df9fb585c1fb"
+    },
+    "test.csv": {
+      "checksum": "7e9649f13510c235ae90907ec503a926"
+    },
+    "trade_data.csv": {
+      "checksum": "7e9649f13510c235ae90907ec503a926"
+    },
+    "www/22Fisheries TEAL_S1 CornerWide.png": {
+      "checksum": "a1b0cda00dbd81a4ee747ed8d6bd2f67"
+    },
+    "www/NOAA_FISHERIES_H.png": {
+      "checksum": "e16b800116613cb9d4b0f7c0aefaff9f"
     }
   },
   "users": null
