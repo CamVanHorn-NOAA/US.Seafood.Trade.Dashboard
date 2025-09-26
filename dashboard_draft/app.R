@@ -21,6 +21,9 @@ if(!require("bsicons"))     install.packages("bsicons")
   # file located in app directory for nmfspalette colors
 source("nmfs_cols.R")
 
+# Add Resource Path for Quarto documents
+addResourcePath("tmpuser", getwd())
+
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
 load('seafood_trade_data_munge_09_15_25.RData')
