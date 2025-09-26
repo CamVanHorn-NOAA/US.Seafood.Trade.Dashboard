@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Species Classification Hierarchy</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="dashboard_species_classification_files/libs/clipboard/clipboard.min.js"></script>
+<script src="dashboard_species_classification_files/libs/quarto-html/quarto.js"></script>
+<script src="dashboard_species_classification_files/libs/quarto-html/popper.min.js"></script>
+<script src="dashboard_species_classification_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="dashboard_species_classification_files/libs/quarto-html/anchor.min.js"></script>
+<link href="dashboard_species_classification_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="dashboard_species_classification_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="dashboard_species_classification_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="dashboard_species_classification_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="dashboard_species_classification_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="dashboard_species_classification_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="dashboard_species_classification_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="dashboard_species_classification_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Species Classification Hierarchy</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Several sources collect federal fisheries data along the supply chain using nonuniform methods. This generates variability in how species information is reported, which poses a barrier to comparing how catch, processing, and trade of a species varies through time. We thus standardized species identification and organization across our data sets by creating a classification hierarchy consisting of four levels: (1) ecological category, (2) species category, (3) species group, and (4) species name (Figure 1). The first two levels primarily reflect species conglomerates (i.e., collections of species organized by specific shared characteristics), and the final two levels primarily reflect species identification. This effort increases the power of the data set by enabling investigation of seafood characteristics at different degrees of species classification (e.g., Albacore Tuna, pacific tunas, or all tunas).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-simple" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+  A[Ecological Category] --&gt; B[Species Category]
+  B --&gt; C[Species Group]
+  C --&gt; D[Species Name]
+
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Flow chart of the classification hierarchy.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We organized our hierarchy as a progressive filter, where the first level (ecological category) is intentionally broad and each progressive level gains specificity until the final level (species name). Ecological categories reflect shared habitat, taxonomic, or anatomic characteristics of animal and plant species collected by fisheries either intentionally or as bycatch. Species categories within an ecological category begin to assign species information; this can be specific for relatively diverse or economically valuable species groups (e.g., rockfish, shrimp) or collective of species conglomerates (e.g., cods and haddocks; groupers and snappers). Species groups within a species category provide further nuance to a species classification without specifying the exact species. For diverse species categories, examples include oyster, sea bass, barracuda, and grenadier. For economically valuable species groups, however, we specify endemic oceans and regions to enhance analytical power. Examples of these species groups include Pacific salmon, Hawaii tuna, and Gulf-Atlantic shrimp. Finally, species names are the most specific attribution possible that have a scientific name, such as skipjack tuna (<em>Katsuwonus pelamis</em>), chinook salmon (<em>Oncorhynchus tshawytscha</em>), and brown shrimp (<em>Penaeus aztecus</em>). Figure 2 below illustrates an example of species classifications.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-simple" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-2">flowchart LR
+  A[Crustaceans] --&gt; B[Lobsters]
+  A --&gt; C[Crabs]
+  B --&gt; D[Pacific Lobster]
+  B --&gt; E[South Atlantic / Gulf Lobster]
+  C --&gt; F[Pacific Crab]
+  C --&gt; G[Atlantic Crab]
+  D --&gt; H[California Spiny Lobster]
+  D --&gt; I[Banded Spiny Lobster]
+  E --&gt; J[Caribbean Spiny Lobster]
+  E --&gt; K[Spotted Spiny Lobster]
+  F --&gt; L[Dungeness Crab]
+  F --&gt; M[Snow Crab]
+  G --&gt; N[Jonah Crab]
+  G --&gt; O[Blue Crab]
+
+</pre>
+<div id="mermaid-tooltip-2" class="mermaidTooltip">
+
+</div>
+<p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: Flow chart of the classification hierarchy detailed with example species.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Classification often required some background knowledge on the species’ taxonomy and ecology, which was not always known. To ensure accurate classification, we resourced species metadata from the public repository <a href="www.fishbase.org">FishBase</a>, an international biodiversity information system that stores taxonomic, biological, and ecological information as well as geographic distributions of tens of thousands of fish species globally (Froese &amp; Pauly 2025; for non-fish species, we used the similar repository <a href="www.sealifebase.org">SeaLifeBase</a>; Palomares &amp; Pauly 2025). Our primary uses of FishBase and SeaLifeBase involved researching habitat (e.g., if fishes were demersally distributed or commonly found in reef habitats), distribution (e.g., if fishes were endemic to the Pacific or Atlantic), taxonomy (e.g., if fishes belonged to families of Jacks, Snappers, or Rockfishes), and common lengths.</p>
+<p>We categorized species beginning with ecological category due to many instances of product labels providing insufficient information to attribute a species name or even species group. Below, we define each of these ecological categories (alphabetically) and provide some examples of classifications for each hierarchy level contained therein.</p>
+<dl>
+<dt>Aquatic Plants</dt>
+<dd>
+<p>All plant species that appear in aquatic environments. In fisheries data, this is exclusively seaweeds and algaes such as rockweed seaweed, sugar kelp seaweed, and irish moss seaweed. <br><br></p>
+</dd>
+<dt>Cartilaginous Fishes</dt>
+<dd>
+<p>Fish species whose skeletal structure is made primarily or entirely of cartilage. Categorically, these include sharks, rays, skates, and chimaeras, which include species such as thresher sharks, stingrays, starry skates, and banded guitarfish, respectively. <br><br></p>
+</dd>
+<dt>Crustaceans</dt>
+<dd>
+<p>Invertebrate species that belong to the sub-phylum <em>Crustacea</em>. Categorically, crustaceans include many economically important species such as crabs, lobsters, and shrimps, as well as freshwater prawns and krill. We separated economically important crustaceans by their oceanic distribution (Pacific or Atlantic); for shrimps and lobsters, we grouped Gulf species with Atlantic species. <br><br></p>
+</dd>
+<dt>Diadromous Fishes</dt>
+<dd>
+<p>Fish species that exhibit diadromous behavior, or those whose life histories involve migration between marine and freshwater environments. These can be catadromous species, such as American eels (<em>Anguilla rostrate</em>), that are born in marine environments, migrate to freshwater habitat until they reach sexual maturity, and return to marine environments to spawn. They can also be anadromous species, such as salmonids, that are born in freshwater environments, migrate to marine environments until they reach sexual maturity, and return to freshwater environments to spawn. Anadromous fish species are far more common than catadromous species and also make up highly valuable fisheries. Categorically, anadromous fishes include salmons, some trouts, and many sturgeons. They can include demersal fishes (such as sturgeon) that spend most of their life history near the benthos. Salmon are some of the most highly demanded fish species domestically, thus we split them into two groups based on their oceanic distribution (Pacific or Atlantic). While Atlantic salmon are also a species (<em>Salmo salar</em>), Pacific salmon are more diverse and include Chinook, Coho (<em>Oncorhynchus kisutch</em>), and Sockeye (<em>Oncorhynchus nerka</em>). <br><br></p>
+</dd>
+<dt>Echinoderms</dt>
+<dd>
+<p>Invertebrate species that belong to the phylum <em>Echinodermata</em>. Categorically, echinoderms include sea cucumbers, sea urchins, and starfishes, among other species groups. In domestic fisheries, many echinoderms are not described to the species level, though some sea cucumbers (Florida Sea Cucumber <em>Holothuria floridana</em>), sea urchins (Slate Pencil Urchin <em>Eucidaris tribuloides</em>), and starfishes (Basket star <em>Astrophyton muricatum</em>, Black Brittle Star <em>Ophiocoma echinata</em>) are exceptions. <br><br></p>
+</dd>
+<dt>Freshwater Fishes</dt>
+<dd>
+<p>Fishes that exclusively inhabit freshwater environments. Domestic freshwater fisheries are diverse and include many fish species categorized by their taxonomy (Cyprinids, such as carp, or Cichlids, such as tilapia), habitat (demersal fishes, such as catfish), or conglomerate (Bass, such as white bass). We grouped species that exist beyond these categories (e.g., pike, perch, some trouts) into an ‘Other Species’ category. <br><br></p>
+</dd>
+<dt>Groundfishes</dt>
+<dd>
+<p>Fishes that occupy demersal environments and are often classified as Groundfishes in Fishery Management Plans (FMPs). While these fishes are inherently demersal and are thus categorized as such (e.g., Monkfish, Roughy), many belong to larger species conglomerates (e.g., Flatfishes, Rockfishes), are closely related (e.g., Cods and Haddocks, or Pollock and Hake), or are economically significant in the North Pacific while not belonging to aforementioned conglomerates (e.g., Sablefish <em>Anoplopoma fimbria</em>, Lingcod <em>Ophiodon elongatus</em>, Atka Mackerel <em>Pleurogrammus monopterygius</em>). The high diversity and economic significance of Flatfishes motivated us to split their categorization by oceanic distribution (Pacific or Atlantic); some flatfish products did not provide sufficient species information (e.g., ‘Halibut’, ‘Plaice’, or ‘Sole’) and were thus placed in a generic ‘Flatfishes’ category. <br><br></p>
+</dd>
+<dt>Large Coastals</dt>
+<dd>
+<p>Fishes who primarily inhabit marine environments near the coast, otherwise defined as the marine environment over the continental shelf, and are commonly longer than 60 centimeters (as defined in FishBase). For fishes to be classified as coastal, their distributions could not extend to offshore pelagic waters. Examples include reef fishes such as triggerfishes and parrotfishes, groupers, and some demersal fishes such as drums and weakfish. Fishes classified as Large Coastals are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br></p>
+</dd>
+<dt>Large Pelagics</dt>
+<dd>
+<p>Fishes who primarily inhabit pelagic marine environments, otherwise defined as offshore, that swim in the water column (i.e., not on the benthos), and are commonly longer than 60 centimeters (as defined in FishBase). For fishes to be classified as pelagic, their distributions could not overlap with coastal environments. Examples include Jacks and Mackerels, Tunas, and Billfishes. Fishes classified as Large Pelagics are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br></p>
+</dd>
+<dt>Marine Mammals</dt>
+<dd>
+<p>Mammals exclusive to the marine environment. In federal fisheries, marine mammals are exclusively caught as bycatch, which is minimal. Marine mammal species information is not available in the data. <br><br></p>
+</dd>
+<dt>Molluscs</dt>
+<dd>
+<p>Invertebrate species that belong to the phylum <em>Mollusca</em>. Categorically, molluscs include many economically important species such as squids, octopuses, and bivalves as well as other shellfish species including conches and snails. Bivalves are species characterized by a hinged pair of calcified half-shells and include oysters, clams, and mussels. <br><br></p>
+</dd>
+<dt>Other Animals</dt>
+<dd>
+<p>Animal species otherwise not exclusively endemic to marine or aquatic environments. In fisheries data, these are largely reptiles and amphibians. <br><br></p>
+</dd>
+<dt>Other Marine Fishes</dt>
+<dd>
+<p>Fish species endemic to marine environments otherwise not classifiable as Cartilaginous fishes, Diadromous fishes, large coastals, large pelagics, small coastals, or small pelagics. Fishes classified here largely have low economic value, including several demersal fishes such as goosefish, barrelfish, and eels, as well as sea bass, marine catfish, and lumpfish. <br><br></p>
+</dd>
+<dt>Other Marine Invertebrates</dt>
+<dd>
+<p>Invertebrates species endemic to marine environments otherwise not classifiable as Crustaceans, Echinoderms, or Molluscs. Species classified here include sponges, jellyfishes, worms, and corals. <br><br></p>
+</dd>
+<dt>Other Plants</dt>
+<dd>
+<p>Plant species otherwise not endemic to aquatic environments. <br><br></p>
+</dd>
+<dt>Small Coastals</dt>
+<dd>
+<p>Fishes who primarily inhabit marine environments near the coast, otherwise defined as the marine environment over the continental shelf, and are commonly no longer than 60 centimeters (as defined in FishBase). For fishes to be classified as coastal, their distributions could not extend to offshore pelagic waters. Examples include reef fishes such as butterflyfishes and damselfishes, some schooling baitfishes, and some demersal fishes such as porgies and croakers. Fishes classified as Small Coastals are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br></p>
+</dd>
+<dt>Small Pelagics</dt>
+<dd>
+<p>Fishes who primarily inhabit pelagic marine environments, otherwise defined as offshore, that swim in the water column (i.e., not on the benthos), and are commonly no longer than 60 centimeters (as defined in FishBase). For fishes to be classified as pelagic, their distributions could not overlap with coastal environments. Examples include schooling baitfishes such as menhaden, sardine, and milkfish, as well as butterfish. Fishes classified as Small Pelagics are those not otherwise classifiable as Cartilaginous Fishes, Diadromous Fishes, or Groundfishes. <br><br></p>
+</dd>
+<dt>Uncategorized</dt>
+<dd>
+<p>Fisheries products whose labels do not provide sufficient information to assign any level of species classification.</p>
+</dd>
+</dl>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
