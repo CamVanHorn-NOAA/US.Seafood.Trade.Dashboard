@@ -2226,6 +2226,30 @@ ui <- page_sidebar(
                                            downloadButton('download_products_page3',
                                                           'Download this plot and the data')))))) 
       ),
+      nav_panel(
+        title = 'Information & Methods',
+        icon = bsicons::bs_icon("text-paragraph"),
+        navset_card_pill(
+          nav_panel(title = 'Introduction',
+                    htmlOutput('intro')),
+          nav_panel(title = 'Data Collection',
+                    htmlOutput('collection')),
+          nav_panel(title = 'Data Sourcing',
+                    htmlOutput('sourcing')),
+          nav_panel(title = 'Data Management',
+                    htmlOutput('management')),
+          nav_panel(title = 'Regional Consolidation',
+                    htmlOutput('region')),
+          nav_panel(title = 'Species Classification',
+                    htmlOutput('classification')),
+          nav_panel(title = 'Metrics',
+                    htmlOutput('metrics')),
+          nav_panel(title = 'Contact Us',
+                    htmlOutput('contact')),
+          nav_panel(title = 'Resources',
+                    htmlOutput('resource'))
+        )
+      )))
 )
       
   
