@@ -15,6 +15,7 @@ if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
 if(!require("shinycssloaders")) install.packages("shinycssloaders")
+if(!require("bsicons"))     install.packages("bsicons")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
 # Due to some limitations in downloading nmfspalette on devices, use source
   # file located in app directory for nmfspalette colors
