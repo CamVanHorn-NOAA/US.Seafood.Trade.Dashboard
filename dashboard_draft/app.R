@@ -1851,6 +1851,8 @@ ui <- page_sidebar(
                    options = list(
                      placeholder = 'Type here...'
                    )),
+    input_switch('units', 'Imperial Units'),
+    input_switch('nominal', 'Nominal Values'),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
