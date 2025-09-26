@@ -1894,336 +1894,338 @@ ui <- page_sidebar(
       p('Investigate 20 Years of U.S. Fisheries Data',
         style = 'font-family: "Gill Sans MT", sans-serif; font-size: clamp(1.0rem, 2.6vw, 2.6rem); margin-top: 0px; margin-bottom: 0px; opacity: 0.9;')
     )),
-  fluidRow(
-    input_switch('units', 'Imperial Units'),
-    input_switch('nominal', 'Nominal Values')
-  ),
-  fluidRow(
-    div(
-      style = 'border: 3px solid #005761; border-radius: 12px;
+  page_fluid(
+    navset_tab(
+      nav_panel(
+        title = 'The Dashboard',
+        icon = bsicons::bs_icon("layout-wtf"),
+        fluidRow(
+          div(
+            style = 'border: 3px solid #005761; border-radius: 12px;
                min-width: 800px; width: 100%; display: flex; flex-direction: column;',
-      navset_card_pill(title = 'Trade',
-                       nav_panel(title = 'Market Summary',
-                                 div(
-                                   style = "position: relative; min-width: 1200px;",
-                                   withSpinner(
-                                     plotOutput('balance',
-                                                click = clickOpts('balance_plot_click'),
-                                                height = "400px", width = "100%"), 
-                                     type = 7),
-                                   # textOutput('balance_tooltip'),
-                                   uiOutput('balance_click_overlay'),
-                                   div(
-                                     style = "position: absolute; top: 0px; left: 68px",
-                                     tooltip(
-                                       icon("info-circle"),
-                                       "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported."
-                                     ))),
-                                 div(
-                                   style = "flex: 1; display: flex; gap: 15px;",
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('trade_ratio',
-                                                  click = clickOpts('ratio_plot_click'),
-                                                  height = '400px'), 
-                                       type = 7),
-                                     # textOutput('ratio_tooltip'),
-                                     uiOutput('ratio_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 20px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('top5_trade',
-                                                  click = clickOpts('top5_plot_click'),
-                                                  height = '400px'), 
-                                       type = 7),
-                                     # textOutput('top5_tooltip'),
-                                     uiOutput('top5_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 10px; left: 52px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order."
-                                       )))),
-                                 downloadButton('download_page1',
-                                                'Download these plots and their data')),
-                       nav_panel(title = 'Value',
-                                 div(
-                                   style = "flex: 1; display: flex; gap: 15px;",
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('exp_value', 
-                                                  click = clickOpts("exp_value_plot_click"),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('expval_tooltip'),
-                                     uiOutput("exp_value_click_overlay"),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('imp_value',
-                                                  click = clickOpts("imp_value_plot_click"),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('impval_tooltip'),
-                                     uiOutput("imp_value_click_overlay"),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points."
-                                       )))),
-                                 downloadButton('download_page2',
-                                                'Download these plots and their data')),
-                       nav_panel(title = 'Volume',
-                                 div(
-                                   style = "flex: 1; display: flex; gap: 15px;",
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('exp_volume',
-                                                  click = clickOpts("exp_volume_plot_click"),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('expvol_tooltip'),
-                                     uiOutput("exp_volume_click_overlay"),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Export volume reflects the total volume of product traded out of the U.S. into other countries."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       plotOutput('imp_volume',
-                                                  click = clickOpts("imp_volume_plot_click"),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('impvol_tooltip')
-                                     uiOutput('imp_volume_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Import volume reflects the total volume of product traded into the U.S. from other countries."
-                                       )))),
-                                 downloadButton('download_page3',
-                                                'Download these plots and their data')),
-                       nav_panel(title = 'Advanced Metrics',
-                                 div(
-                                   style = "flex: 1; display: flex; gap: 15px;",
-                                   div(
-                                     # style argument keeps overlay positioned within the container
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       # tableOutput('exp_mlti_table'),
-                                       plotOutput('exp_mlti',
-                                                  click = clickOpts(id = 'exp_mlti_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('expmlti_tooltip'),
-                                     uiOutput('exp_mlti_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 35px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%;",
-                                     withSpinner(
-                                       # tableOutput('imp_mlti_table'), 
-                                       plotOutput('imp_mlti',
-                                                  click = clickOpts(id = 'imp_mlti_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     uiOutput('imp_mlti_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 15px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
-                                       )))),
-                                 br(),
-                                 div(
-                                   style = "flex: 1; display: flex; gap: 15px",
-                                   div(
-                                     style = "position: relative; min-width: 300px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('hi',
-                                                  click = clickOpts(id = 'hi_plot_click'),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('hi_tooltip'),
-                                     uiOutput('hi_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 10px; left: 26px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 300px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('supply',
-                                                  click = clickOpts(id = "supply_plot_click"),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('supply_tooltip')
-                                     uiOutput("supply_click_overlay"),
-                                     div(
-                                       style = "position: absolute; top: 10px; left: 35px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 300px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('supply_ratio',
-                                                  click = clickOpts(id = 'supply_ratio_plot_click'),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('supplyratio_tooltip')
-                                     uiOutput('supply_ratio_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 27px; left: 18px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available."
-                                       ))),
-                                   div(
-                                     style = "position: relative; min-width: 300px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('supply_share',
-                                                  click = clickOpts(id = 'supply_share_plot_click'),
-                                                  height = "500px"), 
-                                       type = 7),
-                                     # textOutput('supplyshare_tooltip')
-                                     uiOutput('supply_share_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 27px; left: 25px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
-                                       )))),
-                                 downloadButton('download_page4',
-                                                'Download these plots and their data'))))
-  ),
-  fluidRow(
-    div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
-      div(
-        style = 'border: 3px solid #234515; border-radius: 12px;
+            navset_card_pill(title = 'Trade',
+                             nav_panel(title = 'Market Summary',
+                                       div(
+                                         style = "position: relative; min-width: 1200px;",
+                                         withSpinner(
+                                           plotOutput('balance',
+                                                      click = clickOpts('balance_plot_click'),
+                                                      height = "400px", width = "100%"), 
+                                           type = 7),
+                                         # textOutput('balance_tooltip'),
+                                         uiOutput('balance_click_overlay'),
+                                         div(
+                                           style = "position: absolute; top: 0px; left: 68px",
+                                           tooltip(
+                                             icon("info-circle"),
+                                             "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported."
+                                           ))),
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px;",
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('trade_ratio',
+                                                        click = clickOpts('ratio_plot_click'),
+                                                        height = '400px'), 
+                                             type = 7),
+                                           # textOutput('ratio_tooltip'),
+                                           uiOutput('ratio_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 20px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('top5_trade',
+                                                        click = clickOpts('top5_plot_click'),
+                                                        height = '400px'), 
+                                             type = 7),
+                                           # textOutput('top5_tooltip'),
+                                           uiOutput('top5_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 10px; left: 52px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order."
+                                             )))),
+                                       downloadButton('download_page1',
+                                                      'Download these plots and their data')),
+                             nav_panel(title = 'Value',
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px;",
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('exp_value', 
+                                                        click = clickOpts("exp_value_plot_click"),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('expval_tooltip'),
+                                           uiOutput("exp_value_click_overlay"),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 57px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('imp_value',
+                                                        click = clickOpts("imp_value_plot_click"),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('impval_tooltip'),
+                                           uiOutput("imp_value_click_overlay"),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 57px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points."
+                                             )))),
+                                       downloadButton('download_page2',
+                                                      'Download these plots and their data')),
+                             nav_panel(title = 'Volume',
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px;",
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('exp_volume',
+                                                        click = clickOpts("exp_volume_plot_click"),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('expvol_tooltip'),
+                                           uiOutput("exp_volume_click_overlay"),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 57px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Export volume reflects the total volume of product traded out of the U.S. into other countries."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             plotOutput('imp_volume',
+                                                        click = clickOpts("imp_volume_plot_click"),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('impvol_tooltip')
+                                           uiOutput('imp_volume_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 57px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Import volume reflects the total volume of product traded into the U.S. from other countries."
+                                             )))),
+                                       downloadButton('download_page3',
+                                                      'Download these plots and their data')),
+                             nav_panel(title = 'Advanced Metrics',
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px;",
+                                         div(
+                                           # style argument keeps overlay positioned within the container
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             # tableOutput('exp_mlti_table'),
+                                             plotOutput('exp_mlti',
+                                                        click = clickOpts(id = 'exp_mlti_plot_click'),
+                                                        height = "500px"),
+                                             type = 7),
+                                           # textOutput('expmlti_tooltip'),
+                                           uiOutput('exp_mlti_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 35px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 600px; width: 100%;",
+                                           withSpinner(
+                                             # tableOutput('imp_mlti_table'), 
+                                             plotOutput('imp_mlti',
+                                                        click = clickOpts(id = 'imp_mlti_plot_click'),
+                                                        height = "500px"),
+                                             type = 7),
+                                           uiOutput('imp_mlti_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 0px; left: 15px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
+                                             )))),
+                                       br(),
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px",
+                                         div(
+                                           style = "position: relative; min-width: 300px; width: 100%",
+                                           withSpinner(
+                                             plotOutput('hi',
+                                                        click = clickOpts(id = 'hi_plot_click'),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('hi_tooltip'),
+                                           uiOutput('hi_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 10px; left: 26px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 300px; width: 100%",
+                                           withSpinner(
+                                             plotOutput('supply',
+                                                        click = clickOpts(id = "supply_plot_click"),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('supply_tooltip')
+                                           uiOutput("supply_click_overlay"),
+                                           div(
+                                             style = "position: absolute; top: 10px; left: 35px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 300px; width: 100%",
+                                           withSpinner(
+                                             plotOutput('supply_ratio',
+                                                        click = clickOpts(id = 'supply_ratio_plot_click'),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('supplyratio_tooltip')
+                                           uiOutput('supply_ratio_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 27px; left: 18px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available."
+                                             ))),
+                                         div(
+                                           style = "position: relative; min-width: 300px; width: 100%",
+                                           withSpinner(
+                                             plotOutput('supply_share',
+                                                        click = clickOpts(id = 'supply_share_plot_click'),
+                                                        height = "500px"), 
+                                             type = 7),
+                                           # textOutput('supplyshare_tooltip')
+                                           uiOutput('supply_share_click_overlay'),
+                                           div(
+                                             style = "position: absolute; top: 27px; left: 25px",
+                                             tooltip(
+                                               icon("info-circle"),
+                                               "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
+                                             )))),
+                                       downloadButton('download_page4',
+                                                      'Download these plots and their data'))))
+        ),
+        fluidRow(
+          div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
+              div(
+                style = 'border: 3px solid #234515; border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
-        navset_card_pill(title = 'Commercial Landings',
-                         nav_panel(title = 'Value',
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('landings_value',
-                                                  click = clickOpts(id = 'landings_value_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('comvalue_tooltip')
-                                     uiOutput('landings_value_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 50px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
-                                       ))),
-                                   downloadButton('download_landings_page1',
-                                                  'Download this plot and the data')),
-                         nav_panel(title = 'Volume',
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('landings_volume',
-                                                  click = clickOpts(id = 'landings_volume_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('comvolume_tooltip')
-                                     uiOutput('landings_volume_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
-                                       ))),
-                                   downloadButton('download_landings_page2',
-                                                  'Download this plot and the data')))),
-      div(
-        style = 'border: 3px solid #681617; border-radius: 12px;
+                navset_card_pill(title = 'Commercial Landings',
+                                 nav_panel(title = 'Value',
+                                           div(
+                                             style = "position: relative; min-width: 600px; width: 100%",
+                                             withSpinner(
+                                               plotOutput('landings_value',
+                                                          click = clickOpts(id = 'landings_value_plot_click'),
+                                                          height = "500px"),
+                                               type = 7),
+                                             # textOutput('comvalue_tooltip')
+                                             uiOutput('landings_value_click_overlay'),
+                                             div(
+                                               style = "position: absolute; top: 0px; left: 50px",
+                                               tooltip(
+                                                 icon("info-circle"),
+                                                 "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
+                                               ))),
+                                           downloadButton('download_landings_page1',
+                                                          'Download this plot and the data')),
+                                 nav_panel(title = 'Volume',
+                                           div(
+                                             style = "position: relative; min-width: 600px; width: 100%",
+                                             withSpinner(
+                                               plotOutput('landings_volume',
+                                                          click = clickOpts(id = 'landings_volume_plot_click'),
+                                                          height = "500px"),
+                                               type = 7),
+                                             # textOutput('comvolume_tooltip')
+                                             uiOutput('landings_volume_click_overlay'),
+                                             div(
+                                               style = "position: absolute; top: 0px; left: 57px",
+                                               tooltip(
+                                                 icon("info-circle"),
+                                                 "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
+                                               ))),
+                                           downloadButton('download_landings_page2',
+                                                          'Download this plot and the data')))),
+              div(
+                style = 'border: 3px solid #681617; border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
-        navset_card_pill(title = 'Processed Products',
-                         nav_panel(title = 'Value',
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('pp_value',
-                                                  click = clickOpts('pp_value_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('ppvalue_tooltip')
-                                     uiOutput('pp_value_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
-                                       ))),
-                                   downloadButton('download_products_page1',
-                                                  'Download this plot and the data')),
-                         nav_panel(title = 'Volume',
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('pp_volume',
-                                                  click = clickOpts('pp_volume_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('ppvolume_tooltip')
-                                     uiOutput('pp_volume_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 57px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
-                                       ))),
-                                   downloadButton('download_products_page2',
-                                                  'Download this plot and the data')),
-                         nav_panel(title = 'Price',
-                                   div(
-                                     style = "position: relative; min-width: 600px; width: 100%",
-                                     withSpinner(
-                                       plotOutput('pp_price',
-                                                  click = clickOpts('pp_price_plot_click'),
-                                                  height = "500px"),
-                                       type = 7),
-                                     # textOutput('ppprice_tooltip')
-                                     uiOutput('pp_price_click_overlay'),
-                                     div(
-                                       style = "position: absolute; top: 0px; left: 39px",
-                                       tooltip(
-                                         icon("info-circle"),
-                                         "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
-                                       ))),
-                                   downloadButton('download_products_page3',
-                                                  'Download this plot and the data'))))))
+                navset_card_pill(title = 'Processed Products',
+                                 nav_panel(title = 'Value',
+                                           div(
+                                             style = "position: relative; min-width: 600px; width: 100%",
+                                             withSpinner(
+                                               plotOutput('pp_value',
+                                                          click = clickOpts('pp_value_plot_click'),
+                                                          height = "500px"),
+                                               type = 7),
+                                             # textOutput('ppvalue_tooltip')
+                                             uiOutput('pp_value_click_overlay'),
+                                             div(
+                                               style = "position: absolute; top: 0px; left: 57px",
+                                               tooltip(
+                                                 icon("info-circle"),
+                                                 "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
+                                               ))),
+                                           downloadButton('download_products_page1',
+                                                          'Download this plot and the data')),
+                                 nav_panel(title = 'Volume',
+                                           div(
+                                             style = "position: relative; min-width: 600px; width: 100%",
+                                             withSpinner(
+                                               plotOutput('pp_volume',
+                                                          click = clickOpts('pp_volume_plot_click'),
+                                                          height = "500px"),
+                                               type = 7),
+                                             # textOutput('ppvolume_tooltip')
+                                             uiOutput('pp_volume_click_overlay'),
+                                             div(
+                                               style = "position: absolute; top: 0px; left: 57px",
+                                               tooltip(
+                                                 icon("info-circle"),
+                                                 "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
+                                               ))),
+                                           downloadButton('download_products_page2',
+                                                          'Download this plot and the data')),
+                                 nav_panel(title = 'Price',
+                                           div(
+                                             style = "position: relative; min-width: 600px; width: 100%",
+                                             withSpinner(
+                                               plotOutput('pp_price',
+                                                          click = clickOpts('pp_price_plot_click'),
+                                                          height = "500px"),
+                                               type = 7),
+                                             # textOutput('ppprice_tooltip')
+                                             uiOutput('pp_price_click_overlay'),
+                                             div(
+                                               style = "position: absolute; top: 0px; left: 39px",
+                                               tooltip(
+                                                 icon("info-circle"),
+                                                 "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
+                                               ))),
+                                           downloadButton('download_products_page3',
+                                                          'Download this plot and the data')))))) 
+      ),
 )
       
   
