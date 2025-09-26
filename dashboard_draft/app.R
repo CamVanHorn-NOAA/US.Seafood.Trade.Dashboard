@@ -5283,6 +5283,60 @@ server <- function(input, output, session) {
       HTML(paste0(tooltip_heading, click_info$data$YEAR[1], "<br>",
                   pp_price_tooltip)))
   })
+  # Quarto Documents -----------------------------------------------------------
+  output$intro <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_intro.html",
+                height = 800)
+  })
+  
+  output$collection <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_data_collection.html",
+                height = 800)
+  })
+  
+  output$sourcing <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_data_sourcing.html",
+                height = 800)
+  })
+  
+  output$management <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_data_management.html",
+                height = 800)
+  })
+  
+  output$region <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_region_doc.html",
+                height = 800)
+  })
+  
+  output$classification <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_species_classification.html",
+                height = 800)
+  })
+  
+  output$metrics <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_calc_metrics.html",
+                height = 800)
+  })
+  
+  output$contact <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_contact_us.html",
+                height = 800)
+  })
+  
+  output$resource <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/dashboard_resources.html",
+                height = 800)
+  })
 }
 
 # Run the app
