@@ -104,7 +104,11 @@ exports <- foss_exports %>%
     # We calculated the Index value in script 1
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(EXP_VALUE_2024USD = VALUE_USD * INDEX) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  left_join(conversion_factors %>%
+              mutate(HTS_NUMBER = as.character(HTS_NUMBER))) %>%
+  mutate(CF = ifelse(is.na(CF), 1, CF),
+         CONVERTED_VOLUME = VOLUME_KG * CF)
 
 
 # Data summarizing
@@ -125,8 +129,8 @@ exports_products_smry <- exports %>%
   # country name (exported to), customs district (exported from)
 exports_price_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
-         VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, GROUP_NAME, GROUP_TS, 
-         GROUP_CBP, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY,
+         VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, CONVERTED_VOLUME, GROUP_NAME, 
+         GROUP_TS, GROUP_CBP, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY,
          ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, 
            FAO_COUNTRY_CODE, GROUP_NAME, GROUP_TS, GROUP_CBP, SPECIES_NAME,
@@ -161,7 +165,11 @@ imports <- foss_imports %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(IMP_VALUE_2024USD = VALUE_USD * INDEX,
          IMP_CALCULATED_DUTY_2024USD = CALCULATED_DUTY_USD * INDEX) %>%
-  select(-INDEX)
+  select(-INDEX) %>%
+  left_join(conversion_factors %>%
+              mutate(HTS_NUMBER = as.character(HTS_NUMBER))) %>%
+  mutate(CF = ifelse(is.na(CF), 1, CF),
+         CONVERTED_VOLUME = VOLUME_KG * CF)
   
 
 # Data summarizing
@@ -177,7 +185,7 @@ imports_products_smry <- imports %>%
 
 imports_price_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, FAO_COUNTRY_CODE,
-         VALUE_USD, VOLUME_KG, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
+         VALUE_USD, VOLUME_KG, CONVERTED_VOLUME, IMP_VALUE_2024USD, CALCULATED_DUTY_USD,
          IMP_CALCULATED_DUTY_2024USD, GROUP_NAME, GROUP_TS, GROUP_CBP,
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
@@ -200,11 +208,13 @@ imports_smry <- full_join(imports_products_smry, imports_price_smry)
 # We need to change column names to coerce their join properly
 exports_smry <- exports_smry %>%
   rename(EXP_VALUE_USD = VALUE_USD,
-         EXP_VOLUME_KG = VOLUME_KG)
+         EXP_VOLUME_KG = VOLUME_KG,
+         EXP_CONVERTED_VOLUME = CONVERTED_VOLUME)
 
 imports_smry <- imports_smry %>%
   rename(IMP_VALUE_USD = VALUE_USD,
-         IMP_VOLUME_KG = VOLUME_KG) 
+         IMP_VOLUME_KG = VOLUME_KG,
+         IMP_CONVERTED_VOLUME = CONVERTED_VOLUME) 
 # calculated_duty_usd is unique to imports, so no need to change name
 
 # full_join the tables to account for countries or customs districts that 
