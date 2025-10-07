@@ -26,7 +26,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_09_26_25.RData')
+load('seafood_trade_data_munge_10_07_25.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
@@ -262,8 +262,9 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
   summarized_data <- trade_table %>%
     filter_species(species) %>%
     filter_region(region) %>%
-    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, 
-           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, EXP_CONVERTED_VOLUME,
+           IMP_VALUE_2024USD, IMP_VOLUME_KG, IMP_CONVERTED_VOLUME, EXP_VALUE_USD, 
+           IMP_VALUE_USD) %>%
     mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
                                       EXP_VALUE_2024USD),
            IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
@@ -272,6 +273,10 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
                                   IMP_VOLUME_KG),
+           EXP_CONVERTED_VOLUME = ifelse(is.na(EXP_CONVERTED_VOLUME), 0,
+                                         EXP_CONVERTED_VOLUME),
+           IMP_CONVERTED_VOLUME = ifelse(is.na(IMP_CONVERTED_VOLUME), 0,
+                                         IMP_CONVERTED_VOLUME),
            EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD), 0,
                                   EXP_VALUE_USD),
            IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD), 0,
@@ -284,6 +289,8 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
     new_data <- summarized_data %>%
       mutate(EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
+             EXP_ROUND_VOLUME_LB = EXP_CONVERTED_VOLUME * 2.20462,
+             IMP_ROUND_VOLUME_LB = IMP_CONVERTED_VOLUME * 2.20462,
              EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
              IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
              EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
@@ -302,23 +309,35 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
              IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
              EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
              IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
+             EXP_ROUND_VOLUME_MT = EXP_CONVERTED_VOLUME / 1000,
+             IMP_ROUND_VOLUME_MT = IMP_CONVERTED_VOLUME / 1000,
              EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
-             IMP_VOLUME_ST = IMP_VOLUME_LB / 2000)
+             IMP_VOLUME_ST = IMP_VOLUME_LB / 2000,
+             EXP_ROUND_VOLUME_ST = EXP_ROUND_VOLUME_LB / 2000,
+             IMP_ROUND_VOLUME_ST = IMP_ROUND_VOLUME_LB / 2000)
     return(new_data)
   }
   
   if (units == 'METRIC') {
     new_data <- summarized_data %>%
       rename(EXP_VOLUME = EXP_VOLUME_KG,
-             IMP_VOLUME = IMP_VOLUME_KG) %>%
+             IMP_VOLUME = IMP_VOLUME_KG,
+             EXP_ROUND_VOLUME = EXP_CONVERTED_VOLUME,
+             IMP_ROUND_VOLUME = IMP_CONVERTED_VOLUME) %>%
       mutate(EXP_VOLUME_T = EXP_VOLUME / 1000,
-             IMP_VOLUME_T = IMP_VOLUME / 1000)
+             IMP_VOLUME_T = IMP_VOLUME / 1000,
+             EXP_ROUND_VOLUME_T = EXP_ROUND_VOLUME / 1000,
+             IMP_ROUND_VOLUME_T = IMP_ROUND_VOLUME / 1000)
   } else if (units == 'IMPERIAL') {
     new_data <- summarized_data %>%
       mutate(EXP_VOLUME = EXP_VOLUME_KG * 2.20462, # convert kg to lbs
              IMP_VOLUME = IMP_VOLUME_KG * 2.20462,
+             EXP_ROUND_VOLUME = EXP_CONVERTED_VOLUME * 2.20462,
+             IMP_ROUND_VOLUME = IMP_CONVERTED_VOLUME * 2.20462,
              EXP_VOLUME_T = EXP_VOLUME / 2000, # calculate short tons
-             IMP_VOLUME_T = IMP_VOLUME / 2000) %>%
+             IMP_VOLUME_T = IMP_VOLUME / 2000,
+             EXP_ROUND_VOLUME_T = EXP_ROUND_VOLUME / 2000,
+             IMP_ROUND_VOLUME_T = IMP_ROUND_VOLUME / 2000) %>%
       select(!c(EXP_VOLUME_KG, IMP_VOLUME_KG))
   }
   
@@ -360,7 +379,8 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
     trade_data <- new_data %>%
       select(YEAR, EXP_VALUE, IMP_VALUE, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, 
              EXP_PRICE, IMP_PRICE, EXP_VOLUME_T, IMP_VOLUME_T, EXP_VOLUME,
-             IMP_VOLUME) %>%
+             IMP_VOLUME, EXP_ROUND_VOLUME, IMP_ROUND_VOLUME, EXP_ROUND_VOLUME_T,
+             IMP_ROUND_VOLUME_T) %>%
       mutate(RATIO = EXP_VOLUME_T / IMP_VOLUME_T)
     
     return(trade_data)
@@ -1051,10 +1071,10 @@ calculate_supply_metrics <- function(species, region, units = NULL, nominal = F)
     # calculate unexported domestic production relative to apparent supply by
     # dividing the absolute value of the difference of domestic production and
     # export volume by apparent supply
-    mutate(APPARENT_SUPPLY = (PP_VOLUME_T - EXP_VOLUME_T) + IMP_VOLUME_T,
+    mutate(APPARENT_SUPPLY = (PP_VOLUME_T - EXP_ROUND_VOLUME_T) + IMP_ROUND_VOLUME_T,
            APPARENT_SUPPLY_REL_US_PROD = APPARENT_SUPPLY / PP_VOLUME_T,
            UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY = 
-             abs(PP_VOLUME_T - EXP_VOLUME_T) / APPARENT_SUPPLY,
+             abs(PP_VOLUME_T - EXP_ROUND_VOLUME_T) / APPARENT_SUPPLY,
            SPECIES = species) 
   
   return(data)

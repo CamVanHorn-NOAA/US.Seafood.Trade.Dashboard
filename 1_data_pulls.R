@@ -274,6 +274,10 @@ florida_coast_map <- read.csv('florida_city_map.csv')
 # map to assign great lakes cities
 great_lakes_cities <- read.csv('gl_border_state_cities.csv')
 
+# conversion factor map
+conversion_factors <- read.csv('conversion_factors/conversion_factors.csv') %>%
+  select(HTS_NUMBER, CF)
+
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -287,7 +291,8 @@ file_name <- paste0('seafood_trade_data_pull_',
   # NOTE: add new data to this list upon creation in this script
 save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
               'species_ref', 'foss_com_landings', 'florida_coast_map',
-              'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map'),
+              'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map',
+              'conversion_factors'),
      file = file_name)
 
 # upload to google drive
