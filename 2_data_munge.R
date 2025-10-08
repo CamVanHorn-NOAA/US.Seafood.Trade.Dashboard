@@ -283,7 +283,18 @@ pp_data <- pp_processed %>%
          REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            CITY %in% grlake_cities$PLANT_CITY,
-                         'Great Lakes', REGION))
+                         'Great Lakes', REGION)) %>%
+  left_join(confid_map) %>%
+  # mark confidential records' values as 0
+  mutate(CONFIDENTIAL = ifelse(is.na(CONFIDENTIAL), 0, CONFIDENTIAL),
+         POUNDS = ifelse(CONFIDENTIAL == 1, 0, POUNDS),
+         DOLLARS = ifelse(CONFIDENTIAL == 1, 0, DOLLARS),
+         KG = ifelse(CONFIDENTIAL == 1, 0, KG),
+         DOLLARS_2024 = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024),
+         DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_LB),
+         DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_KG),
+         DOLLARS_2024_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_LB),
+         DOLLARS_2024_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_KG))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
