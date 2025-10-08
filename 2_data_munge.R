@@ -392,7 +392,7 @@ pp_data <- pp_processed %>%
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            CITY %in% grlake_cities$PLANT_CITY,
                          'Great Lakes', REGION)) %>%
-  left_join(confid_map) %>%
+  left_join(confid_products) %>%
   # mark confidential records' values as 0
   mutate(CONFIDENTIAL = ifelse(is.na(CONFIDENTIAL), 0, CONFIDENTIAL),
          POUNDS = ifelse(CONFIDENTIAL == 1, 0, POUNDS),
