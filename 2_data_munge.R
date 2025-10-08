@@ -323,12 +323,12 @@ com_landings <- foss_com_landings %>%
          REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
          REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION))
 
-# Remove cities for confidentiality --------------------------------------------
+# Remove cities and states for confidentiality ---------------------------------
 pp_data <- pp_data %>%
-  select(!c(CITY, DOLLARS_PER_LB, DOLLARS_PER_KG, DOLLARS_2024_PER_LB,
+  select(!c(CITY, STATE, DOLLARS_PER_LB, DOLLARS_PER_KG, DOLLARS_2024_PER_LB,
             DOLLARS_2024_PER_KG)) %>%
   group_by(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
-           ECOLOGICAL_CATEGORY, STATE, PRODUCT_FORM, REGION) %>%
+           ECOLOGICAL_CATEGORY, PRODUCT_FORM, REGION, CONFIDENTIAL) %>%
   summarise(across(where(is.numeric), sum),
             .groups ='drop') %>%
   mutate(DOLLARS_PER_LB = DOLLARS / POUNDS,
