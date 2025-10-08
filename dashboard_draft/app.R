@@ -33,7 +33,11 @@ com_landings <- com_landings %>%
   filter(CONFIDENTIALITY == 'Public')
 
 # create matrix of all categorization terms available in the data
-categorization_matrix <- bind_rows(trade_data, com_landings, pp_data) %>%
+categorization_matrix <- bind_rows(trade_data, 
+                                   com_landings %>%
+                                     filter(CONFIDENTIALITY != 'Confidential'), 
+                                   pp_data %>%
+                                     filter(CONFIDENTIAL == 0)) %>%
   select(SPECIES_NAME, SPECIES_GROUP, 
          SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, REGION) %>%
   group_by(SPECIES_NAME, SPECIES_GROUP, 
