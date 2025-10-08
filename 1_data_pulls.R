@@ -278,27 +278,6 @@ great_lakes_cities <- read.csv('gl_border_state_cities.csv')
 conversion_factors <- read.csv('conversion_factors/conversion_factors.csv') %>%
   select(HTS_NUMBER, CF)
 
-# Grabbing confidential data ---------------------------------------------------
-# confidential data in this case only exists in processed products data
-# Data is considered confidential if there are less than 3 (i.e., 1 or 2) records
-  # in a group. Here, the group would be all species classification levels (i.e.,
-  # ecological category, species category, species group, and species name), 
-  # product form, and plant. In other words, if only one or two plants process
-  # a species to a unique condition (e.g., fillet, canned, etc.), those records
-  # are confidential. This will be irregardless of region because if only one or
-  # two plants process a species uniquely, that inherently suggests only one or
-  # two regions process the species uniquely.
-confid_map <- left_join(pp_processed, pp_map) %>%
-  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
-         PRODUCT_FORM, PLANT_STREET) %>%
-  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
-           PRODUCT_FORM) %>%
-  count() %>%
-  ungroup() %>%
-  filter(n < 3) %>%
-  select(!n) %>%
-  # create binary column for mapping
-  mutate(CONFIDENTIAL = 1)
 
 #####################
 ### SAVE THE DATA ###
@@ -314,7 +293,7 @@ file_name <- paste0('seafood_trade_data_pull_',
 save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
               'species_ref', 'foss_com_landings', 'florida_coast_map',
               'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map',
-              'conversion_factors', 'confid_map'),
+              'conversion_factors'),
      file = file_name)
 
 # upload to google drive
