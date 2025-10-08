@@ -244,6 +244,114 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
   # for every year from 2004 - 2024
 
 
+# Grabbing confidential data from processed products ---------------------------
+# confidential data in this case only exists in processed products data
+# Data is considered confidential if there are less than 3 (i.e., 1 or 2) records
+  # in a group. Here, the group would be all species classification levels (i.e.,
+  # ecological category, species category, species group, and species name), 
+  # product form, and plant WITHIN A REGION. In other words, if only one or two 
+  # plants process a species to a unique condition (e.g., fillet, canned, etc.)
+  # within a region, those records are confidential. 
+processed_confids <- left_join(pp_processed, pp_map) %>%
+  # split florida by east and west
+  left_join(florida_coast_map %>%
+              rename(CITY = PLANT_CITY,
+                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
+              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
+  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
+  select(!FLORIDA_STATE) %>%
+  # add regions
+  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
+         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
+         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
+         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
+         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
+         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
+         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
+         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
+                           CITY %in% grlake_cities$PLANT_CITY,
+                         'Great Lakes', REGION))
+# Pacific Confidentials
+confid_pacific <- processed_confids %>%
+  filter(REGION == 'Pacific') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'Pacific')
+# West Pacific Confidentials
+confid_westpacific <- processed_confids %>%
+  filter(REGION == 'West Pacific') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'West Pacific')
+# North Pacific Confidentials
+confid_norpac <- processed_confids %>%
+  filter(REGION == 'North Pacific') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'North Pacific')
+# New England Confidentials
+confid_newengland <- processed_confids %>%
+  filter(REGION == 'New England') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'New England')
+# Mid-Atlantic Confidentials
+confid_midatlantic <- processed_confids %>%
+  filter(REGION == 'Mid-Atlantic') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'Mid-Atlantic')
+# South Atlantic Confidentials
+confid_southatlantic <- processed_confids %>%
+  filter(REGION == 'South Atlantic') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'South Atlantic')
+# Gulf Confidentials
+confid_gulf <- processed_confids %>%
+  filter(REGION == 'Gulf') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'Gulf')
+# Great Lakes Confidentials
+confid_greatlakes <- processed_confids %>%
+  filter(REGION == 'Great Lakes') %>%
+  select(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+         PRODUCT_FORM, PLANT_STREET) %>%
+  group_by(ECOLOGICAL_CATEGORY, SPECIES_CATEGORY, SPECIES_GROUP, SPECIES_NAME,
+           PRODUCT_FORM) %>%
+  count() %>%
+  mutate(REGION = 'Great Lakes')
+# combine
+confid_products <- rbind(confid_pacific, confid_westpacific, confid_norpac,
+                         confid_newengland, confid_midatlantic, confid_southatlantic,
+                         confid_gulf, confid_greatlakes) %>%
+  ungroup() %>%
+  filter(n < 3) %>%
+  select(!n) %>%
+  mutate(CONFIDENTIAL = 1)
 # Processed Products -----------------------------------------------------------
 # Data formatting
 pp_data <- pp_processed %>%
