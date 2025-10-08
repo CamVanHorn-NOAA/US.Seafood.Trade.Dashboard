@@ -193,7 +193,7 @@ pp_address <- read.csv('pp_address.csv') %>%
 pp_processed <- read.csv('pp_processed.csv') %>%
   filter(YEAR >= 2004) %>%
   left_join(pp_address %>%
-              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV) %>%
+              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
               rename(STATE = PLANT_STATE_ABRV,
                      CITY = PLANT_CITY))
 
