@@ -1939,7 +1939,7 @@ ui <- page_sidebar(
                                          # textOutput('balance_tooltip'),
                                          uiOutput('balance_click_overlay'),
                                          div(
-                                           style = "position: absolute; top: 0px; left: 68px",
+                                           style = "position: absolute; top: 0px; left: 5px",
                                            tooltip(
                                              icon("info-circle"),
                                              "Trade balance reflects the net value of product traded between the U.S. and all trading partners. Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported."
@@ -1956,7 +1956,7 @@ ui <- page_sidebar(
                                            # textOutput('ratio_tooltip'),
                                            uiOutput('ratio_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 20px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "The ratio of the volume of exported product to the volume of imported product. Values less than one indicate a greater volume of product is imported than exported. Values greater than one indicate a greater volume of product is exported than imported."
@@ -1971,7 +1971,7 @@ ui <- page_sidebar(
                                            # textOutput('top5_tooltip'),
                                            uiOutput('top5_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 10px; left: 52px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order."
@@ -1991,7 +1991,7 @@ ui <- page_sidebar(
                                            # textOutput('expval_tooltip'),
                                            uiOutput("exp_value_click_overlay"),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 57px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
@@ -2006,7 +2006,7 @@ ui <- page_sidebar(
                                            # textOutput('impval_tooltip'),
                                            uiOutput("imp_value_click_overlay"),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 57px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points."
@@ -2026,7 +2026,7 @@ ui <- page_sidebar(
                                            # textOutput('expvol_tooltip'),
                                            uiOutput("exp_volume_click_overlay"),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 57px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Export volume reflects the total volume of product traded out of the U.S. into other countries."
@@ -2041,7 +2041,7 @@ ui <- page_sidebar(
                                            # textOutput('impvol_tooltip')
                                            uiOutput('imp_volume_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 57px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Import volume reflects the total volume of product traded into the U.S. from other countries."
@@ -2063,7 +2063,7 @@ ui <- page_sidebar(
                                            # textOutput('expmlti_tooltip'),
                                            uiOutput('exp_mlti_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 35px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "The multilateral trade index (MLTI) measures relative densities of exported product volumes to individual nations. The index subsets the top five trading partners by total export value over the time period. The base of the index is the export value of the country with the third most cumulative export value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
@@ -2078,7 +2078,7 @@ ui <- page_sidebar(
                                              type = 7),
                                            uiOutput('imp_mlti_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 0px; left: 15px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "The multilateral trade index (MLTI) measures relative densities of imported product volumes from individual nations. The index subsets the top five trading partners by total import value over the time period. The base of the index is the import value of the country with the third most cumulative import value (middle of the top five selected countries) in the initial year of the time period (MLTI = 1 for the base country in the base year). MLTI above 1 reflects a greater density of traded volume than the base. MLTI below 1 reflects a lower density of traded volume than the base."
@@ -2096,7 +2096,7 @@ ui <- page_sidebar(
                                            # textOutput('hi_tooltip'),
                                            uiOutput('hi_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 10px; left: 26px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "The Herfindahl index (HI) measures the relative distribution of traded product value (exports and imports individually) among trading partners; it cannot be greater than 1. The HI communicates potential trading dependencies for given products. An HI closer to 1 indicates more trade value concentrated among fewer trading partners. An HI closer to 0 indicates trade value is spread out among more trading partners."
@@ -2111,7 +2111,7 @@ ui <- page_sidebar(
                                            # textOutput('supply_tooltip')
                                            uiOutput("supply_click_overlay"),
                                            div(
-                                             style = "position: absolute; top: 10px; left: 35px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
@@ -2126,7 +2126,7 @@ ui <- page_sidebar(
                                            # textOutput('supplyratio_tooltip')
                                            uiOutput('supply_ratio_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 27px; left: 18px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available."
@@ -2141,7 +2141,7 @@ ui <- page_sidebar(
                                            # textOutput('supplyshare_tooltip')
                                            uiOutput('supply_share_click_overlay'),
                                            div(
-                                             style = "position: absolute; top: 27px; left: 25px",
+                                             style = "position: absolute; top: 0px; left: 5px",
                                              tooltip(
                                                icon("info-circle"),
                                                "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
@@ -2166,7 +2166,7 @@ ui <- page_sidebar(
                                              # textOutput('comvalue_tooltip')
                                              uiOutput('landings_value_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 50px",
+                                               style = "position: absolute; top: 0px; left: 5px",
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
@@ -2184,7 +2184,7 @@ ui <- page_sidebar(
                                              # textOutput('comvolume_tooltip')
                                              uiOutput('landings_volume_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 57px",
+                                               style = "position: absolute; top: 0px; left: 5px",
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
@@ -2206,7 +2206,7 @@ ui <- page_sidebar(
                                              # textOutput('ppvalue_tooltip')
                                              uiOutput('pp_value_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 57px",
+                                               style = "position: absolute; top: 0px; left: 5px",
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
@@ -2224,7 +2224,7 @@ ui <- page_sidebar(
                                              # textOutput('ppvolume_tooltip')
                                              uiOutput('pp_volume_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 57px",
+                                               style = "position: absolute; top: 0px; left: 5px",
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
@@ -2242,7 +2242,7 @@ ui <- page_sidebar(
                                              # textOutput('ppprice_tooltip')
                                              uiOutput('pp_price_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 39px",
+                                               style = "position: absolute; top: 0px; left: 5px",
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
@@ -3135,7 +3135,7 @@ server <- function(input, output, session) {
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
     validate(need(try(species_selection_trade() %in% trade_terms()),
-                  'There is no available trade data for the selected species'))
+                  '      There is no available trade data for the selected species'))
   })
   
   # creates trade balance plot (value)
@@ -3148,7 +3148,7 @@ server <- function(input, output, session) {
   output$balance <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(balance_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     balance_plot()
   })
   
@@ -3173,7 +3173,7 @@ server <- function(input, output, session) {
   output$trade_ratio <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(ratio_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     ratio_plot()
   })
   
@@ -3210,7 +3210,7 @@ server <- function(input, output, session) {
   output$top5_trade <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(top5_trade_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     top5_trade_plot()
   })
   
@@ -3224,7 +3224,7 @@ server <- function(input, output, session) {
   output$exp_value <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_value_plot()
   })
   
@@ -3238,7 +3238,7 @@ server <- function(input, output, session) {
   output$imp_value <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_value_plot()
   })
 
@@ -3252,7 +3252,7 @@ server <- function(input, output, session) {
   output$exp_volume <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_volume_plot()
   })
 
@@ -3266,7 +3266,7 @@ server <- function(input, output, session) {
   output$imp_volume <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_volume_plot()
   })
   
@@ -3487,7 +3487,7 @@ server <- function(input, output, session) {
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
     validate(need(try(species_selection_landings() %in% landings_terms()),
-                  'There is no available landings data for this species'))
+                  '      There is no available landings data for this species'))
   })
   
   # creates landings data for download
@@ -3520,7 +3520,7 @@ server <- function(input, output, session) {
   output$landings_value <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_value_plot()
   })
   
@@ -3534,7 +3534,7 @@ server <- function(input, output, session) {
   output$landings_volume <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_volume_plot()
   })
   
@@ -3548,7 +3548,7 @@ server <- function(input, output, session) {
   output$landings_price <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_price_plot()
   })
   
@@ -3740,7 +3740,7 @@ server <- function(input, output, session) {
   # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
     validate(need(try(species_selection_products() %in% pp_terms()),
-                  'There is no available production data for this species'))
+                  '      There is no available production data for this species'))
   })
   
   # creates processed products data for download
@@ -3774,7 +3774,7 @@ server <- function(input, output, session) {
   output$pp_value <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_value_plot()
   })
   
@@ -3789,7 +3789,7 @@ server <- function(input, output, session) {
   output$pp_volume <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_volume_plot()
   })
   
@@ -3805,7 +3805,7 @@ server <- function(input, output, session) {
   output$pp_price <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_price_plot()
   })
   
@@ -3821,7 +3821,7 @@ server <- function(input, output, session) {
   output$exp_mlti_table <- renderTable({
     trade_data_validation()
     validate(need(try(!is.na(exp_mlti_table_df())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     exp_mlti_table_df()
   })
   
@@ -3835,7 +3835,7 @@ server <- function(input, output, session) {
   output$exp_mlti <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_mlti_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_mlti_plot()
   })
   
@@ -3849,7 +3849,7 @@ server <- function(input, output, session) {
   output$imp_mlti_table <- renderTable({
     trade_data_validation()
     validate(need(try(!is.na(imp_mlti_table_df())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     imp_mlti_table_df()
   })
   
@@ -3863,7 +3863,7 @@ server <- function(input, output, session) {
   output$imp_mlti <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_mlti_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_mlti_plot()
   })
   
@@ -3878,7 +3878,7 @@ server <- function(input, output, session) {
   output$hi <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(hi_plot())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     hi_plot()
   })
   
@@ -3899,7 +3899,7 @@ server <- function(input, output, session) {
   output$supply <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_plot()
   })
   
@@ -3913,7 +3913,7 @@ server <- function(input, output, session) {
   output$supply_ratio <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_ratio_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_ratio_plot()
   })
   
@@ -3927,7 +3927,7 @@ server <- function(input, output, session) {
   output$supply_share <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_share_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_share_plot()
   })
   
