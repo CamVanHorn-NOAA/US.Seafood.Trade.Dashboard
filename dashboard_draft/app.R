@@ -3135,7 +3135,7 @@ server <- function(input, output, session) {
   # validation reactive; outputs message if species is not available in trade data
   trade_data_validation <- reactive({
     validate(need(try(species_selection_trade() %in% trade_terms()),
-                  'There is no available trade data for the selected species'))
+                  '      There is no available trade data for the selected species'))
   })
   
   # creates trade balance plot (value)
@@ -3148,7 +3148,7 @@ server <- function(input, output, session) {
   output$balance <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(balance_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     balance_plot()
   })
   
@@ -3173,7 +3173,7 @@ server <- function(input, output, session) {
   output$trade_ratio <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(ratio_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     ratio_plot()
   })
   
@@ -3210,7 +3210,7 @@ server <- function(input, output, session) {
   output$top5_trade <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(top5_trade_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     top5_trade_plot()
   })
   
@@ -3224,7 +3224,7 @@ server <- function(input, output, session) {
   output$exp_value <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_value_plot()
   })
   
@@ -3238,7 +3238,7 @@ server <- function(input, output, session) {
   output$imp_value <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_value_plot()
   })
 
@@ -3252,7 +3252,7 @@ server <- function(input, output, session) {
   output$exp_volume <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_volume_plot()
   })
 
@@ -3266,7 +3266,7 @@ server <- function(input, output, session) {
   output$imp_volume <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_volume_plot()
   })
   
@@ -3487,7 +3487,7 @@ server <- function(input, output, session) {
   # validation reactive; displays message if species is not found in landings data
   landings_data_validation <- reactive({
     validate(need(try(species_selection_landings() %in% landings_terms()),
-                  'There is no available landings data for this species'))
+                  '      There is no available landings data for this species'))
   })
   
   # creates landings data for download
@@ -3520,7 +3520,7 @@ server <- function(input, output, session) {
   output$landings_value <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_value_plot()
   })
   
@@ -3534,7 +3534,7 @@ server <- function(input, output, session) {
   output$landings_volume <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_volume_plot()
   })
   
@@ -3548,7 +3548,7 @@ server <- function(input, output, session) {
   output$landings_price <- renderPlot({
     landings_data_validation()
     validate(need(try(!is.na(landings_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     landings_price_plot()
   })
   
@@ -3740,7 +3740,7 @@ server <- function(input, output, session) {
   # validation reactive; outputs message if species is not found in production data
   pp_data_validation <- reactive({
     validate(need(try(species_selection_products() %in% pp_terms()),
-                  'There is no available production data for this species'))
+                  '      There is no available production data for this species'))
   })
   
   # creates processed products data for download
@@ -3774,7 +3774,7 @@ server <- function(input, output, session) {
   output$pp_value <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_value_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_value_plot()
   })
   
@@ -3789,7 +3789,7 @@ server <- function(input, output, session) {
   output$pp_volume <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_volume_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_volume_plot()
   })
   
@@ -3805,7 +3805,7 @@ server <- function(input, output, session) {
   output$pp_price <- renderPlot({
     pp_data_validation()
     validate(need(try(!is.na(pp_price_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     pp_price_plot()
   })
   
@@ -3821,7 +3821,7 @@ server <- function(input, output, session) {
   output$exp_mlti_table <- renderTable({
     trade_data_validation()
     validate(need(try(!is.na(exp_mlti_table_df())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     exp_mlti_table_df()
   })
   
@@ -3835,7 +3835,7 @@ server <- function(input, output, session) {
   output$exp_mlti <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(exp_mlti_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     exp_mlti_plot()
   })
   
@@ -3849,7 +3849,7 @@ server <- function(input, output, session) {
   output$imp_mlti_table <- renderTable({
     trade_data_validation()
     validate(need(try(!is.na(imp_mlti_table_df())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     imp_mlti_table_df()
   })
   
@@ -3863,7 +3863,7 @@ server <- function(input, output, session) {
   output$imp_mlti <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(imp_mlti_plot())),
-                  'Data for this species is insufficient to produce this plot'))
+                  '      Data for this species is insufficient to produce this plot'))
     imp_mlti_plot()
   })
   
@@ -3878,7 +3878,7 @@ server <- function(input, output, session) {
   output$hi <- renderPlot({
     trade_data_validation()
     validate(need(try(!is.na(hi_plot())),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     hi_plot()
   })
   
@@ -3899,7 +3899,7 @@ server <- function(input, output, session) {
   output$supply <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_plot()
   })
   
@@ -3913,7 +3913,7 @@ server <- function(input, output, session) {
   output$supply_ratio <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_ratio_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_ratio_plot()
   })
   
@@ -3927,7 +3927,7 @@ server <- function(input, output, session) {
   output$supply_share <- renderPlot({
     trade_data_validation()
     validate(need(try(supply_share_plot()),
-                  'Data for this species is insufficient to produce this table'))
+                  '      Data for this species is insufficient to produce this table'))
     supply_share_plot()
   })
   
