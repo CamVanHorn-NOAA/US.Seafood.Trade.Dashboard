@@ -99,7 +99,7 @@ rm(foss_exports_0414, foss_exports_1524, foss_imports_0414, foss_imports_1524)
 
 
 # Get EUMOFA data
-eumofa <- read_excel("DM_Annex 7 - CF by CN-8 from 2001 to 2021.xlsx",
+eumofa <- read_excel("conversion_factors/DM_Annex 7 - CF by CN-8 from 2001 to 2021.xlsx",
                      sheet = "List of CF")
 # use most recent cn-8 codes
 eumofa <- eumofa %>% 
@@ -800,25 +800,25 @@ us_hts_cn8 <- us_hts_cn8 %>%
 
 # salmon (individual species later)
 us_hts_cn8 <- us_hts_cn8 %>%
-  mutate(`CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON', '03021900', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+  mutate(`CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS', '03021900', `CN-8`),
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'FROZEN'), '03031200', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            (str_detect(PRODUCT_NAME, 'FILLET') |
                               str_detect(PRODUCT_NAME, 'STEAKS')), '03044100', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            (str_detect(PRODUCT_NAME, 'FILLET') |
                               str_detect(PRODUCT_NAME, 'STEAKS')) &
                            str_detect(PRODUCT_NAME, 'FROZEN'), '03048100', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'SALTED'), '03056950', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'SMOKED'), '03054100', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'CANNED'), '16041100', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'PREPAR'), '16041100', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMON' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SALMONS' &
                            str_detect(PRODUCT_NAME, 'MEAT'), '03045200', `CN-8`))
 
 # atlantic/danube salmon
@@ -934,23 +934,23 @@ us_hts_cn8 <- us_hts_cn8 %>%
 
 # shrimp
 us_hts_cn8 <- us_hts_cn8 %>%
-  mutate(`CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP', '03063690', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+  mutate(`CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS', '03063690', `CN-8`),
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            str_detect(PRODUCT_NAME, 'COLD-WATER'), '03063590', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            str_detect(PRODUCT_NAME, 'FROZEN'), '03061799', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            str_detect(PRODUCT_NAME, 'FROZEN') &
                            str_detect(PRODUCT_NAME, 'COLD-WATER'), '03061699', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            str_detect(PRODUCT_NAME, 'FROZEN') &
                            str_detect(PRODUCT_NAME, 'WARM-WATER'), '03061799', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            str_detect(PRODUCT_NAME, 'DRIED/SALTED/BRINE'), '03069590', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            (str_detect(PRODUCT_NAME, 'ATC') |
                               str_detect(PRODUCT_NAME, 'CANNED')), '16052900', `CN-8`),
-         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMP' &
+         `CN-8` = ifelse(SPECIES_CATEGORY == 'SHRIMPS' &
                            (str_detect(PRODUCT_NAME, 'PREPAR') |
                               str_detect(PRODUCT_NAME, 'BREADED')), '16052190', `CN-8`))
 
@@ -1294,7 +1294,7 @@ free_hts <- us_hts_cn8 %>%
   distinct()
 
 # pull hts to species groups from hts_to_species_group.R
-hts_species_groups <- read.csv('C:/Users/cameron.vanhorn/Documents/GitHub/seafood-traceability-design/species_group_hts.csv') %>%
+hts_species_groups <- read.csv('conversion_factors/species_group_hts.csv') %>%
   # convert numeric to character
   mutate(HTS.Number = as.character(HTS.Number)) %>%
   rename(HTS_NUMBER = HTS.Number,
