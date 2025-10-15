@@ -66,7 +66,7 @@ Echinoderms
 
 Freshwater Fishes
 
-:   Fishes that exclusively inhabit freshwater environments. Domestic freshwater fisheries are diverse and include many fish species categorized by their taxonomy (Cyprinids, such as carp, or Cichlids, such as tilapia), habitat (demersal fishes, such as catfish), or conglomerate (Bass, such as white bass). We grouped species that exist beyond these categories (e.g., pike, perch, some trouts) into an 'Other Species' category. <br><br>
+:   Fishes that exclusively inhabit freshwater environments. Domestic freshwater fisheries are diverse and include many fish species categorized by their taxonomy, habitat (demersal fishes, such as catfish), or conglomerate (Bass, such as white bass). We grouped species that exist beyond these categories (e.g., pike, perch, some trouts) into an 'Other Species' category. <br><br>
 
 Groundfishes
 
