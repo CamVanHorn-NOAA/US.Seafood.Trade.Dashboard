@@ -3736,7 +3736,9 @@ server <- function(input, output, session) {
       products_filtered(),
       species_selection_products(),
       region = '',
-      full_data = T)
+      full_data = T,
+      units = selected_units(),
+      nominal = selected_value())
     })
   
   # creates processed products data for plots
