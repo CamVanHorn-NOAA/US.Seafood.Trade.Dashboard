@@ -1,0 +1,215 @@
+/* CSS for App */
+.tooltip-inner {
+  max-width: 600px !important;
+  width: auto !important;
+  font-size: 16px !important;
+  background-color: #283A38 !important;
+}
+
+g.hovertext > path {opacity: .9;}
+
+.color-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 15px; 
+  border: 1px solid #000;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+#banner {
+  background: linear-gradient(155deg, #001743 0%, #0085CA 100%);
+  color: white;
+  padding: 30px 20px;
+  margin-bottom: 10px;
+  min-width: 800px;
+  border-radius: 10px;
+  align-items: center;
+  text-align: left;
+  display: flex;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-family: "Gill Sans MT", sans-serif;
+  text-shadow: 4px 4px 4px black;
+  font-size: clamp(2.5rem, 4vw, 4.5rem); 
+  margin-bottom: 0px;
+}
+
+p {
+  font-family: "Gill Sans MT", sans-serif; 
+  font-size: clamp(1.5rem, 2.6vw, 2.6rem); 
+  margin-top: 0px; 
+  margin-bottom: 0px; 
+  opacity: 0.9;
+}
+
+#info-circle {
+  position: absolute; 
+  top: 0px; 
+  left: 5px
+}
+
+h2 {
+  font-family: "Cambria Math";
+  font-variant: small-caps;
+  text-align: center;
+  text-decoration-line: underline;
+  font-size: 35px;
+  font-weight: bold;
+  text-decoration-thickness: 2px;
+  text-shadow: 1px 1px white;
+}
+
+
+.btn-default {
+  font-family: "Tahoma";
+  --bs-btn-color: #000;
+    --bs-btn-bg: #f9b928;
+    --bs-btn-border-color: #000;
+    --bs-btn-hover-color: #000;
+    --bs-btn-focus-shadow-rgb: 212,157,34;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-shadow: inset 0 3px 5pxrgba(0,0,0,0.125);
+    --bs-btn-disabled-color: #000;
+    --bs-btn-disabled-bg: #f9b928;
+    --bs-btn-disabled-border-color: #f9b928;
+}
+
+.bslib-sidebar-layout>.sidebar {
+  background: linear-gradient(130deg, #C6E6F0 0%, #0085CA 100%);
+}
+
+.btn-warning:hover {
+  font-family: "Tahoma";
+    --bs-btn-color: #000;
+    --bs-btn-bg: #f9b928;
+    --bs-btn-border-color: #000;
+    --bs-btn-hover-color: #000;
+    --bs-btn-focus-shadow-rgb: 212,157,34;
+    --bs-btn-active-color: #000;
+    --bs-btn-active-shadow: inset 0 3px 5pxrgba(0,0,0,0.125);
+    --bs-btn-disabled-color: #000;
+    --bs-btn-disabled-bg: #f9b928;
+    --bs-btn-disabled-border-color: #f9b928;
+    box-shadow: 2px 3px 10px grey;
+}
+
+.control-label {
+  font-family: "Tahoma";
+  font-weight: bold;
+}
+
+.selectize-input.focus {
+  border-color: #002364;
+  box-shadow: 0px 0px 4px 0.1rem #002364;
+  font-family: "Tahoma";
+}
+
+.selectize-input {
+  font-family: "Tahoma";
+}
+
+.selectize-dropdown {
+  font-family: "Tahoma";
+}
+
+.form-check-label {
+  font-family: "Tahoma";
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.form-check-input:focus {
+  border-color: #002364;
+  box-shadow: 0px 0px 4px 0.1rem #002364;
+}
+
+.btn-default.shiny-download-link {
+  font-family: "Tahoma";
+  background: linear-gradient(200deg, #001743 0%, #0085CA 100%);
+  --bs-btn-color: #fff;
+    --bs-btn-border-color: #001743;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #1EBEC7;
+    --bs-btn-hover-border-color: black;
+    --bs-btn-focus-shadow-rgb: 64,64,64;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #001743;
+    --bs-btn-active-border-color: #001743;
+    --bs-btn-active-shadow: inset 0 3px 5pxrgba(0,0,0,0.125);
+    --bs-btn-disabled-color: #001743;
+    --bs-btn-disabled-bg: #001743;
+    --bs-btn-disabled-border-color: #001743;
+    --bs-btn-bg: #001743;
+    --bs-gradient: none;
+}
+
+.btn-default.shiny-download-link:hover {
+  box-shadow: 0px 0px 10px 0px black;
+  background: linear-gradient(200deg, #0085CA 0%, #90DFE3 100%);
+}
+
+.nav-tabs .nav-link.active, .nav-tabs>li>a.active {
+  color: white;
+  background: linear-gradient(200deg, #001743 0%, #0085CA 100%);
+  border-color: white;
+  transition: background 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
+}
+
+.nav-tabs .nav-link, .nav-tabs>li>a {
+  color: black;
+  background: linear-gradient(20deg, #90DFE3 0%, #fff);
+  border-color: white;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
+}
+
+.nav-tabs .nav-link:hover, .nav-tabs>li>a:hover {
+  box-shadow: inset 0px 0px 15px 2px white;
+  border-color: white;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
+}
+
+.nav-link, .nav-tabs>li>a {
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
+  border-color: white;
+}
+
+.nav {
+  --bs-nav-link-hover-color: #000000
+  --bs-nav-link-border-color: transparent
+}
+.nav-pills .nav-link {
+  color: #001743;
+}
+.nav-pills .nav-link.active {
+  font-family: "Tahoma";
+  color: #fff;
+  background: linear-gradient(200deg, #001743 0%, #0085CA 100%);
+}
+
+.nav-pills {
+  font-family: "Tahoma";
+  color: black;
+}
+
+.nav-pills>li>a:hover {
+  text-shadow: 0px 0px 10px #001743;
+  color: #fff;
+  transition: text-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+h3 {
+  font-family: "Cambria Math";
+  font-variant: small-caps;
+  font-size: 20px;
+  color: black;
+  font-weight: bold;
+  margin-top: 5px;
+}
