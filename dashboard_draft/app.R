@@ -1549,7 +1549,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
                  color = 'black',
                  size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2023)) +
+                       limits = factor(2004:2024)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
                          sec.axis = sec_axis(~./scale_factor, name = ylab2,
@@ -1572,7 +1572,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     geom_col(color = 'black',
              fill = landings_colors[1]) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                     limits = factor(2004:2023)) +
+                     limits = factor(2004:2024)) +
     scale_y_continuous(labels = label) +
     labs(x = '',
          y = ylab,
