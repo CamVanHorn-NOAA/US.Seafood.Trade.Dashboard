@@ -79,6 +79,7 @@ exports <- foss_exports %>%
          CENSUS_DISTRICT_CODE = as.numeric(CENSUS_DISTRICT_CODE),
          FAO_COUNTRY_CODE = as.numeric(FAO_COUNTRY_CODE),
          YEAR = as.numeric(YEAR)) %>%
+  filter(YEAR < 2025) %>%
   # use species_ref to attach species info to products
   left_join(species_ref %>% 
               select(HTS_NUMBER, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
@@ -154,6 +155,7 @@ imports <- foss_imports %>%
          FAO_COUNTRY_CODE = as.numeric(FAO_COUNTRY_CODE),
          CALCULATED_DUTY_USD = as.numeric(gsub(',', '', CALCULATED_DUTY_USD)),
          YEAR = as.numeric(YEAR)) %>%
+  filter(YEAR < 2025) %>%
   left_join(species_ref %>% 
               select(HTS_NUMBER, GROUP_NAME, GROUP_TS, GROUP_CBP) %>%
               distinct()) %>%

@@ -63,3 +63,5 @@ pp_hts_mismatches.xlsx
 *.xlsx
 city_region.R
 *.pdf
+supply_species_nuance.qmd
+supply_species_nuance.html
