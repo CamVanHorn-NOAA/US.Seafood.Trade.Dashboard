@@ -31,11 +31,11 @@ drive_auth()
   # it might be easier to use drive_find to see the name of the file
 # FOSS Exports, split by ~10 years
   # UNCOMMENT IF DATA IS UPDATED
-# drive_download('foss_exports_15-24.csv',
+# drive_download('foss_exports_15-25.csv',
 #                overwrite = T)
 # drive_download('foss_exports_04-14.csv',
 #                overwrite = T)
-# drive_download('foss_imports_15-24.csv',
+# drive_download('foss_imports_15-25.csv',
 #                overwrite = T)
 # drive_download('foss_imports_04-14.csv',
 #                overwrite = T)
@@ -68,7 +68,7 @@ drive_auth()
 
 # Exports ----------------------------------------------------------------------
 # read csv's
-foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
+foss_exports_1525 <- read.csv('foss_exports_15-25.csv') %>%
   # use setNames from 'stats' to assign first row values as column names
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
@@ -90,7 +90,7 @@ foss_exports_1524 <- read.csv('foss_exports_15-24.csv') %>%
          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
-foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
+foss_exports_0414 <- read.csv('foss_exports_04-14 (2).csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
@@ -106,11 +106,11 @@ foss_exports_0414 <- read.csv('foss_exports_04-14.csv') %>%
                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
-foss_exports <- bind_rows(foss_exports_0414, foss_exports_1524)
+foss_exports <- bind_rows(foss_exports_0414, foss_exports_1525)
 
 # Imports ----------------------------------------------------------------------
 # read csv's
-foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
+foss_imports_1525 <- read.csv('foss_imports_15-25.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
@@ -125,7 +125,7 @@ foss_imports_1524 <- read.csv('foss_imports_15-24.csv') %>%
          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
-foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
+foss_imports_0414 <- read.csv('foss_imports_04-14 (2).csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
@@ -141,7 +141,7 @@ foss_imports_0414 <- read.csv('foss_imports_04-14.csv') %>%
                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
-foss_imports <- bind_rows(foss_imports_0414, foss_imports_1524)
+foss_imports <- bind_rows(foss_imports_0414, foss_imports_1525)
 
 # Processed Products & Species Metadata ----------------------------------------
 # read csv's
@@ -200,7 +200,7 @@ pp_processed <- read.csv('pp_processed.csv') %>%
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
-foss_com_1523 <- read.csv('foss_com_landings_15-23.csv') %>%
+foss_com_1524 <- read.csv('foss_com_landings_15-24.csv') %>%
   setNames(.[1, ]) %>%
   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
   .[-1, ] %>%
@@ -224,7 +224,7 @@ foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
                             NMFS_NAME))
 
 # combine data (stack)
-foss_com_landings <- bind_rows(foss_com_0414, foss_com_1523)
+foss_com_landings <- bind_rows(foss_com_0414, foss_com_1524)
 
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
