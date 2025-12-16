@@ -299,7 +299,7 @@ overwrite_prodform <- function(data, cols = '', region = '') {
   
   # if cols is empty (i.e., no desired columns to group by), set cols to be 
     # NEW_PRODUCT_FORM 
-  if (cols == '') {
+  if ('' %in% cols) {
     cols <- c('NEW_PRODUCT_FORM')
   }
   # Identify what the last column in cols is (this should be the lowest level
