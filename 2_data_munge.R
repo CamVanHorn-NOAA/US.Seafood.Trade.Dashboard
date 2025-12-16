@@ -276,6 +276,145 @@ products <- left_join(pp_processed, pp_map) %>%
          REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            CITY %in% grlake_cities$PLANT_CITY,
+                         'Great Lakes', REGION),
+         # NEW_PRODUCT_FORM will store updated product conditions so that
+          # PRODUCT_FORM can retain prior, more specific data
+         NEW_PRODUCT_FORM = PRODUCT_FORM,
+         # CONFIDENTIAL is a placeholder for labeling data as confidential
+         CONFIDENTIAL = NA) 
+
+# Our first step is to identify what products would currently be confidential,
+  # then adjust their product form to OTHER so that they may aggregate and no
+  # longer be confidential. We will use a function.
+overwrite_prodform <- function(data, cols = '', region = '') {
+  # here, data should be processed product data as formatted above 
+  # cols is a vector of columns to group by and is defaulted as an empty string;
+    # acceptable inputs are columns that exist in the inputted data
+    # ORDER MATTERS: the last column included in the vector should be the finest
+    # level of resolution within the species hierarchy
+    # This is because we need to remove any NAs in that column such that the
+    # data only includes products with 
+  # region is defaulted as an empty string; acceptable inputs are specific
+    # regions
+  
+  # if cols is empty (i.e., no desired columns to group by), set cols to be 
+    # NEW_PRODUCT_FORM 
+  if (cols == '') {
+    cols <- c('NEW_PRODUCT_FORM')
+  }
+  # Identify what the last column in cols is (this should be the lowest level
+    # of the classification hierarchy) and set it as object of type quosure
+    # to work in dplyr pipe
+  level_filter <- cols[length(cols)]
+  level_filter <- as.symbol(level_filter)
+  level_filter <- rlang::enquo(level_filter)
+  
+  # there are three possible ways to munge the data:
+  # 1) if no region is provided
+  if (region == '') {
+    data %>%
+      # all inputted columns and non-negotiable columns
+      # all_of() allows us to use a vector of strings in a dplyr pipe
+      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      # Some plant addresses are blank or NA, so we don't worry about those for 
+        # confidentiality
+      # We also don't want any NAs of the finest level of classification - this
+        # ensures that we aren't accidentally marking confidential data that
+        # is nonspecific to the desired classification level
+      # In the event that no columns are provided, this will be NEW_PRODUCT_FORM
+        # which will ensure that we leave out products without a provided condition
+      filter(PLANT_STREET != '',
+             !is.na(PLANT_STREET),
+             !is.na(!!level_filter)) %>%
+      # remove duplicates from the data so plants are NOT double-counted
+      distinct() %>%
+      # group by all columns except plant street so we count the number of plants
+        # for our desired group of columns
+      group_by(across(c(-PLANT_STREET))) %>%
+      count() %>%
+      # filter for combos that have fewer than 3 plants 
+      filter(n < 3) %>%
+      ungroup() %>%
+      # join back to the original data so now there is an extra column of 'n'
+        # this column will have a number for any product found to have less than
+        # 3 plants which process said product, and NA for any others
+      right_join(data) %>%
+      # we now want to overwrite NEW_PRODUCT_FORM to be OTHER for any products
+        # listed at less than 3 plants
+      # In the event a product was listed at less than 3 plants for one group
+        # and more than 3 for another, we do not want to lose that work and overwrite
+        # back to the previous product form, so we also check to see if CONFIDENTIAL
+        # is NA or not to preserve prior confidentiality checks
+      mutate(NEW_PRODUCT_FORM = ifelse(!is.na(n), 'OTHER', 
+                                       ifelse(!is.na(CONFIDENTIAL), 'OTHER', PRODUCT_FORM)),
+             # we update CONFIDENTIAL to 1 if the product was found to be
+              # confidential in the current grouping
+             CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      # remove the 'n' column so now data is same structure as inputted
+      select(!n)
+    
+    # 2) if region is North Pacific 
+  } else if (region == 'North Pacific') {
+    # the North Pacific is unique to other regions in that there are only
+      # 2 plant addresses provided, and one of the two is blank
+    # this means there is only one real address provided, which makes selecting
+      # confidential records more complicated
+    # we perform the same process as above save for an important distinction:
+      # we select confidential records as those with n == 1 AND the plant
+      # address is not blank (this means the product was only processed at
+      # the plant with an associated address)
+    data %>%
+      filter(REGION == 'North Pacific') %>%
+      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      # We need the plants of blank addresses to be included so only filter out
+        # the level_filter
+      filter(!is.na(!!level_filter)) %>%
+      distinct() %>%
+      group_by(across(c(-PLANT_STREET))) %>%
+      # we need the plant address to know which products were only processed
+        # at the plant with a provided address, so we use n() instead of count()
+      mutate(n = n()) %>%
+      # only retain products processed at 1 plant AND with a provided address
+      filter(n == 1,
+             PLANT_STREET != '') %>%
+      # we add a column for the region so that upon joining back to the data,
+        # it only joins to products within that specific region, not all products
+        # of that combination
+      mutate(REGION = 'North Pacific') %>%
+      # remove plant street for joining
+      select(!PLANT_STREET) %>%
+      # should only join on region, year, new product form, and selected columns
+      right_join(data) %>%
+      mutate(NEW_PRODUCT_FORM = ifelse(!is.na(n), 'OTHER',
+                                       ifelse(!is.na(CONFIDENTIAL), 'OTHER', PRODUCT_FORM)),
+             CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      select(!n)
+    
+    # 3) Regions that are not the North Pacific
+  } else {
+    # this is a hybrid of 1) and 2), where the only difference from 1) is that
+      # we filter for the inputted region and add the column for region later
+      # for joining
+    data %>%
+      filter(REGION == region) %>%
+      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      filter(PLANT_STREET != '',
+             !is.na(PLANT_STREET),
+             !is.na(!!level_filter)) %>%
+      distinct() %>%
+      group_by(across(c(-PLANT_STREET))) %>%
+      count() %>%
+      filter(n < 3) %>%
+      ungroup() %>%
+      mutate(REGION = region) %>%
+      right_join(data) %>%
+      mutate(NEW_PRODUCT_FORM = ifelse(!is.na(n), 'OTHER', 
+                                       ifelse(!is.na(CONFIDENTIAL), 'OTHER', PRODUCT_FORM)),
+             CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      select(!n)
+  }
+}
+
 # Processed Products -----------------------------------------------------------
 # Data formatting
 pp_data <- pp_processed %>%
