@@ -249,12 +249,15 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
 # Grabbing confidential data from processed products ---------------------------
 # confidential data in this case only exists in processed products data
 # Data is considered confidential if there are less than 3 (i.e., 1 or 2) records
-  # in a group. Here, the group would be all species classification levels (i.e.,
-  # ecological category, species category, species group, and species name), 
-  # product form, and plant WITHIN A REGION. In other words, if only one or two 
-  # plants process a species to a unique condition (e.g., fillet, canned, etc.)
-  # within a region, those records are confidential. 
-processed_confids <- left_join(pp_processed, pp_map) %>%
+  # in a group. Because our classification hierarchy has four levels, and because 
+  # not all products provide information up to the species name, we must isolate
+  # confidentiality at each level of the hierarchy. Also, because the user may
+  # or may not investigate region, this must be done both at the regional and 
+  # outside the regional level. This will be many steps, but the fundamentals are:
+  # 1) Determine what would be confidential in the data presently. For those products,
+  # change their product form to be OTHER so that they may aggregate.
+  # 2) Determine what would be confidential after adjusting product forms.
+products <- left_join(pp_processed, pp_map) %>%
   # split florida by east and west
   left_join(florida_coast_map %>%
               rename(CITY = PLANT_CITY,
