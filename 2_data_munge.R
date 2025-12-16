@@ -414,6 +414,96 @@ overwrite_prodform <- function(data, cols = '', region = '') {
       select(!n)
   }
 }
+# the end result of the above function is a dataset identical in structure to
+  # the inputted data, with some changes made to NEW_PRODUCT_FORM and CONFIDENTIAL
+# the function is designed where it can be used in a pipe and no prior effort
+  # is lost
+
+# pipe for overwriting product forms to OTHER
+overwritten_products <- products %>%
+  # first identify data that is confidential without aggregation (i.e., 
+    # product conditions that are only processed at 1 or 2 plants)
+  overwrite_prodform() %>%
+  # FIRST SECTION: Each level of the classification hierarchy without region
+  overwrite_prodform('ECOLOGICAL_CATEGORY') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY')) %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP')) %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME')) %>%
+  # SECOND SECTION: Each level of the classification hierarchy for EACH region
+  # Pacific
+  overwrite_prodform(region = 'Pacific') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Pacific') %>%
+  # North Pacific
+  overwrite_prodform(region = 'North Pacific') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'North Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'North Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'North Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'North Pacific') %>%
+  # West Pacific
+  overwrite_prodform(region = 'West Pacific') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'West Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'West Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'West Pacific') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'West Pacific') %>%
+  # New England
+  overwrite_prodform(region = 'New England') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'New England') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'New England') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'New England') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'New England') %>%
+  # Mid-Atlantic
+  overwrite_prodform(region = 'Mid-Atlantic') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'Mid-Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Mid-Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Mid-Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Mid-Atlantic') %>%
+  # South Atlantic
+  overwrite_prodform(region = 'South Atlantic') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'South Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'South Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'South Atlantic') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'South Atlantic') %>%
+  # Gulf
+  overwrite_prodform(region = 'Gulf') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'Gulf') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Gulf') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Gulf') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Gulf') %>%
+  # Great Lakes
+  overwrite_prodform(region = 'Great Lakes') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'Great Lakes') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Great Lakes') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Great Lakes') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes')
 
 # Processed Products -----------------------------------------------------------
 # Data formatting
