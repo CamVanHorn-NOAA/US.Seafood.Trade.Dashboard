@@ -315,7 +315,7 @@ overwrite_prodform <- function(data, cols = '', region = '') {
     data %>%
       # all inputted columns and non-negotiable columns
       # all_of() allows us to use a vector of strings in a dplyr pipe
-      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
       # Some plant addresses are blank or NA, so we don't worry about those for 
         # confidentiality
       # We also don't want any NAs of the finest level of classification - this
@@ -365,7 +365,7 @@ overwrite_prodform <- function(data, cols = '', region = '') {
       # the plant with an associated address)
     data %>%
       filter(REGION == 'North Pacific') %>%
-      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
       # We need the plants of blank addresses to be included so only filter out
         # the level_filter
       filter(!is.na(!!level_filter)) %>%
@@ -397,7 +397,7 @@ overwrite_prodform <- function(data, cols = '', region = '') {
       # for joining
     data %>%
       filter(REGION == region) %>%
-      select(all_of(cols), YEAR, NEW_PRODUCT_FORM, PLANT_STREET) %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
       filter(PLANT_STREET != '',
              !is.na(PLANT_STREET),
              !is.na(!!level_filter)) %>%
