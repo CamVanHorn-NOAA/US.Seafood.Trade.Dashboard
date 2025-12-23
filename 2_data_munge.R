@@ -511,6 +511,209 @@ overwritten_products <- products %>%
   overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes')
 
+# The next step is to identify which products, after attempting to consolidate
+  # into less specific product conditions, are confidential. For these, we will
+  # attempt to consolidate into less specific species classifications
+declassify_species <- function(data, region = '') {
+  # data is a dataset of processed products
+  # region is an empty character string by default that accepts a string of a 
+    # desired region formatted as is in 'data'
+  
+  # The process is four steps, one for each level of the species hierarchy
+  # Each step consists of isolating necessary columns for aggregation, counting
+    # how many plants process the product, and overwriting species classifications
+    # The distinction in each step lies in the specific level getting isolated
+    # and then overwritten. 
+  if (region == '') {
+    step1 <- data %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      # Because users can't select NA species name, only take products with 
+        # a provided species name
+      filter(!is.na(SPECIES_NAME)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1) %>%
+      # rejoin back to original data with CONFIDENTIAL removed (clean join)
+      right_join(data %>% select(!CONFIDENTIAL)) %>%
+      # STATE OF ALASKA represnts many processors, so they are not confidential
+      # For any confidentially marked products, remove the assigned species name
+      mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL),
+             SPECIES_NAME = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_NAME)) %>%
+      # remove n
+      select(!n)
+    
+    step2 <- step1 %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      # Now we only want products for which there is no species name but a 
+        # species group
+      filter(is.na(SPECIES_NAME),
+             !is.na(SPECIES_GROUP)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1) %>%
+      right_join(step1 %>% select(!CONFIDENTIAL)) %>%
+      mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL),
+             SPECIES_GROUP = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_GROUP)) %>%
+      select(!n)
+    
+    step3 <- step2 %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      # only products for which there is no species name nor group, but a 
+        # species category
+      filter(is.na(SPECIES_NAME),
+             is.na(SPECIES_GROUP),
+             !is.na(SPECIES_CATEGORY)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1) %>%
+      right_join(step2 %>% select(!CONFIDENTIAL)) %>%
+      mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL),
+             SPECIES_CATEGORY = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_CATEGORY)) %>%
+      select(!n)
+    
+    step4 <- step3 %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      # only products for which there is no species name, group, nor category,
+        # but an ecological category
+      filter(is.na(SPECIES_NAME),
+             is.na(SPECIES_GROUP),
+             is.na(SPECIES_CATEGORY),
+             !is.na(ECOLOGICAL_CATEGORY)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1) %>%
+      right_join(step3 %>% select(!CONFIDENTIAL)) %>%
+      mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL),
+             ECOLOGICAL_CATEGORY = ifelse(!is.na(CONFIDENTIAL), NA, ECOLOGICAL_CATEGORY)) %>%
+      select(!n)
+    
+  } else {
+    # Due to the complexity of the North Pacific processors (STATE OF ALASKA) and
+      # the very few products that would be confidential from the NP, the
+      # North Pacific is excluded from this process
+    if (region == 'North Pacific') {
+      return(data)
+    }
+    
+    # Here, the only differences from the steps above are filtering for the
+      # desired region in the data
+    
+    step1 <- data %>%
+      filter(REGION == region) %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      filter(!is.na(SPECIES_NAME)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1,
+             REGION = region) %>%
+      right_join(data %>% select(!CONFIDENTIAL)) %>%
+      mutate(SPECIES_NAME = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_NAME)) %>%
+      select(!n)
+    
+    step2 <- step1 %>%
+      filter(REGION == region) %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      filter(is.na(SPECIES_NAME),
+             !is.na(SPECIES_GROUP)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1,
+             REGION = region) %>%
+      right_join(step1 %>% select(!CONFIDENTIAL)) %>%
+      mutate(SPECIES_GROUP = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_GROUP)) %>%
+      select(!n)
+    
+    step3 <- step2 %>%
+      filter(REGION == region) %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      filter(is.na(SPECIES_NAME),
+             is.na(SPECIES_GROUP),
+             !is.na(SPECIES_CATEGORY)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1,
+             REGION = region) %>%
+      right_join(step2 %>% select(!CONFIDENTIAL)) %>%
+      mutate(SPECIES_CATEGORY = ifelse(!is.na(CONFIDENTIAL), NA, SPECIES_CATEGORY)) %>%
+      select(!n)
+    
+    step4 <- step3 %>%
+      filter(REGION == region) %>%
+      select(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+             SPECIES_GROUP, SPECIES_NAME, PLANT_STREET) %>%
+      filter(is.na(SPECIES_NAME),
+             is.na(SPECIES_GROUP),
+             is.na(SPECIES_CATEGORY),
+             !is.na(ECOLOGICAL_CATEGORY)) %>%
+      distinct() %>%
+      group_by(YEAR, NEW_PRODUCT_FORM, ECOLOGICAL_CATEGORY, SPECIES_CATEGORY,
+               SPECIES_GROUP, SPECIES_NAME) %>%
+      count() %>%
+      ungroup() %>%
+      filter(n < 3) %>%
+      mutate(CONFIDENTIAL = 1,
+             REGION = region) %>%
+      right_join(step3 %>% select(!CONFIDENTIAL)) %>%
+      mutate(ECOLOGICAL_CATEGORY = ifelse(!is.na(CONFIDENTIAL), NA, ECOLOGICAL_CATEGORY)) %>%
+      select(!n)
+  }
+  
+  return(step4)
+}
+
+# pipe for declassifying species
+declassified_products <- declassify_species(overwritten_products) %>%
+  declassify_species('Pacific') %>%
+  declassify_species('North Pacific') %>%
+  declassify_species('West Pacific') %>%
+  declassify_species('New England') %>%
+  declassify_species('Mid-Atlantic') %>%
+  declassify_species('South Atlantic') %>%
+  declassify_species('Gulf')
+
+# store declassified species in separate object
+species_declassified_products <- declassified_products %>%
+  filter((is.na(SPECIES_NAME) & !is.na(OLD_SPECIES_NAME)) |
+           (is.na(SPECIES_GROUP) & !is.na(OLD_SPECIES_GROUP)) |
+           (is.na(SPECIES_CATEGORY) & !is.na(OLD_SPECIES_CATEGORY)) |
+           (is.na(ECOLOGICAL_CATEGORY) & !is.na(OLD_ECOLOGICAL_CATEGORY)))
+
+
 # Processed Products -----------------------------------------------------------
 # Data formatting
 pp_data <- pp_processed %>%
