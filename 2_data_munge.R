@@ -280,6 +280,12 @@ products <- left_join(pp_processed, pp_map) %>%
          # NEW_PRODUCT_FORM will store updated product conditions so that
           # PRODUCT_FORM can retain prior, more specific data
          NEW_PRODUCT_FORM = PRODUCT_FORM,
+         # OLD_ levels of the classification hierarchy will store initial
+           # species classifications that may be set to NA for confidentiality
+         OLD_SPECIES_NAME = SPECIES_NAME,
+         OLD_SPECIES_GROUP = SPECIES_GROUP,
+         OLD_SPECIES_CATEGORY = SPECIES_CATEGORY,
+         OLD_ECOLOGICAL_CATEGORY = ECOLOGICAL_CATEGORY,
          # CONFIDENTIAL is a placeholder for labeling data as confidential
          CONFIDENTIAL = NA) 
 
