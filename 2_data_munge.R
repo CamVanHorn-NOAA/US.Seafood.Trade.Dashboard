@@ -513,6 +513,15 @@ overwritten_products <- products %>%
   overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes')
 
+# store changed products in separate object
+changed_product_forms <- overwritten_products %>%
+  filter(CONFIDENTIAL == 1) %>%
+  select(!CONFIDENTIAL)
+
+# remove confidential markers
+overwritten_products <- overwritten_products %>%
+  mutate(CONFIDENTIAL = NA)
+
 # The next step is to identify which products, after attempting to consolidate
   # into less specific product conditions, are confidential. For these, we will
   # attempt to consolidate into less specific species classifications
@@ -870,6 +879,10 @@ products_marked <- declassified_products %>%
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes') %>%
   # if there is no provided street address, then a product should not be confidential
   mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL))
+
+# store confidential products in separate objects
+confidential_products <- products_marked %>%
+  filter(CONFIDENTIAL == 1)
 
 # Processed Products -----------------------------------------------------------
 # Data formatting
