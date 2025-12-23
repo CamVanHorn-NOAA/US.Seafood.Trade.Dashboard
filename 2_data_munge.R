@@ -256,7 +256,9 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
   # outside the regional level. This will be many steps, but the fundamentals are:
   # 1) Determine what would be confidential in the data presently. For those products,
   # change their product form to be OTHER so that they may aggregate.
-  # 2) Determine what would be confidential after adjusting product forms.
+  # 2) Determine what would be confidential after adjusting product forms. For
+  # those products, remove species classification level by level.
+  # 3) Determine what would be confidential.
 products <- left_join(pp_processed, pp_map) %>%
   # split florida by east and west
   left_join(florida_coast_map %>%
