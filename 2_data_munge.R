@@ -886,55 +886,33 @@ confidential_products <- products_marked %>%
 
 # Processed Products -----------------------------------------------------------
 # Data formatting
-pp_data <- pp_processed %>%
-  # connect groups from map
-  left_join(pp_map) %>%
-  mutate(YEAR = as.numeric(YEAR),
-         POUNDS = as.numeric(gsub(',', '', POUNDS)),
-         DOLLARS = as.numeric(gsub(',', '', DOLLARS)),
-         # convert pounds to kilograms in separate column
-         KG = POUNDS * 0.45359237) %>%
-  arrange(YEAR, SPECIES_NAME, PRODUCT_FORM) %>%
-  # reorder columns so species is left of PRODUCT_FORM for ease of viewing
-  select(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, STATE, CITY,
-         ECOLOGICAL_CATEGORY, PRODUCT_FORM, POUNDS, DOLLARS, KG) %>%
+pp_data <- products_marked %>%
+  # convert pounds to kilograms in separate column
+  mutate(KG = POUNDS * 0.45359237) %>%
+  select(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY, 
+         NEW_PRODUCT_FORM, POUNDS, DOLLARS, KG, REGION, CONFIDENTIAL) %>%
+  rename(PRODUCT_FORM = NEW_PRODUCT_FORM) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(DOLLARS_2024 = DOLLARS * INDEX,
+  mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
+         POUNDS = ifelse(is.na(POUNDS), 0, POUNDS),
+         KG = ifelse(is.na(KG), 0, KG),
+         DOLLARS_2024 = DOLLARS * INDEX,
          DOLLARS_PER_LB = DOLLARS / POUNDS,
          DOLLARS_PER_KG = DOLLARS / KG,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
   select(-INDEX) %>%
-  # split florida by east and west
-  left_join(florida_coast_map %>%
-              rename(CITY = PLANT_CITY,
-                     FLORIDA_STATE = PLANT_STATE_ABRV) %>%
-              select(!c(PLANT_COAST_GEMINI, PLANT_COAST))) %>%
-  mutate(STATE = ifelse(!is.na(FLORIDA_STATE), FLORIDA_STATE, STATE)) %>%
-  select(!FLORIDA_STATE) %>%
-  # add regions
-  mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
-         REGION = ifelse(STATE %in% pac, 'Pacific', REGION),
-         REGION = ifelse(STATE %in% pacisl, 'West Pacific', REGION),
-         REGION = ifelse(STATE %in% neweng, 'New England', REGION),
-         REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
-         REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
-         REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
-         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
-         REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
-                           CITY %in% grlake_cities$PLANT_CITY,
-                         'Great Lakes', REGION)) %>%
-  left_join(confid_products) %>%
   # mark confidential records' values as 0
   mutate(CONFIDENTIAL = ifelse(is.na(CONFIDENTIAL), 0, CONFIDENTIAL),
          POUNDS = ifelse(CONFIDENTIAL == 1, 0, POUNDS),
          DOLLARS = ifelse(CONFIDENTIAL == 1, 0, DOLLARS),
          KG = ifelse(CONFIDENTIAL == 1, 0, KG),
          DOLLARS_2024 = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024),
-         DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_LB),
-         DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_KG),
-         DOLLARS_2024_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_LB),
-         DOLLARS_2024_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_KG))
+         # if pounds = 0 also set any rates to 0 (would be Inf or NaN otherwise)
+         DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_PER_LB),
+         DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_PER_KG),
+         DOLLARS_2024_PER_LB = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_2024_PER_LB),
+         DOLLARS_2024_PER_KG = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_2024_PER_KG))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
@@ -962,23 +940,6 @@ com_landings <- foss_com_landings %>%
          REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
          REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
          REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION))
-
-# Remove cities and states for confidentiality ---------------------------------
-pp_data <- pp_data %>%
-  select(!c(CITY, STATE, DOLLARS_PER_LB, DOLLARS_PER_KG, DOLLARS_2024_PER_LB,
-            DOLLARS_2024_PER_KG)) %>%
-  group_by(YEAR, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
-           ECOLOGICAL_CATEGORY, PRODUCT_FORM, REGION, CONFIDENTIAL) %>%
-  summarise(across(where(is.numeric), sum),
-            .groups ='drop') %>%
-  mutate(DOLLARS_PER_LB = DOLLARS / POUNDS,
-         DOLLARS_PER_KG = DOLLARS / KG,
-         DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
-         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG,
-         DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_LB),
-         DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_PER_KG),
-         DOLLARS_2024_PER_LB = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_LB),
-         DOLLARS_2024_PER_KG = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024_PER_KG))
 
 #####################
 ### SAVE THE DATA ###
