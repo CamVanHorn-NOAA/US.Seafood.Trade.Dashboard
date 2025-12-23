@@ -716,6 +716,161 @@ species_declassified_products <- declassified_products %>%
            (is.na(ECOLOGICAL_CATEGORY) & !is.na(OLD_ECOLOGICAL_CATEGORY)))
 
 
+# The last step is to identify which products, after attempting to consolidate
+  # into less specific product conditions and species, are confidential
+set_confids <- function(data, cols = '', region = '') {
+  # this function is nearly identical to overwrite_prodforms
+  # data can be raw products data or that formatted by overwrite_prodforms
+  # cols are columns to group the data by
+  # region is an empty string that accepts specific regions as strings
+  
+  # the only difference between set_confids and overwrite_prodforms is the 
+    # absence of changing product forms to other. Instead, any products 
+    # identified to less than 3 plants will have CONFIDENTIAL as 1
+  
+  if ('' %in% cols) {
+    cols <- c('NEW_PRODUCT_FORM')
+  }
+  
+  level_filter <- cols[length(cols)]
+  level_filter <- as.symbol(level_filter)
+  level_filter <- rlang::enquo(level_filter)
+  
+  if (region == '') {
+    data %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
+      filter(PLANT_STREET != '',
+             !is.na(PLANT_STREET),
+             !is.na(!!level_filter)) %>%
+      distinct() %>%
+      group_by(across(c(-PLANT_STREET))) %>%
+      count() %>%
+      filter(n < 3) %>%
+      ungroup() %>%
+      right_join(data) %>%
+      mutate(CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      select(!n)
+  } else if (region == 'North Pacific') {
+    data %>%
+      filter(REGION == 'North Pacific') %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
+      filter(!is.na(!!level_filter)) %>%
+      distinct() %>%
+      group_by(across(c(-PLANT_STREET))) %>%
+      mutate(n = n()) %>%
+      filter(n == 1,
+             PLANT_STREET != '') %>%
+      ungroup() %>%
+      mutate(REGION = 'North Pacific') %>%
+      select(!PLANT_STREET) %>%
+      right_join(data) %>%
+      mutate(CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      select(!n)
+  } else {
+    data %>%
+      filter(REGION == region) %>%
+      select(YEAR, NEW_PRODUCT_FORM, all_of(cols), PLANT_STREET) %>%
+      filter(PLANT_STREET != '',
+             !is.na(PLANT_STREET),
+             !is.na(!!level_filter)) %>%
+      distinct() %>%
+      group_by(across(c(-PLANT_STREET))) %>%
+      count() %>%
+      filter(n < 3) %>%
+      ungroup() %>%
+      mutate(REGION = region) %>%
+      right_join(data) %>%
+      mutate(CONFIDENTIAL = ifelse(!is.na(n), 1, CONFIDENTIAL)) %>%
+      select(!n)
+  }
+}
+
+# pipe for identifying confidential products
+products_marked <- declassified_products %>%
+  set_confids() %>%
+  # FIRST SECTION: Each level of the classification hierarchy without region
+  set_confids('ECOLOGICAL_CATEGORY') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY')) %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP')) %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME')) %>%
+  # SECOND SECTION: Each level of the classification hierarchy for EACH region
+  # Pacific
+  set_confids(region = 'Pacific') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Pacific') %>%
+  # North Pacific
+  set_confids(region = 'North Pacific') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'North Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'North Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'North Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'North Pacific') %>%
+  # West Pacific
+  set_confids(region = 'West Pacific') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'West Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+              region = 'West Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'West Pacific') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'West Pacific') %>%
+  # New England
+  set_confids(region = 'New England') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'New England') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'New England') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'New England') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'New England') %>%
+  # Mid-Atlantic
+  set_confids(region = 'Mid-Atlantic') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'Mid-Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Mid-Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Mid-Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Mid-Atlantic') %>%
+  # South Atlantic
+  set_confids(region = 'South Atlantic') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'South Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'South Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'South Atlantic') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'South Atlantic') %>%
+  # Gulf
+  set_confids(region = 'Gulf') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'Gulf') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Gulf') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Gulf') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Gulf') %>%
+  # Great Lakes
+  set_confids(region = 'Great Lakes') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'Great Lakes') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'Great Lakes') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'Great Lakes') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes') %>%
+  # if there is no provided street address, then a product should not be confidential
+  mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL))
+
 # Processed Products -----------------------------------------------------------
 # Data formatting
 pp_data <- pp_processed %>%
