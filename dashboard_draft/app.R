@@ -141,7 +141,6 @@ tooltip_heading <- paste0(
 tooltip_subheading <- paste0(
   "</span><span style = 'font-size: 18px; font-weight: bold;'>")
 
-###
 
 ###
 # Plot Aesthetic Objects -------------------------------------------------------
@@ -1658,7 +1657,7 @@ plot_hi <- function(hi_data, region, species) {
   # hi_data is a data set formatted by calculate_hi
   
   if (region != '') {
-    region_text <- paste0(' traded in the ', region)
+    region_text <- paste0('\ntraded in the ', region)
   } else {region_text <- ''}
   
   # format the data by renaming columns for plot labels
@@ -1681,7 +1680,7 @@ plot_hi <- function(hi_data, region, species) {
                          type = c(export_color, import_color)) +
     labs(x = '',
          y = 'Index',
-         title = paste0('Herfindahl Index of \n', species, region_text)) +
+         title = paste0('Herfindahl Index of ', species, region_text)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     theme_bw() +
     theme(axis.text = element_text(size = axis_value_size),
@@ -1709,7 +1708,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       # apparent supply
   
   if (region != '') {
-    region_text <- paste0(' in the ', region)
+    region_text <- paste0('\nin the ', region)
   } else {region_text <- ''}
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
@@ -1726,7 +1725,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       geom_col(fill = c(supply_color)) +
       labs(x = '',
            y = ylab,
-           title = paste0('Apparent Supply of \n', species, region_text)) +
+           title = paste0('Apparent Supply of ', species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
@@ -1750,8 +1749,8 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
                 linewidth = 1) +
       labs(x = '',
            y = 'Ratio',
-           title = paste0('Apparent Supply of \n', species, 
-                          '\nRelative to Domestic \nProduction', region_text)) +
+           title = paste0('Apparent Supply of ', species, 
+                          '\nRelative to Domestic Production', region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
@@ -1771,7 +1770,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       geom_col(fill = share_color) +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', 
+           title = paste0('Unexported Domestic Production Relative to\nApparent Supply of ', 
                           species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
