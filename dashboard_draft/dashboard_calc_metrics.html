@@ -36,6 +36,7 @@ ul.task-list li input[type="checkbox"] {
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<link rel="stylesheet" href="www/quarto-style.css">
 </head>
 
 <body class="fullcontent">
@@ -66,9 +67,9 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt>Top Five Trading Partners</dt>
 <dd>
-We summarize the net trade value of the top five trading partners (i.e., nations; <span class="math inline">\(c\)</span>) for a given species, group, or category of interest over the five-year period from 2020 to 2024 (<span class="math inline">\(T\)</span>). We determine the top five trading partners by first filtering the data to reflect our chosen time period. Within this period, we sum the total value of product (i.e., species) imported and exported for each trading partner (individual years = <span class="math inline">\(t\)</span>): <span class="math display">\[
+<p>We summarize the net trade value of the top five trading partners (i.e., nations; <span class="math inline">\(c\)</span>) for a given species, group, or category of interest over the five-year period from 2020 to 2024 (<span class="math inline">\(T\)</span>). We determine the top five trading partners by first filtering the data to reflect our chosen time period. Within this period, we sum the total value of product (i.e., species) imported and exported for each trading partner (individual years = <span class="math inline">\(t\)</span>): <span class="math display">\[
 D_{T,c} = \sum_{i = t} D_{I,c,t} + D_{E,c,t}
-\]</span>
+\]</span></p>
 </dd>
 </dl>
 <p>This is contrary to trade balance, which takes the difference of exports and imports rather than the sum. We then identify the five nations (trading partners) that traded the greatest sum of value and filter our original data to only include their trade data during the time period. We finish by calculating the trade balance, or the net export value, for the top five trading partners within each year of the time period. <span class="math display">\[
@@ -77,7 +78,7 @@ D_{T,c} = \sum_{i = t} D_{I,c,t} + D_{E,c,t}
 <dl>
 <dt>Multilateral Trade Index (MLTI)</dt>
 <dd>
-The multilateral trade index (MLTI) is a parameter that relates trade value and volume among trading partners through time. The MLTI is a complex metric that compares how trade amongst the most recent dominant trading partners (i.e., the top trading partners by value of the last calendar year) has changed through time. The MLTI uses the normalized price of a traded product, or the average price of a good traded over some time period (<span class="math inline">\(\bar P_{T}\)</span>), to compare traded value of the product among trading partners relative to a base index. Calculating the base index is not straightforward and requires several steps. We first filter our trade data for exports or imports as desired and summarise the annual value and volume traded for each trading partner therein. <span class="math display">\[
+<p>The multilateral trade index (MLTI) is a parameter that relates trade value and volume among trading partners through time. The MLTI is a complex metric that compares how trade amongst the most recent dominant trading partners (i.e., the top trading partners by value of the last calendar year) has changed through time. The MLTI uses the normalized price of a traded product, or the average price of a good traded over some time period (<span class="math inline">\(\bar P_{T}\)</span>), to compare traded value of the product among trading partners relative to a base index. Calculating the base index is not straightforward and requires several steps. We first filter our trade data for exports or imports as desired and summarise the annual value and volume traded for each trading partner therein. <span class="math display">\[
 D_{T,c} = \sum_{i = t} D_{I or E,c,t}
 \]</span> <span class="math display">\[
 V_{T,c} = \sum_{i = t}V_{IorE,c,t}
@@ -89,25 +90,25 @@ P_{T,c} = \frac {D_{T,c}}{V_{T,c}}
 Q_b = V_{c_m,t=1} * \bar P_{T}
 \]</span> This is termed the base Q-index. Finally, we compute a Q-index (<span class="math inline">\(Q\)</span>) for each of 2024’s top trading partners for each year that trade of the product occurred. The dividend of a Q-index and the base Q-index is the MLTI (<span class="math inline">\(M\)</span>). <span class="math display">\[
 M = \frac {Q}{Q_b}
-\]</span> MLTIs that are less than one indicate the relative value of the trading partner’s imports or exports for the given year is less than the base country’s import or export value for the same product in the first year of the time period. Contrarily, MLTIs greater than one indicate the relative value of the trading partner’s imports or exports for the given year is more than the base country’s import or export value for the same product in the first year of the time period. The MLTI of the base country equals 1.00 for the first year of the time period. <br><br><br>
+\]</span> MLTIs that are less than one indicate the relative value of the trading partner’s imports or exports for the given year is less than the base country’s import or export value for the same product in the first year of the time period. Contrarily, MLTIs greater than one indicate the relative value of the trading partner’s imports or exports for the given year is more than the base country’s import or export value for the same product in the first year of the time period. The MLTI of the base country equals 1.00 for the first year of the time period. <br><br><br></p>
 </dd>
 <dt>Herfindahl Index (HI)</dt>
 <dd>
-The Herfindahl Index (HI) is a parameter that interprets the density of export or import value among trading partners through time. Calculating the HI for exports or imports begins with summing the total trade value (export or import) for each trading partner of the given product in a given year (<span class="math inline">\(D_{c,t}\)</span>). We then calculate the dividend of the annual trade values for each trading partner and the total annual trade value of the traded product to yield a proportion of trade value for each trading partner (<span class="math inline">\(\hat P(D_{EorI,c,t})\)</span>). <span class="math display">\[
+<p>The Herfindahl Index (HI) is a parameter that interprets the density of export or import value among trading partners through time. Calculating the HI for exports or imports begins with summing the total trade value (export or import) for each trading partner of the given product in a given year (<span class="math inline">\(D_{c,t}\)</span>). We then calculate the dividend of the annual trade values for each trading partner and the total annual trade value of the traded product to yield a proportion of trade value for each trading partner (<span class="math inline">\(\hat P(D_{EorI,c,t})\)</span>). <span class="math display">\[
 \hat P(D_{EorI,c,t}) = \frac {D_{EorI,c,t}}{\Sigma D_{EorI,c,t}}
 \]</span> The sum of the squares of these proportions is the HI (<span class="math inline">\(H\)</span>)for the given year. <span class="math display">\[
 H_{EorI} = \sum_{i = c} (\hat P(D_{EorI,c,t}))^2
-\]</span> Low HIs indicate that total trade value is split up (i.e., not concentrated) among many trade partners, whereas high HIs indicate that total trade value is more concentrated among fewer trade partners. <br><br><br>
+\]</span> Low HIs indicate that total trade value is split up (i.e., not concentrated) among many trade partners, whereas high HIs indicate that total trade value is more concentrated among fewer trade partners. <br><br><br></p>
 </dd>
 <dt>Supply Metrics</dt>
 <dd>
-We calculate several metrics that communicate characteristics of domestic supply of a specified species, group, or category. Apparent supply is the volume of product available in domestic markets through time (<span class="math inline">\(A\)</span>); we calculate apparent supply by summing the volume of processed products and imports and subtracting the volume of exports for a given species. <span class="math display">\[
+<p>We calculate several metrics that communicate characteristics of domestic supply of a specified species, group, or category. Apparent supply is the volume of product available in domestic markets through time (<span class="math inline">\(A\)</span>); we calculate apparent supply by summing the volume of processed products and imports and subtracting the volume of exports for a given species. <span class="math display">\[
 A_t = V_{J,t} + V_{I,t} - V_{E,t}
 \]</span> We also present apparent supply relative to domestic production (<span class="math inline">\(R\)</span>), a ratio of apparent supply to the volume of processed products for the given product. <span class="math display">\[
 R_t = \frac {A_t}{V_{J,t}}
 \]</span> Ratios greater than one indicate a greater volume of imports than exports, and ratios less than one indicate a greater volume of exports than imports. The last metric we present is the unexported domestic production relative to apparent supply (<span class="math inline">\(U\)</span>). This communicates what percentage of the domestic volume (apparent supply) of a product derives from retained domestic production (i.e., the volume of processed products not exported, or processed product volume less export volume). <span class="math display">\[
 U_{t} = \frac {V_{J,t} - V_{E,t}}{A_t} * 100\%
-\]</span> This is a rough approximation because exports can be of raw catch, which do not undergo processing and are thus not reflected in processed production volume. Low percentages suggest imports comprise most domestic supply, whereas high percentages suggest domestic production comprises most domestic supply.
+\]</span> This is a rough approximation because exports can be of raw catch, which do not undergo processing and are thus not reflected in processed production volume. Low percentages suggest imports comprise most domestic supply, whereas high percentages suggest domestic production comprises most domestic supply.</p>
 </dd>
 </dl>
 
