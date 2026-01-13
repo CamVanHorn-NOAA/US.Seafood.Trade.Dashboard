@@ -2120,7 +2120,10 @@ ui <- page_fluid(
                                              tooltip(
                                                icon("info-circle"),
                                                "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
-                                             ))),
+                                             )))),
+                                       br(),
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px",
                                          div(
                                            style = "position: relative; min-width: 300px; width: 100%",
                                            withSpinner(
@@ -2279,7 +2282,7 @@ ui <- page_fluid(
                     htmlOutput('resource'))
         )
       )))
-)
+))
       
   
 # Define server logic ----------------------------------------------------------
