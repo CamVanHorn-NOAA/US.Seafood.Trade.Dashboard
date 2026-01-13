@@ -4643,7 +4643,8 @@ server <- function(input, output, session) {
   observeEvent(input$hi_plot_click, {
     click_x <- input$hi_plot_click$x
     
-    hi_data <- calculate_hi(species_selection_trade(), nominal = selected_value())
+    hi_data <- calculate_hi(species_selection_trade(), region = input$region,
+                            nominal = selected_value())
     
     year_levels <- levels(factor(sort(unique(hi_data$YEAR))))
     clicked_year <- round(click_x)
