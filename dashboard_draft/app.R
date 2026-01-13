@@ -109,11 +109,11 @@ sname_list <- unique(categorization_matrix %>%
 tooltip_aes <- paste0(
   "position: absolute; ",
   "background-color: rgba(255, 255, 255, 0.95); ",
-  "border: 1px solid #ccc; ",
+  "border: 1px solid #002364; ",
   "border-radius: 10px; ",
   "padding: 10px; ",
   "padding-right: 25px; ",
-  "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
+#   "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
   "z-index: 1000; ",
   "max-width: 250px; ",
   "min-width: 250px; "
