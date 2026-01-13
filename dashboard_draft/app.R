@@ -1856,7 +1856,7 @@ names(pp_colors) <- levels(factor(levels = c(
 mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 # App --------------------------------------------------------------------------
 # Define UI --------------------------------------------------------------------
-ui <- page_sidebar(
+ui <- page_fluid(
   # add link to CSS sheet
   tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css')
