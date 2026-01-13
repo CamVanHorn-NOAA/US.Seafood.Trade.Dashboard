@@ -1861,20 +1861,27 @@ ui <- page_fluid(
   tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css')
   ),
-  # custom CSS for wider tooltips
-  tags$head(
-    tags$style(HTML("g.hovertext > path {opacity: .9;}")),
-    tags$style(HTML(".color-swatch {
-                      display: inline-block;
-                      width: 18px;
-                      height: 15px; 
-                      border: 1px solid #000; 
-                      border-radius: 3px;
-                      vertical-align: middle;
-                      margin-right: 8px;
-                    }"))
-  ),
   
+  # Banner
+  div(id = 'banner',
+      
+      # Image
+      div(
+        style = 'flex-shrink: 0;',
+        img(src = 'NOAA_FISHERIES_logoH.png',
+            align = 'left',
+            style = 'max-width: 300px; max-height: 300px; width: auto; height: auto;'
+        )
+      ),
+      
+      # Text
+      div(
+        style = 'flex: 1; text-align: left; margin-left: 100px;',
+        h1('Seafood Dashboard'),
+        
+        p('A Tool to Investigate 20 Years of U.S. Fisheries Data')
+      )),
+  page_sidebar(
   sidebar = sidebar(
     width = 350,
     title = h2('Species Selection'),
