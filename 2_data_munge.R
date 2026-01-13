@@ -513,6 +513,11 @@ overwritten_products <- products %>%
   overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes')
 
+test <- overwritten_products %>%
+  mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
+
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) # 23.8%
+
 # store changed products in separate object
 changed_product_forms <- overwritten_products %>%
   filter(CONFIDENTIAL == 1) %>%
@@ -879,6 +884,11 @@ products_marked <- declassified_products %>%
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes') %>%
   # if there is no provided street address, then a product should not be confidential
   mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL))
+
+test <- products_marked %>%
+  mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
+
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS)
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
