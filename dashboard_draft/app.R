@@ -2264,6 +2264,8 @@ ui <- page_fluid(
         navset_card_pill(
           nav_panel(title = 'Introduction',
                     htmlOutput('intro')),
+          nav_panel(title = 'Tutorial',
+                    htmlOutput('tutorial')),
           nav_panel(title = 'Data Collection',
                     htmlOutput('collection')),
           nav_panel(title = 'Data Sourcing',
@@ -5321,6 +5323,12 @@ server <- function(input, output, session) {
   output$intro <- renderUI({
     tags$iframe(seamless = "seamless",
                 src = "tmpuser/dashboard_intro.html",
+                height = 800)
+  })
+  
+  output$tutorial <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/how-to-dashboard.html",
                 height = 800)
   })
   
