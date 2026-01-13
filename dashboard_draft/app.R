@@ -1926,7 +1926,7 @@ ui <- page_fluid(
   page_fluid(
     navset_tab(
       nav_panel(
-        title = 'The Dashboard',
+        title = 'Dashboard',
         icon = bsicons::bs_icon("layout-wtf"),
         fluidRow(
           div(
@@ -1998,7 +1998,7 @@ ui <- page_fluid(
                                            div(
                                              id = 'info-circle',
                                              tooltip(
-                                               icon("info-circle"),
+                                               icon("info-circle"), 
                                                "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
                                              ))),
                                          div(
