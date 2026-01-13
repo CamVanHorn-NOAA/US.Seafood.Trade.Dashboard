@@ -16,6 +16,7 @@ if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
 if(!require("shinycssloaders")) install.packages("shinycssloaders")
 if(!require("bsicons"))     install.packages("bsicons")
+if(!require("ggtext"))      install.packages("ggtext")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
 # Due to some limitations in downloading nmfspalette on devices, use source
   # file located in app directory for nmfspalette colors
@@ -26,7 +27,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_12_23_25.RData')
+load('seafood_trade_data_munge_01_13_26.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
@@ -108,11 +109,11 @@ sname_list <- unique(categorization_matrix %>%
 tooltip_aes <- paste0(
   "position: absolute; ",
   "background-color: rgba(255, 255, 255, 0.95); ",
-  "border: 1px solid #ccc; ",
+  "border: 1px solid #002364; ",
   "border-radius: 10px; ",
   "padding: 10px; ",
   "padding-right: 25px; ",
-  "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
+#   "box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); ",
   "z-index: 1000; ",
   "max-width: 250px; ",
   "min-width: 250px; "
@@ -135,13 +136,18 @@ close_button_aes <- paste0(
   "text-align: center; ")
 
 tooltip_heading <- paste0(
-  "</span><span style = 'font-size: 22px; font-weight: bold; text-decoration: underline;'>")
+  "</span><span style = 'font-size: 22px; font-weight: bold;'>")
 
 tooltip_subheading <- paste0(
-  "</span><span style = 'font-size: 18px; font-style: italic; text-decoration: underline;'>")
+  "</span><span style = 'font-size: 18px; font-weight: bold;'>")
+
 
 ###
-
+# Plot Aesthetic Objects -------------------------------------------------------
+plot_title_size <- 22
+plot_title_color <- '#002364'
+axis_title_size <- 15
+axis_value_size <- 13
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -1176,8 +1182,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
              aes(x = factor(YEAR),
                  # call for unique y value set earlier (see RLang)
                  y = !!y)) + 
-      geom_col(color = 'black',
-               fill = color) +
+      geom_col(fill = color) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(labels = label,
@@ -1186,9 +1191,11 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
            y = ylab,
            title = paste0(species, ' ', longform, region_text)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            plot.title = element_text(size = 18),
-            axis.title = element_text(size = 15))
+      theme(axis.text = element_text(size = axis_value_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'),
+            axis.title = element_text(size = axis_title_size))
   } else if (plot_format == 'VALUE') {
     # plot of Value with Price overlayed as a line chart
     # because we have a line chart, we need a column to group by
@@ -1206,15 +1213,14 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       ggplot(data = data,
              aes(x = factor(YEAR))) +
       geom_col(aes(y = !!y),
-               fill = color,
-               color = 'black') +
+               fill = color) +
       geom_line(aes(y = !!y2 * scale_factor,
                     group = GROUP),
                 color = trade_price_color,
                 linewidth = 1.5) +
-      geom_point(aes(y = !!y2 * scale_factor),
-                 color = 'black',
-                 size = 2) +
+      # geom_point(aes(y = !!y2 * scale_factor),
+      #            color = 'black',
+      #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(name = ylab, 
@@ -1225,9 +1231,11 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       labs(x = '',
            title = paste0(species, ' ', longform, region_text)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            plot.title = element_text(size = 18),
-            axis.title = element_text(size = 15))
+      theme(axis.text = element_text(size = axis_value_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'),
+            axis.title = element_text(size = axis_title_size))
   } else if (plot_format == 'RATIO') {
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
@@ -1244,17 +1252,19 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       geom_line(aes(group = GROUP),
                 color = 'black',
                 linewidth = 1.5) +
-      geom_point(color = 'black',
-                 size = 2) +
+      # geom_point(color = 'black',
+      #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       labs(x = '', 
            y = 'Export / Import',
            title = paste0('Volume Ratio of ', species, region_text)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            plot.title = element_text(size = 18),
-            axis.title = element_text(size = 15))
+      theme(axis.text = element_text(size = axis_value_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'),
+            axis.title = element_text(size = axis_title_size))
   } else {
     if (region != '') {
       region_text <- paste0(' traded in the ', region)
@@ -1266,8 +1276,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                  y = VALUE_MILLIONS)) +
       geom_bar(aes(fill = TRADE),
                stat = 'identity',
-               position = 'dodge',
-               color = 'black') +
+               position = 'dodge') +
       labs(x = '',
            # y = 'Billions (Real 2024 USD)',
            y = 'Millions (Real 2024 USD)',
@@ -1282,12 +1291,14 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       theme(legend.position = 'top',
             axis.line.y = element_line(color = 'black'),
             axis.text.x = element_text(hjust = 0.8,
-                                       size = 12),
-            axis.text.y = element_text(size = 12),
+                                       size = axis_value_size),
+            axis.text.y = element_text(size = axis_value_size),
             axis.title.y = element_text(vjust = 23,
-                                        size = 15),
+                                        size = axis_title_size),
             legend.text = element_text(size = 15),
-            plot.title = element_text(size = 18),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
@@ -1316,8 +1327,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
          aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
              y = NET_VALUE_MILLIONS, 
              fill = factor(YEAR))) +
-    geom_col(position = 'dodge',
-             color = 'black') +
+    geom_col(position = 'dodge') +
     scale_fill_manual(values = top5_colors) +
     labs(x = '',
          y = ylab,
@@ -1327,11 +1337,13 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
     scale_y_continuous(labels = label_currency(suffix = 'M')) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
+    theme(axis.text = element_text(size = axis_value_size),
+          axis.title = element_text(size = axis_title_size),
           legend.title = element_text(size = 15),
           legend.text = element_text(size = 12),
-          plot.title = element_text(size = 18))
+          plot.title = element_text(size = plot_title_size,
+                                    color = plot_title_color,
+                                    face = 'bold'))
 }
 plot_spp_pp <- function(processed_product_data, region, plot.format, units = NULL, species, nominal = F) {
   # function that plots processed product data 
@@ -1411,8 +1423,8 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
                        color = PRODUCT_FORM)) +
       geom_line(aes(group = PRODUCT_FORM),
                 linewidth = 1.5) +
-      geom_point(color = 'black',
-                 size = 1.5) +
+      # geom_point(color = 'black',
+      #            size = 1.5) +
       scale_color_manual(values = pp_colors,
                          name = 'Product Condition') +
       labs(x = '',
@@ -1424,11 +1436,13 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
                          expand = c(0, 0),
                          labels = label) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            axis.title = element_text(size = 15),
+      theme(axis.text = element_text(size = axis_value_size),
+            axis.title = element_text(size = axis_title_size),
             legend.text = element_text(size = 12),
             legend.title = element_text(size = 15),
-            plot.title = element_text(size = 18))
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'))
       
     return(plot)
   }
@@ -1449,8 +1463,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
                  aes(x = factor(YEAR),
                      y = !!y,
                      fill = PRODUCT_FORM)) +
-    geom_col(position = 'stack',
-             color = 'black') +
+    geom_col(position = 'stack') +
     scale_fill_manual(values = pp_colors,
                       name = 'Product Condition') +
     labs(x = '',
@@ -1462,11 +1475,13 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
                        expand = c(0, 0),
                        labels = label) +
     theme_bw() +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
+    theme(axis.text = element_text(size = axis_value_size),
+          axis.title = element_text(size = axis_title_size),
           legend.text = element_text(size = 12),
           legend.title = element_text(size = 15),
-          plot.title = element_text(size = 18))
+          plot.title = element_text(size = plot_title_size,
+                                    color = plot_title_color,
+                                    face = 'bold'))
   
   return(plot)
 }
@@ -1539,15 +1554,14 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
       ggplot(data = data,
              aes(x = factor(YEAR))) +
       geom_col(aes(y = COM_VALUE_MILLIONS),
-               fill = landings_colors[1],
-               color = 'black') +
+               fill = landings_colors[1]) +
       geom_line(aes(y = COM_PRICE * scale_factor,
                     group = GROUP),
                 color = landings_colors[2],
                 linewidth = 1.5) +
-      geom_point(aes(y = COM_PRICE * scale_factor),
-                 color = 'black',
-                 size = 2) +
+      # geom_point(aes(y = COM_PRICE * scale_factor),
+      #            color = 'black',
+      #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                        limits = factor(2004:2024)) +
       scale_y_continuous(name = ylab, 
@@ -1557,9 +1571,11 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
       labs(x = '',
            title = paste0(region_text, tlab, species)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            axis.title = element_text(size = 15),
-            plot.title = element_text(size = 18))
+      theme(axis.text = element_text(size = axis_value_size),
+            axis.title = element_text(size = axis_title_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'))
     
     return(plot)
   }
@@ -1569,8 +1585,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     ggplot(data = data,
            aes(x = factor(YEAR),
                y = COM_VOLUME_T)) +
-    geom_col(color = 'black',
-             fill = landings_colors[1]) +
+    geom_col(fill = landings_colors[1]) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
                      limits = factor(2004:2024)) +
     scale_y_continuous(labels = label) +
@@ -1578,9 +1593,11 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
          y = ylab,
          title = paste0(region_text, tlab, species)) +
     theme_bw() +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
-          plot.title = element_text(size = 18))
+    theme(axis.text = element_text(size = axis_value_size),
+          axis.title = element_text(size = axis_title_size),
+          plot.title = element_text(size = plot_title_size,
+                                    color = plot_title_color,
+                                    face = 'bold'))
   
   return(plot)
 }
@@ -1624,9 +1641,11 @@ plot_mlti <- function(mlti_data, region, exports = F, imports = F, species) {
          color = '',
          shape = '') +
     theme_bw() +
-    theme(axis.text = element_text(size = 15),
-          axis.title.y = element_text(size = 18),
-          plot.title = element_text(size = 20),
+    theme(axis.text = element_text(size = axis_value_size),
+          axis.title.y = element_text(size = axis_title_size),
+          plot.title = element_text(size = plot_title_size,
+                                    color = plot_title_color,
+                                    face = 'bold'),
           strip.text = element_text(size = 15,
                                     color = 'white'),
           legend.text = element_text(size = 15),
@@ -1638,7 +1657,7 @@ plot_hi <- function(hi_data, region, species) {
   # hi_data is a data set formatted by calculate_hi
   
   if (region != '') {
-    region_text <- paste0(' traded in the ', region)
+    region_text <- paste0('\ntraded in the ', region)
   } else {region_text <- ''}
   
   # format the data by renaming columns for plot labels
@@ -1655,22 +1674,26 @@ plot_hi <- function(hi_data, region, species) {
     geom_line(aes(group = name, 
                   colour = name),
               linewidth = 1.5) +
-    geom_point(size = 2,
-               color = 'black') +
+    # geom_point(size = 2,
+    #            color = 'black') +
     scale_color_discrete(name = NULL, 
                          type = c(export_color, import_color)) +
     labs(x = '',
          y = 'Index',
-         title = paste0('Herfindahl Index of \n', species, region_text)) +
+         title = paste0('Herfindahl Index of ', species, region_text)) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4)) +
     theme_bw() +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 15),
+    theme(axis.text = element_text(size = axis_value_size),
+          axis.title = element_text(size = axis_title_size),
           legend.text = element_text(size = 15),
           legend.position = 'inside',
           legend.position.inside = c(0.87, 0.93),
-          legend.box.background = element_rect(color = 'black', linetype = 'solid', linewidth = 1),
-          plot.title = element_text(size = 16))
+          legend.box.background = element_rect(color = 'black', 
+                                               linetype = 'solid', 
+                                               linewidth = 1),
+          plot.title = element_text(size = plot_title_size,
+                                    color = plot_title_color,
+                                    face = 'bold'))
   
 }
 plot_supply_metrics <- function(supply_data, region, metric, units = NULL, species) {
@@ -1685,7 +1708,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       # apparent supply
   
   if (region != '') {
-    region_text <- paste0(' in the ', region)
+    region_text <- paste0('\nin the ', region)
   } else {region_text <- ''}
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
@@ -1699,17 +1722,18 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY)) +
-      geom_col(color = 'black',
-               fill = c(supply_color)) +
+      geom_col(fill = c(supply_color)) +
       labs(x = '',
            y = ylab,
-           title = paste0('Apparent Supply of \n', species, region_text)) +
+           title = paste0('Apparent Supply of ', species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            axis.title = element_text(size = 15),
-            plot.title = element_text(size = 18))
+      theme(axis.text = element_text(size = axis_value_size),
+            axis.title = element_text(size = axis_title_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'))
   }
   
   if (metric == 'RATIO') {
@@ -1719,20 +1743,22 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY_REL_US_PROD,
                  group = SPECIES)) +
-      geom_point(color = 'black', 
-                 size = 3) +
+      # geom_point(color = 'black', 
+      #            size = 3) +
       geom_line(color = 'black',
                 linewidth = 1) +
       labs(x = '',
            y = 'Ratio',
-           title = paste0('Apparent Supply of \n', species, 
-                          '\nRelative to Domestic \nProduction', region_text)) +
+           title = paste0('Apparent Supply of ', species, 
+                          '\nRelative to Domestic Production', region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            axis.title = element_text(size = 15),
-            plot.title = element_text(size = 18))
+      theme(axis.text = element_text(size = axis_value_size),
+            axis.title = element_text(size = axis_title_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'))
   }
   
   if (metric == 'SHARE') {
@@ -1741,26 +1767,27 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
                filter(YEAR < 2024),
              aes(x = factor(YEAR),
                  y = UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY)) +
-      geom_col(color = 'black',
-               fill = share_color) +
+      geom_col(fill = share_color) +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = paste0('Unexported Domestic \nProduction Relative \nto Apparent Supply of \n', 
+           title = paste0('Unexported Domestic Production Relative to\nApparent Supply of ', 
                           species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent()) +
       theme_bw() +
-      theme(axis.text = element_text(size = 12),
-            axis.title = element_text(size = 15),
-            plot.title = element_text(size = 18))
+      theme(axis.text = element_text(size = axis_value_size),
+            axis.title = element_text(size = axis_title_size),
+            plot.title = element_text(size = plot_title_size,
+                                      color = plot_title_color,
+                                      face = 'bold'))
   }
   
   return(plot)
 }
 
 # tooltip function
-tooltip_line_icon <- function(line, point) {
+tooltip_line_icon <- function(line, point, mlti = F) {
   # Create temporary PNG
   temp_png <- tempfile(fileext = '.png')
   
@@ -1772,8 +1799,10 @@ tooltip_line_icon <- function(line, point) {
   # Draw the line (color specific)
   lines(c(0.1, 0.9), c(0.5, 0.5), col = line, lwd = 4)
   
-  # Draw point (shape specific)
-  points(0.5, 0.5, pch = point, col = 'black', cex = 1.5)
+  # Draw point (shape specific - only for mlti)
+  if (mlti == T) {
+    points(0.5, 0.5, pch = point, col = 'black', cex = 1.5) 
+  }
   
   dev.off()
   
@@ -1827,28 +1856,35 @@ names(pp_colors) <- levels(factor(levels = c(
 mlti_colors <- c('#A6D4EC', '#54ADDB', '#B3EDEF', '#6DDBE1', '#005761')
 # App --------------------------------------------------------------------------
 # Define UI --------------------------------------------------------------------
-ui <- page_sidebar(
+ui <- page_fluid(
   # add link to CSS sheet
   tags$head(
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css')
   ),
-  # custom CSS for wider tooltips
-  tags$head(
-    tags$style(HTML("g.hovertext > path {opacity: .9;}")),
-    tags$style(HTML(".color-swatch {
-                      display: inline-block;
-                      width: 18px;
-                      height: 15px; 
-                      border: 1px solid #000; 
-                      border-radius: 3px;
-                      vertical-align: middle;
-                      margin-right: 8px;
-                    }"))
-  ),
   
+  # Banner
+  div(id = 'banner',
+      
+      # Image
+      div(
+        style = 'flex-shrink: 0;',
+        img(src = 'NOAA_FISHERIES_logoH.png',
+            align = 'left',
+            style = 'max-width: 300px; max-height: 300px; width: auto; height: auto;'
+        )
+      ),
+      
+      # Text
+      div(
+        style = 'flex: 1; text-align: left; margin-left: 100px;',
+        h1('Seafood Dashboard'),
+        
+        p('A Tool to Investigate 20 Years of U.S. Fisheries Data')
+      )),
+  page_sidebar(
   sidebar = sidebar(
     width = 350,
-    title = h2('Species Selection'),
+    title = h2(br(), 'Species Selection'),
     actionButton('reset_button', 'Reset All Filters',
                  class = 'btn-warning',
                  style = 'margin-bottom: 15px; width: 100%'),
@@ -1866,15 +1902,15 @@ ui <- page_sidebar(
     uiOutput('filter_3'),
     uiOutput('filter_4'),
     selectizeInput(inputId = 'region',
-                   label = 'Alternatively, select a FEUS Region',
+                   label = h4('Alternatively, select a FEUS Region'),
                    choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
                                'New England', 'Mid-Atlantic', 'South Atlantic',
                                'Gulf', 'Great Lakes'),
                    options = list(
                      placeholder = 'Type here...'
                    )),
-    input_switch('units', 'Imperial Units'),
-    input_switch('nominal', 'Nominal Values'),
+    input_switch('units', h4('Imperial Units')),
+    input_switch('nominal', h4('Nominal Values')),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
@@ -1886,33 +1922,15 @@ ui <- page_sidebar(
                    'Download raw processed products data')
   ),
   
-  # Banner
-  div(id = 'banner',
-    
-    # Image
-    div(
-      style = 'flex-shrink: 0;',
-      img(src = 'NOAA_FISHERIES_H.png',
-          align = 'left',
-          style = 'width: 200px; height: 200px;'
-      )
-    ),
-    
-    # Text
-    div(
-      style = 'flex: 1; text-align: left;',
-      h1('NOAA Fisheries Seafood Dashboard'),
-      
-      p('Investigate 20 Years of U.S. Fisheries Data')
-    )),
+  
   page_fluid(
     navset_tab(
       nav_panel(
-        title = 'The Dashboard',
+        title = 'Dashboard',
         icon = bsicons::bs_icon("layout-wtf"),
         fluidRow(
           div(
-            style = 'border: 3px solid #005761; border-radius: 12px;
+            style = 'border-radius: 12px;
                min-width: 800px; width: 100%; display: flex; flex-direction: column;',
             navset_card_pill(title = h3('Trade'),
                              nav_panel(title = 'Market Summary',
@@ -1980,7 +1998,7 @@ ui <- page_sidebar(
                                            div(
                                              id = 'info-circle',
                                              tooltip(
-                                               icon("info-circle"),
+                                               icon("info-circle"), 
                                                "Export value reflects the total value of product traded out of the U.S. into other countries. The left y-axis reflects the total value of exports and applies to the bars. The right y-axis reflects the average price of exported product per kilogram or pound and applies to the line and points."
                                              ))),
                                          div(
@@ -2102,7 +2120,10 @@ ui <- page_sidebar(
                                              tooltip(
                                                icon("info-circle"),
                                                "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
-                                             ))),
+                                             )))),
+                                       br(),
+                                       div(
+                                         style = "flex: 1; display: flex; gap: 15px",
                                          div(
                                            style = "position: relative; min-width: 300px; width: 100%",
                                            withSpinner(
@@ -2139,7 +2160,7 @@ ui <- page_sidebar(
         fluidRow(
           div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
               div(
-                style = 'border: 3px solid #234515; border-radius: 12px;
+                style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Commercial Landings'),
                                  nav_panel(title = 'Value',
@@ -2153,7 +2174,7 @@ ui <- page_sidebar(
                                              # textOutput('comvalue_tooltip')
                                              uiOutput('landings_value_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 5px",
+                                               id = 'info-circle',
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
@@ -2171,7 +2192,7 @@ ui <- page_sidebar(
                                              # textOutput('comvolume_tooltip')
                                              uiOutput('landings_volume_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 5px",
+                                               id = 'info-circle',
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
@@ -2179,7 +2200,7 @@ ui <- page_sidebar(
                                            downloadButton('download_landings_page2',
                                                           'Download this plot and the data')))),
               div(
-                style = 'border: 3px solid #681617; border-radius: 12px;
+                style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Processed Products'),
                                  nav_panel(title = 'Value',
@@ -2243,6 +2264,8 @@ ui <- page_sidebar(
         navset_card_pill(
           nav_panel(title = 'Introduction',
                     htmlOutput('intro')),
+          nav_panel(title = 'Tutorial',
+                    htmlOutput('tutorial')),
           nav_panel(title = 'Data Collection',
                     htmlOutput('collection')),
           nav_panel(title = 'Data Sourcing',
@@ -2261,7 +2284,7 @@ ui <- page_sidebar(
                     htmlOutput('resource'))
         )
       )))
-)
+))
       
   
 # Define server logic ----------------------------------------------------------
@@ -2637,7 +2660,7 @@ server <- function(input, output, session) {
                                    pull())))
     
     selectizeInput('search_term', 
-                'Search for a Species',
+                h4('Search for a Species'),
                 species_list,
                 options = list(
                   placeholder = 'Type here...'
@@ -2682,9 +2705,9 @@ server <- function(input, output, session) {
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
                      pull())
     if (input$search_term == '') {
-      selectInput('ecol_cat', 'or Choose a Category', ecol_cats)
+      selectInput('ecol_cat', h4('or Choose a Category'), ecol_cats)
     } else {
-      selectInput('ecol_cat', 'or Choose a Category', ecol_cats, 
+      selectInput('ecol_cat', h4('or Choose a Category'), ecol_cats, 
                   selected = search_cats()[4])
     }
   })
@@ -2707,9 +2730,9 @@ server <- function(input, output, session) {
                         pull())
     
     if (input$search_term == '') {
-      selectInput('species_cat', 'Choose a Secondary Category', species_cats)
+      selectInput('species_cat', h4('Choose a Secondary Category'), species_cats)
     } else {
-      selectInput('species_cat', 'Choose a Secondary Category', species_cats,
+      selectInput('species_cat', h4('Choose a Secondary Category'), species_cats,
                   selected = search_cats()[3])
     }
   })
@@ -2736,9 +2759,9 @@ server <- function(input, output, session) {
                           pull())
     
     if (input$search_term == '') {
-      selectInput('species_grp', 'Choose a Group', species_groups)
+      selectInput('species_grp', h4('Choose a Group'), species_groups)
     } else {
-      selectInput('species_grp', 'Choose a Group', species_groups,
+      selectInput('species_grp', h4('Choose a Group'), species_groups,
                   selected = search_cats()[2])
     }
   })
@@ -2766,9 +2789,9 @@ server <- function(input, output, session) {
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
     if (input$search_term == '') {
-      selectInput('species_name', 'Choose a Species', species_names)
+      selectInput('species_name', h4('Choose a Species'), species_names)
     } else {
-      selectInput('species_name', 'Choose a Species', species_names,
+      selectInput('species_name', h4('Choose a Species'), species_names,
                   selected = search_cats()[1])
     }
   })
@@ -4478,11 +4501,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     # create all 5 icons
-    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1], mlti = T)
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2], mlti = T)
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3], mlti = T)
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4], mlti = T)
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5], mlti = T)
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
@@ -4570,11 +4593,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     
-    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1], mlti = T)
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2], mlti = T)
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3], mlti = T)
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4], mlti = T)
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5], mlti = T)
     
     
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
@@ -4620,7 +4643,8 @@ server <- function(input, output, session) {
   observeEvent(input$hi_plot_click, {
     click_x <- input$hi_plot_click$x
     
-    hi_data <- calculate_hi(species_selection_trade(), nominal = selected_value())
+    hi_data <- calculate_hi(species_selection_trade(), region = input$region,
+                            nominal = selected_value())
     
     year_levels <- levels(factor(sort(unique(hi_data$YEAR))))
     clicked_year <- round(click_x)
@@ -5300,6 +5324,12 @@ server <- function(input, output, session) {
   output$intro <- renderUI({
     tags$iframe(seamless = "seamless",
                 src = "tmpuser/dashboard_intro.html",
+                height = 800)
+  })
+  
+  output$tutorial <- renderUI({
+    tags$iframe(seamless = "seamless",
+                src = "tmpuser/how-to-dashboard.html",
                 height = 800)
   })
   
