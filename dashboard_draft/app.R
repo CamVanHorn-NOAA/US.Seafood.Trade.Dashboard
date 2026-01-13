@@ -1884,7 +1884,7 @@ ui <- page_fluid(
   page_sidebar(
   sidebar = sidebar(
     width = 350,
-    title = h2('Species Selection'),
+    title = h2(br(), 'Species Selection'),
     actionButton('reset_button', 'Reset All Filters',
                  class = 'btn-warning',
                  style = 'margin-bottom: 15px; width: 100%'),
@@ -1902,15 +1902,15 @@ ui <- page_fluid(
     uiOutput('filter_3'),
     uiOutput('filter_4'),
     selectizeInput(inputId = 'region',
-                   label = 'Alternatively, select a FEUS Region',
+                   label = h4('Alternatively, select a FEUS Region'),
                    choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
                                'New England', 'Mid-Atlantic', 'South Atlantic',
                                'Gulf', 'Great Lakes'),
                    options = list(
                      placeholder = 'Type here...'
                    )),
-    input_switch('units', 'Imperial Units'),
-    input_switch('nominal', 'Nominal Values'),
+    input_switch('units', h4('Imperial Units')),
+    input_switch('nominal', h4('Nominal Values')),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
@@ -2673,7 +2673,7 @@ server <- function(input, output, session) {
                                    pull())))
     
     selectizeInput('search_term', 
-                'Search for a Species',
+                h4('Search for a Species'),
                 species_list,
                 options = list(
                   placeholder = 'Type here...'
@@ -2718,9 +2718,9 @@ server <- function(input, output, session) {
                               str_to_title(ECOLOGICAL_CATEGORY)) %>%
                      pull())
     if (input$search_term == '') {
-      selectInput('ecol_cat', 'or Choose a Category', ecol_cats)
+      selectInput('ecol_cat', h4('or Choose a Category'), ecol_cats)
     } else {
-      selectInput('ecol_cat', 'or Choose a Category', ecol_cats, 
+      selectInput('ecol_cat', h4('or Choose a Category'), ecol_cats, 
                   selected = search_cats()[4])
     }
   })
@@ -2743,9 +2743,9 @@ server <- function(input, output, session) {
                         pull())
     
     if (input$search_term == '') {
-      selectInput('species_cat', 'Choose a Secondary Category', species_cats)
+      selectInput('species_cat', h4('Choose a Secondary Category'), species_cats)
     } else {
-      selectInput('species_cat', 'Choose a Secondary Category', species_cats,
+      selectInput('species_cat', h4('Choose a Secondary Category'), species_cats,
                   selected = search_cats()[3])
     }
   })
@@ -2772,9 +2772,9 @@ server <- function(input, output, session) {
                           pull())
     
     if (input$search_term == '') {
-      selectInput('species_grp', 'Choose a Group', species_groups)
+      selectInput('species_grp', h4('Choose a Group'), species_groups)
     } else {
-      selectInput('species_grp', 'Choose a Group', species_groups,
+      selectInput('species_grp', h4('Choose a Group'), species_groups,
                   selected = search_cats()[2])
     }
   })
@@ -2802,9 +2802,9 @@ server <- function(input, output, session) {
                          mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                          pull())
     if (input$search_term == '') {
-      selectInput('species_name', 'Choose a Species', species_names)
+      selectInput('species_name', h4('Choose a Species'), species_names)
     } else {
-      selectInput('species_name', 'Choose a Species', species_names,
+      selectInput('species_name', h4('Choose a Species'), species_names,
                   selected = search_cats()[1])
     }
   })
