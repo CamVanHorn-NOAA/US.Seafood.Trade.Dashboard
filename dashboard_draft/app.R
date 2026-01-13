@@ -4501,11 +4501,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     # create all 5 icons
-    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1], mlti = T)
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2], mlti = T)
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3], mlti = T)
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4], mlti = T)
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5], mlti = T)
     
     # Position tooltip near clicked point
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
@@ -4593,11 +4593,11 @@ server <- function(input, output, session) {
     new_mlti_colors <- mlti_colors
     names(new_mlti_colors) <- c(countries)
     
-    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1])
-    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2])
-    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3])
-    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4])
-    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5])
+    icon_1 <- tooltip_line_icon(new_mlti_colors[1], point_shapes[1], mlti = T)
+    icon_2 <- tooltip_line_icon(new_mlti_colors[2], point_shapes[2], mlti = T)
+    icon_3 <- tooltip_line_icon(new_mlti_colors[3], point_shapes[3], mlti = T)
+    icon_4 <- tooltip_line_icon(new_mlti_colors[4], point_shapes[4], mlti = T)
+    icon_5 <- tooltip_line_icon(new_mlti_colors[5], point_shapes[5], mlti = T)
     
     
     left_pos <- click_info$coords_css$x + 10 # Offset to right of point
