@@ -1922,25 +1922,7 @@ ui <- page_fluid(
                    'Download raw processed products data')
   ),
   
-  # Banner
-  div(id = 'banner',
-    
-    # Image
-    div(
-      style = 'flex-shrink: 0;',
-      img(src = 'NOAA_FISHERIES_H.png',
-          align = 'left',
-          style = 'width: 200px; height: 200px;'
-      )
-    ),
-    
-    # Text
-    div(
-      style = 'flex: 1; text-align: left;',
-      h1('NOAA Fisheries Seafood Dashboard'),
-      
-      p('Investigate 20 Years of U.S. Fisheries Data')
-    )),
+  
   page_fluid(
     navset_tab(
       nav_panel(
@@ -1948,7 +1930,7 @@ ui <- page_fluid(
         icon = bsicons::bs_icon("layout-wtf"),
         fluidRow(
           div(
-            style = 'border: 3px solid #005761; border-radius: 12px;
+            style = 'border-radius: 12px;
                min-width: 800px; width: 100%; display: flex; flex-direction: column;',
             navset_card_pill(title = h3('Trade'),
                              nav_panel(title = 'Market Summary',
@@ -2175,7 +2157,7 @@ ui <- page_fluid(
         fluidRow(
           div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
               div(
-                style = 'border: 3px solid #234515; border-radius: 12px;
+                style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Commercial Landings'),
                                  nav_panel(title = 'Value',
@@ -2189,7 +2171,7 @@ ui <- page_fluid(
                                              # textOutput('comvalue_tooltip')
                                              uiOutput('landings_value_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 5px",
+                                               id = 'info-circle',
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
@@ -2207,7 +2189,7 @@ ui <- page_fluid(
                                              # textOutput('comvolume_tooltip')
                                              uiOutput('landings_volume_click_overlay'),
                                              div(
-                                               style = "position: absolute; top: 0px; left: 5px",
+                                               id = 'info-circle',
                                                tooltip(
                                                  icon("info-circle"),
                                                  "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
@@ -2215,7 +2197,7 @@ ui <- page_fluid(
                                            downloadButton('download_landings_page2',
                                                           'Download this plot and the data')))),
               div(
-                style = 'border: 3px solid #681617; border-radius: 12px;
+                style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Processed Products'),
                                  nav_panel(title = 'Value',
