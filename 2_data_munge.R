@@ -730,6 +730,8 @@ species_declassified_products <- declassified_products %>%
            (is.na(ECOLOGICAL_CATEGORY) & !is.na(OLD_ECOLOGICAL_CATEGORY)))
 
 
+declassified_products <- declassified_products %>%
+  mutate(CONFIDENTIAL = NA)
 # The last step is to identify which products, after attempting to consolidate
   # into less specific product conditions and species, are confidential
 set_confids <- function(data, cols = '', region = '') {
