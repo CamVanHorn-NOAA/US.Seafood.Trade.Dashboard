@@ -1787,7 +1787,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
 }
 
 # tooltip function
-tooltip_line_icon <- function(line, point) {
+tooltip_line_icon <- function(line, point, mlti = F) {
   # Create temporary PNG
   temp_png <- tempfile(fileext = '.png')
   
@@ -1799,8 +1799,10 @@ tooltip_line_icon <- function(line, point) {
   # Draw the line (color specific)
   lines(c(0.1, 0.9), c(0.5, 0.5), col = line, lwd = 4)
   
-  # Draw point (shape specific)
-  points(0.5, 0.5, pch = point, col = 'black', cex = 1.5)
+  # Draw point (shape specific - only for mlti)
+  if (mlti == T) {
+    points(0.5, 0.5, pch = point, col = 'black', cex = 1.5) 
+  }
   
   dev.off()
   
