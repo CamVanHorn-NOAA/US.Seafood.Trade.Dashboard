@@ -19,27 +19,28 @@ drive_auth()
 
 # Grab most recent data file
   # only take first two columns (the third column is a list of metadata)
-data_file <- drive_find(pattern = 'seafood_trade_data_pull')[, 1:2] %>%
-  # set column names to caps for best data practice
-  rename_with(toupper) %>%
-  # isolate date of data creation into separate string
-    # recall that script 1 embeds date of data creation into file name
-  mutate(DATE = str_remove(NAME, 'seafood_trade_data_pull_'),
-         DATE = str_remove(DATE, '.RData'),
-         # format date to find the most recent date
-         date = as.Date(DATE, format = '%m_%d_%y')) %>%
-  # filter for most recent date (max)
-  filter(DATE == max(DATE)) %>%
-  select(NAME)
-  
-# Download the data
-drive_download(data_file$NAME,
-               overwrite = T)
-
-# Load the data
-load(data_file$NAME)
+# data_file <- drive_find(pattern = 'seafood_trade_data_pull')[, 1:2] %>%
+#   # set column names to caps for best data practice
+#   rename_with(toupper) %>%
+#   # isolate date of data creation into separate string
+#     # recall that script 1 embeds date of data creation into file name
+#   mutate(DATE = str_remove(NAME, 'seafood_trade_data_pull_'),
+#          DATE = str_remove(DATE, '.RData'),
+#          # format date to find the most recent date
+#          date = as.Date(DATE, format = '%m_%d_%y')) %>%
+#   # filter for most recent date (max)
+#   filter(DATE == max(DATE)) %>%
+#   select(NAME)
+#   
+# # Download the data
+# drive_download(data_file$NAME,
+#                overwrite = T)
+# 
+# # Load the data
+# load(data_file$NAME)
+load('seafood_trade_data_pull_01_15_26.RData')
 # clean environment
-rm(data_file)
+# rm(data_file)
 
 # Regional designations --------------------------------------------------------
 # FEUS 2022 source for regions: https://s3.amazonaws.com/media.fisheries.noaa.gov/2024-11/FEUS-2022-SPO248B.pdf
