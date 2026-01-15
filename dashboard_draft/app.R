@@ -26,7 +26,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_01_13_26.RData')
+load('seafood_trade_data_munge_01_15_26.RData')
 
 # filter out confidential data (no data contained therein)
 com_landings <- com_landings %>%
