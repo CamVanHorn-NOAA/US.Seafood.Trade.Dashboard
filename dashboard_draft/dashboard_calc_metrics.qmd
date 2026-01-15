@@ -21,7 +21,7 @@ $$ <br>
 
 Multilateral Trade Index (MLTI)
 
-:   The multilateral trade index (MLTI) is a parameter that relates trade value and volume among trading partners through time. The MLTI is a complex metric that compares how trade amongst the most recent dominant trading partners (i.e., the top trading partners by value of the last calendar year) has changed through time. The MLTI uses the normalized price of a traded product, or the average price of a good traded over some time period ($\bar P_{T}$), to compare traded value of the product among trading partners relative to a base index. Calculating the base index is not straightforward and requires several steps. We first filter our trade data for exports or imports as desired and summarise the annual value and volume traded for each trading partner therein. $$
+:   The multilateral trade index (MLTI) is a complex metric that compares how trade among the most recent dominant trading partners (i.e., the top trading partners by value of the last calendar year) has changed through time. The MLTI uses the normalized price of a traded product, or the average price of a good traded over some time period ($\bar P_{T}$), to compare traded value of the product among trading partners relative to a base index. Calculating the base index is not straightforward and requires several steps. We first filter our trade data for exports or imports as desired and summarize the annual value and volume traded for each trading partner therein. $$
     D_{T,c} = \sum_{i = t} D_{I or E,c,t}
     $$ $$
     V_{T,c} = \sum_{i = t}V_{IorE,c,t}
@@ -45,10 +45,12 @@ Herfindahl Index (HI)
 
 Supply Metrics
 
-:   We calculate several metrics that communicate characteristics of domestic supply of a specified species, group, or category. Apparent supply is the volume of product available in domestic markets through time ($A$); we calculate apparent supply by summing the volume of processed products and imports and subtracting the volume of exports for a given species. $$
-    A_t = V_{J,t} + V_{I,t} - V_{E,t}
-    $$ We also present apparent supply relative to domestic production ($R$), a ratio of apparent supply to the volume of processed products for the given product. $$
-    R_t = \frac {A_t}{V_{J,t}}
-    $$ Ratios greater than one indicate a greater volume of imports than exports, and ratios less than one indicate a greater volume of exports than imports. The last metric we present is the unexported domestic production relative to apparent supply ($U$). This communicates what percentage of the domestic volume (apparent supply) of a product derives from retained domestic production (i.e., the volume of processed products not exported, or processed product volume less export volume). $$
-    U_{t} = \frac {V_{J,t} - V_{E,t}}{A_t} * 100\%
-    $$ This is a rough approximation because exports can be of raw catch, which do not undergo processing and are thus not reflected in processed production volume. Low percentages suggest imports comprise most domestic supply, whereas high percentages suggest domestic production comprises most domestic supply.
+:   We calculate several metrics that communicate characteristics of domestic supply of a specified species, group, or category. Apparent supply is the volume of product available in domestic markets through time ($A$); to calculate apparent supply, we first convert product weight to round weight (see 'Data Management' for more information) for exports and imports using a conversion factor specific to the traded product ($F_{E,I}$): $$
+    V_{round} = V_{product}*F_{E,I}
+$$ We then calculate apparent supply by summing the volume of commercial landings and imports and subtracting the volume of exports for a given species. $$
+    A_t = V_{C,t} + V_{I,t} - V_{E,t}
+    $$ We also present apparent supply relative to domestic production ($R$), a ratio of apparent supply to the volume of commercial landings for the given product. $$
+    R_t = \frac {A_t}{V_{C,t}}
+    $$ Ratios greater than one indicate a greater volume of imports than exports, and ratios less than one indicate a greater volume of exports than imports. The last metric we present is the unexported domestic production relative to apparent supply ($U$). This communicates what percentage of the domestic volume (apparent supply) of a product derives from retained domestic catch (i.e., the volume of commercial landings not exported, or commercial landing volume less export volume). $$
+    U_{t} = \frac {V_{C,t} - V_{E,t}}{A_t} * 100\%
+    $$ This is a rough approximation because exports can be of raw catch, which do not undergo processing and are thus not reflected in processed production volume. Low percentages suggest imports comprise most domestic supply, whereas high percentages suggest domestic production comprises most domestic supply. All apparent supply related metrics use round weights in calculations. 
