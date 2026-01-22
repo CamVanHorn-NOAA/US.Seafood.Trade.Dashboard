@@ -1770,7 +1770,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       labs(x = '',
            y = 'Ratio',
            title = paste0('Apparent Supply of ', species, 
-                          '\nRelative to Domestic Production', region_text)) +
+                          '\nRelative to Domestic Catch', region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
@@ -1791,7 +1791,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       geom_col(fill = share_color) +
       labs(x = '',
            y = 'Share of Apparent Supply',
-           title = paste0('Unexported Domestic Production Relative to\nApparent Supply of ', 
+           title = paste0('Unexported Domestic Catch Relative to\nApparent Supply of ', 
                           species, region_text)) +
       scale_x_discrete(limits = factor(c(2004:2023)),
                        breaks = seq(2006, 2022, by = 4)) +
