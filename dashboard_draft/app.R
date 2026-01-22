@@ -1886,7 +1886,7 @@ ui <- page_fluid(
   # Banner
   div(id = 'banner',
       
-      # Image
+      # NOAA icon
       div(
         style = 'flex-shrink: 0;',
         img(src = 'NOAA_FISHERIES_logoH.png',
@@ -1901,7 +1901,15 @@ ui <- page_fluid(
         h1('Seafood Dashboard'),
         
         p('A Tool to Investigate 20 Years of U.S. Fisheries Data')
-      )),
+      ),
+      
+      # animal icons
+      # div(
+      #   img(src = 'graphics_icons/sfd_banner-fish-blue.png',
+      #       align = 'right',
+      #       style = 'max-width: 800px; max-height: 600px; height: auto; width: auto; margin-bottom: -35px; margin-top: -35px; margin-right: -5px;')
+      # )
+      ),
   page_sidebar(
   sidebar = sidebar(
     width = 350,
