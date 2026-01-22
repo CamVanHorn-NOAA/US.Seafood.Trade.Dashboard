@@ -16,6 +16,7 @@ if(!require("scales"))      install.packages("scales")
 if(!require("ggh4x"))       install.packages("ggh4x")
 if(!require("shinycssloaders")) install.packages("shinycssloaders")
 if(!require("bsicons"))     install.packages("bsicons")
+if(!require("systemfonts")) install.packages("systemfonts")
 # if(!require("nmfspalette")) install.packages("nmfspalette")
 # Due to some limitations in downloading nmfspalette on devices, use source
   # file located in app directory for nmfspalette colors
@@ -147,6 +148,14 @@ plot_title_size <- 22
 plot_title_color <- '#002364'
 axis_title_size <- 15
 axis_value_size <- 13
+# fonts
+register_variant(
+  name = 'ArialNarrowB',
+  family = 'Arial',
+  weight = 'bold',
+  width = 'condensed'
+)
+title_font = 'ArialNarrowB'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -1192,6 +1201,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'),
             axis.title = element_text(size = axis_title_size))
@@ -1232,6 +1242,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'),
             axis.title = element_text(size = axis_title_size))
@@ -1261,6 +1272,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'),
             axis.title = element_text(size = axis_title_size))
@@ -1296,6 +1308,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                                         size = axis_title_size),
             legend.text = element_text(size = 15),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'),
             plot.background = element_rect(fill = 'white',
@@ -1341,6 +1354,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
           legend.title = element_text(size = 15),
           legend.text = element_text(size = 12),
           plot.title = element_text(size = plot_title_size,
+                                    family = title_font,
                                     color = plot_title_color,
                                     face = 'bold'))
 }
@@ -1440,6 +1454,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
             legend.text = element_text(size = 12),
             legend.title = element_text(size = 15),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'))
       
@@ -1479,6 +1494,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
           legend.text = element_text(size = 12),
           legend.title = element_text(size = 15),
           plot.title = element_text(size = plot_title_size,
+                                    family = title_font,
                                     color = plot_title_color,
                                     face = 'bold'))
   
@@ -1573,6 +1589,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'))
     
@@ -1595,6 +1612,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     theme(axis.text = element_text(size = axis_value_size),
           axis.title = element_text(size = axis_title_size),
           plot.title = element_text(size = plot_title_size,
+                                    family = title_font,
                                     color = plot_title_color,
                                     face = 'bold'))
   
@@ -1643,6 +1661,7 @@ plot_mlti <- function(mlti_data, region, exports = F, imports = F, species) {
     theme(axis.text = element_text(size = axis_value_size),
           axis.title.y = element_text(size = axis_title_size),
           plot.title = element_text(size = plot_title_size,
+                                    family = title_font,
                                     color = plot_title_color,
                                     face = 'bold'),
           strip.text = element_text(size = 15,
@@ -1691,6 +1710,7 @@ plot_hi <- function(hi_data, region, species) {
                                                linetype = 'solid', 
                                                linewidth = 1),
           plot.title = element_text(size = plot_title_size,
+                                    family = title_font,
                                     color = plot_title_color,
                                     face = 'bold'))
   
@@ -1731,6 +1751,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'))
   }
@@ -1756,6 +1777,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'))
   }
@@ -1778,6 +1800,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
             plot.title = element_text(size = plot_title_size,
+                                      family = title_font,
                                       color = plot_title_color,
                                       face = 'bold'))
   }
@@ -1818,6 +1841,7 @@ tooltip_color_icon <- function(color) {
   paste0("</span><span class = 'color-swatch' style = 'background-color: ", 
          color, ";'>")
 }
+
 # Colors -----------------------------------------------------------------------
 # Balance plot colors
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
