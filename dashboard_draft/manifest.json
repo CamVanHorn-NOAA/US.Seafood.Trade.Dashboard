@@ -3212,13 +3212,13 @@
   },
   "files": {
     "app.R": {
-      "checksum": "29be4d81af89820155cac4909225d091"
+      "checksum": "5efe2cc309d27e5df7022601cbd0c308"
     },
     "dashboard_calc_metrics.html": {
-      "checksum": "05b431282e847f266de393179c96754d"
+      "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
     },
     "dashboard_calc_metrics.qmd": {
-      "checksum": "fda386a0fcfa173f4f05eb83a9cab710"
+      "checksum": "48e50e94e24e1321c1f5fc3c98485cd0"
     },
     "dashboard_calc_metrics_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3332,10 +3332,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_data_management.html": {
-      "checksum": "de7af505e73f9e169454dc457278ef19"
+      "checksum": "b8d489cd9c432b368cfd0125a36777d8"
     },
     "dashboard_data_management.qmd": {
-      "checksum": "4c6e7ac5fe5615fda539f0fdc0e26626"
+      "checksum": "b3723f72440563f6dcc27b6bafd47d30"
     },
     "dashboard_data_management_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3410,10 +3410,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_intro.html": {
-      "checksum": "f7692421c1d85c235f5fc0fa944ec39e"
+      "checksum": "b1c90219d74dee907cae3cd1f12cc3f7"
     },
     "dashboard_intro.qmd": {
-      "checksum": "6b54751ae33e3c7fe03c68e2ec31b5b8"
+      "checksum": "e37894d10838ede97993ceca16077b71"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3488,10 +3488,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_resources.html": {
-      "checksum": "7ce5a16defe762891667e9fedeb470b4"
+      "checksum": "9d564a476d12cc01629d2e7a39866bbe"
     },
     "dashboard_resources.qmd": {
-      "checksum": "e68e7fa1c48e26d809958f8bba99cd13"
+      "checksum": "74069de5f5430a6dbd0dfe2bf2224a67"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3616,8 +3616,8 @@
     "nmfs_cols.R": {
       "checksum": "3319cae28b424f32a1d67037f1aa005d"
     },
-    "seafood_trade_data_munge_01_13_26.RData": {
-      "checksum": "5cd2c2c34805c8ee9156ad8eef4c3335"
+    "seafood_trade_data_munge_01_15_26.RData": {
+      "checksum": "7a677163f0c685e87310111ad49567dd"
     },
     "seafood_trade_data_munge_03_13_25.RData": {
       "checksum": "6abeddd0fa58556c8626fa3ddf8a6196"
@@ -3664,14 +3664,77 @@
     "trade_data.csv": {
       "checksum": "7e9649f13510c235ae90907ec503a926"
     },
+    "www/graphics_icons/sfd_banner-fish-blue.jpg": {
+      "checksum": "99133ebb115ea3449235112cb44f969c"
+    },
+    "www/graphics_icons/sfd_banner-fish-blue.png": {
+      "checksum": "b6a6e7674922bdad7596d12d3ed99e23"
+    },
+    "www/graphics_icons/sfd_icon-AM-dk.png": {
+      "checksum": "3209a817467b38a9d681c4fa886aed78"
+    },
+    "www/graphics_icons/sfd_icon-AM-lt.png": {
+      "checksum": "4b5f6b0beb76e72b20fe4dfe7634e0c8"
+    },
+    "www/graphics_icons/sfd_icon-DB-dk.png": {
+      "checksum": "7599f818562b95777ef40fbc502d8865"
+    },
+    "www/graphics_icons/sfd_icon-DB-lt.png": {
+      "checksum": "83fcf5245d84eb75a014a2c1d46454a7"
+    },
+    "www/graphics_icons/sfd_icon-DL-dk.png": {
+      "checksum": "075bd988e3091ab3ce686d563554337f"
+    },
+    "www/graphics_icons/sfd_icon-DL-gray-dk.png": {
+      "checksum": "0beaf1f3fab0185a2b6d3d1fd758d7b8"
+    },
+    "www/graphics_icons/sfd_icon-DL-gray-lt.png": {
+      "checksum": "916042cf9db6b796b3cd0c6a16ff32c6"
+    },
+    "www/graphics_icons/sfd_icon-DL-lt.png": {
+      "checksum": "4dbc89d3d690e064344d5bb5b7c91254"
+    },
+    "www/graphics_icons/sfd_icon-info-dk.png": {
+      "checksum": "a18a5ecee5093e5e5c357a96634f502c"
+    },
+    "www/graphics_icons/sfd_icon-info-lt.png": {
+      "checksum": "e34300f163e7028431f55f74c936d6f2"
+    },
+    "www/graphics_icons/sfd_icon-MS-dk.png": {
+      "checksum": "1304193c99fb2a9d6a4a847bae9a989b"
+    },
+    "www/graphics_icons/sfd_icon-MS-lt.png": {
+      "checksum": "ea6d68cf76f96a425ea8766d2283eacd"
+    },
+    "www/graphics_icons/sfd_icon-price-dk.png": {
+      "checksum": "ab8cfe000ee9a6636bfb9463118826a6"
+    },
+    "www/graphics_icons/sfd_icon-price-lt.png": {
+      "checksum": "b5ef197611fa78bbf437743bde47b43c"
+    },
+    "www/graphics_icons/sfd_icon-TT.png": {
+      "checksum": "0010f15f533ff686f50bc1d5f41a00a9"
+    },
+    "www/graphics_icons/sfd_icon-val-dk.png": {
+      "checksum": "68b8020c1b148490f1457b9747c8c77e"
+    },
+    "www/graphics_icons/sfd_icon-val-lt.png": {
+      "checksum": "46c060f470c9623bd41a97b146932af6"
+    },
+    "www/graphics_icons/sfd_icon-vol-dk.png": {
+      "checksum": "530e85a2830b0f3679cfbb54fef5ccc7"
+    },
+    "www/graphics_icons/sfd_icon-vol-lt.png": {
+      "checksum": "080d77cbaf28ec2dc3bfc49887f83139"
+    },
     "www/NOAA_FISHERIES_logoH.png": {
       "checksum": "958d958c7d7108909f27fa0e08e70007"
     },
     "www/quarto-style.css": {
-      "checksum": "291da9a81c9c8f9b048ef45fb8349666"
+      "checksum": "85c9c267bb0a027a963eb47238eee4c8"
     },
     "www/style.css": {
-      "checksum": "2c4c61f106e0d65a498c246638a66a7e"
+      "checksum": "36fc3e8b8bca711570b23f28de542261"
     }
   },
   "users": null
