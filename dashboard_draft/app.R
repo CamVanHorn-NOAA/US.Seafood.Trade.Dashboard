@@ -1913,10 +1913,10 @@ ui <- page_fluid(
   page_sidebar(
   sidebar = sidebar(
     width = 350,
-    title = h2(br(), 'Species Selection'),
     actionButton('reset_button', 'Reset All Filters',
                  class = 'btn-warning',
                  style = 'margin-bottom: 15px; width: 100%'),
+    h2('Select Species'),
     # search bar that outputs directions for how to filter for the searched 
     # species (if available)
     # selectizeInput(inputId = 'search_term',
