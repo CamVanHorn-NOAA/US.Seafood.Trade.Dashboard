@@ -1939,8 +1939,8 @@ ui <- page_fluid(
                    options = list(
                      placeholder = 'Type here...'
                    )),
-    input_switch('units', h4('Imperial Units')),
-    input_switch('nominal', h4('Nominal Values')),
+    input_switch('units', 'Imperial Units'),
+    input_switch('inflation', 'Inflation-Adjusted', value = T),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
@@ -2874,8 +2874,10 @@ server <- function(input, output, session) {
     ifelse(input$units == F, 'METRIC', 'IMPERIAL')
   })
   
+  # functions are designed for inflation-adjusted as default, so the inverse of
+    # the button value is what should be stored (i.e., true inflation = false nominal)
   selected_value <- reactive({
-    ifelse(input$nominal == F, 'FALSE', 'TRUE')
+    ifelse(input$inflation == F, 'TRUE', 'FALSE')
   })
   
   # trade ----------------------------------------------------------------------
