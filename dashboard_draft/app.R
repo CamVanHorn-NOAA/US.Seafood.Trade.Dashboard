@@ -155,7 +155,7 @@ axis_value_size <- 13
 #   weight = 'bold',
 #   width = 'condensed'
 # )
-title_font = 'Arial'
+title_font = 'Arial Narrow'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -1309,6 +1309,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
             legend.text = element_text(size = 15),
             plot.title = element_text(size = plot_title_size,
                                       family = title_font,
+                                      face = 'bold',
                                       color = plot_title_color,
                                       hjust = -0.038),
             plot.background = element_rect(fill = 'white',
