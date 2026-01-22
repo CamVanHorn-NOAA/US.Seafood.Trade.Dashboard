@@ -759,13 +759,14 @@ summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
                           # joins
                         summarize_pp_yr_spp(pp_data, species, region, units = units,
                                             nominal = nominal) %>%
-                          select(!PRODUCT_FORM) %>%
+                          select(!c(PRODUCT_FORM, KG)) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
               summarize_landings_yr_spp(com_landings, species, region, units = units,
-                                        nominal = nominal)) 
+                                        nominal = nominal) %>%
+                select(!KG)) 
   
   return(combined_data)
 }
