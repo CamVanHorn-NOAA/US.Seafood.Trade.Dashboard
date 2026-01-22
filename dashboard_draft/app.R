@@ -145,7 +145,7 @@ tooltip_subheading <- paste0(
 ###
 # Plot Aesthetic Objects -------------------------------------------------------
 plot_title_size <- 22
-plot_title_color <- '#002364'
+plot_title_color <- '#02233E'
 axis_title_size <- 15
 axis_value_size <- 13
 # fonts
