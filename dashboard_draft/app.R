@@ -2171,7 +2171,7 @@ ui <- page_fluid(
                                              id = 'info-circle',
                                              tooltip(
                                                icon("info-circle"),
-                                               "Apparent supply indicates the volume of given product available for domestic consumption that relates domestic landings and production with trade."
+                                               "Apparent supply indicates the volume of given product available for domestic consumption, relating domestic landings with trade. Volume is presented in round weight. See 'Data Management' for more information."
                                              )))),
                                        br(),
                                        div(
@@ -2189,7 +2189,7 @@ ui <- page_fluid(
                                              id = 'info-circle',
                                              tooltip(
                                                icon("info-circle"),
-                                               "Apparent supply relative to domestic production reflects the ratio of apparent supply to domestic production (processed products) volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. produces more of the product than is domestically available."
+                                               "Apparent supply relative to domestic catch reflects the ratio of apparent supply to domestic commercial landings volume. Ratios greater than 1 indicate the U.S. must import product to meet domestic demand. Ratios less than 1 indicate the U.S. lands more of the product than is domestically available."
                                              ))),
                                          div(
                                            style = "position: relative; min-width: 300px; width: 100%",
@@ -2204,7 +2204,7 @@ ui <- page_fluid(
                                              id = 'info-circle',
                                              tooltip(
                                                icon("info-circle"),
-                                               "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
+                                               "Unexported domestic catch relative to apparently supply reflects the share of apparent supply that derives from retained commercial landings (i.e., landed volume less export volume). High percentages indicate most apparent supply is domestically landed and retained. Low percentages indicate most apparent supply is due to imports."
                                              )))),
                                        downloadButton('download_page4',
                                                       'Download these plots and their data',
