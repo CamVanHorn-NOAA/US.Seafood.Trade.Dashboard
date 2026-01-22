@@ -149,13 +149,13 @@ plot_title_color <- '#02233E'
 axis_title_size <- 15
 axis_value_size <- 13
 # fonts
-register_variant(
-  name = 'ArialNarrowB',
-  family = 'Arial',
-  weight = 'bold',
-  width = 'condensed'
-)
-title_font = 'ArialNarrowB'
+# register_variant(
+#   name = 'ArialNarrowB',
+#   family = 'Arial',
+#   weight = 'bold',
+#   width = 'condensed'
+# )
+title_font = 'Arial'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
