@@ -1310,7 +1310,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
             plot.title = element_text(size = plot_title_size,
                                       family = title_font,
                                       color = plot_title_color,
-                                      face = 'bold'),
+                                      hjust = -0.038),
             plot.background = element_rect(fill = 'white',
                                            color = 'white'),
             panel.grid = element_blank(),
