@@ -1946,25 +1946,33 @@ ui <- page_fluid(
     uiOutput('landings_unfilter_button'),
     h2('Download Data'),
     downloadButton('download_trade',
-                   'Download raw trade data'),
+                   'Trade Data',
+                   icon = icon(name = NULL,
+                               class = 'download_icon')),
     downloadButton('download_landings',
-                   'Download raw landings data'),
+                   'Landings Data',
+                   icon = icon(name = NULL,
+                               class = 'download_icon')),
     downloadButton('download_products',
-                   'Download raw processed products data')
+                   'Processed Products Data',
+                   icon = icon(name = NULL,
+                               class = 'download_icon'))
   ),
   
   
   page_fluid(
     navset_tab(
       nav_panel(
-        title = 'Dashboard',
-        icon = bsicons::bs_icon("layout-wtf"),
+        title = h5(icon(name = NULL,
+                        class = 'dashboard_icon'), 'DASHBOARD'),
         fluidRow(
           div(
             style = 'border-radius: 12px;
                min-width: 800px; width: 100%; display: flex; flex-direction: column;',
             navset_card_pill(title = h3('Trade'),
-                             nav_panel(title = 'Market Summary',
+                             nav_panel(title = h6(icon(name = NULL,
+                                                       class = 'mktsum_icon'), 
+                                                  'Market Summary'),
                                        div(
                                          style = "position: relative; min-width: 1200px;",
                                          withSpinner(
@@ -2013,8 +2021,12 @@ ui <- page_fluid(
                                                "Trade balance reflects the net value of product traded between the U.S. and the given trading partner. The top 5 countries displayed are those with the greatest sum of value traded (exports + imports). Balance values in the negative indicate more product is imported than exported. Balance values in the positive indicate more product is exported than imported. Countries display in alphabetical order."
                                              )))),
                                        downloadButton('download_page1',
-                                                      'Download these plots and their data')),
-                             nav_panel(title = 'Value',
+                                                      'Download these plots and their data',
+                                                      icon = icon(name = NULL,
+                                                                  class = 'download_icon2'))),
+                             nav_panel(title = h6(icon(name = NULL,
+                                                       class = 'val_icon'), 
+                                                  'Value'),
                                        div(
                                          style = "flex: 1; display: flex; gap: 15px;",
                                          div(
@@ -2048,8 +2060,12 @@ ui <- page_fluid(
                                                "Import value reflects the total value of product traded into the U.S. from other countries. The left y-axis reflects the total value of imports and applies to the bars. The right y-axis reflects the average price of imported product per kilogram or pound and applies to the line and points."
                                              )))),
                                        downloadButton('download_page2',
-                                                      'Download these plots and their data')),
-                             nav_panel(title = 'Volume',
+                                                      'Download these plots and their data',
+                                                      icon = icon(name = NULL,
+                                                                  class = 'download_icon2'))),
+                             nav_panel(title = h6(icon(name = NULL,
+                                                       class = 'vol_icon'),
+                                                  'Volume'),
                                        div(
                                          style = "flex: 1; display: flex; gap: 15px;",
                                          div(
@@ -2083,8 +2099,12 @@ ui <- page_fluid(
                                                "Import volume reflects the total volume of product traded into the U.S. from other countries."
                                              )))),
                                        downloadButton('download_page3',
-                                                      'Download these plots and their data')),
-                             nav_panel(title = 'Advanced Metrics',
+                                                      'Download these plots and their data',
+                                                      icon = icon(name = NULL,
+                                                                  class = 'download_icon2'))),
+                             nav_panel(title = h6(icon(name = NULL,
+                                                       class = 'advmet_icon'),
+                                                  'Advanced Metrics'),
                                        div(
                                          style = "flex: 1; display: flex; gap: 15px;",
                                          div(
@@ -2186,7 +2206,9 @@ ui <- page_fluid(
                                                "Unexported domestic production relative to apparently supply reflects the share of apparent supply that derives from retained processed products (i.e., processed product volume less export volume). High percentages indicate most apparent supply is domestically produced and retained. Low percentages indicate most apparent supply is due to imports."
                                              )))),
                                        downloadButton('download_page4',
-                                                      'Download these plots and their data'))))
+                                                      'Download these plots and their data',
+                                                      icon = icon(name = NULL,
+                                                                  class = 'download_icon2')))))
         ),
         fluidRow(
           div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
@@ -2194,7 +2216,9 @@ ui <- page_fluid(
                 style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Commercial Landings'),
-                                 nav_panel(title = 'Value',
+                                 nav_panel(title = h6(icon(name = NULL,
+                                                           class = 'val_icon'),
+                                                      'Value'),
                                            div(
                                              style = "position: relative; min-width: 600px; width: 100%",
                                              withSpinner(
@@ -2211,8 +2235,12 @@ ui <- page_fluid(
                                                  "Ex-vessel value reflects the amount paid to fishers for raw product (i.e., landed catch) in the U.S. The left y-axis reflects the total value of landed catch and applies to the bars. The right y-axis reflects the average price of landed catch per kilogram or pound and applies to the line and points."
                                                ))),
                                            downloadButton('download_landings_page1',
-                                                          'Download this plot and the data')),
-                                 nav_panel(title = 'Volume',
+                                                          'Download this plot and the data',
+                                                          icon = icon(name = NULL,
+                                                                      class = 'download_icon2'))),
+                                 nav_panel(title = h6(icon(name = NULL,
+                                                           class = 'vol_icon'),
+                                                      'Volume'),
                                            div(
                                              style = "position: relative; min-width: 600px; width: 100%",
                                              withSpinner(
@@ -2229,12 +2257,16 @@ ui <- page_fluid(
                                                  "Ex-vessel volume reflects the weight of raw product landed by fishers in the U.S."
                                                ))),
                                            downloadButton('download_landings_page2',
-                                                          'Download this plot and the data')))),
+                                                          'Download this plot and the data',
+                                                          icon = icon(name = NULL,
+                                                                      class = 'download_icon2'))))),
               div(
                 style = 'border-radius: 12px;
                  min-width: 400px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Processed Products'),
-                                 nav_panel(title = 'Value',
+                                 nav_panel(title = h6(icon(name = NULL,
+                                                           class = 'val_icon'),
+                                                      'Value'),
                                            div(
                                              style = "position: relative; min-width: 600px; width: 100%",
                                              withSpinner(
@@ -2251,8 +2283,12 @@ ui <- page_fluid(
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
                                                ))),
                                            downloadButton('download_products_page1',
-                                                          'Download this plot and the data')),
-                                 nav_panel(title = 'Volume',
+                                                          'Download this plot and the data',
+                                                          icon = icon(name = NULL,
+                                                                      class = 'download_icon2'))),
+                                 nav_panel(title = h6(icon(name = NULL,
+                                                           class = 'vol_icon'),
+                                                      'Volume'),
                                            div(
                                              style = "position: relative; min-width: 600px; width: 100%",
                                              withSpinner(
@@ -2269,8 +2305,12 @@ ui <- page_fluid(
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
                                                ))),
                                            downloadButton('download_products_page2',
-                                                          'Download this plot and the data')),
-                                 nav_panel(title = 'Price',
+                                                          'Download this plot and the data',
+                                                          icon = icon(name = NULL,
+                                                                      class = 'download_icon2'))),
+                                 nav_panel(title = h6(icon(name = NULL,
+                                                           class = 'price_icon'),
+                                                      'Price'),
                                            div(
                                              style = "position: relative; min-width: 600px; width: 100%",
                                              withSpinner(
@@ -2287,11 +2327,14 @@ ui <- page_fluid(
                                                  "Processed products are divided by the condition of their processing (i.e., canned, fillets, surimi, etc.). The category Other* includes conditions marked as 'Other' as well as those that comprise 2% or less of total processed product value."
                                                ))),
                                            downloadButton('download_products_page3',
-                                                          'Download this plot and the data')))))) 
+                                                          'Download this plot and the data',
+                                                          icon = icon(name = NULL,
+                                                                      class = 'download_icon2'))))))) 
       ),
       nav_panel(
-        title = 'Information & Methods',
-        icon = bsicons::bs_icon("text-paragraph"),
+        title = h5(icon(name = NULL,
+                        class = 'intro_icon'),
+                   'INFORMATION & METHODS'),
         navset_card_pill(
           nav_panel(title = 'Introduction',
                     htmlOutput('intro')),
