@@ -1929,7 +1929,8 @@ ui <- page_fluid(
       # appears once filter_2 has input, etc.
     uiOutput('filter_2'),
     uiOutput('filter_3'),
-    uiOutput('filter_4'),
+    uiOutput('filter_4'), 
+    h2('Other Options'),
     selectizeInput(inputId = 'region',
                    label = h4('Alternatively, select a FEUS Region'),
                    choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
@@ -1943,6 +1944,7 @@ ui <- page_fluid(
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
+    h2('Download Data'),
     downloadButton('download_trade',
                    'Download raw trade data'),
     downloadButton('download_landings',
