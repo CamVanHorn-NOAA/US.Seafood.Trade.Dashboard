@@ -729,7 +729,8 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
   } else if (units == 'IMPERIAL') {
     summarized_data <- summarized_data %>%
       mutate(COM_VOLUME = KG * 2.20462, # convert kilgorams to pounds
-             COM_VOLUME_T = COM_VOLUME / 2000) # short tons are 2000 pounds
+             COM_VOLUME_T = COM_VOLUME / 2000) %>% # short tons are 2000 pounds
+      select(!KG)
   }
   
   summarized_data <- summarized_data %>%
@@ -759,14 +760,13 @@ summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
                           # joins
                         summarize_pp_yr_spp(pp_data, species, region, units = units,
                                             nominal = nominal) %>%
-                          select(!c(PRODUCT_FORM, KG)) %>%
+                          select(!PRODUCT_FORM) %>%
                           # regroup by Year and sum value and volume columns
                           group_by(YEAR) %>%
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
               summarize_landings_yr_spp(com_landings, species, region, units = units,
-                                        nominal = nominal) %>%
-                select(!KG)) 
+                                        nominal = nominal)) 
   
   return(combined_data)
 }
