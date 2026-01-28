@@ -3138,11 +3138,25 @@ server <- function(input, output, session) {
     # each if statement overwrites 'new_data', thus only the last met condition
     # will apply to the outputted data
   trade_filtered <- reactive({
-    # first filter data for the selected ecol_cat
-      # (this will work if 'all species' is selected (default) bc filter_species
-      # accounts for that input)
-    new_data <- trade_data %>%
-      filter_species(input$ecol_cat)
+    # first store trade_data in a new data frame
+    new_data <- trade_data
+    
+    # Then filter data for selected ecol_cat, which can only happen if 
+      # the ecol_cat exists in the trade data, AND if ecol_cat exists (this
+      # may be redundant)
+    if (species_selection_trade() %in% 
+        trade_categorization_matrix$ECOLOGICAL_CATEGORY &
+        !(is.null(input$ecol_cat))) {
+      
+      # if these conditions are met (i.e., a ecol_cat is selected), filter
+      new_data <- trade_data %>%
+        filter_species(input$ecol_cat)
+      
+      # should the trade_button be selected, instead set new_data to trade_data
+      if (input$trade_button == T) {
+        new_data <- trade_data
+      }
+    }
     
     # It will apply the next inputted filter only if there is an input for that
       # filter AND if the selected filter is present in the trade data at that
@@ -3518,8 +3532,19 @@ server <- function(input, output, session) {
   
   # see notes above and within trade_filtered
   landings_filtered <- reactive({
-    new_data <- com_landings %>%
-      filter_species(input$ecol_cat)
+    new_data <- com_landings
+
+    if (species_selection_landings() %in% 
+        landings_categorization_matrix$ECOLOGICAL_CATEGORY &
+        !(is.null(input$ecol_cat))) {
+      
+      new_data <- com_landings %>%
+        filter_species(input$ecol_cat)
+      
+      if (input$landings_button == T) {
+        new_data <- com_landings
+      }
+    }
     
     if(species_selection_landings() %in% 
        landings_categorization_matrix$SPECIES_CATEGORY &
@@ -3772,8 +3797,21 @@ server <- function(input, output, session) {
   
   # see notes above and within trade_filtered
   products_filtered <- reactive({
-    new_data <- pp_data %>%
-      filter_species(input$ecol_cat)
+    new_data <- pp_data
+    
+    if (species_selection_products() %in% 
+        products_categorization_matrix$ECOLOGICAL_CATEGORY &
+        !(is.null(input$ecol_cat))) {
+      
+      # if these conditions are met (i.e., a ecol_cat is selected), filter
+      new_data <- pp_data %>%
+        filter_species(input$ecol_cat)
+      
+      # should the trade_button be selected, instead set new_data to trade_data
+      if (input$product_button == T) {
+        new_data <- pp_data
+      }
+    }
     
     if(species_selection_products() %in% 
        products_categorization_matrix$SPECIES_CATEGORY &
