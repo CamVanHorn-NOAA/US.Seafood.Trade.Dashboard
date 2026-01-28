@@ -3808,7 +3808,7 @@ server <- function(input, output, session) {
         filter_species(input$ecol_cat)
       
       # should the trade_button be selected, instead set new_data to trade_data
-      if (input$product_button == T) {
+      if (input$products_button == T) {
         new_data <- pp_data
       }
     }
