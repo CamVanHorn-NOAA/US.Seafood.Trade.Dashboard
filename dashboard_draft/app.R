@@ -1113,7 +1113,9 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     shortform <- 'EXP'
     longform <- 'Exports'
     color <- export_color
-    if (region != '') {
+    if (region == 'New England') {
+      region_text <- paste0(' from ', region)
+    } else if (region != '') {
       region_text <- paste0(' from the ', region)
     } else {region_text <- ''}
   }
@@ -1122,7 +1124,9 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     shortform <- 'IMP'
     longform <- 'Imports'
     color <- import_color
-    if (region != '') {
+    if (region == 'New England') {
+      region_text <- paste0(' to ', region)
+    } else if (region != '') {
       region_text <- paste0(' to the ', region)
     } else {region_text <- ''}
   }
@@ -1253,7 +1257,9 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
     data$GROUP <- 'group'
-    if (region != '') {
+    if (region == 'New England') {
+      region_text <- paste0(' traded in ', region)
+    } else if (region != '') {
       region_text <- paste0(' traded in the ', region)
     } else {region_text <- ''}
     
@@ -1280,7 +1286,9 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                                       face = 'bold'),
             axis.title = element_text(size = axis_title_size))
   } else {
-    if (region != '') {
+    if (region == 'New England') {
+      region_text <- paste0(' traded in ', region)
+    } else if (region != '') {
       region_text <- paste0(' traded in the ', region)
     } else {region_text <- ''}
     
@@ -1335,7 +1343,9 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
     ylab <- 'Millions (Real 2024 USD)'
   }
   
-  if (region != '') {
+  if (region == 'New England') {
+    region_text <- paste0(' with ', region)
+  } else if (region != '') {
     region_text <- paste0(' with the ', region)
   } else {region_text <- ''}
   
@@ -1639,7 +1649,9 @@ plot_mlti <- function(mlti_data, region, exports = F, imports = F, species) {
     stop('Please set "exports" or "imports" to "T"')
   }
   
-  if (region != '') {
+  if (region == 'New England') {
+    region_text <- paste0(ifelse(exports == T, ' from ', ' to '), region)
+  } else if (region != '') {
     region_text <- paste0(ifelse(exports == T, ' from the ', ' to the '),
                           region)
   } else {region_text <- ''}
@@ -1683,7 +1695,9 @@ plot_hi <- function(hi_data, region, species) {
   # this function generates a line plot that compares HI for exports and imports
   # hi_data is a data set formatted by calculate_hi
   
-  if (region != '') {
+  if (region == 'New England') {
+    region_text <- paste0('\ntraded in ', region)
+  } else if (region != '') {
     region_text <- paste0('\ntraded in the ', region)
   } else {region_text <- ''}
   
@@ -1735,7 +1749,9 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
     # SHARE outputs plots of Unexported domestic production relative to 
       # apparent supply
   
-  if (region != '') {
+  if (region == 'New England') {
+    region_text <- paste0('\nin ', region)
+  } else if (region != '') {
     region_text <- paste0('\nin the ', region)
   } else {region_text <- ''}
   if (metric == 'SUPPLY') {
