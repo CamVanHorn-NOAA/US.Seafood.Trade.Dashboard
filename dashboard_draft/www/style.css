@@ -328,7 +328,11 @@ label.form-check-label {
   margin-top: 23px;
 }
 
-
+.info-tab .card-header-pills {
+  margin-top: -17px;
+  margin-bottom: 12px;
+  margin-left: 0px; 
+}
 
 
 
