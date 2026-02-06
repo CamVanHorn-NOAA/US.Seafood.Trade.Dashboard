@@ -106,6 +106,11 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
+region_order <- levels(factor(levels = c(
+  'North Pacific', 'Pacific', 'West Pacific', 'New England', 'Mid-Atlantic',
+  'South Atlantic', 'Gulf', 'Great Lakes'
+)))
+
 tooltip_aes <- paste0(
   "position: absolute; ",
   "background-color: rgba(255, 255, 255, 0.95); ",
@@ -1960,14 +1965,7 @@ ui <- page_fluid(
     uiOutput('filter_3'),
     uiOutput('filter_4'), 
     h2('Other Options'),
-    selectizeInput(inputId = 'region',
-                   label = h4('Region'),
-                   choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
-                               'New England', 'Mid-Atlantic', 'South Atlantic',
-                               'Gulf', 'Great Lakes'),
-                   options = list(
-                     placeholder = 'Type here...'
-                   )),
+    uiOutput('filter_region'),
     input_switch('units', 'Imperial Units'),
     input_switch('inflation', 'Inflation-Adjusted', value = T),
     uiOutput('trade_unfilter_button'),
@@ -2898,6 +2896,69 @@ server <- function(input, output, session) {
       selectInput('species_name', h4('Species Name'), species_names,
                   selected = search_cats()[1])
     }
+  })
+  
+  # creates input: region
+  output$filter_region <- renderUI({
+    region_options <- categorization_matrix %>%
+      filter(!is.na(REGION)) %>%
+      select(REGION) %>%
+      distinct() %>%
+      pull()
+    
+    if (!(is.null(input$ecol_cat))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_cat))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_grp))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_name))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter_species(input$species_name) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    region_list <- factor(region_options, levels = region_order, ordered = T)
+    ordered_regions <- as.vector(sort(region_list))
+    
+    selectizeInput(inputId = 'region',
+                   label = h4('Region'),
+                   choices = c('', ordered_regions),
+                   options = list(
+                     placeholder = ifelse(length(ordered_regions != 0), 
+                                                 'Type here...',
+                                                 'No Available Regions')
+                   ))
   })
   
   # creates checkbox to unfilter trade up one level
