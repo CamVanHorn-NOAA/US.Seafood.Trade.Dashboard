@@ -106,6 +106,11 @@ sname_list <- unique(categorization_matrix %>%
                        mutate(SPECIES_NAME = str_to_title(SPECIES_NAME)) %>%
                        pull())
 
+region_order <- levels(factor(levels = c(
+  'North Pacific', 'Pacific', 'West Pacific', 'New England', 'Mid-Atlantic',
+  'South Atlantic', 'Gulf', 'Great Lakes'
+)))
+
 tooltip_aes <- paste0(
   "position: absolute; ",
   "background-color: rgba(255, 255, 255, 0.95); ",
@@ -1933,11 +1938,11 @@ ui <- page_fluid(
       ),
       
       # animal icons
-      # div(
-      #   img(src = 'graphics_icons/sfd_banner-fish-blue.png',
-      #       align = 'right',
-      #       style = 'max-width: 800px; max-height: 600px; height: auto; width: auto; margin-bottom: -35px; margin-top: -35px; margin-right: -5px;')
-      # )
+      div(
+        img(src = 'graphics_icons/sfd_banner-blue-fish.png',
+            align = 'right',
+            style = 'max-width: 800px; max-height: 600px; height: auto; width: auto; margin-bottom: -35px; margin-top: -35px; margin-right: -5px;')
+      )
       ),
   page_sidebar(
   sidebar = sidebar(
@@ -1960,20 +1965,13 @@ ui <- page_fluid(
     uiOutput('filter_3'),
     uiOutput('filter_4'), 
     h2('Other Options'),
-    selectizeInput(inputId = 'region',
-                   label = h4('Region'),
-                   choices = c('', 'North Pacific', 'Pacific', 'West Pacific',
-                               'New England', 'Mid-Atlantic', 'South Atlantic',
-                               'Gulf', 'Great Lakes'),
-                   options = list(
-                     placeholder = 'Type here...'
-                   )),
+    uiOutput('filter_region'),
     input_switch('units', 'Imperial Units'),
     input_switch('inflation', 'Inflation-Adjusted', value = T),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
-    h2('Download Data'),
+    h2(id = 'download-text', 'Download Data'),
     downloadButton('download_trade',
                    'Trade Data',
                    icon = icon(name = NULL,
@@ -2244,7 +2242,7 @@ ui <- page_fluid(
           div(style = 'display: flex; gap: 15px; min-width: 800px; width: 100%;',
               div(
                 style = 'border-radius: 12px;
-                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
+                 min-width: 730px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Commercial Landings'),
                                  nav_panel(title = h6(icon(name = NULL,
                                                            class = 'val_icon'),
@@ -2292,7 +2290,7 @@ ui <- page_fluid(
                                                                       class = 'download_icon2'))))),
               div(
                 style = 'border-radius: 12px;
-                 min-width: 400px; width: 100%; display: flex; flex-direction: column;',
+                 min-width: 730px; width: 100%; display: flex; flex-direction: column;',
                 navset_card_pill(title = h3('Processed Products'),
                                  nav_panel(title = h6(icon(name = NULL,
                                                            class = 'val_icon'),
@@ -2900,6 +2898,69 @@ server <- function(input, output, session) {
     }
   })
   
+  # creates input: region
+  output$filter_region <- renderUI({
+    region_options <- categorization_matrix %>%
+      filter(!is.na(REGION)) %>%
+      select(REGION) %>%
+      distinct() %>%
+      pull()
+    
+    if (!(is.null(input$ecol_cat))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_cat))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_grp))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    if (!(is.null(input$species_name))) {
+      region_options <- categorization_matrix %>%
+        filter_species(input$ecol_cat) %>%
+        filter_species(input$species_cat) %>%
+        filter_species(input$species_grp) %>%
+        filter_species(input$species_name) %>%
+        filter(!is.na(REGION)) %>%
+        select(REGION) %>%
+        distinct() %>%
+        pull()
+    }
+    
+    region_list <- factor(region_options, levels = region_order, ordered = T)
+    ordered_regions <- as.vector(sort(region_list))
+    
+    selectizeInput(inputId = 'region',
+                   label = h4('Region'),
+                   choices = c('', ordered_regions),
+                   options = list(
+                     placeholder = ifelse(length(ordered_regions != 0), 
+                                                 'Type here...',
+                                                 'No Available Regions')
+                   ))
+  })
+  
   # creates checkbox to unfilter trade up one level
     # requires the selected species to NOT be available in trade categories
     # the validate prevents an error from being displayed in the side bar
@@ -2955,6 +3016,17 @@ server <- function(input, output, session) {
   
   # trade ----------------------------------------------------------------------
   
+  trade_cat_mat <- reactive({
+    trade_data %>%
+      filter_region(input$region) %>%
+      select(SPECIES_NAME, SPECIES_GROUP, 
+             SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      group_by(SPECIES_NAME, SPECIES_GROUP, 
+               SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      distinct() %>%
+      ungroup()
+  })
+  
   # create list of trade categories based on selected filters
   trade_terms <- reactive({
     
@@ -2979,7 +3051,7 @@ server <- function(input, output, session) {
     # if the user has selected an ecological category, or if the ecological 
       # category is 'All Species', will return the list of ecological categories
     if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
-      result <- c('All Species', trade_categorization_matrix %>%
+      result <- c('All Species', trade_cat_mat() %>%
                     select(ECOLOGICAL_CATEGORY) %>%
                     mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
                     pull())
@@ -2991,7 +3063,7 @@ server <- function(input, output, session) {
         # but only if that category exists in the trade data
     if(cat_index == 'scat') {
       if(toupper(input$ecol_cat) %in% 
-         trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
+         trade_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         # if the category does not exist, create empty vector for functionality
@@ -3004,7 +3076,7 @@ server <- function(input, output, session) {
           # return an empty data frame, thus trade_terms will be empty, and
           # 'All Species' will be returned later in unfilter_species_trade()
       result <- c(terms,
-                  trade_categorization_matrix %>%
+                  trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
                     mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
@@ -3016,14 +3088,14 @@ server <- function(input, output, session) {
       # We also need to include the previously selected ecological and species
         # categories but only if they exist in the trade data
     if(cat_index == 'sgrp') {
-      if(toupper(input$species_cat) %in% (trade_categorization_matrix %>%
+      if(toupper(input$species_cat) %in% (trade_cat_mat() %>%
                                           filter_species(input$ecol_cat) %>%
                                           select(SPECIES_CATEGORY) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
         # if they don't exist, then check if ecol_cat exists in the trade data
       } else if(toupper(input$ecol_cat) %in%
-                trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                trade_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
         # if neither the selected species or e_cat terms exist, returns empty
           # vector
@@ -3032,7 +3104,7 @@ server <- function(input, output, session) {
       }
       
       result <- c(terms, 
-                  trade_categorization_matrix %>%
+                  trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     select(SPECIES_GROUP) %>%
@@ -3047,7 +3119,7 @@ server <- function(input, output, session) {
         # categories and the species group, but only if they exist in the trade
         # data
     if(cat_index == 'sname') {
-      if(toupper(input$species_grp) %in% (trade_categorization_matrix %>%
+      if(toupper(input$species_grp) %in% (trade_cat_mat() %>%
                                          filter_species(input$ecol_cat) %>%
                                          filter_species(input$species_cat) %>%
                                          select(SPECIES_GROUP) %>%
@@ -3055,7 +3127,7 @@ server <- function(input, output, session) {
         terms <- c(input$ecol_cat, input$species_cat, input$species_grp)
         # if they don't, check if the selected ecological and species categories
           # exist in the trade data
-      } else if(toupper(input$species_cat) %in% (trade_categorization_matrix %>%
+      } else if(toupper(input$species_cat) %in% (trade_cat_mat() %>%
                                                  filter_species(input$ecol_cat) %>%
                                                  select(SPECIES_CATEGORY) %>%
                                                  pull())) {
@@ -3063,7 +3135,7 @@ server <- function(input, output, session) {
         # if they don't, check if the selected ecological category exists in the
           # trade data
       } else if(toupper(input$ecol_cat) %in% 
-                trade_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                trade_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
         # if it doesn't, return empty vector
       } else {
@@ -3071,7 +3143,7 @@ server <- function(input, output, session) {
       }
       
       result <- c(terms, 
-                  trade_categorization_matrix %>%
+                  trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     filter_species(input$species_grp) %>%
@@ -3430,6 +3502,16 @@ server <- function(input, output, session) {
   
   # landings -------------------------------------------------------------------
   
+  landings_cat_mat <- reactive({
+    com_landings %>%
+      filter_region(input$region) %>%
+      select(SPECIES_NAME, SPECIES_GROUP, 
+             SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      group_by(SPECIES_NAME, SPECIES_GROUP, 
+               SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      distinct() %>%
+      ungroup()
+  })
   # create list of landings categories based on selected filters
   # see trade_terms() notes 
   landings_terms <- reactive({
@@ -3442,7 +3524,7 @@ server <- function(input, output, session) {
                                   'sname'))))
     
     if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
-      result <- c('All Species', landings_categorization_matrix %>%
+      result <- c('All Species', landings_cat_mat() %>%
                     select(ECOLOGICAL_CATEGORY) %>%
                     mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
                     pull())
@@ -3450,14 +3532,14 @@ server <- function(input, output, session) {
     
     if(cat_index == 'scat') {
       if(toupper(input$ecol_cat) %in% 
-         landings_categorization_matrix$ECOLOGICAL_CATEGORY) {
+         landings_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms,
-                  landings_categorization_matrix %>%
+                  landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
                     mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
@@ -3465,20 +3547,20 @@ server <- function(input, output, session) {
     }
     
     if(cat_index == 'sgrp') {
-      if(toupper(input$species_cat) %in% (landings_categorization_matrix %>%
+      if(toupper(input$species_cat) %in% (landings_cat_mat() %>%
                                           filter_species(input$ecol_cat) %>%
                                           select(SPECIES_CATEGORY) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
       } else if(toupper(input$ecol_cat) %in%
-                landings_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                landings_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms, 
-                  landings_categorization_matrix %>%
+                  landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     select(SPECIES_GROUP) %>%
@@ -3487,26 +3569,26 @@ server <- function(input, output, session) {
     }
     
     if(cat_index == 'sname') {
-      if(toupper(input$species_grp) %in% (landings_categorization_matrix %>%
+      if(toupper(input$species_grp) %in% (landings_cat_mat() %>%
                                           filter_species(input$ecol_cat) %>%
                                           filter_species(input$species_cat) %>%
                                           select(SPECIES_GROUP) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat, input$species_grp)
-      } else if(toupper(input$species_cat) %in% (landings_categorization_matrix %>%
+      } else if(toupper(input$species_cat) %in% (landings_cat_mat() %>%
                                                  filter_species(input$ecol_cat) %>%
                                                  select(SPECIES_CATEGORY) %>%
                                                  pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
       } else if(toupper(input$ecol_cat) %in% 
-                landings_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                landings_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms, 
-                  landings_categorization_matrix %>%
+                  landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     filter_species(input$species_grp) %>%
@@ -3695,6 +3777,16 @@ server <- function(input, output, session) {
   
   # products -------------------------------------------------------------------
   
+  products_cat_mat <- reactive({
+    pp_data %>%
+      filter_region(input$region) %>%
+      select(SPECIES_NAME, SPECIES_GROUP, 
+             SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      group_by(SPECIES_NAME, SPECIES_GROUP, 
+               SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
+      distinct() %>%
+      ungroup()
+  })
   # create list of production categories based on selected filters
   # see trade_terms() notes
   pp_terms <- reactive({
@@ -3707,7 +3799,7 @@ server <- function(input, output, session) {
                                   'sname'))))
     
     if(cat_index == 'ecat' | cat_index == 'DEFAULT') {
-      result <- c('All Species', products_categorization_matrix %>%
+      result <- c('All Species', products_cat_mat() %>%
                     select(ECOLOGICAL_CATEGORY) %>%
                     mutate(ECOLOGICAL_CATEGORY = str_to_title(ECOLOGICAL_CATEGORY)) %>%
                     pull())
@@ -3715,14 +3807,14 @@ server <- function(input, output, session) {
     
     if(cat_index == 'scat') {
       if(toupper(input$ecol_cat) %in% 
-         products_categorization_matrix$ECOLOGICAL_CATEGORY) {
+         products_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms,
-                  products_categorization_matrix %>%
+                  products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
                     mutate(SPECIES_CATEGORY = str_to_title(SPECIES_CATEGORY)) %>%
@@ -3730,20 +3822,20 @@ server <- function(input, output, session) {
     }
     
     if(cat_index == 'sgrp') {
-      if(toupper(input$species_cat) %in% (products_categorization_matrix %>%
+      if(toupper(input$species_cat) %in% (products_cat_mat() %>%
                                           filter_species(input$ecol_cat) %>%
                                           select(SPECIES_CATEGORY) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
       } else if(toupper(input$ecol_cat) %in%
-                products_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                products_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms, 
-                  products_categorization_matrix %>%
+                  products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     select(SPECIES_GROUP) %>%
@@ -3752,26 +3844,26 @@ server <- function(input, output, session) {
     }
     
     if(cat_index == 'sname') {
-      if(toupper(input$species_grp) %in% (products_categorization_matrix %>%
+      if(toupper(input$species_grp) %in% (products_cat_mat() %>%
                                           filter_species(input$ecol_cat) %>%
                                           filter_species(input$species_cat) %>%
                                           select(SPECIES_GROUP) %>%
                                           pull())) {
         terms <- c(input$ecol_cat, input$species_cat, input$species_grp)
-      } else if(toupper(input$species_cat) %in% (products_categorization_matrix %>%
+      } else if(toupper(input$species_cat) %in% (products_cat_mat() %>%
                                                  filter_species(input$ecol_cat) %>%
                                                  select(SPECIES_CATEGORY) %>%
                                                  pull())) {
         terms <- c(input$ecol_cat, input$species_cat)
       } else if(toupper(input$ecol_cat) %in% 
-                products_categorization_matrix$ECOLOGICAL_CATEGORY) {
+                products_cat_mat()$ECOLOGICAL_CATEGORY) {
         terms <- input$ecol_cat
       } else {
         terms <- vector()
       }
       
       result <- c(terms, 
-                  products_categorization_matrix %>%
+                  products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
                     filter_species(input$species_grp) %>%

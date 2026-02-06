@@ -6,7 +6,7 @@ p {
   font-family: "Arial Narrow", sans-serif; 
   font-size: clamp(1.8rem, 1.6vw, 2.6rem); 
   color: #05477D;
-  margin-top: -15px; 
+  margin-top: -11px; 
   margin-bottom: 0px; 
   opacity: 0.9;
 }
@@ -61,17 +61,22 @@ h5 {
 /* Pill Titles */
 h6 {
   font-family: 'Arial Narrow';
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 0rem; 
 }
 
-/* Tab Titles */
-h7 {
-  font-family: 'Arial Narrow';
-  font-weight: bold; 
-  font-size: 19px;
+#download-text {
+  margin-bottom: 0px;
 }
 
+
+
+/* Space Behind Cards */
+.bslib-sidebar-layout>.main {
+  padding-left: 45px; 
+  padding-right: 45px;
+  background: #f2f2f2;
+}
 
 /* Checkboxes */
 .shiny-input-container .checkbox label {
@@ -92,7 +97,7 @@ h7 {
 
 /* Banner */
 #banner {
-  background: linear-gradient(155deg, #DAEFF8 50%, #69BBFC 100%);
+  background: linear-gradient(144deg, #DAEFF8 30%, #69BBFC 100%);
   padding: 20px 10px;
   min-width: 100px;
   align-items: center;
@@ -163,6 +168,7 @@ h7 {
   font-family: "Arial Narrow";
   font-size: 17px;
   color: #02233E;
+  border: transparent;
 }
 
 .selectize-dropdown {
@@ -187,8 +193,8 @@ h7 {
 
 /* Switches */
 .form-check-input:checked {
-  background-color: #2699FC;
-  border-color: #2699FC;
+  background-color: #05477D;
+  border-color: #05477D;
 }
 
 label.form-check-label {
@@ -238,9 +244,8 @@ label.form-check-label {
 .bslib-card {
   border-color: #B6DCF5;
   border-width: 4px;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
-  box-shadow: 5px 10px 10px 1px #E8E8E8;
+  border-radius: 20px;
+  box-shadow: 5px 10px 15px 1px #E8E8E8;
   
   margin-top: -30px;
   margin-bottom: 45px;
@@ -249,6 +254,10 @@ label.form-check-label {
 .bslib-navs-card-title {
   margin-top: -25px;
   padding-bottom: 11px;
+}
+
+.card-body {
+  padding: 30px; !important
 }
 
 
@@ -430,6 +439,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .intro_icon {
@@ -440,6 +450,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .mktsum_icon {
@@ -450,6 +461,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .val_icon {
@@ -460,6 +472,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .vol_icon {
@@ -470,6 +483,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .advmet_icon {
@@ -480,6 +494,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .price_icon {
@@ -490,6 +505,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .download_icon {
@@ -500,6 +516,7 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
 
 .download_icon2 {
@@ -510,4 +527,5 @@ g.hovertext > path {opacity: .9;}
   width: 32px; 
   display: inline-block;
   vertical-align: middle;
+  margin-right: 6px;
 }
