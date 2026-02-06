@@ -3212,7 +3212,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "5efe2cc309d27e5df7022601cbd0c308"
+      "checksum": "dfb5baf056943f988ddabc2ccdde52a2"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -3664,11 +3664,14 @@
     "trade_data.csv": {
       "checksum": "7e9649f13510c235ae90907ec503a926"
     },
-    "www/graphics_icons/sfd_banner-fish-blue.jpg": {
-      "checksum": "99133ebb115ea3449235112cb44f969c"
+    "www/graphics_icons/sfd_banner-blue-fish.png": {
+      "checksum": "e919f2f61c299912ef63364378e0b303"
     },
-    "www/graphics_icons/sfd_banner-fish-blue.png": {
-      "checksum": "b6a6e7674922bdad7596d12d3ed99e23"
+    "www/graphics_icons/sfd_banner-blue-swoosh.png": {
+      "checksum": "bc9347d9a3c826f89f39d378991f76df"
+    },
+    "www/graphics_icons/sfd_banner-blue-swoosh2.png": {
+      "checksum": "aeed2c05b331db7360693f0780ec906f"
     },
     "www/graphics_icons/sfd_icon-AM-dk.png": {
       "checksum": "3209a817467b38a9d681c4fa886aed78"
@@ -3734,7 +3737,7 @@
       "checksum": "85c9c267bb0a027a963eb47238eee4c8"
     },
     "www/style.css": {
-      "checksum": "36fc3e8b8bca711570b23f28de542261"
+      "checksum": "5ec15247c20100be4ff8a9a7b2c68dd9"
     }
   },
   "users": null
