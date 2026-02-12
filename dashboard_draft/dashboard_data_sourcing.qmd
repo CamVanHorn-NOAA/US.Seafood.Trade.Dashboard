@@ -13,11 +13,13 @@ The FOSS typically reports catch volume in rounded live weight. Exceptions inclu
 
 The FOSS reports the value of catch, or the ex-vessel sale paid to fishermen, in U.S. dollars. These dollar values reflect market conditions (i.e., variables that impact the strength and thus value of the U.S. dollar) at time of sale and are not adjusted for inflation within the FOSS database.
 
-We downloaded commercial landings data from the FOSS in a conventional manner using the public webpage. We first selected the 'Landings' tab from the sidebar on the left side of the page. Therein, we selected the 'Commercial' data set and left the 'Recreational' data set unchecked. We selected years 2004 through 2023 inclusive and selected all 'State Landed' options as well as 'Species' options. We then selected 'Totals by Year/State/Species' as the report format, to return the most detailed data set possible, and selected 'Run Report'. Finally, we downloaded the generated data set as a .csv file.
+We downloaded commercial landings data from the FOSS in a conventional manner using the public webpage. We first selected the 'Landings' tab from the sidebar on the left side of the page. Therein, we selected the 'Commercial' data set and left the 'Recreational' data set unchecked. We selected years 2004 through 2024 inclusive and selected all 'State Landed' options as well as 'Species' options. We then selected 'Totals by Year/State/Species' as the report format, to return the most detailed data set possible, and selected 'Run Report'. Finally, we downloaded the generated data set as a .csv file.
 
 ## Processed Products
 
-\[need information on how to describe accessing\]
+The NOAA collects processed product data via annual surveys of all domestic seafood processors. These represent the only source for all statistics of processed products in the domestic market. Surveys collect data on the value (in U.S. dollars) and volume (in pounds) of processed product sales by species and product condition (e.g., canned, fillet).
+
+The FOSS uses processed product data sourced from a private NOAA Fisheries server. There, processed product data collected via NOAA surveyors undergoes management such that product conditions are standardized and confidential information such as processor address is removed. Our presentation of processed product data here, however, is more stratified than that available in the FOSS due to our need for regional resolution otherwise unavailable in the FOSS due to confidentiality. We thus sourced processed product data directly from the private NOAA Fisheries server and performed our own management such that any confidential information was removed while retaining regional attribution where possible. This data should not be confused as distinct from that available in the FOSS; rather, we present the same data in the FOSS at a spatial resolution without sacrificing confidentiality.
 
 ## Trade
 

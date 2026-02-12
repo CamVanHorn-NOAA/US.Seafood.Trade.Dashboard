@@ -11,11 +11,17 @@ Froese, R. and D. Pauly. Editors. 2025. FishBase. World Wide Web electronic publ
 
 National Marine Fisheries Service. 2024. Fisheries Economics of the United States, 2022. U.S. Dept of Commerce, NOAA Tech. Memo. NMFS-F/SPO-248B, 28 p.
 
+NOAA Fisheries Office of Science and Technology, Commercial Landings Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 11/24/2025.
+
+NOAA Fisheries Office of Science and Technology, Foreign Trade Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 11/24/2025.
+
+NOAA Fisheries Office of Science and Technology, Processed Products Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed 06/24/2025.
+
 Palomares, M.L.D. and D. Pauly. Editors. 2025. SeaLifeBase. World Wide Web electronic publication. [www.sealifebase.org](www.sealifebase.org), version (04/2025).
 
 R Core Team (2023). \_R: A Language and Environment for Statistical Computing\_. R Foundation for Statistical Computing, Vienna, Austria. [\<https://www.R-project.org/\>](www.R-project.org).
 
-Steinkruger, A., Kroetz, K., Malakoff, K. A., Gephart, J. A., Luque, G., Lee, P., Moore, K. C., Donlan, J. (2024). "Replication package for: 'Seafood Traceability Program Design: Examination of the United States' Seafood Import Monitoring Program'". [https://github.com/kaitlyn-c-lee/seafood-traceability-design](https://github.com/kaitlyn-c-lee/seafood-traceability-design)
+Steinkruger, A., Kroetz, K., Malakoff, K. A., Gephart, J. A., Luque, G., Lee, P., Moore, K. C., Donlan, J. (2024). "Replication package for: 'Seafood Traceability Program Design: Examination of the United States' Seafood Import Monitoring Program'". <https://github.com/kaitlyn-c-lee/seafood-traceability-design>
 
 U.S. Bureau of Economic Analysis, Gross Domestic Product: Implicit Price Deflator \[GDPDEF\], retrieved from FRED, Federal Reserve Bank of St. Louis; [https://fred.stlouisfed.org/series/GDPDEF](fred.stlouisfed.org/series/GDPDEF), April 9, 2025.
 
