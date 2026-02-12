@@ -22,6 +22,9 @@ if(!require("systemfonts")) install.packages("systemfonts")
   # file located in app directory for nmfspalette colors
 source("nmfs_cols.R")
 
+# turn off scientific notation (for data export)
+options(scipen = 999)
+
 # Add Resource Path for Quarto documents
 addResourcePath("tmpuser", getwd())
 
