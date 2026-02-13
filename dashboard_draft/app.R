@@ -2492,20 +2492,30 @@ server <- function(input, output, session) {
         # ggsave items listed below
       fs <- c('balance_plot.png', 'ratio_plot.png', 'top5_trade_plot.png',
               'trade_plots_data.csv', 'top5_trade_plot_data.csv')
-      ggsave('balance_plot.png', balance_plot(),
-             width = 15,
-             height = 8,
-             device = 'png')
-      ggsave('ratio_plot.png', ratio_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('top5_trade_plot.png', top5_trade_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      write.csv(trade_df_full(), 'trade_plots_data.csv')
-      write.csv(top5_trade_df_full(), 'top5_trade_plot_data.csv')
+      if (!is.character(try(balance_plot()))) {
+        ggsave('balance_plot.png', balance_plot(),
+               width = 15,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(ratio_plot()))) {
+        ggsave('ratio_plot.png', ratio_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(top5_trade_plot()))) {
+        ggsave('top5_trade_plot.png', top5_trade_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(trade_df_full()))) {
+        write.csv(trade_df_full(), 'trade_plots_data.csv')
+      }
+      if (!is.character(try(top5_trade_df_full()))) {
+        write.csv(top5_trade_df_full(), 'top5_trade_plot_data.csv')
+      }
       
       # we are saving multiple files so they must be in a zip file
       # fname is filename that derives from the start of the function
@@ -2528,15 +2538,21 @@ server <- function(input, output, session) {
       
       fs <- c('export_value_plot.png', 'import_value_plot.png', 
               'trade_plots_data.csv')
-      ggsave('export_value_plot.png', exp_value_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('import_value_plot.png', imp_value_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      write.csv(trade_df_full(), 'trade_plots_data.csv')
+      if (!is.character(try(exp_value_plot()))) {
+        ggsave('export_value_plot.png', exp_value_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(imp_value_plot()))) {
+        ggsave('import_value_plot.png', imp_value_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(trade_df_full()))) {
+        write.csv(trade_df_full(), 'trade_plots_data.csv')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2556,15 +2572,21 @@ server <- function(input, output, session) {
       
       fs <- c('export_volume_plot.png', 'import_volume_plot.png',
               'trade_plots_data.csv')
-      ggsave('export_volume_plot.png', exp_volume_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('import_volume_plot.png', imp_volume_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      write.csv(trade_df_full(), 'trade_plots_data.csv')
+      if (!is.character(try(exp_volume_plot()))) {
+        ggsave('export_volume_plot.png', exp_volume_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(imp_volume_plot()))) {
+        ggsave('import_volume_plot.png', imp_volume_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(trade_df_full()))) {
+        write.csv(trade_df_full(), 'trade_plots_data.csv')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2586,25 +2608,45 @@ server <- function(input, output, session) {
               'supply_plots_data.csv', 'HI_plot.png', 'supply_plot.png', 
               'supply_production_ratio.png', 
               'unexported_production_supply_rate.png')
-      write.csv(exp_mlti_table_df(), 'export_MLTI_table.csv')
-      write.csv(imp_mlti_table_df(), 'import_MLTI_table.csv')
-      write.csv(supply_df(), 'supply_plots_data.csv')
-      ggsave('HI_plot.png', hi_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('supply_plot.png', supply_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('supply_production_ratio.png', supply_ratio_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
-      ggsave('unexported_production_supply_rate.png', supply_share_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(supply_df()))) {
+        write.csv(supply_df(), 'supply_plots_data.csv')
+      }
+      if (!is.character(try(exp_mlti_plot()))) {
+        ggsave('export_mlti_plot.png', exp_mlti_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(imp_mlti_plot()))) {
+        ggsave('import_mlti_plot.png', imp_mlti_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(hi_plot()))) {
+        ggsave('HI_plot.png', hi_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(supply_plot()))) {
+        ggsave('supply_plot.png', supply_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(supply_ratio_plot()))) {
+        ggsave('supply_production_ratio.png', supply_ratio_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
+      if (!is.character(try(supply_share_plot()))) {
+        ggsave('unexported_production_supply_rate.png', supply_share_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2626,11 +2668,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_value.png')
-      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
-      ggsave('landings_value.png', landings_value_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(landings_df_full()))) {
+        write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
+      }
+      if (!is.character(try(landings_value_plot()))) {
+        ggsave('landings_value.png', landings_value_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2649,11 +2695,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_volume.png')
-      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
-      ggsave('landings_volume.png', landings_volume_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(landings_df_full()))) {
+        write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
+      }
+      if (!is.character(try(landings_volume_plot()))) {
+        ggsave('landings_volume.png', landings_volume_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2672,11 +2722,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('commercial_landings_plots_data.csv', 'landings_price.png')
-      write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
-      ggsave('landings_price.png', landings_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(landings_df_full()))) {
+        write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
+      }
+      if (!is.character(try(landings_price_plot()))) {
+        ggsave('landings_price.png', landings_price_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2695,11 +2749,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_value.png')
-      write.csv(pp_df_full(), 'products_plots_data.csv')
-      ggsave('products_value.png', pp_value_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(pp_df_full()))) {
+        write.csv(pp_df_full(), 'products_plots_data.csv')
+      }
+      if (!is.character(try(pp_value_plot()))) {
+        ggsave('products_value.png', pp_value_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2718,11 +2776,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_volume.png')
-      write.csv(pp_df_full(), 'products_plots_data.csv')
-      ggsave('products_volume.png', pp_volume_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(pp_df_full()))) {
+        write.csv(pp_df_full(), 'products_plots_data.csv')
+      }
+      if (!is.character(try(pp_volume_plot()))) {
+        ggsave('products_volume.png', pp_volume_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
@@ -2741,11 +2803,15 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('products_plots_data.csv', 'products_price.png')
-      write.csv(pp_df_full(), 'products_plots_data.csv')
-      ggsave('products_price.png', pp_price_plot(),
-             width = 10,
-             height = 8,
-             device = 'png')
+      if (!is.character(try(pp_df_full()))) {
+        write.csv(pp_df_full(), 'products_plots_data.csv')
+      }
+      if (!is.character(try(pp_price_plot()))) {
+        ggsave('products_price.png', pp_price_plot(),
+               width = 10,
+               height = 8,
+               device = 'png')
+      }
       
       zip(zipfile = fname, files = fs)
     },
