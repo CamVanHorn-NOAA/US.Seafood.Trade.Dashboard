@@ -2605,9 +2605,16 @@ server <- function(input, output, session) {
       setwd(tempdir())
       
       fs <- c('export_MLTI_table.csv', 'import_MLTI_table.csv', 
-              'supply_plots_data.csv', 'HI_plot.png', 'supply_plot.png', 
+              'supply_plots_data.csv', 'export_mlti_plot.png', 
+              'import_mlti_plot.png', 'HI_plot.png', 'supply_plot.png', 
               'supply_production_ratio.png', 
               'unexported_production_supply_rate.png')
+      if (!is.character(try(exp_mlti_table_df()))) {
+        write.csv(exp_mlti_table_df(), 'export_MLTI_table.csv')
+      }
+      if (!is.character(try(imp_mlti_table_df()))) {
+        write.csv(imp_mlti_table_df(), 'import_MLTI_table.csv')
+      }
       if (!is.character(try(supply_df()))) {
         write.csv(supply_df(), 'supply_plots_data.csv')
       }
