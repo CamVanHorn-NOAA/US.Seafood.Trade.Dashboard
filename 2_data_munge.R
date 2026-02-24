@@ -38,7 +38,7 @@ drive_auth()
 # 
 # # Load the data
 # load(data_file$NAME)
-load('seafood_trade_data_pull_01_15_26.RData')
+load('seafood_trade_data_pull_02_24_26.RData')
 # clean environment
 # rm(data_file)
 
@@ -965,7 +965,8 @@ file_name <- paste0('seafood_trade_data_munge_',
 
 # create the file
 # NOTE: add new data to this list upon creation in this script
-save(list = c('trade_data', 'pp_data', 'com_landings'),
+save(list = c('trade_data', 'pp_data', 'com_landings', 'trade_date',
+              'landings_date', 'products_date'),
      file = file_name)
 
 # upload to google drive
