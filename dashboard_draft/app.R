@@ -1880,6 +1880,11 @@ tooltip_color_icon <- function(color) {
          color, ";'>")
 }
 
+# replace null values
+replace_null <- function(input) {
+  ifelse(is.null(input), 'NA', input)
+}
+
 # Colors -----------------------------------------------------------------------
 # Balance plot colors
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
