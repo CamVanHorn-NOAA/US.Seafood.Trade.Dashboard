@@ -278,6 +278,16 @@ great_lakes_cities <- read.csv('gl_border_state_cities.csv')
 conversion_factors <- read.csv('conversion_factors/conversion_factors.csv') %>%
   select(HTS_NUMBER, CF)
 
+# Metadata (time of data access) -----------------------------------------------
+trade_date <- 
+  format(file.info('C:/Users/cameron.vanhorn/Documents/GitHub/US.Seafood.Trade.Dashboard/foss_exports_15-25.csv')$ctime,
+         '%m/%d/%Y')
+landings_date <- 
+  format(file.info('C:/Users/cameron.vanhorn/Documents/GitHub/US.Seafood.Trade.Dashboard/foss_com_landings_15-24.csv')$ctime,
+         '%m/%d/%Y')
+products_date <- 
+  format(file.info('C:/Users/cameron.vanhorn/Documents/GitHub/US.Seafood.Trade.Dashboard/pp_processed.csv')$ctime,
+         '%m/%d/%Y')
 
 #####################
 ### SAVE THE DATA ###
@@ -293,7 +303,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
               'species_ref', 'foss_com_landings', 'florida_coast_map',
               'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map',
-              'conversion_factors'),
+              'conversion_factors', 'trade_date', 'landings_date',
+              'products_date'),
      file = file_name)
 
 # upload to google drive
