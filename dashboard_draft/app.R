@@ -2452,7 +2452,14 @@ server <- function(input, output, session) {
       showModal(modalDialog('Downloading data...', footer = NULL))
       on.exit(removeModal())
       
-      write.csv(trade_data, con)
+      metadata <- data.frame(date(), time(), trade_date)
+      colnames(metadata) <- c('Date Accessed', 'Time Accessed', 
+                              'Date of Original Data Pull')
+      metadata <- pivot_longer(metadata, cols = colnames(metadata))
+      colnames(metadata) <- c('', '')
+      
+      final_sheet <- list('Data' = trade_data, 'Metadata' = metadata)
+      write.xlsx(final_sheet, con)
     }
   )
   
@@ -2464,7 +2471,14 @@ server <- function(input, output, session) {
       Sys.sleep(1)
       on.exit(removeModal())
       
-      write.csv(com_landings, con)
+      metadata <- data.frame(date(), time(), landings_date)
+      colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                              'Date of Original Data Pull')
+      metadata <- pivot_longer(metadata, cols = colnames(metadata))
+      colnames(metadata) <- c('', '')
+      
+      final_sheet <- list('Data' = com_landings, 'Metadata' = metadata)
+      write.xlsx(final_sheet, con)
     }
   )
   
@@ -2480,7 +2494,14 @@ server <- function(input, output, session) {
       Sys.sleep(1)
       on.exit(removeModal())
       
-      write.csv(pp_data, con)
+      metadata <- data.frame(date(), time(), products_date)
+      colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                              'Date of Original Data Pull')
+      metadata <- pivot_longer(metadata, cols = colnames(metadata))
+      colnames(metadata) <- c('', '')
+      
+      final_sheet <- list('Data' = pp_data, 'Metadata' = metadata)
+      write.xlsx(final_sheet, con)
     }
   )
   
@@ -2521,10 +2542,42 @@ server <- function(input, output, session) {
                device = 'png')
       }
       if (!is.character(try(trade_df_full()))) {
-        write.csv(trade_df_full(), 'trade_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = trade_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'trade_plots_data.xlsx')
       }
       if (!is.character(try(top5_trade_df_full()))) {
-        write.csv(top5_trade_df_full(), 'top5_trade_plot_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = top5_trade_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'top5_trade_plot_data.xlsx')
       }
       
       # we are saving multiple files so they must be in a zip file
@@ -2561,7 +2614,23 @@ server <- function(input, output, session) {
                device = 'png')
       }
       if (!is.character(try(trade_df_full()))) {
-        write.csv(trade_df_full(), 'trade_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = trade_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'trade_plots_data.xlsx')
       }
       
       zip(zipfile = fname, files = fs)
@@ -2595,7 +2664,23 @@ server <- function(input, output, session) {
                device = 'png')
       }
       if (!is.character(try(trade_df_full()))) {
-        write.csv(trade_df_full(), 'trade_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = trade_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'trade_plots_data.xlsx')
       }
       
       zip(zipfile = fname, files = fs)
@@ -2620,13 +2705,61 @@ server <- function(input, output, session) {
               'supply_production_ratio.png', 
               'unexported_production_supply_rate.png')
       if (!is.character(try(exp_mlti_table_df()))) {
-        write.csv(exp_mlti_table_df(), 'export_MLTI_table.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = exp_mlti_table_df(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'export_MLTI_table.xlsx')
       }
       if (!is.character(try(imp_mlti_table_df()))) {
-        write.csv(imp_mlti_table_df(), 'import_MLTI_table.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = imp_mlti_table_df(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'import_MLTI_table.xlsx')
       }
       if (!is.character(try(supply_df()))) {
-        write.csv(supply_df(), 'supply_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = supply_df(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'supply_plots_data.xlsx')
       }
       if (!is.character(try(exp_mlti_plot()))) {
         ggsave('export_mlti_plot.png', exp_mlti_plot(),
@@ -2686,7 +2819,23 @@ server <- function(input, output, session) {
       
       fs <- c('commercial_landings_plots_data.xlsx', 'landings_value.png')
       if (!is.character(try(landings_df_full()))) {
-        write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = landings_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'commercial_landings_plots_data.xlsx')
       }
       if (!is.character(try(landings_value_plot()))) {
         ggsave('landings_value.png', landings_value_plot(),
@@ -2713,7 +2862,23 @@ server <- function(input, output, session) {
       
       fs <- c('commercial_landings_plots_data.xlsx', 'landings_volume.png')
       if (!is.character(try(landings_df_full()))) {
-        write.csv(landings_df_full(), 'commercial_landings_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = landings_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'commercial_landings_plots_data.xlsx')
       }
       if (!is.character(try(landings_volume_plot()))) {
         ggsave('landings_volume.png', landings_volume_plot(),
@@ -2767,7 +2932,23 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_value.png')
       if (!is.character(try(pp_df_full()))) {
-        write.csv(pp_df_full(), 'products_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = pp_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'products_plots_data.xlsx')
       }
       if (!is.character(try(pp_value_plot()))) {
         ggsave('products_value.png', pp_value_plot(),
@@ -2794,7 +2975,23 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_volume.png')
       if (!is.character(try(pp_df_full()))) {
-        write.csv(pp_df_full(), 'products_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = pp_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'products_plots_data.xlsx')
       }
       if (!is.character(try(pp_volume_plot()))) {
         ggsave('products_volume.png', pp_volume_plot(),
@@ -2821,7 +3018,23 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_price.png')
       if (!is.character(try(pp_df_full()))) {
-        write.csv(pp_df_full(), 'products_plots_data.csv')
+        metadata <- data.frame(date(), time(), trade_date, 
+                               replace_null(input$ecol_cat),
+                               replace_null(input$species_cat), 
+                               replace_null(input$species_grp), 
+                               replace_null(input$species_name), 
+                               replace_null(input$region), 
+                               selected_units(), 
+                               as.character(input$inflation))
+        colnames(metadata) <- c('Date Accessed', 'Time Accessed',
+                                'Date of Original Data Pull', 'Ecological Category',
+                                'Species Category', 'Species Group', 'Species Name',
+                                'Region', 'Units', 'Inflation-Adjusted')
+        metadata <- pivot_longer(metadata, cols = colnames(metadata))
+        colnames(metadata) <- c('', '')
+        
+        final_sheet <- list('Data' = pp_df_full(), 'Metadata' = metadata)
+        write.xlsx(final_sheet, 'products_plots_data.xlsx')
       }
       if (!is.character(try(pp_price_plot()))) {
         ggsave('products_price.png', pp_price_plot(),
