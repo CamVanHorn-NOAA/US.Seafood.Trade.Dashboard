@@ -2401,6 +2401,10 @@ ui <- page_fluid(
   
 # Define server logic ----------------------------------------------------------
 server <- function(input, output, session) {
+  # Metadata info --------------------------------------------------------------
+  date <- reactive(format(Sys.Date(), '%m/%d/%Y'))
+  time <- reactive(format(Sys.time(), '%H:%M:%S'))
+  
   # Reset Button ---------------------------------------------------------------
   observeEvent(input$reset_button, {
     updateSelectizeInput(session, 'search_term', selected = '')
