@@ -1829,6 +1829,40 @@
         "Archs": "x64"
       }
     },
+    "openxlsx": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Type": "Package",
+        "Package": "openxlsx",
+        "Title": "Read, Write and Edit xlsx Files",
+        "Version": "4.2.8.1",
+        "Date": "2025-10-30",
+        "Authors@R": "\n    c(person(given = \"Philipp\",\n             family = \"Schauberger\",\n             role = \"aut\",\n             email = \"philipp@schauberger.co.at\"),\n      person(given = \"Alexander\",\n             family = \"Walker\",\n             role = \"aut\",\n             email = \"Alexander.Walker1989@gmail.com\"),\n      person(given = \"Luca\",\n             family = \"Braglia\",\n             role = \"ctb\"),\n      person(given = \"Joshua\",\n             family = \"Sturm\",\n             role = \"ctb\"),\n      person(given = \"Jan Marvin\",\n             family = \"Garbuszus\",\n             role = c(\"ctb\", \"cre\"),\n             email = \"jan.garbuszus@ruhr-uni-bochum.de\"),\n      person(given = \"Jordan Mark\",\n             family = \"Barbone\",\n             role = \"ctb\",\n             email = \"jmbarbone@gmail.com\",\n             comment = c(ORCID = \"0000-0001-9788-3628\")),\n      person(given = \"David\",\n             family = \"Zimmermann\",\n             role = \"ctb\",\n             email = \"david_j_zimmermann@hotmail.com\"),\n      person(given = \"Reinhold\",\n             family = \"Kainhofer\",\n             role = \"ctb\",\n             email = \"reinhold@kainhofer.com\"))",
+        "Description": "Simplifies the creation of Excel .xlsx files by providing a\n    high level interface to writing, styling and editing worksheets.\n    Through the use of 'Rcpp', read/write times are comparable to the\n    'xlsx' and 'XLConnect' packages with the added benefit of removing the\n    dependency on Java.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://ycphs.github.io/openxlsx/index.html,\nhttps://github.com/ycphs/openxlsx",
+        "BugReports": "https://github.com/ycphs/openxlsx/issues",
+        "Depends": "R (>= 3.3.0)",
+        "Imports": "grDevices, methods, Rcpp, stats, stringi, utils, zip",
+        "Suggests": "curl, formula.tools, knitr, rmarkdown, testthat",
+        "LinkingTo": "Rcpp",
+        "VignetteBuilder": "knitr",
+        "Encoding": "UTF-8",
+        "Language": "en-US",
+        "RoxygenNote": "7.3.3",
+        "Collate": "'CommentClass.R' 'HyperlinkClass.R' 'RcppExports.R'\n'class_definitions.R' 'StyleClass.R' 'WorkbookClass.R'\n'asserts.R' 'baseXML.R' 'borderFunctions.R' 'build_workbook.R'\n'chartsheet_class.R' 'conditional_formatting.R'\n'data-fontSizeLookupTables.R' 'helperFunctions.R'\n'loadWorkbook.R' 'onUnload.R' 'openXL.R' 'openxlsx-package.R'\n'openxlsx.R' 'openxlsxCoerce.R' 'readWorkbook.R'\n'setWindowSize.R' 'sheet_data_class.R' 'utils.R'\n'workbook_column_widths.R' 'workbook_read_workbook.R'\n'workbook_write_data.R' 'worksheet_class.R' 'wrappers.R'\n'writeData.R' 'writeDataTable.R' 'writexlsx.R' 'zzz.R'",
+        "LazyData": "true",
+        "NeedsCompilation": "yes",
+        "Packaged": "2025-10-30 20:28:52 UTC; janmarvingarbuszus",
+        "Author": "Philipp Schauberger [aut],\n  Alexander Walker [aut],\n  Luca Braglia [ctb],\n  Joshua Sturm [ctb],\n  Jan Marvin Garbuszus [ctb, cre],\n  Jordan Mark Barbone [ctb] (ORCID:\n    <https://orcid.org/0000-0001-9788-3628>),\n  David Zimmermann [ctb],\n  Reinhold Kainhofer [ctb]",
+        "Maintainer": "Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-10-31 06:10:51 UTC",
+        "Built": "R 4.5.2; x86_64-w64-mingw32; 2026-02-18 02:26:17 UTC; windows",
+        "Archs": "x64"
+      }
+    },
     "pillar": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -3208,11 +3242,39 @@
         "Built": "R 4.5.0; x86_64-w64-mingw32; 2025-06-18 00:26:50 UTC; windows",
         "Archs": "x64"
       }
+    },
+    "zip": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "zip",
+        "Title": "Cross-Platform 'zip' Compression",
+        "Version": "2.3.3",
+        "Authors@R": "c(\n    person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")),\n    person(\"Kuba\", \"Podgórski\", role = \"ctb\"),\n    person(\"Rich\", \"Geldreich\", role = \"ctb\"),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"),\n           comment = c(ROR = \"03wc8by49\"))\n  )",
+        "Description": "Cross-Platform 'zip' Compression Library. A replacement for\n    the 'zip' function, that does not require any additional external\n    tools on any platform.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/r-lib/zip, https://r-lib.github.io/zip/",
+        "BugReports": "https://github.com/r-lib/zip/issues",
+        "Suggests": "covr, pillar, processx, R6, testthat, withr",
+        "Config/Needs/website": "tidyverse/tidytemplate",
+        "Config/testthat/edition": "3",
+        "Config/usethis/last-upkeep": "2025-05-07",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.3.2.9000",
+        "NeedsCompilation": "yes",
+        "Packaged": "2025-05-13 13:31:44 UTC; gaborcsardi",
+        "Author": "Gábor Csárdi [aut, cre],\n  Kuba Podgórski [ctb],\n  Rich Geldreich [ctb],\n  Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)",
+        "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-05-13 14:10:02 UTC",
+        "Built": "R 4.5.1; x86_64-w64-mingw32; 2025-10-06 00:49:58 UTC; windows",
+        "Archs": "x64"
+      }
     }
   },
   "files": {
     "app.R": {
-      "checksum": "dfb5baf056943f988ddabc2ccdde52a2"
+      "checksum": "d4e42956ce1344f8d6815ea844457ee3"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -3371,10 +3433,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_data_sourcing.html": {
-      "checksum": "8c1e8fb27b06e9d5664966e099d00e17"
+      "checksum": "dd8377ad6e4a0482e4bc362d1695adfd"
     },
     "dashboard_data_sourcing.qmd": {
-      "checksum": "7f4627030bfa4df0ed5a7d8c3bd08bd5"
+      "checksum": "a6bdd9ca1f8c5df53781905b4675f7ff"
     },
     "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3410,10 +3472,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_intro.html": {
-      "checksum": "b1c90219d74dee907cae3cd1f12cc3f7"
+      "checksum": "46973de002752bb85d15243dedf6c002"
     },
     "dashboard_intro.qmd": {
-      "checksum": "e37894d10838ede97993ceca16077b71"
+      "checksum": "ee13a53502c05cd11c94d8bee098f0df"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3488,10 +3550,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_resources.html": {
-      "checksum": "9d564a476d12cc01629d2e7a39866bbe"
+      "checksum": "372e35dd3000ed39d6428cc626a31acb"
     },
     "dashboard_resources.qmd": {
-      "checksum": "74069de5f5430a6dbd0dfe2bf2224a67"
+      "checksum": "87f8380a14d5a8c2718b42b540ebf4eb"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3616,14 +3678,11 @@
     "nmfs_cols.R": {
       "checksum": "3319cae28b424f32a1d67037f1aa005d"
     },
-    "seafood_trade_data_munge_01_15_26.RData": {
-      "checksum": "7a677163f0c685e87310111ad49567dd"
+    "seafood_trade_data_munge_02_24_26.RData": {
+      "checksum": "64b3a409d9dda4fbb255dbb2f5059083"
     },
     "seafood_trade_data_munge_03_13_25.RData": {
       "checksum": "6abeddd0fa58556c8626fa3ddf8a6196"
-    },
-    "seafood_trade_data_munge_05_12_25.RData": {
-      "checksum": "73842bcedc6a79e04a73a790ac0d142b"
     },
     "seafood_trade_data_munge_09_08_25.RData": {
       "checksum": "8bcece2d3da78231e6be3d76c5cacd69"
@@ -3737,7 +3796,7 @@
       "checksum": "85c9c267bb0a027a963eb47238eee4c8"
     },
     "www/style.css": {
-      "checksum": "5ec15247c20100be4ff8a9a7b2c68dd9"
+      "checksum": "e0d9de3c97943213e6b62e049afaf772"
     }
   },
   "users": null
