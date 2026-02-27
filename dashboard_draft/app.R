@@ -2819,7 +2819,7 @@ server <- function(input, output, session) {
       
       fs <- c('commercial_landings_plots_data.xlsx', 'landings_value.png')
       if (!is.character(try(landings_df_full()))) {
-        metadata <- data.frame(date(), time(), trade_date, 
+        metadata <- data.frame(date(), time(), landings_date, 
                                replace_null(input$ecol_cat),
                                replace_null(input$species_cat), 
                                replace_null(input$species_grp), 
@@ -2862,7 +2862,7 @@ server <- function(input, output, session) {
       
       fs <- c('commercial_landings_plots_data.xlsx', 'landings_volume.png')
       if (!is.character(try(landings_df_full()))) {
-        metadata <- data.frame(date(), time(), trade_date, 
+        metadata <- data.frame(date(), time(), landings_date, 
                                replace_null(input$ecol_cat),
                                replace_null(input$species_cat), 
                                replace_null(input$species_grp), 
@@ -2932,7 +2932,7 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_value.png')
       if (!is.character(try(pp_df_full()))) {
-        metadata <- data.frame(date(), time(), trade_date, 
+        metadata <- data.frame(date(), time(), products_date, 
                                replace_null(input$ecol_cat),
                                replace_null(input$species_cat), 
                                replace_null(input$species_grp), 
@@ -2975,7 +2975,7 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_volume.png')
       if (!is.character(try(pp_df_full()))) {
-        metadata <- data.frame(date(), time(), trade_date, 
+        metadata <- data.frame(date(), time(), products_date, 
                                replace_null(input$ecol_cat),
                                replace_null(input$species_cat), 
                                replace_null(input$species_grp), 
@@ -3018,7 +3018,7 @@ server <- function(input, output, session) {
       
       fs <- c('products_plots_data.xlsx', 'products_price.png')
       if (!is.character(try(pp_df_full()))) {
-        metadata <- data.frame(date(), time(), trade_date, 
+        metadata <- data.frame(date(), time(), products_date, 
                                replace_null(input$ecol_cat),
                                replace_null(input$species_cat), 
                                replace_null(input$species_grp), 
