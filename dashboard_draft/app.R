@@ -3257,8 +3257,22 @@ server <- function(input, output, session) {
                    options = list(
                      placeholder = ifelse(length(ordered_regions != 0), 
                                                  'Type here...',
-                                                 'No Available Regions')
-                   ))
+                                                 'No Available Regions')),
+                   multiple = T)
+  })
+  
+  output$region_text <- renderText(region_selection())
+  
+  region_selection <- reactive({
+    if (is.null(input$region)) {
+      return('NONE')
+    }
+    
+    if (length(input$region) == 9) {
+      return('ALL')
+    }
+    
+    return(input$region)
   })
   
   # creates checkbox to unfilter trade up one level
