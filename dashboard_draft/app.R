@@ -245,12 +245,19 @@ filter_region <- function(data, region) {
   # This filter is used in all summary functions to filter for selected regions
   # Data is any data frame with a field specifying the data's region of origin
   # Region is a character vector meant to match how region is specified in data
-  if (region == '' | is.null(region)) {
+  if ('NONE' %in% region) {
     return(data)
   }
   
+  if ('ALL' %in% region) {
+    new_data <- data %>%
+      filter(!is.na(REGION))
+    
+    return(new_data)
+  }
+  
   new_data <- data %>%
-    filter(REGION == region)
+    filter(REGION %in% region)
   return(new_data)
 }
 
