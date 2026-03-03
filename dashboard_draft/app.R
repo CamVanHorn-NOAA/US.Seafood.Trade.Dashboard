@@ -1129,9 +1129,12 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     shortform <- 'EXP'
     longform <- 'Exports'
     color <- export_color
-    if (region == 'New England') {
+    
+    if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+      region_text <- ''
+    } else if (length(region) < 2 & 'New England' %in% region) {
       region_text <- paste0(' from ', region)
-    } else if (region != '') {
+    } else if (!is.null(region)) {
       region_text <- paste0(' from the ', region)
     } else {region_text <- ''}
   }
@@ -1140,9 +1143,12 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     shortform <- 'IMP'
     longform <- 'Imports'
     color <- import_color
-    if (region == 'New England') {
+    
+    if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+      region_text <- ''
+    } else if (length(region) < 2 & 'New England' %in% region) {
       region_text <- paste0(' to ', region)
-    } else if (region != '') {
+    } else if (!is.null(region)) {
       region_text <- paste0(' to the ', region)
     } else {region_text <- ''}
   }
@@ -1273,9 +1279,11 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     # plot of RATIO
     # RATIO is a line chart, so we need a column to group by
     data$GROUP <- 'group'
-    if (region == 'New England') {
+    if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+      region_text <- ''
+    } else if (length(region) < 2 & 'New England' %in% region) {
       region_text <- paste0(' traded in ', region)
-    } else if (region != '') {
+    } else if (!is.null(region)) {
       region_text <- paste0(' traded in the ', region)
     } else {region_text <- ''}
     
@@ -1302,9 +1310,11 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                                       face = 'bold'),
             axis.title = element_text(size = axis_title_size))
   } else {
-    if (region == 'New England') {
+    if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+      region_text <- ''
+    } else if (length(region) < 2 & 'New England' %in% region) {
       region_text <- paste0(' traded in ', region)
-    } else if (region != '') {
+    } else if (!is.null(region)) {
       region_text <- paste0(' traded in the ', region)
     } else {region_text <- ''}
     
@@ -1359,9 +1369,11 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
     ylab <- 'Millions (Real 2024 USD)'
   }
   
-  if (region == 'New England') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else if (length(region) < 2 & 'New England' %in% region) {
     region_text <- paste0(' with ', region)
-  } else if (region != '') {
+  } else if (!is.null(region)) {
     region_text <- paste0(' with the ', region)
   } else {region_text <- ''}
   
@@ -1397,9 +1409,11 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
   
-  if (region != '') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else {
     region_text <- paste0(region, ' ')
-  } else {region_text <- ''}
+  } 
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
@@ -1538,9 +1552,11 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
   # coerce plot.format to uppercase to work within function
   plot.format <- toupper(plot.format)
   
-  if (region != '') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else {
     region_text <- paste0(region, ' ')
-  } else {region_text <- ''}
+  }
   
   # set labels for VALUE plot
   if (plot.format == 'VALUE') {
@@ -1665,12 +1681,14 @@ plot_mlti <- function(mlti_data, region, exports = F, imports = F, species) {
     stop('Please set "exports" or "imports" to "T"')
   }
   
-  if (region == 'New England') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else if (length(region) < 2 & 'New England' %in% region) {
     region_text <- paste0(ifelse(exports == T, ' from ', ' to '), region)
-  } else if (region != '') {
+  } else if (!is.null(region)) {
     region_text <- paste0(ifelse(exports == T, ' from the ', ' to the '),
                           region)
-  } else {region_text <- ''}
+  }
   
   # set label for plot based on exports logical
   label <- ifelse(exports == T, 'Export', 'Import')
@@ -1711,11 +1729,13 @@ plot_hi <- function(hi_data, region, species) {
   # this function generates a line plot that compares HI for exports and imports
   # hi_data is a data set formatted by calculate_hi
   
-  if (region == 'New England') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else if (length(region) < 2 & 'New England' %in% region) {
     region_text <- paste0('\ntraded in ', region)
-  } else if (region != '') {
+  } else if (!is.null(region)) {
     region_text <- paste0('\ntraded in the ', region)
-  } else {region_text <- ''}
+  } 
   
   # format the data by renaming columns for plot labels
   format_hi_data <- hi_data %>%
@@ -1765,11 +1785,14 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
     # SHARE outputs plots of Unexported domestic production relative to 
       # apparent supply
   
-  if (region == 'New England') {
+  if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
+    region_text <- ''
+  } else if (length(region) < 2 & 'New England' %in% region) {
     region_text <- paste0('\nin ', region)
-  } else if (region != '') {
-    region_text <- paste0('\nin the ', region)
-  } else {region_text <- ''}
+  } else if (!is.null(region)) {
+    region_text <- paste0('\nin the', region)
+  }
+  
   if (metric == 'SUPPLY') {
     # units are embedded in the calculation function
     # here, we only need to specify how the figure is labeled
