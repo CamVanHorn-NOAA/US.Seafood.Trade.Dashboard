@@ -112,7 +112,7 @@ sname_list <- unique(categorization_matrix %>%
 
 region_order <- levels(factor(levels = c(
   'North Pacific', 'Pacific', 'West Pacific', 'New England', 'Mid-Atlantic',
-  'South Atlantic', 'Gulf', 'Great Lakes'
+  'South Atlantic', 'Gulf', 'Great Lakes', 'No Region Assigned'
 )))
 
 tooltip_aes <- paste0(
