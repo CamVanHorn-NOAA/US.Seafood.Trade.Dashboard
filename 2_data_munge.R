@@ -52,13 +52,13 @@ neweng <- c('CT', 'CONNECTICUT', 'ME', 'MAINE', 'MA', 'MASSACHUSETTS', 'NH',
 midatl <- c('DE', 'DELAWARE', 'MD', 'MARYLAND', 'NJ', 'NEW JERSEY', 'NY',
             'NEW YORK', 'VA', 'VIRGINIA', 'PA', 'PENNSYLVANIA', 'DC')
 souatl <- c('GA', 'GEORGIA', 'NC', 'NORTH CAROLINA', 'SC', 'SOUTH CAROLINA',
-            'FL-E', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
+            'FL-E', 'FLORIDA-EAST', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
 gulf <- c('AL', 'ALABAMA', 'LA', 'LOUISIANA', 'MS', 'MISSISSIPPI', 'TX', 'TEXAS',
-          'FL-W')
+          'FL-W', 'FLORIDA-WEST')
 # We are adding a Great Lakes region that is city-based, not state-based like
-  # the FEUS. State exceptions include OH and MI, which are considered great
+  # the FEUS. State exceptions include OH, MI, MN and WI, which are considered great
   # lake states
-grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN')
+grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN', 'MINNESOTA', 'WISCONSIN')
 # great lakes cities are defined as cities within 75 miles of the nearest great
   # lake
 grlake_cities <- great_lakes_cities %>%
