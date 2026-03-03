@@ -3274,7 +3274,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "d4e42956ce1344f8d6815ea844457ee3"
+      "checksum": "74b70d674ba65747c487107848d7268f"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -3637,10 +3637,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "how-to-dashboard.html": {
-      "checksum": "1a9398b7f6398552cfdbf19f3ae8bcb0"
+      "checksum": "51677b1df615d0b3442ee3752c5dfb56"
     },
     "how-to-dashboard.qmd": {
-      "checksum": "7a7663e0e1d44a7b2dd2575ce8ae028c"
+      "checksum": "0b4b9e1e06e8211037edcaee560a41eb"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3678,8 +3678,8 @@
     "nmfs_cols.R": {
       "checksum": "3319cae28b424f32a1d67037f1aa005d"
     },
-    "seafood_trade_data_munge_02_24_26.RData": {
-      "checksum": "64b3a409d9dda4fbb255dbb2f5059083"
+    "seafood_trade_data_munge_03_03_26.RData": {
+      "checksum": "00862bca8764daa3d0a90d7ee799ff93"
     },
     "seafood_trade_data_munge_03_13_25.RData": {
       "checksum": "6abeddd0fa58556c8626fa3ddf8a6196"

@@ -52,13 +52,13 @@ neweng <- c('CT', 'CONNECTICUT', 'ME', 'MAINE', 'MA', 'MASSACHUSETTS', 'NH',
 midatl <- c('DE', 'DELAWARE', 'MD', 'MARYLAND', 'NJ', 'NEW JERSEY', 'NY',
             'NEW YORK', 'VA', 'VIRGINIA', 'PA', 'PENNSYLVANIA', 'DC')
 souatl <- c('GA', 'GEORGIA', 'NC', 'NORTH CAROLINA', 'SC', 'SOUTH CAROLINA',
-            'FL-E', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
+            'FL-E', 'FLORIDA-EAST', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
 gulf <- c('AL', 'ALABAMA', 'LA', 'LOUISIANA', 'MS', 'MISSISSIPPI', 'TX', 'TEXAS',
-          'FL-W')
+          'FL-W', 'FLORIDA-WEST')
 # We are adding a Great Lakes region that is city-based, not state-based like
-  # the FEUS. State exceptions include OH and MI, which are considered great
+  # the FEUS. State exceptions include OH, MI, MN and WI, which are considered great
   # lake states
-grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN')
+grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN', 'MINNESOTA', 'WISCONSIN')
 # great lakes cities are defined as cities within 75 miles of the nearest great
   # lake
 grlake_cities <- great_lakes_cities %>%
@@ -241,7 +241,8 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
          REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            US_CUSTOMS_DISTRICT %in% grlake_cities$PLANT_CITY,
-                         'Great Lakes', REGION)) 
+                         'Great Lakes', REGION),
+         REGION = ifelse(is.na(REGION), 'No Region Assigned', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
   # for every year from 2004 - 2024
@@ -280,6 +281,7 @@ products <- left_join(pp_processed, pp_map) %>%
          REGION = ifelse(STATE %in% grlake_cities$PLANT_STATE_ABRV &
                            CITY %in% grlake_cities$PLANT_CITY,
                          'Great Lakes', REGION),
+         REGION = ifelse(is.na(REGION), 'No Region Assigned', REGION),
          # NEW_PRODUCT_FORM will store updated product conditions so that
           # PRODUCT_FORM can retain prior, more specific data
          NEW_PRODUCT_FORM = PRODUCT_FORM,
@@ -512,12 +514,21 @@ overwritten_products <- products %>%
   overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
                        'SPECIES_GROUP'), region = 'Great Lakes') %>%
   overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
-                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes')
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes') %>%
+  # No Region Assigned
+  overwrite_prodform(region = 'No Region Assigned') %>%
+  overwrite_prodform('ECOLOGICAL_CATEGORY', region = 'No Region Assigned') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+                     region = 'No Region Assigned') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                       'SPECIES_GROUP'), region = 'No Region Assigned') %>%
+  overwrite_prodform(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                       'SPECIES_GROUP', 'SPECIES_NAME'), region = 'No Region Assigned')
 
 test <- overwritten_products %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) # 23.8%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) # 27.3%
 
 # store changed products in separate object
 changed_product_forms <- overwritten_products %>%
@@ -721,7 +732,8 @@ declassified_products <- declassify_species(overwritten_products) %>%
   declassify_species('New England') %>%
   declassify_species('Mid-Atlantic') %>%
   declassify_species('South Atlantic') %>%
-  declassify_species('Gulf')
+  declassify_species('Gulf') %>%
+  declassify_species('No Region Assigned')
 
 # store declassified species in separate object
 species_declassified_products <- declassified_products %>%
@@ -885,13 +897,22 @@ products_marked <- declassified_products %>%
                        'SPECIES_GROUP'), region = 'Great Lakes') %>%
   set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
                        'SPECIES_GROUP', 'SPECIES_NAME'), region = 'Great Lakes') %>%
+  # No Region Assigned
+  set_confids(region = 'No Region Assigned') %>%
+  set_confids('ECOLOGICAL_CATEGORY', region = 'No Region Assigned') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY'), 
+              region = 'No Region Assigned') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY', 
+                'SPECIES_GROUP'), region = 'No Region Assigned') %>%
+  set_confids(c('ECOLOGICAL_CATEGORY', 'SPECIES_CATEGORY',
+                'SPECIES_GROUP', 'SPECIES_NAME'), region = 'No Region Assigned') %>%
   # if there is no provided street address, then a product should not be confidential
   mutate(CONFIDENTIAL = ifelse(CITY == 'STATE OF ALASKA', NA, CONFIDENTIAL))
 
 test <- products_marked %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS)
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #2.17%
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
@@ -952,7 +973,8 @@ com_landings <- foss_com_landings %>%
          REGION = ifelse(STATE %in% midatl, 'Mid-Atlantic', REGION),
          REGION = ifelse(STATE %in% souatl, 'South Atlantic', REGION),
          REGION = ifelse(STATE %in% gulf, 'Gulf', REGION),
-         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION))
+         REGION = ifelse(STATE %in% grlake, 'Great Lakes', REGION),
+         REGION = ifelse(is.na(REGION), 'No Region Assigned', REGION))
 
 #####################
 ### SAVE THE DATA ###
