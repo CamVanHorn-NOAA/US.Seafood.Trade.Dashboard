@@ -10,3 +10,7 @@ The National Oceanic and Atmospheric Administration (NOAA) has surveyed and coll
 The NOAA Fisheries U.S. Seafood Dashboard summarizes the landing, processing, and trade of over 700 seafood species over the last twenty years. Users can investigate the value, volume and price of domestically traded, landed, and processed species and species groups of interest. The metrics visualized in this dashboard largely draw from [Fissel et al.'s study in 2023](https://spo.nmfs.noaa.gov/sites/default/files/pdf-content/mfr841-21_1.pdf) that explored characteristics of U.S. trade of seafood species with significant domestic commercial interest. We source our data from the same NOAA database sourced by the FOSS rather than from the FOSS directly due to heightened data resolution not currently available in the FOSS. While we continue to maintain the same data confidentiality standards outlined by the MSA, withheld data may cause underestimates.
 
 All data and code used to generate this dashboard is available on [Github](https://github.com/CamVanHorn-NOAA/US.Seafood.Trade.Dashboard).
+
+#### Citation
+
+NOAA Fisheries Office of Science and Technology. 2026. NOAA Fisheries Seafood Dashboard (avail. at <https://connect.fisheries.noaa.gov/seafooddashboard>). Accessed MM/DD/YYYY.
