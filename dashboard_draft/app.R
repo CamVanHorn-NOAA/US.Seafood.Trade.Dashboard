@@ -3425,7 +3425,7 @@ server <- function(input, output, session) {
         # Should the e_cat NOT exist in the trade data, filter_species will 
           # return an empty data frame, thus trade_terms will be empty, and
           # 'All Species' will be returned later in unfilter_species_trade()
-      result <- c(terms,
+      result <- c('All Species', terms,
                   trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
@@ -3453,7 +3453,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
@@ -3492,7 +3492,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   trade_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
@@ -3851,7 +3851,6 @@ server <- function(input, output, session) {
   # })
   
   # landings -------------------------------------------------------------------
-  
   landings_cat_mat <- reactive({
     com_landings %>%
       filter_region(region_selection()) %>%
@@ -3888,7 +3887,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms,
+      result <- c('All Species', terms,
                   landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
@@ -3909,7 +3908,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
@@ -3937,7 +3936,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   landings_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
@@ -4163,7 +4162,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms,
+      result <- c('All Species', terms,
                   products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     select(SPECIES_CATEGORY) %>%
@@ -4184,7 +4183,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
@@ -4212,7 +4211,7 @@ server <- function(input, output, session) {
         terms <- vector()
       }
       
-      result <- c(terms, 
+      result <- c('All Species', terms, 
                   products_cat_mat() %>%
                     filter_species(input$ecol_cat) %>%
                     filter_species(input$species_cat) %>%
