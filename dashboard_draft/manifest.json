@@ -3274,7 +3274,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "74b70d674ba65747c487107848d7268f"
+      "checksum": "d412b09cd1f77a5b2460cfc7b34457b4"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -3472,10 +3472,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_intro.html": {
-      "checksum": "46973de002752bb85d15243dedf6c002"
+      "checksum": "6beb27a40b2b88e726735fa787b200c5"
     },
     "dashboard_intro.qmd": {
-      "checksum": "ee13a53502c05cd11c94d8bee098f0df"
+      "checksum": "9690e5b6dfe5b7b4603ae382f3577dd0"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
@@ -3637,10 +3637,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "how-to-dashboard.html": {
-      "checksum": "51677b1df615d0b3442ee3752c5dfb56"
+      "checksum": "44425d1bd7f21525a41b380d456abd3f"
     },
     "how-to-dashboard.qmd": {
-      "checksum": "0b4b9e1e06e8211037edcaee560a41eb"
+      "checksum": "14521f893dbde087b8581a5c38f1c0ce"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap-icons.css": {
       "checksum": "3104c106b6c22560ae274d7c56f116c5"
