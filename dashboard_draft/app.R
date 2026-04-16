@@ -37,9 +37,12 @@ load('seafood_trade_data_munge_03_03_26.RData')
 com_landings <- com_landings %>%
   filter(CONFIDENTIALITY == 'Public')
 
-# filter out nonedibles in trade data
+# filter out nonedibles in trade and product data
 trade_data <- trade_data %>%
   filter(GROUP_TS != 'NONEDIBLE')
+
+pp_data <- pp_data %>%
+  filter(PRODUCT_FORM != 'NOT FOR HUMAN CONSUMPTION')
 
 # create matrix of all categorization terms available in the data
 categorization_matrix <- bind_rows(trade_data, 
