@@ -3669,7 +3669,7 @@ server <- function(input, output, session) {
     summarize_trade_yr_spp(
       trade_filtered(),
       species_selection_trade(),
-      region = 'NONE',
+      region = region_selection(),
       'FULL')
     })
   
@@ -4067,7 +4067,7 @@ server <- function(input, output, session) {
     summarize_landings_yr_spp(
       landings_filtered(),
       species_selection_landings(),
-      region = 'NONE',
+      region = region_selection(),
       full_data = T)
     })
   
@@ -4343,7 +4343,7 @@ server <- function(input, output, session) {
     summarize_pp_yr_spp(
       products_filtered(),
       species_selection_products(),
-      region = 'NONE',
+      region = region_selection(),
       full_data = T,
       units = selected_units(),
       nominal = selected_value())
