@@ -340,14 +340,6 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
              EXP_PRICE_NOMINAL_PER_LB = EXP_VALUE_USD / EXP_VOLUME_LB,
              IMP_PRICE_NOMINAL_PER_KG = IMP_VALUE_USD / IMP_VOLUME_KG,
              IMP_PRICE_NOMINAL_PER_LB = IMP_VALUE_USD / IMP_VOLUME_LB,
-             EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-             IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-             EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-             IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-             EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-             IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-             EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-             IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
              EXP_VOLUME_MT = EXP_VOLUME_KG / 1000,
              IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
              EXP_ROUND_VOLUME_MT = EXP_CONVERTED_VOLUME / 1000,
@@ -396,32 +388,27 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
   }
   
   new_data <- new_data %>%
-    mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
-           EXP_VALUE_BILLIONS = EXP_VALUE / 1000000000,
-           IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
-           IMP_VALUE_BILLIONS = IMP_VALUE / 1000000000,
-           EXP_PRICE = EXP_VALUE / EXP_VOLUME,
+    mutate(EXP_PRICE = EXP_VALUE / EXP_VOLUME,
            IMP_PRICE = IMP_VALUE / IMP_VOLUME) 
   
   if (output.format == 'BALANCE') {
     balance_data <- new_data %>%
-      rename(EXPORTS = EXP_VALUE_MILLIONS,
-             IMPORTS = IMP_VALUE_MILLIONS) %>%
+      rename(EXPORTS = EXP_VALUE,
+             IMPORTS = IMP_VALUE) %>%
       select(YEAR, EXPORTS, IMPORTS) %>%
       mutate(TRADE_BALANCE = EXPORTS - IMPORTS) %>%
       pivot_longer(cols = c(EXPORTS, IMPORTS, TRADE_BALANCE)) %>%
       mutate(name = ifelse(name == 'TRADE_BALANCE', 'TRADE BALANCE', name),
              name = as.factor(str_to_title(name))) %>%
-      rename(VALUE_MILLIONS = value,
+      rename(VALUE = value,
              TRADE = name)
     
     return(balance_data)
   } else if (output.format %in% c('VALUE', 'VOLUME')) {
     trade_data <- new_data %>%
-      select(YEAR, EXP_VALUE, IMP_VALUE, EXP_VALUE_MILLIONS, IMP_VALUE_MILLIONS, 
-             EXP_PRICE, IMP_PRICE, EXP_VOLUME_T, IMP_VOLUME_T, EXP_VOLUME,
-             IMP_VOLUME, EXP_ROUND_VOLUME, IMP_ROUND_VOLUME, EXP_ROUND_VOLUME_T,
-             IMP_ROUND_VOLUME_T) %>%
+      select(YEAR, EXP_VALUE, IMP_VALUE, EXP_PRICE, IMP_PRICE, EXP_VOLUME_T, 
+             IMP_VOLUME_T, EXP_VOLUME, IMP_VOLUME, EXP_ROUND_VOLUME, 
+             IMP_ROUND_VOLUME, EXP_ROUND_VOLUME_T, IMP_ROUND_VOLUME_T) %>%
       mutate(RATIO = EXP_VOLUME_T / IMP_VOLUME_T)
     
     return(trade_data)
