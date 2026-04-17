@@ -1180,8 +1180,8 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       ylab2 <- 'Average Price (Real 2024 USD)' 
     }
     
-    max_exp <- max(data$EXP_VALUE_MILLIONS, na.rm = T)
-    max_imp <- max(data$IMP_VALUE_MILLIONS, na.rm = T)
+    max_exp <- max(data$EXP_VALUE, na.rm = T)
+    max_imp <- max(data$IMP_VALUE, na.rm = T)
     
     y_max <- ifelse(max_exp > max_imp, max_exp, max_imp)
     
@@ -1315,7 +1315,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR),
-                 y = VALUE_MILLIONS)) +
+                 y = VALUE)) +
       geom_bar(aes(fill = TRADE),
                stat = 'identity',
                position = 'dodge') +
