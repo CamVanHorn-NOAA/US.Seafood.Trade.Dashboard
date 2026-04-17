@@ -500,22 +500,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
       # calculate export and import values in millions/billions,
       # calculate export and import volumes in metric tons,
       # calculate net value and net volume by subtracting imports from exports
-      mutate(EXP_VALUE_2024USD_BILLIONS = EXP_VALUE_2024USD / 1000000000,
-             IMP_VALUE_2024USD_BILLIONS = IMP_VALUE_2024USD / 1000000000,
-             EXP_VALUE_BILLIONS = EXP_VALUE_USD / 1000000000,
-             IMP_VALUE_BILLIONS = IMP_VALUE_USD / 1000000000,
-             NET_VALUE_2024USD_BILLIONS = 
-               EXP_VALUE_2024USD_BILLIONS - IMP_VALUE_2024USD_BILLIONS,
-             NET_VALUE_NOMINAL_BILLIONS = 
-               EXP_VALUE_BILLIONS - IMP_VALUE_BILLIONS,
-             EXP_VALUE_2024USD_MILLIONS = EXP_VALUE_2024USD / 1000000,
-             IMP_VALUE_2024USD_MILLIONS = IMP_VALUE_2024USD / 1000000,
-             EXP_VALUE_MILLIONS = EXP_VALUE_USD / 1000000,
-             IMP_VALUE_MILLIONS = IMP_VALUE_USD / 1000000,
-             NET_VALUE_2024USD_MILLIONS =
-               EXP_VALUE_2024USD_MILLIONS - IMP_VALUE_2024USD_MILLIONS,
-             NET_VALUE_NOMINAL_MILLIONS = 
-               EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS,
+      mutate(NET_VALUE_2024USD = EXP_VALUE_2024USD - IMP_VALUE_2024USD,
+             NET_VALUE_NOMINAL = EXP_VALUE_USD - IMP_VALUE_USD,
              EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
              EXP_VOLUME_ST = EXP_VOLUME_LB / 2000,
@@ -547,9 +533,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
     
     final_data <- final_data %>%
       select(YEAR, COUNTRY_NAME, EXP_VALUE, IMP_VALUE) %>%
-      mutate(EXP_VALUE_MILLIONS = EXP_VALUE / 1000000,
-             IMP_VALUE_MILLIONS = IMP_VALUE / 1000000,
-             NET_VALUE_MILLIONS = EXP_VALUE_MILLIONS - IMP_VALUE_MILLIONS)
+      mutate(NET_VALUE = EXP_VALUE - IMP_VALUE)
     
     return(final_data)
   }
@@ -582,24 +566,16 @@ summarize_pp_yr_spp <- function(product_data, species, region, full_data = F,
     summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
              ST = POUNDS / 2000,
-             MILLIONS_2024USD = DOLLARS_2024 / 1000000,
-             BILLIONS_2024USD = DOLLARS_2024 / 1000000000,
              PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
              PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / POUNDS,
-             MILLIONS = DOLLARS / 1000000,
-             BILLIONS = DOLLARS / 1000000000,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              PP_PRICE_NOMINAL_PER_LB = DOLLARS / POUNDS) %>%
       rename(PP_VALUE_2024USD = DOLLARS_2024,
              PP_VOLUME_MT = MT,
              PP_VOLUME_LB = POUNDS,
              PP_VOLUME_ST = ST,
-             PP_VALUE_MILLIONS_2024USD = MILLIONS_2024USD,
-             PP_VALUE_BILLIONS_2024USD = BILLIONS_2024USD,
              PP_VOLUME_KG = KG,
-             PP_NOMINAL_VALUE = DOLLARS,
-             PP_VALUE_MILLIONS = MILLIONS,
-             PP_VALUE_BILLIONS = BILLIONS)
+             PP_NOMINAL_VALUE = DOLLARS)
     
     return(summarized_data)
   }
@@ -643,8 +619,7 @@ summarize_pp_yr_spp <- function(product_data, species, region, full_data = F,
     group_by(YEAR, PRODUCT_FORM) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
-    mutate(PP_VALUE_MILLIONS = PP_VALUE / 1000000,
-           PP_PRICE = PP_VALUE / PP_VOLUME,
+    mutate(PP_PRICE = PP_VALUE / PP_VOLUME,
            PRODUCT_FORM = factor(str_to_title(PRODUCT_FORM),
                                  levels = c(
                                    'Fillets', 'Surimi', 'Steaks', 'Meat',
@@ -702,22 +677,14 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
       mutate(MT = KG / 1000,
              LB = KG * 2.20462,
              ST = LB / 2000,
-             MILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000,
-             BILLIONS_DOLLARS_2024 = DOLLARS_2024 / 1000000000,
              COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
              COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
-             MILLIONS = DOLLARS / 1000000,
-             BILLIONS = DOLLARS / 1000000000,
              COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
       rename(COM_VOLUME_KG = KG,
              COM_VOLUME_MT = MT,
              COM_VOLUME_LB = LB,
-             COM_VOLUME_ST = ST,
-             COM_VALUE_MILLIONS_2024USD = MILLIONS_DOLLARS_2024,
-             COM_VALUE_BILLIONS_2024USD = BILLIONS_DOLLARS_2024,
-             COM_VALUE_MILLIONS = MILLIONS,
-             COM_VALUE_BILLIONS = BILLIONS) 
+             COM_VOLUME_ST = ST) 
     
     return(summarized_data)
   }
@@ -744,8 +711,7 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
   }
   
   summarized_data <- summarized_data %>%
-    mutate(COM_VALUE_MILLIONS = COM_VALUE / 1000000,
-           COM_PRICE = COM_VALUE / COM_VOLUME) 
+    mutate(COM_PRICE = COM_VALUE / COM_VOLUME) 
   
   return(summarized_data)
 }
