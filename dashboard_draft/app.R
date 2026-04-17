@@ -1155,7 +1155,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     y <- rlang::enquo(y)
     
     # label <- label_currency(suffix = 'B')
-    label <- label_currency(suffix = 'M')
+    label <- label_currency(scale_cut = cut_short_scale())
     
     y2 <- as.symbol(paste0(shortform, '_PRICE'))
     y2 <- rlang::enquo(y2)
@@ -1327,7 +1327,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       scale_fill_manual(values = balance_colors) +
       coord_axes_inside(labels_inside = T) +
       scale_x_discrete(limits = factor(2004:2024)) +
-      scale_y_continuous(labels = label_currency()) +
+      scale_y_continuous(labels = label_currency(scale_cut = cut_short_scale())) +
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
       theme(legend.position = 'top',
