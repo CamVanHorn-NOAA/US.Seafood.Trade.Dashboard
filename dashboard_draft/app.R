@@ -1324,9 +1324,9 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
   # volume is logical that specifies if the data is formatted for volume
   
   if (nominal == T) {
-    ylab <- 'Millions (Nominal USD)'
+    ylab <- 'Value (Nominal USD)'
   } else {
-    ylab <- 'Millions (Real 2024 USD)'
+    ylab <- 'Value (Real 2024 USD)'
   }
   
   if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
@@ -1339,7 +1339,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
   
   ggplot(data = data,
          aes(x = factor(gsub(' ', '\n', str_to_title(COUNTRY_NAME))),
-             y = NET_VALUE_MILLIONS, 
+             y = NET_VALUE, 
              fill = factor(YEAR))) +
     geom_col(position = 'dodge') +
     scale_fill_manual(values = top5_colors) +
@@ -1348,7 +1348,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
          fill = 'Year',
          title = paste0('Net Export Value of ', species, 
                         ' for the \nTop 5 Trading Partners', region_text)) +
-    scale_y_continuous(labels = label_currency(suffix = 'M')) +
+    scale_y_continuous(labels = label_currency(scale_cut = cut_short_scale())) +
     theme_bw() +
     geom_hline(yintercept = 0, 'black') +
     theme(axis.text = element_text(size = axis_value_size),
@@ -1377,16 +1377,16 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
   
   # set labels for VALUE plots
   if (plot.format == 'VALUE') {
-    y <- as.symbol('PP_VALUE_MILLIONS') 
+    y <- as.symbol('PP_VALUE') 
     y <- rlang::enquo(y)
     
     if (nominal == T) {
-      ylab <- 'Millions (Nominal USD)'
+      ylab <- 'Value (Nominal USD)'
     } else {
-      ylab <- 'Millions (2024 Real USD)'
+      ylab <- 'Value (2024 Real USD)'
     }
     
-    label <- label_currency(suffix = 'M')
+    label <- label_currency(scale_cut = cut_short_scale())
     tlab <- 'Production Value of '
   }
   
@@ -1529,14 +1529,14 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     }
     
     if (nominal == F) {
-      ylab <- 'Millions (Real 2024 USD)'
+      ylab <- 'Value (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)'
     } else {
-      ylab <- 'Millions (Nominal USD)'
+      ylab <- 'Value (Nominal USD)'
       ylab2 <- 'Average Price (Nominal USD)'
     }
     
-    label <- label_currency(suffix = 'M')
+    label <- label_currency(scale_cut = cut_short_scale())
     tlab <- 'Ex-Vessel Value of '
   }
   
@@ -1560,8 +1560,8 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     
     # calculate scale factor (see plot_trade for details)
     max_value <- data %>%
-      slice_max(COM_VALUE_MILLIONS, n = 1) %>%
-      select(COM_VALUE_MILLIONS) %>%
+      slice_max(COM_VALUE, n = 1) %>%
+      select(COM_VALUE) %>%
       pull()
     
     max_price <- data %>%
@@ -1574,7 +1574,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     plot <- 
       ggplot(data = data,
              aes(x = factor(YEAR))) +
-      geom_col(aes(y = COM_VALUE_MILLIONS),
+      geom_col(aes(y = COM_VALUE),
                fill = landings_colors[1]) +
       geom_line(aes(y = COM_PRICE * scale_factor,
                     group = GROUP),
