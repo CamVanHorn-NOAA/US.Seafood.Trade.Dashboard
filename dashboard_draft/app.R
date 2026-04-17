@@ -1151,7 +1151,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
   
   # set labels and y values for plots of VALUE
   if (plot_format == 'VALUE') {
-    y <- as.symbol(paste0(shortform, '_VALUE_MILLIONS'))
+    y <- as.symbol(paste0(shortform, '_VALUE'))
     y <- rlang::enquo(y)
     
     # label <- label_currency(suffix = 'B')
@@ -1173,10 +1173,10 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
     }
     
     if (nominal == T) {
-      ylab <- 'Millions (Nominal USD)'
+      ylab <- 'Value (USD)'
       ylab2 <- 'Average Price (Nominal USD)'
     } else {
-      ylab <- 'Millions (Real 2024 USD)'
+      ylab <- 'Value (Real 2024 USD)'
       ylab2 <- 'Average Price (Real 2024 USD)' 
     }
     
@@ -1321,7 +1321,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                position = 'dodge') +
       labs(x = '',
            # y = 'Billions (Real 2024 USD)',
-           y = 'Millions (Real 2024 USD)',
+           y = 'Value (Real 2024 USD)',
            fill = '',
            title = paste0('Value Balance of ', species, region_text)) +
       scale_fill_manual(values = balance_colors) +
