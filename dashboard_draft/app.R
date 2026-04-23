@@ -2515,7 +2515,7 @@ server <- function(input, output, session) {
               'trade_plots_data.xlsx', 'top5_trade_plot_data.xlsx')
       if (!is.character(try(balance_plot()))) {
         ggsave('balance_plot.png', balance_plot(),
-               width = 15,
+               width = 18,
                height = 8,
                device = 'png')
       }
