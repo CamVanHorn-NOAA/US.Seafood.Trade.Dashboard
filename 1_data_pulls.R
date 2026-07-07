@@ -15,6 +15,147 @@ if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("jsonlite"))   install.packages("jsonlite")
 if(!require("httr"))   install.packages("httr")
+######################
+### API CONNECTION ###
+######################
+# functions --------------------------------------------------------------------
+# interior functions for get_landings and get_trade
+landings_api <- function(year) {
+  # split up the url call into different objects
+  url <- 'https://apps-st.fisheries.noaa.gov/ods/foss/landings/'
+  # in the filter call, must start with ?q={} to establish query language
+  # any columns we wish to index by must be in quotations "" NOT ''
+  filter <- paste0('?q={"year":', year,',"collection":"Commercial"}')
+  
+  # get data from FOSS
+  res <- GET(paste0(url, filter),
+             # high limit so we don't lose data to a cutoff
+             query = list(limit = 100000))
+  
+  # our data is embedded in content of object, translate from JSON (default)
+  data <- fromJSON(rawToChar(res$content))
+  
+  # data stored in items field as a df
+  output <- data$items %>%
+    # get necessary columns
+    select(tsn, ts_afs_name, ts_scientific_name, state_name, year, pounds, dollars) %>%
+    # replace NAs with 0s for aggregation
+    replace(is.na(.), 0) %>%
+    # round pounds and dollars
+    mutate(pounds = round(pounds),
+           dollars = round(dollars)) %>%
+    group_by(tsn, ts_afs_name, ts_scientific_name, state_name, year) %>%
+    summarise(across(where(is.numeric), sum), .groups = 'drop') %>%
+    # coerce names 
+    rename(TSN = tsn,
+           NMFS_NAME = ts_afs_name,
+           SCIENTIFIC_NAME = ts_scientific_name,
+           STATE = state_name,
+           POUNDS = pounds,
+           DOLLARS = dollars,
+           YEAR = year) %>%
+    # fix error where POLLOCK, WALLEYE and SEA HARES have extra space in string
+    mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+                              'POLLOCK, WALLEYE',
+                              NMFS_NAME),
+           NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+                              'SEA HARES', 
+                              NMFS_NAME)) 
+  return(output)
+}
+trade_api <- function(year, type) {
+  # the data is too large to download in a single call, so need to pull on a 
+    # month to month basis
+  months <- c("01", "02", "03", "04", "05", "06", 
+              "07", "08", "09", "10", "11", "12")
+  
+  # create empty data frame for the loop
+  df <- data.frame()
+  # loop for months to download per month
+  for (i in months) {
+    # split up the url call into different objects
+    url <- 'https://apps-st.fisheries.noaa.gov/ods/foss/trade_data/'
+    # in the filter call, must start with ?q={} to establish query language
+    # any columns we wish to index by must be in quotations "" NOT ''
+    filter <- paste0('?q={"year":', year,',"source":"', 
+                     type, '","month":"', i, '"}')
+    
+    # get data from FOSS
+    res <- GET(paste0(url, filter),
+               # high limit so we don't lose data to a cutoff
+               query = list(limit = 100000))
+    
+    # our data is embedded in content of object, translate from JSON (default)
+    data <- fromJSON(rawToChar(res$content))
+    
+    df <- bind_rows(df, data$items)
+  }
+  
+  # data stored in items field as a df
+  output <- df %>%
+    # get necessary columns
+    select(year, month, hts_number, name, cntry_name, continent,
+           custom_district_name, kilos, val, source) %>%
+    # replace NAs with 0s for aggregation
+    replace(is.na(.), 0) %>%
+    # round kilos and dollars
+    mutate(kilos = round(kilos),
+           val = round(val)) %>%
+    group_by(year, month, hts_number, name, cntry_name, continent,
+             custom_district_name, source) %>%
+    summarise(across(where(is.numeric), sum), .groups = 'drop') %>%
+    # coerce names 
+    rename(YEAR = year,
+           MONTH = month,
+           HTS_NUMBER = hts_number, 
+           PRODUCT_NAME = name,
+           COUNTRY_NAME = cntry_name, 
+           CONTINENT = continent,
+           US_CUSTOMS_DISTRICT = custom_district_name,
+           SOURCE = source,
+           VOLUME_KG = kilos,
+           VALUE_USD = val) %>%
+    # clean data
+      # remove leading zeroes in HTS to match other data sources
+    mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
+                               str_sub(HTS_NUMBER, 2, -1),
+                               HTS_NUMBER),
+           # create a state column from customs district info
+           STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+                          nchar(US_CUSTOMS_DISTRICT)),
+           # for Low value shipments and other non-cities, set state as NA
+           STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+           # remove state from customs district string
+           US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+                                        substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
+  
+  return(output)
+}
+
+# functions to pull data
+get_landings <- function(years) {
+  
+  # set empty data frame
+  df <- data.frame()
+  for (i in years[1]:years[2]) {
+    data <- landings_api(i)
+    df <- bind_rows(df, data)
+  }
+  
+  return(df)
+}
+get_trade <- function(years, type) {
+  
+  # set empty data frame
+  df <- data.frame()
+  for (i in years[1]:years[2]) {
+    data <- trade_api(i, type)
+    df <- bind_rows(df, data)
+  }
+  
+  return(df)
+}
+
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
