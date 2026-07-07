@@ -316,7 +316,7 @@ drive_auth()
 
 # Above are FOSS processed products; below is direct from database
   # 'Direct' meaning downloaded initially from our database
-pp_address <- read.csv('pp_address.csv') %>%
+pp_address <- read.csv('pp_address_043026.csv') %>%
   mutate(STATE = STATE_ABRV,
          STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
                         ifelse(STATE == 'GU', 'GUAM',
@@ -342,7 +342,7 @@ pp_address <- read.csv('pp_address.csv') %>%
          PLANT_STATE_ABRV = ifelse(PLANT_CITY == 'IRVINGTON', 'AL', PLANT_STATE_ABRV))
 
 # Merge address data with pp_processed csv
-pp_processed <- read.csv('pp_processed.csv') %>%
+pp_processed <- read.csv('pp_processed_043026.csv') %>%
   filter(YEAR >= 2004) %>%
   left_join(pp_address %>%
               select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
