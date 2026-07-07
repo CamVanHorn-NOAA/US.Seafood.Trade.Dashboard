@@ -156,6 +156,15 @@ get_trade <- function(years, type) {
   return(df)
 }
 
+# data pulls -------------------------------------------------------------------
+# these pulls will take a few minutes each
+export_pull <- get_trade(years = c(2004, 2024), 
+                         type = 'EXP')
+
+import_pull <- get_trade(years = c(2004, 2024),
+                         type = 'IMP')
+
+landings_pull <- get_landings(years = c(2004, 2024))
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
