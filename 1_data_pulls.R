@@ -13,6 +13,8 @@
 # Load Packages ----------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse"))   install.packages("tidyverse")
+if(!require("jsonlite"))   install.packages("jsonlite")
+if(!require("httr"))   install.packages("httr")
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
