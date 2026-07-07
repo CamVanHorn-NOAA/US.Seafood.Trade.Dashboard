@@ -220,80 +220,80 @@ drive_auth()
 
 # Exports ----------------------------------------------------------------------
 # read csv's
-foss_exports_1525 <- read.csv('foss_exports_15-25.csv') %>%
-  # use setNames from 'stats' to assign first row values as column names
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
-  # remove first row
-  .[-1, ] %>%
-  # HTS_NUMBER, which is the key to attach species information, is not properly
-    # formatted as some keys have an incorrect leading '0'
-  # Remove the leading 0 from any keys containing one
-  # set ifelse such that if the first character in HTS_NUMBER == 0, it is
-    # removed from the string
-  mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
-                             str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER),
-         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
-                        nchar(US_CUSTOMS_DISTRICT)),
-         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
-         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
-                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
+# foss_exports <- read.csv('foss_exports.csv') %>%
+#   # use setNames from 'stats' to assign first row values as column names
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
+#   # remove first row
+#   .[-1, ] %>%
+#   # HTS_NUMBER, which is the key to attach species information, is not properly
+#     # formatted as some keys have an incorrect leading '0'
+#   # Remove the leading 0 from any keys containing one
+#   # set ifelse such that if the first character in HTS_NUMBER == 0, it is
+#     # removed from the string
+#   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
+#                              str_sub(HTS_NUMBER, 2, -1),
+#                              HTS_NUMBER),
+#          STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+#                         nchar(US_CUSTOMS_DISTRICT)),
+#          STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+#          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+#                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
-foss_exports_0414 <- read.csv('foss_exports_04-14 (2).csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
-  .[-1, ] %>%
-  mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
-                             str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER),
-         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
-                        nchar(US_CUSTOMS_DISTRICT)),
-         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
-         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
-                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
+# foss_exports_0414 <- read.csv('foss_exports_04-14 (2).csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
+#   .[-1, ] %>%
+#   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
+#                              str_sub(HTS_NUMBER, 2, -1),
+#                              HTS_NUMBER),
+#          STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+#                         nchar(US_CUSTOMS_DISTRICT)),
+#          STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+#          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+#                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
 
 # combine data (stack)
-foss_exports <- bind_rows(foss_exports_0414, foss_exports_1525)
+# foss_exports <- bind_rows(foss_exports_0414, foss_exports_1525)
 
 # Imports ----------------------------------------------------------------------
 # read csv's
-foss_imports_1525 <- read.csv('foss_imports_15-25.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
-  .[-1, ] %>%
-  mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
-                             str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER),
-         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
-                        nchar(US_CUSTOMS_DISTRICT)),
-         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
-         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
-                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
-
-foss_imports_0414 <- read.csv('foss_imports_04-14 (2).csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
-  rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
-  .[-1, ] %>%
-  mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
-                             str_sub(HTS_NUMBER, 2, -1),
-                             HTS_NUMBER),
-         STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
-                        nchar(US_CUSTOMS_DISTRICT)),
-         STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
-         US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
-                                      substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
-
-# combine data (stack)
-foss_imports <- bind_rows(foss_imports_0414, foss_imports_1525)
+# foss_imports_1425 <- read.csv('foss_imports_14-25.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
+#   .[-1, ] %>%
+#   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
+#                              str_sub(HTS_NUMBER, 2, -1),
+#                              HTS_NUMBER),
+#          STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+#                         nchar(US_CUSTOMS_DISTRICT)),
+#          STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+#          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+#                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
+# 
+# foss_imports_0413 <- read.csv('foss_imports_04-13.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub('(', '', .x, fixed = T))) %>%
+#   rename_with( ~ toupper(gsub(')', '', .x, fixed = T))) %>%
+#   .[-1, ] %>%
+#   mutate(HTS_NUMBER = ifelse(str_sub(HTS_NUMBER, 1, 1) == '0',
+#                              str_sub(HTS_NUMBER, 2, -1),
+#                              HTS_NUMBER),
+#          STATE = substr(US_CUSTOMS_DISTRICT, nchar(US_CUSTOMS_DISTRICT) - 1,
+#                         nchar(US_CUSTOMS_DISTRICT)),
+#          STATE = ifelse(STATE %in% c('NT', 'DS'), NA, STATE),
+#          US_CUSTOMS_DISTRICT = ifelse(is.na(STATE), US_CUSTOMS_DISTRICT,
+#                                       substr(US_CUSTOMS_DISTRICT, 0, nchar(US_CUSTOMS_DISTRICT) - 4)))
+# 
+# # combine data (stack)
+# foss_imports <- bind_rows(foss_imports_0413, foss_imports_1425)
 
 # Processed Products & Species Metadata ----------------------------------------
 # read csv's
@@ -352,31 +352,31 @@ pp_processed <- read.csv('pp_processed.csv') %>%
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
-foss_com_1524 <- read.csv('foss_com_landings_15-24.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ] %>%
-  # fix error where POLLOCK, WALLEYE and SEA HARES have extra space in string
-  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
-                            'POLLOCK, WALLEYE',
-                            NMFS_NAME),
-         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
-                            'SEA HARES', 
-                            NMFS_NAME))
+# foss_com_landings <- read.csv('foss_com_landings.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ] %>%
+#   # fix error where POLLOCK, WALLEYE and SEA HARES have extra space in string
+#   mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+#                             'POLLOCK, WALLEYE',
+#                             NMFS_NAME),
+#          NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+#                             'SEA HARES', 
+#                             NMFS_NAME))
 
-foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
-  setNames(.[1, ]) %>%
-  rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
-  .[-1, ] %>%
-  mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
-                            'POLLOCK, WALLEYE',
-                            NMFS_NAME),
-         NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
-                            'SEA HARES', 
-                            NMFS_NAME))
+# foss_com_0414 <- read.csv('foss_com_landings_04-14.csv') %>%
+#   setNames(.[1, ]) %>%
+#   rename_with( ~ toupper(gsub(' ', '_', .x, fixed = T))) %>%
+#   .[-1, ] %>%
+#   mutate(NMFS_NAME = ifelse(NMFS_NAME == 'POLLOCK, WALLEYE ', 
+#                             'POLLOCK, WALLEYE',
+#                             NMFS_NAME),
+#          NMFS_NAME = ifelse(NMFS_NAME == 'SEA HARES ',
+#                             'SEA HARES', 
+#                             NMFS_NAME))
 
 # combine data (stack)
-foss_com_landings <- bind_rows(foss_com_0414, foss_com_1524)
+# foss_com_landings <- bind_rows(foss_com_0414, foss_com_1524)
 
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
