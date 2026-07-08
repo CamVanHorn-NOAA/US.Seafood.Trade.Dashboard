@@ -431,12 +431,10 @@ conversion_factors <- read.csv('conversion_factors/conversion_factors.csv') %>%
   select(HTS_NUMBER, CF)
 
 # Metadata (time of data access) -----------------------------------------------
-trade_date <- 
-  format(file.info('foss_exports_15-25.csv')$ctime,
-         '%m/%d/%Y')
-landings_date <- 
-  format(file.info('foss_com_landings_15-24.csv')$ctime,
-         '%m/%d/%Y')
+trade_date <- date()
+
+landings_date <- date()
+
 products_date <- 
   format(file.info('pp_processed.csv')$ctime,
          '%m/%d/%Y')
