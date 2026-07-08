@@ -450,8 +450,8 @@ file_name <- paste0('seafood_trade_data_pull_',
 
 # create the file
   # NOTE: add new data to this list upon creation in this script
-save(list = c('foss_exports', 'foss_imports', 'pp_processed', 'def_index',
-              'species_ref', 'foss_com_landings', 'florida_coast_map',
+save(list = c('export_pull', 'import_pull', 'pp_processed', 'def_index',
+              'species_ref', 'landings_pull', 'florida_coast_map',
               'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map',
               'conversion_factors', 'trade_date', 'landings_date',
               'products_date'),
