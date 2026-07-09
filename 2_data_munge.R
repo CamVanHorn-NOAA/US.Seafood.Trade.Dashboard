@@ -893,7 +893,7 @@ products_marked <- declassified_products %>%
 test <- products_marked %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #2.17%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #2.13%
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
@@ -931,10 +931,9 @@ pp_data <- products_marked %>%
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
-com_landings <- foss_com_landings %>%
+com_landings <- landings_pull %>%
   mutate(YEAR = as.numeric(YEAR),
          POUNDS = as.numeric(gsub(',', '', POUNDS)),
-         METRIC_TONS = as.numeric(gsub(',', '', METRIC_TONS)),
          DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
   # connect groups from map
   left_join(landings_map %>%
@@ -943,6 +942,7 @@ com_landings <- foss_com_landings %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
          KG = POUNDS * 0.45359237,
+         METRIC_TONS = KG / 1000,
          DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
          DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
   select(-INDEX) %>%
