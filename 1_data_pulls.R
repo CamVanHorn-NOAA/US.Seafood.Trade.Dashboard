@@ -94,14 +94,14 @@ trade_api <- function(year, type) {
   # data stored in items field as a df
   output <- df %>%
     # get necessary columns
-    select(year, month, hts_number, name, cntry_name, continent,
+    select(year, month, hts_number, name, fus_group1, cntry_name, continent,
            custom_district_name, kilos, val, source) %>%
     # replace NAs with 0s for aggregation
     replace(is.na(.), 0) %>%
     # round kilos and dollars
     mutate(kilos = round(kilos),
            val = round(val)) %>%
-    group_by(year, month, hts_number, name, cntry_name, continent,
+    group_by(year, month, hts_number, name, fus_group1, cntry_name, continent,
              custom_district_name, source) %>%
     summarise(across(where(is.numeric), sum), .groups = 'drop') %>%
     # coerce names 
@@ -109,6 +109,7 @@ trade_api <- function(year, type) {
            MONTH = month,
            HTS_NUMBER = hts_number, 
            PRODUCT_NAME = name,
+           GROUP_TS = fus_group1,
            COUNTRY_NAME = cntry_name, 
            CONTINENT = continent,
            US_CUSTOMS_DISTRICT = custom_district_name,
