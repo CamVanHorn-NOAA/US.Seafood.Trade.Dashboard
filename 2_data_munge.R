@@ -38,7 +38,7 @@ drive_auth()
 # 
 # # Load the data
 # load(data_file$NAME)
-load('seafood_trade_data_pull_07_07_26.RData')
+load('seafood_trade_data_pull_07_09_26.RData')
 # clean environment
 # rm(data_file)
 
@@ -113,10 +113,10 @@ exports <- export_pull %>%
 # First piece: summarise # of product types exported by year, 
   # country name (exported to), customs district (exported from)
 exports_products_smry <- exports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
          PRODUCT_NAME, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
          ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(EXP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
@@ -124,10 +124,10 @@ exports_products_smry <- exports %>%
 # Second piece: summarise value and volume of exports by year, 
   # country name (exported to), customs district (exported from)
 exports_price_smry <- exports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
          VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, CONVERTED_VOLUME, 
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, 
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
@@ -162,19 +162,19 @@ imports <- import_pull %>%
 
 # Data summarizing
 imports_products_smry <- imports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
          PRODUCT_NAME, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, 
          ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(IMP_PRODUCT_DIVERSITY = n_distinct(PRODUCT_NAME),
             .groups = 'drop')
 
 imports_price_smry <- imports %>%
-  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
          VALUE_USD, VOLUME_KG, CONVERTED_VOLUME, IMP_VALUE_2024USD,
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
-  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE,
+  group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
