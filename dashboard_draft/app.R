@@ -7,6 +7,12 @@
   # all 'value' data are calculated in Real 2024 U.S. Dollars (USD) to account
   # for inflation (see 2_data_munge.R)
 
+#' *IMPORTANT*
+# run the following EVERY TIME a branch is about to merge back into main for
+  # GitHub
+# setwd("~/GitHub/US.Seafood.Trade.Dashboard/dashboard_draft")
+# rsconnect::writeManifest()
+
 # Packages Sources, and Data ---------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("shiny"))       install.packages("shiny")
