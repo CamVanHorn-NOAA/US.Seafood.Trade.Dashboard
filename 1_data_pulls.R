@@ -7,8 +7,8 @@
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
 
-
-
+#' *IMPORTANT* '#
+options(scipen = 999)
 
 # Load Packages ----------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
