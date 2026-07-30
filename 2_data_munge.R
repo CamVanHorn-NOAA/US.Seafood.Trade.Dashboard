@@ -12,7 +12,8 @@
 # Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
-
+# Data Validation --------------------------------------------------------------
+source('data_pull_check.R')
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
 drive_auth()
