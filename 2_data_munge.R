@@ -12,7 +12,8 @@
 # Packages ---------------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse")) install.packages("tidyverse")
-
+# Data Validation --------------------------------------------------------------
+source('data_pull_check.R')
 # Pull Data --------------------------------------------------------------------
 # Authorize link to google drive
 drive_auth()
@@ -62,6 +63,9 @@ grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN', 'MINNESOTA', 'WISCONSIN')
 # great lakes cities are defined as cities within 75 miles of the nearest great
   # lake
 grlake_cities <- great_lakes_cities %>%
+  filter(!is.na(MILES_TO_LAKE)) %>%
+  filter(MILES_TO_LAKE != '200 +') %>%
+  filter(MILES_TO_LAKE != '200+') %>%
   mutate(MILES_TO_LAKE = as.numeric(MILES_TO_LAKE)) %>%
   filter(MILES_TO_LAKE <= 75)
 

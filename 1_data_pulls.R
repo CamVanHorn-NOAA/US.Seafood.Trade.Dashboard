@@ -7,14 +7,15 @@
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
 
-
-
+#' *IMPORTANT* '#
+options(scipen = 999)
 
 # Load Packages ----------------------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
 if(!require("tidyverse"))   install.packages("tidyverse")
 if(!require("jsonlite"))   install.packages("jsonlite")
 if(!require("httr"))   install.packages("httr")
+
 ######################
 ### API CONNECTION ###
 ######################
@@ -403,12 +404,18 @@ species_ref <- read.csv('FTS_PRODUCTS.csv')
   # species category, which groups like generas by collections, such as all crabs
   # ecological category, which groups like categories by shared traits, such as
     # crustaceans, or small pelagic fish, etc.
-trade_map <- read.csv('trade_data_mapping_sheet.csv') %>%
+trade_map <- read.csv('ussd_trade_map.csv') %>%
   mutate(HTS_NUMBER = as.character(HTS_NUMBER))
 
 # this sheet was developed by the same effort described above
-landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
-  mutate(TSN = as.character(TSN))
+landings_map <- read.csv('ussd_landings_map.csv') %>%
+  mutate(TSN = as.character(TSN)) %>%
+  # NFMS_NAME is not needed; species with '**' in name will be mapped identically
+    # to species with matching NMFS_NAME that lacks the '**' (they must possess 
+    # the same TSN)
+  select(!NMFS_NAME) %>%
+  # get rid of duplicate TSNs
+  distinct()
 
 # this sheet was developed by the same effort described above
   # however, with a lack of available scientific names and specified common
@@ -417,9 +424,10 @@ landings_map <- read.csv('com_landings_mapping_sheet.csv') %>%
 
 # Above contains the mapping sheet for FOSS processed products
 # Below contains the mapping sheet for database processed products
-pp_form_map <- read.csv('pp_form_map.csv')
-pp_map <- read.csv('pp_db_map.csv') %>%
-  left_join(pp_form_map)
+# pp_form_map <- read.csv('pp_form_map.csv')
+# pp_map <- read.csv('pp_db_map.csv') %>%
+#   left_join(pp_form_map)
+pp_map <- read.csv('ussd_pp_map.csv')
 
 # map to assign coasts to florida cities
 florida_coast_map <- read.csv('florida_city_map.csv')
