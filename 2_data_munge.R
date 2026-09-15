@@ -39,35 +39,8 @@ drive_auth()
 # 
 # # Load the data
 # load(data_file$NAME)
-load('seafood_trade_data_pull_07_09_26.RData')
-# clean environment
-# rm(data_file)
-
-# Regional designations --------------------------------------------------------
-# FEUS 2022 source for regions: https://s3.amazonaws.com/media.fisheries.noaa.gov/2024-11/FEUS-2022-SPO248B.pdf
-norpac <- c('AK', 'ALASKA')
-pac <- c('CA', 'CALIFORNIA', 'OR', 'OREGON', 'WA', 'WASHINGTON')
-pacisl <- c('HI', 'HAWAII', 'AS', 'CM', 'MP', 'GU')
-neweng <- c('CT', 'CONNECTICUT', 'ME', 'MAINE', 'MA', 'MASSACHUSETTS', 'NH', 
-            'NEW HAMPSHIRE', 'RI', 'RHODE ISLAND')
-midatl <- c('DE', 'DELAWARE', 'MD', 'MARYLAND', 'NJ', 'NEW JERSEY', 'NY',
-            'NEW YORK', 'VA', 'VIRGINIA', 'PA', 'PENNSYLVANIA', 'DC')
-souatl <- c('GA', 'GEORGIA', 'NC', 'NORTH CAROLINA', 'SC', 'SOUTH CAROLINA',
-            'FL-E', 'FLORIDA-EAST', 'FLORIDA', 'PR', 'PUERTO RICO', 'VI', 'U.S. VIRGIN ISLANDS')
-gulf <- c('AL', 'ALABAMA', 'LA', 'LOUISIANA', 'MS', 'MISSISSIPPI', 'TX', 'TEXAS',
-          'FL-W', 'FLORIDA-WEST')
-# We are adding a Great Lakes region that is city-based, not state-based like
-  # the FEUS. State exceptions include OH, MI, MN and WI, which are considered great
-  # lake states
-grlake <- c('OH', 'OHIO', 'MI', 'MICHIGAN', 'MINNESOTA', 'WISCONSIN')
-# great lakes cities are defined as cities within 75 miles of the nearest great
-  # lake
-grlake_cities <- great_lakes_cities %>%
-  filter(!is.na(MILES_TO_LAKE)) %>%
-  filter(MILES_TO_LAKE != '200 +') %>%
-  filter(MILES_TO_LAKE != '200+') %>%
-  mutate(MILES_TO_LAKE = as.numeric(MILES_TO_LAKE)) %>%
-  filter(MILES_TO_LAKE <= 75)
+load('seafood_trade_data_pull_08_12_26.RData')
+source('region_definitions.R')
 
 ##########################
 ### DATA SUMMARIZATION ###
@@ -513,7 +486,7 @@ overwritten_products <- products %>%
 test <- overwritten_products %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) # 27.3%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) # 28.7%
 
 # store changed products in separate object
 changed_product_forms <- overwritten_products %>%
@@ -897,7 +870,7 @@ products_marked <- declassified_products %>%
 test <- products_marked %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #2.13%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #0.94%
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
@@ -941,7 +914,6 @@ com_landings <- landings_pull %>%
          DOLLARS = as.numeric(gsub(',', '', DOLLARS))) %>%
   # connect groups from map
   left_join(landings_map %>%
-              select(NMFS_NAME, TSN, SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
               distinct()) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(DOLLARS_2024 = DOLLARS * INDEX,
