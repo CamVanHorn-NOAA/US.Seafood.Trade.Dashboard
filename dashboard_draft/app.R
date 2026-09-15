@@ -8,7 +8,7 @@
   # for inflation (see 2_data_munge.R)
 
 #' *IMPORTANT*
-# run the following EVERY TIME a branch is about to merge back into main for
+# ALWAYS run the following BEFORE a branch is about to merge back into main for
   # GitHub
 # setwd("~/GitHub/US.Seafood.Trade.Dashboard/dashboard_draft")
 # rsconnect::writeManifest()
@@ -37,7 +37,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_07_30_26.RData')
+load('seafood_trade_data_munge_08_12_26.RData')
 
 # filter out confidential data (no data contained therein)
 # com_landings <- com_landings %>%
