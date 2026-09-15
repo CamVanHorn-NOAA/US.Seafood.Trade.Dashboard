@@ -3898,7 +3898,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "898b10a86d60e1f60e938f0e07a06ce9"
+      "checksum": "c6d09fda5ca16b4384146b2cd4686004"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -4310,6 +4310,9 @@
     },
     "seafood_trade_data_munge_07_30_26.RData": {
       "checksum": "70246063c53a2fffab9a478d3828645e"
+    },
+    "seafood_trade_data_munge_08_12_26.RData": {
+      "checksum": "456339832b6281db48c5e811b0df772e"
     },
     "seafood_trade_data_munge_09_08_25.RData": {
       "checksum": "8bcece2d3da78231e6be3d76c5cacd69"
