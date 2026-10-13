@@ -25,6 +25,36 @@ import_pull <- get_trade(years = c(2004, 2024),
 
 landings_pull <- get_landings(years = c(2004, 2024))
 
+#' *connect to the VPN first*
+jdbcDriver <- JDBC(driverClass = "oracle.jdbc.OracleDriver",
+                   classPath = "C:/Oracle-SQLPlus/ojdbc11.jar")
+
+# establish connection to the database
+db_connection <- 
+  dbConnect(jdbcDriver, 
+            "jdbc:oracle:thin:@//155.206.241.9:1522/st_prod_db_foss_pdb.stproddbsn.stprodvcn.oraclevcn.com",
+            # prompts user to enter their Oracle ID and Password for connection
+            rstudioapi::askForPassword('Enter your Oracle Username: '), 
+            rstudioapi::askForPassword('Enter your Oracle Password: '))
+
+# get pp address data
+pp_address <- dbGetQuery(db_connection, 
+                         "select * from PPS.PP_ADDRESS") %>%
+  mutate(PLANT_CITY = toupper(PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA', PLANT_CITY))
+
+# get processed product data
+pp_processed <- dbGetQuery(db_connection, 
+                           "select * from PPS.PP_PROCESSED WHERE YEAR > 2003") %>%
+  left_join(pp_address %>%
+              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
+              rename(STATE = PLANT_STATE_ABRV,
+                     CITY = PLANT_CITY)) %>%
+  mutate(YEAR = as.integer(YEAR),
+         PP_IDNUM = as.integer(PP_IDNUM),
+         PP_CODE = as.numeric(PP_CODE)) 
+
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
 ####################################
