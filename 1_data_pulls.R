@@ -334,9 +334,11 @@ trade_date <- date()
 
 landings_date <- date()
 
-products_date <- 
-  format(file.info('pp_processed_043026.csv')$ctime,
-         '%m/%d/%Y')
+products_date <- date()
+
+# products_date <- 
+#   format(file.info('pp_processed_043026.csv')$ctime,
+#          '%m/%d/%Y')
 
 #####################
 ### SAVE THE DATA ###
