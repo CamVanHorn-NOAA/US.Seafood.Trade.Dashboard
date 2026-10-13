@@ -12,6 +12,9 @@ options(scipen = 999)
 
 # Load Packages and Functions --------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
+if(!require('rJava')) install.packages('rJava')
+if(!require('RJDBC')) install.packages('RJDBC')
+if(!require('here'))  install.packages('here')
 
 source('api_pull_fxns.R')
 
