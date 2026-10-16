@@ -12,9 +12,6 @@ options(scipen = 999)
 
 # Load Packages and Functions --------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
-if(!require('rJava')) install.packages('rJava')
-if(!require('RJDBC')) install.packages('RJDBC')
-if(!require('here'))  install.packages('here')
 
 source('api_pull_fxns.R')
 
@@ -28,36 +25,6 @@ import_pull <- get_trade(years = c(2004, 2024),
 
 landings_pull <- get_landings(years = c(2004, 2024))
 
-#' *connect to the VPN first*
-jdbcDriver <- JDBC(driverClass = "oracle.jdbc.OracleDriver",
-                   classPath = "C:/Oracle-SQLPlus/ojdbc11.jar")
-
-# establish connection to the database
-db_connection <- 
-  dbConnect(jdbcDriver, 
-            "jdbc:oracle:thin:@//155.206.241.9:1522/st_prod_db_foss_pdb.stproddbsn.stprodvcn.oraclevcn.com",
-            # prompts user to enter their Oracle ID and Password for connection
-            rstudioapi::askForPassword('Enter your Oracle Username: '), 
-            rstudioapi::askForPassword('Enter your Oracle Password: '))
-
-# get pp address data
-pp_address <- dbGetQuery(db_connection, 
-                         "select * from PPS.PP_ADDRESS") %>%
-  mutate(PLANT_CITY = toupper(PLANT_CITY),
-         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND', PLANT_CITY),
-         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA', PLANT_CITY))
-
-# get processed product data
-pp_processed <- dbGetQuery(db_connection, 
-                           "select * from PPS.PP_PROCESSED WHERE YEAR > 2003") %>%
-  left_join(pp_address %>%
-              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
-              rename(STATE = PLANT_STATE_ABRV,
-                     CITY = PLANT_CITY)) %>%
-  mutate(YEAR = as.integer(YEAR),
-         PP_IDNUM = as.integer(PP_IDNUM),
-         PP_CODE = as.numeric(PP_CODE)) 
-
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
 ####################################
@@ -65,7 +32,7 @@ pp_processed <- dbGetQuery(db_connection,
   # directly to google drive for access to files.
 # We can run drive_auth() to obtain access credentials and link the R session to 
   # a google drive account
-# drive_auth()
+drive_auth()
 
 #############################################
 ### DOWNLOAD DATA FILES FROM GOOGLE DRIVE ###
@@ -208,38 +175,38 @@ pp_processed <- dbGetQuery(db_connection,
 
 # Above are FOSS processed products; below is direct from database
   # 'Direct' meaning downloaded initially from our database
-# pp_address <- read.csv('pp_address_043026.csv') %>%
-#   mutate(STATE = STATE_ABRV,
-#          STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
-#                         ifelse(STATE == 'GU', 'GUAM',
-#                                ifelse(STATE == 'PR', 'PUERTO RICO',
-#                                       ifelse(STATE == 'AS', 'AMERICAN SAMOA',
-#                                              STATE)))),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'BOZEMEN', 'BOZEMAN', PLANT_CITY),
-#          STATE = ifelse(PLANT_CITY == 'SAN FRANCISCO', 'CA', STATE),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'EAST QUOQUE', 'EAST QUOGUE', PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'EAST SEATAUKUT', 'EAST SETAUKET', PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'GLEN FALLS', 'GLENS FALLS', PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'Hodgkins', 'HODGKINS', PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA',
-#                              PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'FT LAUDERDALE', 'FORT LAUDERDALE',
-#                              PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'FT PIERCE', 'FORT PIERCE',
-#                              PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND',
-#                              PLANT_CITY),
-#          PLANT_CITY = ifelse(PLANT_CITY == 'Jacksonville', 'JACKSONVILLE',
-#                              PLANT_CITY),
-#          PLANT_STATE_ABRV = ifelse(PLANT_CITY == 'IRVINGTON', 'AL', PLANT_STATE_ABRV))
-# 
-# # Merge address data with pp_processed csv
-# pp_processed <- read.csv('pp_processed_043026.csv') %>%
-#   filter(YEAR >= 2004) %>%
-#   left_join(pp_address %>%
-#               select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
-#               rename(STATE = PLANT_STATE_ABRV,
-#                      CITY = PLANT_CITY))
+pp_address <- read.csv('pp_address_043026.csv') %>%
+  mutate(STATE = STATE_ABRV,
+         STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
+                        ifelse(STATE == 'GU', 'GUAM',
+                               ifelse(STATE == 'PR', 'PUERTO RICO',
+                                      ifelse(STATE == 'AS', 'AMERICAN SAMOA',
+                                             STATE)))),
+         PLANT_CITY = ifelse(PLANT_CITY == 'BOZEMEN', 'BOZEMAN', PLANT_CITY),
+         STATE = ifelse(PLANT_CITY == 'SAN FRANCISCO', 'CA', STATE),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST QUOQUE', 'EAST QUOGUE', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'EAST SEATAUKUT', 'EAST SETAUKET', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GLEN FALLS', 'GLENS FALLS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Hodgkins', 'HODGKINS', PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT LAUDERDALE', 'FORT LAUDERDALE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'FT PIERCE', 'FORT PIERCE',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND',
+                             PLANT_CITY),
+         PLANT_CITY = ifelse(PLANT_CITY == 'Jacksonville', 'JACKSONVILLE',
+                             PLANT_CITY),
+         PLANT_STATE_ABRV = ifelse(PLANT_CITY == 'IRVINGTON', 'AL', PLANT_STATE_ABRV))
+
+# Merge address data with pp_processed csv
+pp_processed <- read.csv('pp_processed_043026.csv') %>%
+  filter(YEAR >= 2004) %>%
+  left_join(pp_address %>%
+              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
+              rename(STATE = PLANT_STATE_ABRV,
+                     CITY = PLANT_CITY))
 
 
 # Commercial Landings ----------------------------------------------------------
@@ -334,11 +301,9 @@ trade_date <- date()
 
 landings_date <- date()
 
-products_date <- date()
-
-# products_date <- 
-#   format(file.info('pp_processed_043026.csv')$ctime,
-#          '%m/%d/%Y')
+products_date <- 
+  format(file.info('pp_processed_043026.csv')$ctime,
+         '%m/%d/%Y')
 
 #####################
 ### SAVE THE DATA ###
