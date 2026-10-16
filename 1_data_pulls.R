@@ -1,9 +1,9 @@
 # Script 1: Pull Data for Seafood Dashboard
 # Data sources include the fisheries one-stop shop (FOSS, 
-  # https://www.fisheries.noaa.gov/foss/f?p=215:2:742090237412:::::) and SQL
-  # databases. 
-  # TODO: link to SQL database for processed product download
-  # TODO: get new GDPDEF reference that can calculate real 2024 USD
+# https://www.fisheries.noaa.gov/foss/f?p=215:2:742090237412:::::) and SQL
+# databases. 
+# TODO: link to SQL database for processed product download
+# TODO: get new GDPDEF reference that can calculate real 2024 USD
 # Contact: Cameron Van Horn
 #          cameron.vanhorn@noaa.gov
 
@@ -12,9 +12,6 @@ options(scipen = 999)
 
 # Load Packages and Functions --------------------------------------------------
 if(!require("googledrive")) install.packages("googledrive")
-if(!require('rJava')) install.packages('rJava')
-if(!require('RJDBC')) install.packages('RJDBC')
-if(!require('here'))  install.packages('here')
 
 source('api_pull_fxns.R')
 
@@ -28,53 +25,27 @@ import_pull <- get_trade(years = c(2004, 2024),
 
 landings_pull <- get_landings(years = c(2004, 2024))
 
+
 #' *connect to the VPN first*
-jdbcDriver <- JDBC(driverClass = "oracle.jdbc.OracleDriver",
-                   classPath = "C:/Oracle-SQLPlus/ojdbc11.jar")
-
-# establish connection to the database
-db_connection <- 
-  dbConnect(jdbcDriver, 
-            "jdbc:oracle:thin:@//155.206.241.9:1522/st_prod_db_foss_pdb.stproddbsn.stprodvcn.oraclevcn.com",
-            # prompts user to enter their Oracle ID and Password for connection
-            rstudioapi::askForPassword('Enter your Oracle Username: '), 
-            rstudioapi::askForPassword('Enter your Oracle Password: '))
-
-# get pp address data
-pp_address <- dbGetQuery(db_connection, 
-                         "select * from PPS.PP_ADDRESS") %>%
-  mutate(PLANT_CITY = toupper(PLANT_CITY),
-         PLANT_CITY = ifelse(PLANT_CITY == 'GODDLAND', 'GOODLAND', PLANT_CITY),
-         PLANT_CITY = ifelse(PLANT_CITY == 'APALCHICOLA', 'APALACHICOLA', PLANT_CITY))
-
-# get processed product data
-pp_processed <- dbGetQuery(db_connection, 
-                           "select * from PPS.PP_PROCESSED WHERE YEAR > 2003") %>%
-  left_join(pp_address %>%
-              select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
-              rename(STATE = PLANT_STATE_ABRV,
-                     CITY = PLANT_CITY)) %>%
-  mutate(YEAR = as.integer(YEAR),
-         PP_IDNUM = as.integer(PP_IDNUM),
-         PP_CODE = as.numeric(PP_CODE)) 
+source('products_pull.R')
 
 ####################################
 ### CONNECT TO YOUR GOOGLE DRIVE ###
 ####################################
 # The googledrive package comes from tidyverse and enables R users to connect
-  # directly to google drive for access to files.
+# directly to google drive for access to files.
 # We can run drive_auth() to obtain access credentials and link the R session to 
-  # a google drive account
-# drive_auth()
+# a google drive account
+drive_auth()
 
 #############################################
 ### DOWNLOAD DATA FILES FROM GOOGLE DRIVE ###
 #############################################
 # IMPORTANT: ADD DOWNLOADS BELOW FOR FUTURE DATA PULLS
 # to download data from google drive, specify the file name
-  # it might be easier to use drive_find to see the name of the file
+# it might be easier to use drive_find to see the name of the file
 # FOSS Exports, split by ~10 years
-  # UNCOMMENT IF DATA IS UPDATED
+# UNCOMMENT IF DATA IS UPDATED
 # drive_download('foss_exports_15-25.csv',
 #                overwrite = T)
 # drive_download('foss_exports_04-14.csv',
@@ -207,7 +178,7 @@ pp_processed <- dbGetQuery(db_connection,
 #   select(!X)
 
 # Above are FOSS processed products; below is direct from database
-  # 'Direct' meaning downloaded initially from our database
+# 'Direct' meaning downloaded initially from our database
 # pp_address <- read.csv('pp_address_043026.csv') %>%
 #   mutate(STATE = STATE_ABRV,
 #          STATE = ifelse(STATE %in% c('CM', 'MP'), 'NORTHERN MARIANA IS.',
@@ -240,7 +211,7 @@ pp_processed <- dbGetQuery(db_connection,
 #               select(PP_IDNUM, PLANT_CITY, PLANT_STATE_ABRV, PLANT_STREET) %>%
 #               rename(STATE = PLANT_STATE_ABRV,
 #                      CITY = PLANT_CITY))
-
+# 
 
 # Commercial Landings ----------------------------------------------------------
 # read csv's
@@ -282,18 +253,18 @@ def_index <- read.csv('GDPDEF_2024_index.csv') %>%
 
 # Species Reference and Mapping Data -------------------------------------------
 # Imports and Exports in FOSS provide detailed descriptions of the products
-  # However, these descriptions are cumbersome strings that are difficult
-    # to parse for species names without a brute force method
+# However, these descriptions are cumbersome strings that are difficult
+# to parse for species names without a brute force method
 # Thankfully, FOSS includes HTS (Harmonized Tariff Schedule) numbers which,
-  # through the use of FTS reference tables
+# through the use of FTS reference tables
 # We will import the reference table here to munge into the tables later
 species_ref <- read.csv('FTS_PRODUCTS.csv')
 
 # this sheet was developed by hand to categorize species into three groups:
-  # species group, which groups like species by identifiers such as genera
-  # species category, which groups like generas by collections, such as all crabs
-  # ecological category, which groups like categories by shared traits, such as
-    # crustaceans, or small pelagic fish, etc.
+# species group, which groups like species by identifiers such as genera
+# species category, which groups like generas by collections, such as all crabs
+# ecological category, which groups like categories by shared traits, such as
+# crustaceans, or small pelagic fish, etc.
 trade_map <- read.csv('ussd_trade_map.csv') %>%
   mutate(HTS_NUMBER = as.character(HTS_NUMBER))
 
@@ -301,15 +272,15 @@ trade_map <- read.csv('ussd_trade_map.csv') %>%
 landings_map <- read.csv('ussd_landings_map.csv') %>%
   mutate(TSN = as.character(TSN)) %>%
   # NFMS_NAME is not needed; species with '**' in name will be mapped identically
-    # to species with matching NMFS_NAME that lacks the '**' (they must possess 
-    # the same TSN)
+  # to species with matching NMFS_NAME that lacks the '**' (they must possess 
+  # the same TSN)
   select(!NMFS_NAME) %>%
   # get rid of duplicate TSNs
   distinct()
 
 # this sheet was developed by the same effort described above
-  # however, with a lack of available scientific names and specified common
-  # names, this map contains more NAs and generic maps
+# however, with a lack of available scientific names and specified common
+# names, this map contains more NAs and generic maps
 # pp_map <- read.csv('pp_mapping_sheet.csv')
 
 # Above contains the mapping sheet for FOSS processed products
@@ -336,10 +307,6 @@ landings_date <- date()
 
 products_date <- date()
 
-# products_date <- 
-#   format(file.info('pp_processed_043026.csv')$ctime,
-#          '%m/%d/%Y')
-
 #####################
 ### SAVE THE DATA ###
 #####################
@@ -350,7 +317,7 @@ file_name <- paste0('seafood_trade_data_pull_',
                     '.RData')
 
 # create the file
-  # NOTE: add new data to this list upon creation in this script
+# NOTE: add new data to this list upon creation in this script
 save(list = c('export_pull', 'import_pull', 'pp_processed', 'def_index',
               'species_ref', 'landings_pull', 'florida_coast_map',
               'great_lakes_cities', 'trade_map', 'landings_map', 'pp_map',
@@ -361,7 +328,7 @@ save(list = c('export_pull', 'import_pull', 'pp_processed', 'def_index',
 # upload to google drive
 drive_upload(file_name,
              # IMPORTANT: change path below to match your personal Drive
-              # NOTE: no path results in save to Drive location specified
-              #       above
+             # NOTE: no path results in save to Drive location specified
+             #       above
              path = 'Seafood Trade Dashboard Project/Seafood Trade Data/',
              overwrite = T)
