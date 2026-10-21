@@ -1927,10 +1927,9 @@ ui <- page_fluid(
       
       # NOAA icon
       div(
-        style = 'flex-shrink: 0;',
-        img(src = 'NOAA_FISHERIES_logoH.png',
-            align = 'left',
-            style = 'max-width: 300px; max-height: 300px; width: auto; height: auto;'
+        img(id = 'noaa-icon',
+            src = 'NOAA_FISHERIES_logoH.png',
+            align = 'left'
         )
       ),
       
