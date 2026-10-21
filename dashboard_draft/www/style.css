@@ -4,11 +4,9 @@
 /* Banner subheader */
 p {
   font-family: "Arial Narrow", sans-serif; 
-  font-size: clamp(1.8rem, 1.6vw, 2.6rem); 
+  font-weight: normal;
+  font-size: clamp(1.65rem, 1.5cqw, 1.5cqw); 
   color: #05477D;
-  margin-top: -11px; 
-  margin-bottom: 0px; 
-  opacity: 0.9;
 }
 
 /* Banner header */
@@ -16,9 +14,8 @@ h1 {
   font-family: "Cambria", sans-serif;
   font-weight: bold;
   color: #05477D;
-  font-size: clamp(3.9rem, 5vw, 4.5rem); 
-  margin-bottom: 0px;
-  margin-top: -8px;
+  font-size: clamp(4rem, 4cqw, 4cqw); 
+  margin-bottom: -15px;
 }
 
 /* Species Selection */
@@ -106,7 +103,18 @@ h6 {
   min-width: 2000px;
 }
 
+#noaa-icon {
+  height: 100%;
+  z-index: 2;
+  position: absolute;
+}
 
+#banner-text {
+  z-index: 10;
+  align-content: center;
+  margin-top: 0vw;
+  margin-left: 23vw;
+}
 
 /* Sidebar */
 .bslib-sidebar-layout>.sidebar {

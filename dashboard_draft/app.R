@@ -1936,10 +1936,9 @@ ui <- page_fluid(
       
       # Text
       div(
-        style = 'flex: 1; text-align: left; margin-left: 100px;',
-        h1('Seafood Dashboard'),
-        
-        p('A Tool to Investigate 20 Years of U.S. Fisheries Data')
+        id = 'banner-text',
+        span(h1('Seafood Dashboard')),
+        span(p('A Tool to Investigate 20 Years of U.S. Fisheries Data'))
       ),
       
       # animal icons
