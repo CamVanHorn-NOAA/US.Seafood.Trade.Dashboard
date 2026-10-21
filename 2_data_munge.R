@@ -39,7 +39,7 @@ drive_auth()
 # 
 # # Load the data
 # load(data_file$NAME)
-load('seafood_trade_data_pull_08_12_26.RData')
+load('seafood_trade_data_pull_10_07_26.RData')
 source('region_definitions.R')
 
 ##########################
