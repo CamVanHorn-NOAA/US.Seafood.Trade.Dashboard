@@ -37,7 +37,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_08_12_26.RData')
+load('seafood_trade_data_munge_10_13_26.RData')
 
 # filter out confidential data (no data contained therein)
 # com_landings <- com_landings %>%
@@ -2395,7 +2395,6 @@ server <- function(input, output, session) {
   # Metadata info --------------------------------------------------------------
   date <- reactive(format(Sys.Date(), '%m/%d/%Y'))
   time <- reactive(format(Sys.time(), '%H:%M:%S'))
-  
   # Reset Button ---------------------------------------------------------------
   observeEvent(input$reset_button, {
     updateSelectizeInput(session, 'search_term', selected = '')
