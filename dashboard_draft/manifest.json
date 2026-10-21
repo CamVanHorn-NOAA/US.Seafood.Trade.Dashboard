@@ -3412,7 +3412,7 @@
         "Maintainer": "Hadley Wickham <hadley@rstudio.com>",
         "Repository": "CRAN",
         "Date/Publication": "2023-02-22 09:20:06 UTC",
-        "Built": "R 4.6.0; ; 2026-05-11 04:43:15 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-11 04:30:53 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "tidyverse",
         "RemoteRef": "tidyverse",
@@ -3898,7 +3898,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "c6d09fda5ca16b4384146b2cd4686004"
+      "checksum": "170c6f02aa1113546553e4e0bc02cee5"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -4308,9 +4308,6 @@
     "seafood_trade_data_munge_07_09_26.RData": {
       "checksum": "70246063c53a2fffab9a478d3828645e"
     },
-    "seafood_trade_data_munge_07_30_26.RData": {
-      "checksum": "70246063c53a2fffab9a478d3828645e"
-    },
     "seafood_trade_data_munge_08_12_26.RData": {
       "checksum": "456339832b6281db48c5e811b0df772e"
     },
@@ -4329,6 +4326,9 @@
     "seafood_trade_data_munge_10_08_25.RData": {
       "checksum": "c2fe1cacf504e2fb592d6acb411a5349"
     },
+    "seafood_trade_data_munge_10_13_26.RData": {
+      "checksum": "3ed8e121036200f7478ba78ca9760bd1"
+    },
     "seafood_trade_data_munge_10_14_25.RData": {
       "checksum": "93089ceec7a9abfd1ae9d92bdc25ca17"
     },
@@ -4343,6 +4343,9 @@
     },
     "seafood_trade_data_pull_09_12_25.RData": {
       "checksum": "717a5e52096cfd2e2525d8ccc2a3a43d"
+    },
+    "seafood_trade_data_pull_10_07_26.RData": {
+      "checksum": "01f62695daf75c2203bf828fef3d0de1"
     },
     "seafood_trade_data_pull_10_15_25.RData": {
       "checksum": "6b0f948dc10e81112521a6d59810bda1"
@@ -4426,7 +4429,7 @@
       "checksum": "85c9c267bb0a027a963eb47238eee4c8"
     },
     "www/style.css": {
-      "checksum": "e0d9de3c97943213e6b62e049afaf772"
+      "checksum": "46634ffcc400a4eccb05f6b72e2e9774"
     }
   },
   "users": null
