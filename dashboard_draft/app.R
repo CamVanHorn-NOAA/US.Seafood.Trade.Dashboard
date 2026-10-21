@@ -177,7 +177,7 @@ axis_value_size <- 13
 #   weight = 'bold',
 #   width = 'condensed'
 # )
-title_font = 'Arial Narrow'
+title_font = 'Cambria'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
