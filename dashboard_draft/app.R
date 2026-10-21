@@ -177,7 +177,7 @@ axis_value_size <- 13
 #   weight = 'bold',
 #   width = 'condensed'
 # )
-title_font = 'Arial Narrow'
+title_font = 'Cambria'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -1927,27 +1927,22 @@ ui <- page_fluid(
       
       # NOAA icon
       div(
-        style = 'flex-shrink: 0;',
-        img(src = 'NOAA_FISHERIES_logoH.png',
-            align = 'left',
-            style = 'max-width: 300px; max-height: 300px; width: auto; height: auto;'
+        img(id = 'noaa-icon',
+            src = 'NOAA_FISHERIES_logoH.png',
+            align = 'left'
         )
       ),
       
       # Text
       div(
-        style = 'flex: 1; text-align: left; margin-left: 100px;',
-        h1('Seafood Dashboard'),
-        
-        p('A Tool to Investigate 20 Years of U.S. Fisheries Data')
+        id = 'banner-text',
+        span(h1('Seafood Dashboard')),
+        span(p('A Tool to Investigate 20 Years of U.S. Fisheries Data'))
       ),
       
       # animal icons
-      div(
-        img(src = 'graphics_icons/sfd_banner-blue-fish.png',
-            align = 'right',
-            style = 'max-width: 800px; max-height: 600px; height: auto; width: auto; margin-bottom: -35px; margin-top: -35px; margin-right: -5px;')
-      )
+      img(id = 'animal-icon',
+          src = 'graphics_icons/sfd_banner-blue-fish.png')
       ),
   page_sidebar(
   sidebar = sidebar(
@@ -2400,7 +2395,6 @@ server <- function(input, output, session) {
   # Metadata info --------------------------------------------------------------
   date <- reactive(format(Sys.Date(), '%m/%d/%Y'))
   time <- reactive(format(Sys.time(), '%H:%M:%S'))
-  
   # Reset Button ---------------------------------------------------------------
   observeEvent(input$reset_button, {
     updateSelectizeInput(session, 'search_term', selected = '')

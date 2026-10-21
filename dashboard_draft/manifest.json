@@ -3412,7 +3412,7 @@
         "Maintainer": "Hadley Wickham <hadley@rstudio.com>",
         "Repository": "CRAN",
         "Date/Publication": "2023-02-22 09:20:06 UTC",
-        "Built": "R 4.6.0; ; 2026-05-11 04:43:15 UTC; windows",
+        "Built": "R 4.6.1; ; 2026-10-11 04:30:53 UTC; windows",
         "RemoteType": "standard",
         "RemotePkgRef": "tidyverse",
         "RemoteRef": "tidyverse",
@@ -4343,6 +4343,9 @@
     },
     "seafood_trade_data_pull_09_12_25.RData": {
       "checksum": "717a5e52096cfd2e2525d8ccc2a3a43d"
+    },
+    "seafood_trade_data_pull_10_07_26.RData": {
+      "checksum": "01f62695daf75c2203bf828fef3d0de1"
     },
     "seafood_trade_data_pull_10_15_25.RData": {
       "checksum": "6b0f948dc10e81112521a6d59810bda1"
