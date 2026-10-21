@@ -354,6 +354,9 @@ label.form-check-label {
 
 
 /* Nav Pills */
+.bslib-card .bslib-navs-card-title .nav {
+  margin-left: 20px;
+}
 .nav-pills .nav-link {
   color: #2699FC;
   font-size: 17px;
