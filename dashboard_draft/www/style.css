@@ -114,6 +114,16 @@ h6 {
   margin-left: 23vw;
 }
 
+#animal-icon {
+  height: 100%;
+  width: auto;
+  right: 0;
+  margin-bottom: -35px; 
+  z-index: 1;
+  position: absolute;
+  pointer-events: none;
+}
+
 /* Sidebar */
 .bslib-sidebar-layout>.sidebar {
   background: #2B70B1;

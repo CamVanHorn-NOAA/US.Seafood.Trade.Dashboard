@@ -1942,11 +1942,8 @@ ui <- page_fluid(
       ),
       
       # animal icons
-      div(
-        img(src = 'graphics_icons/sfd_banner-blue-fish.png',
-            align = 'right',
-            style = 'max-width: 800px; max-height: 600px; height: auto; width: auto; margin-bottom: -35px; margin-top: -35px; margin-right: -5px;')
-      )
+      img(id = 'animal-icon',
+          src = 'graphics_icons/sfd_banner-blue-fish.png')
       ),
   page_sidebar(
   sidebar = sidebar(
