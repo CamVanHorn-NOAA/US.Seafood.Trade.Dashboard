@@ -3898,7 +3898,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "3356fbedbcb53b3bdb2a672060007fea"
+      "checksum": "170c6f02aa1113546553e4e0bc02cee5"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -3940,37 +3940,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_contact_us.html": {
-      "checksum": "5d15d3de93697bb8ec8c0f2397a7825d"
+      "checksum": "7c9f37fc52c39e685b26e1d1a3cc26f7"
     },
     "dashboard_contact_us.qmd": {
-      "checksum": "edc108237950a806b5f811b2624d0ea4"
+      "checksum": "9736b2edce4471f5aa10023ff67ee150"
+    },
+    "dashboard_contact_us_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_contact_us_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_contact_us_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_contact_us_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_contact_us_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_contact_us_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_contact_us_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_contact_us_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_contact_us_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_contact_us_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_contact_us_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_contact_us_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4018,37 +4027,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_data_management.html": {
-      "checksum": "c381f9ff8a84dc4b78b8cbd876fb3454"
+      "checksum": "abd95a0a9c52b3fc734c9a9c95a9ef40"
     },
     "dashboard_data_management.qmd": {
-      "checksum": "a599ef5b1010b02ab37a6349315ed30b"
+      "checksum": "698524cb2827e98c71d278eab0eae013"
+    },
+    "dashboard_data_management_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_data_management_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_data_management_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_data_management_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_data_management_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_data_management_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_data_management_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_data_management_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_data_management_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_data_management_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_data_management_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_data_management_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_data_management_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4057,37 +4075,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_data_sourcing.html": {
-      "checksum": "dd8377ad6e4a0482e4bc362d1695adfd"
+      "checksum": "ede1bb85c756e60248a8858700d8ef52"
     },
     "dashboard_data_sourcing.qmd": {
-      "checksum": "a6bdd9ca1f8c5df53781905b4675f7ff"
+      "checksum": "0ebb150b1a28c9dbf154455e5edc665b"
+    },
+    "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_data_sourcing_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_data_sourcing_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_data_sourcing_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_data_sourcing_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_data_sourcing_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_data_sourcing_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_data_sourcing_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_data_sourcing_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_data_sourcing_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_data_sourcing_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4096,37 +4123,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_intro.html": {
-      "checksum": "6beb27a40b2b88e726735fa787b200c5"
+      "checksum": "d48cfa49ccfaf7adb27ef6bf453a5662"
     },
     "dashboard_intro.qmd": {
-      "checksum": "9690e5b6dfe5b7b4603ae382f3577dd0"
+      "checksum": "676a0be34b1fa12a260bbf18c3ae232f"
+    },
+    "dashboard_intro_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_intro_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_intro_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_intro_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_intro_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_intro_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_intro_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_intro_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_intro_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_intro_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4135,37 +4171,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_region_doc.html": {
-      "checksum": "6ec8ecb3092314699b61ae3f5d3cde3b"
+      "checksum": "d78669792f283ee48609e076556a2ff0"
     },
     "dashboard_region_doc.qmd": {
-      "checksum": "ccc133fae51329c106c547cc66b89d3e"
+      "checksum": "2c8155a3d0d65ea3322d65ec38cbb138"
+    },
+    "dashboard_region_doc_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_region_doc_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_region_doc_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_region_doc_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_region_doc_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_region_doc_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_region_doc_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_region_doc_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_region_doc_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_region_doc_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_region_doc_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_region_doc_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4174,37 +4219,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "dashboard_resources.html": {
-      "checksum": "372e35dd3000ed39d6428cc626a31acb"
+      "checksum": "985ea291efb92e19418eb8c2c70181e3"
     },
     "dashboard_resources.qmd": {
-      "checksum": "87f8380a14d5a8c2718b42b540ebf4eb"
+      "checksum": "0c53d6d11db3e44f49ee7365a655bf9f"
+    },
+    "dashboard_resources_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "dashboard_resources_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "dashboard_resources_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "dashboard_resources_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "dashboard_resources_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "dashboard_resources_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "dashboard_resources_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "dashboard_resources_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "dashboard_resources_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "dashboard_resources_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4261,37 +4315,46 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "how-to-dashboard.html": {
-      "checksum": "44425d1bd7f21525a41b380d456abd3f"
+      "checksum": "2d26b063d6fcc41240a5eefc60f6b4be"
     },
     "how-to-dashboard.qmd": {
-      "checksum": "14521f893dbde087b8581a5c38f1c0ce"
+      "checksum": "33a65593c6262e69ff3c71addad8e330"
+    },
+    "how-to-dashboard_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css": {
+      "checksum": "efbb37e9afcc02144ebbc7afd12a776f"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "3104c106b6c22560ae274d7c56f116c5"
+      "checksum": "886da841d7421705f715f600c5ff11bb"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "e4cc83ddcec34db65724eb56c5230b4c"
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap.min.css": {
       "checksum": "c3d94fc928527d3d5ff9475017cd76ce"
     },
     "how-to-dashboard_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "7ccd9d390d31af98110f74f842ea9b32"
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
     },
     "how-to-dashboard_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "ad98572d415d2f2452845a6068a913c0"
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
     },
     "how-to-dashboard_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "a58f4bdbf86e8ae057af9131b5b1bcfd"
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
     },
     "how-to-dashboard_files/libs/quarto-html/popper.min.js": {
-      "checksum": "ad6c106f3ba17d5a54d8053a4c4899ca"
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "how-to-dashboard_files/libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css": {
+      "checksum": "845c23b38eaddc0f92fda52bfe77a8c8"
     },
     "how-to-dashboard_files/libs/quarto-html/quarto-syntax-highlighting.css": {
       "checksum": "099cd394577c915952e100d918f76f84"
     },
     "how-to-dashboard_files/libs/quarto-html/quarto.js": {
-      "checksum": "6c59bad421c4db5cafa70cd49864a5d1"
+      "checksum": "6f4245742deb3cc92337dbe2701ccfe1"
+    },
+    "how-to-dashboard_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
     },
     "how-to-dashboard_files/libs/quarto-html/tippy.css": {
       "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
@@ -4307,9 +4370,6 @@
     },
     "seafood_trade_data_munge_07_09_26.RData": {
       "checksum": "70246063c53a2fffab9a478d3828645e"
-    },
-    "seafood_trade_data_munge_08_12_26.RData": {
-      "checksum": "456339832b6281db48c5e811b0df772e"
     },
     "seafood_trade_data_munge_09_08_25.RData": {
       "checksum": "8bcece2d3da78231e6be3d76c5cacd69"
@@ -4429,7 +4489,7 @@
       "checksum": "85c9c267bb0a027a963eb47238eee4c8"
     },
     "www/style.css": {
-      "checksum": "45ab942711b52a0ccfb5bcba082b1b6e"
+      "checksum": "46634ffcc400a4eccb05f6b72e2e9774"
     }
   },
   "users": null
