@@ -11,11 +11,11 @@ Froese, R. and D. Pauly. Editors. 2025. FishBase. World Wide Web electronic publ
 
 National Marine Fisheries Service. 2024. Fisheries Economics of the United States, 2022. U.S. Dept of Commerce, NOAA Tech. Memo. NMFS-F/SPO-248B, 28 p.
 
-NOAA Fisheries Office of Science and Technology, Commercial Landings Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 11/24/2025.
+NOAA Fisheries Office of Science and Technology, Commercial Landings Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 10/07/2026.
 
-NOAA Fisheries Office of Science and Technology, Foreign Trade Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 11/24/2025.
+NOAA Fisheries Office of Science and Technology, Foreign Trade Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed: 10/07/2026.
 
-NOAA Fisheries Office of Science and Technology, Processed Products Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed 06/24/2025.
+NOAA Fisheries Office of Science and Technology, Processed Products Query, Available at: [www.fisheries.noaa.gov/foss](www.fisheries.noaa.gov/foss), Accessed 10/07/2026.
 
 Palomares, M.L.D. and D. Pauly. Editors. 2025. SeaLifeBase. World Wide Web electronic publication. [www.sealifebase.org](www.sealifebase.org), version (04/2025).
 
