@@ -243,9 +243,9 @@ drive_auth()
 
 # GDPDEF Index -----------------------------------------------------------------
 # read csv's
-def_index <- read.csv('GDPDEF_2024_index.csv') %>%
+def_index <- read.csv('GDPDEF_2025_index.csv') %>%
   rename_with( ~ toupper(.x)) %>%
-  rename(DEFLATOR_VALUE = GDPDEF_NBD20240101,
+  rename(DEFLATOR_VALUE = GDPDEF_NBD20250101,
          YEAR = OBSERVATION_DATE) %>%
   # remove -01-01 from year as it is negligible (the index is averaged per year)
   mutate(YEAR = as.numeric(gsub('-01-01', '', YEAR)),
