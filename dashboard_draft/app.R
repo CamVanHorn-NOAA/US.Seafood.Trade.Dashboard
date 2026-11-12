@@ -1765,10 +1765,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
     ylab <- ifelse(units == 'METRIC', 'Metric Tons',
                    'Short Tons')
     plot <- 
-      ggplot(data = supply_data %>%
-               # we do not have landings or processing data for 2024 despite
-                # having so for trade data
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY)) +
       geom_col(fill = c(supply_color)) +
@@ -1791,8 +1788,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
   
   if (metric == 'RATIO') {
     plot <- 
-      ggplot(data = supply_data %>%
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY_REL_US_PROD,
                  group = SPECIES)) +
@@ -1817,8 +1813,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
   
   if (metric == 'SHARE') {
     plot <- 
-      ggplot(data = supply_data %>%
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY)) +
       geom_col(fill = share_color) +
