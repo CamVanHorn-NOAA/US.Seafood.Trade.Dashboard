@@ -4,8 +4,8 @@
 #          cameron.vanhorn@noaa.gov
 
 # A note on the general data formatting:
-  # all 'value' data are calculated in Real 2024 U.S. Dollars (USD) to account
-  # for inflation (see 2_data_munge.R)
+  # all 'real value' data are calculated in Real 2025 U.S. Dollars (USD) to 
+  # account for inflation (see 2_data_munge.R)
 
 #' *IMPORTANT*
 # ALWAYS run the following BEFORE a branch is about to merge back into main for
@@ -37,7 +37,7 @@ addResourcePath("tmpuser", getwd())
 
 # Pull Data (most recent version)
 # load('seafood_trade_data_munge_05_12_25.RData')
-load('seafood_trade_data_munge_10_13_26.RData')
+load('seafood_trade_data_munge_11_12_26.RData')
 
 # filter out confidential data (no data contained therein)
 # com_landings <- com_landings %>%
@@ -177,7 +177,7 @@ axis_value_size <- 13
 #   weight = 'bold',
 #   width = 'condensed'
 # )
-title_font = 'Cambria'
+title_font = 'Arial Narrow'
 # Custom Functions -------------------------------------------------------------
 # stop functions without outputting error message
 stop_quietly <- function() {
@@ -309,13 +309,13 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
   summarized_data <- trade_table %>%
     filter_species(species) %>%
     filter_region(region) %>%
-    select(YEAR, !!level, EXP_VALUE_2024USD, EXP_VOLUME_KG, EXP_CONVERTED_VOLUME,
-           IMP_VALUE_2024USD, IMP_VOLUME_KG, IMP_CONVERTED_VOLUME, EXP_VALUE_USD, 
+    select(YEAR, !!level, EXP_REAL_VALUE_USD, EXP_VOLUME_KG, EXP_CONVERTED_VOLUME,
+           IMP_REAL_VALUE_USD, IMP_VOLUME_KG, IMP_CONVERTED_VOLUME, EXP_VALUE_USD, 
            IMP_VALUE_USD) %>%
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                      EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                      IMP_VALUE_2024USD),
+    mutate(EXP_REAL_VALUE_USD = ifelse(is.na(EXP_REAL_VALUE_USD), 0,
+                                      EXP_REAL_VALUE_USD),
+           IMP_REAL_VALUE_USD = ifelse(is.na(IMP_REAL_VALUE_USD), 0,
+                                      IMP_REAL_VALUE_USD),
            EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
@@ -338,10 +338,10 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
              EXP_ROUND_VOLUME_LB = EXP_CONVERTED_VOLUME * 2.20462,
              IMP_ROUND_VOLUME_LB = IMP_CONVERTED_VOLUME * 2.20462,
-             EXP_PRICE_USD_PER_KG = EXP_VALUE_2024USD / EXP_VOLUME_KG,
-             IMP_PRICE_USD_PER_KG = IMP_VALUE_2024USD / IMP_VOLUME_KG,
-             EXP_PRICE_USD_PER_LB = EXP_VALUE_2024USD / EXP_VOLUME_LB,
-             IMP_PRICE_USD_PER_LB = IMP_VALUE_2024USD / IMP_VOLUME_LB,
+             EXP_PRICE_USD_PER_KG = EXP_REAL_VALUE_USD / EXP_VOLUME_KG,
+             IMP_PRICE_USD_PER_KG = IMP_REAL_VALUE_USD / IMP_VOLUME_KG,
+             EXP_PRICE_USD_PER_LB = EXP_REAL_VALUE_USD / EXP_VOLUME_LB,
+             IMP_PRICE_USD_PER_LB = IMP_REAL_VALUE_USD / IMP_VOLUME_LB,
              EXP_PRICE_NOMINAL_PER_KG = EXP_VALUE_USD / EXP_VOLUME_KG,
              EXP_PRICE_NOMINAL_PER_LB = EXP_VALUE_USD / EXP_VOLUME_LB,
              IMP_PRICE_NOMINAL_PER_KG = IMP_VALUE_USD / IMP_VOLUME_KG,
@@ -383,12 +383,12 @@ summarize_trade_yr_spp <- function(trade_table, species, region, output.format,
   if (nominal == F) {
     new_data <- new_data %>%
       select(!c(EXP_VALUE_USD, IMP_VALUE_USD)) %>%
-      rename(EXP_VALUE = EXP_VALUE_2024USD,
-             IMP_VALUE = IMP_VALUE_2024USD)
+      rename(EXP_VALUE = EXP_REAL_VALUE_USD,
+             IMP_VALUE = IMP_REAL_VALUE_USD)
     
   } else if (nominal == T) {
     new_data <- new_data %>%
-      select(!c(EXP_VALUE_2024USD, IMP_VALUE_2024USD)) %>%
+      select(!c(EXP_REAL_VALUE_USD, IMP_REAL_VALUE_USD)) %>%
       rename(EXP_VALUE = EXP_VALUE_USD,
              IMP_VALUE = IMP_VALUE_USD)
   }
@@ -453,16 +453,16 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
     filter_species(species) %>%
     filter_region(region) %>%
     # select only columns of interest: year, country, exports and imports
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, EXP_VOLUME_KG,
-           IMP_VALUE_2024USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
+    select(YEAR, COUNTRY_NAME, EXP_REAL_VALUE_USD, EXP_VOLUME_KG,
+           IMP_REAL_VALUE_USD, IMP_VOLUME_KG, EXP_VALUE_USD, IMP_VALUE_USD) %>%
     # filter data to be within the specified time frame
     filter(YEAR >= time.frame[1],
            YEAR <= time.frame[2]) %>%
     # set NAs to 0 so sums and averages can be calculated without outputting NA
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD), 0,
-                                      EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD), 0,
-                                      IMP_VALUE_2024USD),
+    mutate(EXP_REAL_VALUE_USD = ifelse(is.na(EXP_REAL_VALUE_USD), 0,
+                                      EXP_REAL_VALUE_USD),
+           IMP_REAL_VALUE_USD = ifelse(is.na(IMP_REAL_VALUE_USD), 0,
+                                      IMP_REAL_VALUE_USD),
            EXP_VOLUME_KG = ifelse(is.na(EXP_VOLUME_KG), 0,
                                   EXP_VOLUME_KG),
            IMP_VOLUME_KG = ifelse(is.na(IMP_VOLUME_KG), 0,
@@ -488,7 +488,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
               .groups = 'drop') %>%
     # calculate total real trade value by summing export and import values
     # calculate total real trade volume by summing export and import volumes 
-    mutate(TOTAL_REAL_TRADE_VALUE = EXP_VALUE_2024USD + IMP_VALUE_2024USD,
+    mutate(TOTAL_REAL_TRADE_VALUE = EXP_REAL_VALUE_USD + IMP_REAL_VALUE_USD,
            TOTAL_NOMINAL_TRADE_VALUE = EXP_VALUE_USD + IMP_VALUE_USD,
            TOTAL_TRADE_VOLUME = EXP_VOLUME_KG + IMP_VOLUME_KG) %>%
     # filter for the top 5 countries based on the field specified from 
@@ -506,7 +506,7 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
       # calculate export and import values in millions/billions,
       # calculate export and import volumes in metric tons,
       # calculate net value and net volume by subtracting imports from exports
-      mutate(NET_VALUE_2024USD = EXP_VALUE_2024USD - IMP_VALUE_2024USD,
+      mutate(NET_VALUE_REAL = EXP_REAL_VALUE_USD - IMP_REAL_VALUE_USD,
              NET_VALUE_NOMINAL = EXP_VALUE_USD - IMP_VALUE_USD,
              EXP_VOLUME_LB = EXP_VOLUME_KG * 2.20462,
              IMP_VOLUME_LB = IMP_VOLUME_KG * 2.20462,
@@ -516,8 +516,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
              IMP_VOLUME_MT = IMP_VOLUME_KG / 1000,
              NET_VOLUME_MT = EXP_VOLUME_MT - IMP_VOLUME_MT,
              NET_VOLUME_ST = EXP_VOLUME_ST - IMP_VOLUME_ST,
-             NET_PRICE_2024USD_PER_KG = 
-               (EXP_VALUE_2024USD - IMP_VALUE_2024USD) / 
+             NET_REAL_PRICE_PER_KG = 
+               (EXP_REAL_VALUE_USD - IMP_REAL_VALUE_USD) / 
                (EXP_VOLUME_KG - IMP_VOLUME_KG))
     
     return(final_data)
@@ -529,8 +529,8 @@ summarize_trade_ctry_yr_spp <- function(trade_table, species, region, output.for
     
     if (nominal == F) {
        final_data <- final_data %>%
-        rename(EXP_VALUE = EXP_VALUE_2024USD,
-               IMP_VALUE = IMP_VALUE_2024USD)
+        rename(EXP_VALUE = EXP_REAL_VALUE_USD,
+               IMP_VALUE = IMP_REAL_VALUE_USD)
     } else if (nominal == T) {
       final_data <- final_data %>%
         rename(EXP_VALUE = EXP_VALUE_USD,
@@ -559,9 +559,9 @@ summarize_pp_yr_spp <- function(product_data, species, region, full_data = F,
   summarized_data <- product_data %>%
     filter_species(species) %>%
     filter_region(region) %>%
-    select(YEAR, PRODUCT_FORM, KG, DOLLARS_2024, DOLLARS, POUNDS) %>%
+    select(YEAR, PRODUCT_FORM, KG, REAL_DOLLARS, DOLLARS, POUNDS) %>%
     mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
-           DOLLARS_2024 = ifelse(is.na(DOLLARS_2024), 0, DOLLARS_2024),
+           REAL_DOLLARS = ifelse(is.na(REAL_DOLLARS), 0, REAL_DOLLARS),
            KG = ifelse(is.na(KG), 0, KG),
            POUNDS = ifelse(is.na(POUNDS), 0, POUNDS)) %>%
     group_by(YEAR, PRODUCT_FORM) %>%
@@ -572,11 +572,11 @@ summarize_pp_yr_spp <- function(product_data, species, region, full_data = F,
     summarized_data <- summarized_data %>%
       mutate(MT = KG / 1000,
              ST = POUNDS / 2000,
-             PP_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             PP_PRICE_2024USD_PER_LB = DOLLARS_2024 / POUNDS,
+             PP_REAL_PRICE_PER_KG = REAL_DOLLARS / KG,
+             PP_REAL_PRICE_PER_LB = REAL_DOLLARS / POUNDS,
              PP_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              PP_PRICE_NOMINAL_PER_LB = DOLLARS / POUNDS) %>%
-      rename(PP_VALUE_2024USD = DOLLARS_2024,
+      rename(PP_REAL_VALUE = REAL_DOLLARS,
              PP_VOLUME_MT = MT,
              PP_VOLUME_LB = POUNDS,
              PP_VOLUME_ST = ST,
@@ -589,10 +589,10 @@ summarize_pp_yr_spp <- function(product_data, species, region, full_data = F,
   if (nominal == F) {
     summarized_data <- summarized_data %>%
       select(!c(DOLLARS)) %>%
-      rename(PP_VALUE = DOLLARS_2024)
+      rename(PP_VALUE = REAL_DOLLARS)
   } else {
     summarized_data <- summarized_data %>%
-      select(!c(DOLLARS_2024)) %>%
+      select(!c(REAL_DOLLARS)) %>%
       rename(PP_VALUE = DOLLARS)
   }
   
@@ -673,7 +673,7 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
     filter(# CONFIDENTIALITY != 'Confidential',
            !is.na(DOLLARS),
            !is.na(KG)) %>%
-    select(YEAR, !!level, KG, DOLLARS_2024, DOLLARS) %>%
+    select(YEAR, !!level, KG, REAL_DOLLARS, DOLLARS) %>%
     group_by(YEAR, !!level) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop')
@@ -683,8 +683,8 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
       mutate(MT = KG / 1000,
              LB = KG * 2.20462,
              ST = LB / 2000,
-             COM_PRICE_2024USD_PER_KG = DOLLARS_2024 / KG,
-             COM_PRICE_2024USD_PER_LB = DOLLARS_2024 / LB,
+             COM_REAL_PRICE_PER_KG = REAL_DOLLARS / KG,
+             COM_REAL_PRICE_PER_LB = REAL_DOLLARS / LB,
              COM_PRICE_NOMINAL_PER_KG = DOLLARS / KG,
              COM_PRICE_NOMINAL_PER_LB = DOLLARS / LB) %>%
       rename(COM_VOLUME_KG = KG,
@@ -698,10 +698,10 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
   if (nominal == F) {
     summarized_data <- summarized_data %>%
       select(!c(DOLLARS)) %>%
-      rename(COM_VALUE = DOLLARS_2024)
+      rename(COM_VALUE = REAL_DOLLARS)
   } else {
     summarized_data <- summarized_data %>%
-      select(!c(DOLLARS_2024)) %>%
+      select(!c(REAL_DOLLARS)) %>%
       rename(COM_VALUE = DOLLARS)
   }
   
@@ -774,8 +774,8 @@ calculate_mlti <- function(species, region, exports = F, imports = F, nominal = 
     which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_USD',
                                     'IMP_VALUE_USD'))
   } else {
-    which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
-                                    'IMP_VALUE_2024USD')) 
+    which_value <- as.symbol(ifelse(exports == T, 'EXP_REAL_VALUE_USD',
+                                    'IMP_REAL_VALUE_USD')) 
   }
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
                                    'IMP_VOLUME_KG'))
@@ -846,9 +846,9 @@ calculate_mlti <- function(species, region, exports = F, imports = F, nominal = 
   # by the product of the number of years and the number of countries
   average_price <- average_price$PRICE / (total_years * total_countries)
   
-  # step 6: find top 5 trading partners by value during most recent year (2024)
+  # step 6: find top 5 trading partners by value during most recent year (2025)
   top5 <- summary_spp_data %>%
-    filter(YEAR == 2024) %>%
+    filter(YEAR == 2025) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -906,8 +906,8 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   
   species <- toupper(species)
   
-  which_value <- as.symbol(ifelse(exports == T, 'EXP_VALUE_2024USD',
-                                  'IMP_VALUE_2024USD'))
+  which_value <- as.symbol(ifelse(exports == T, 'EXP_REAL_VALUE_USD',
+                                  'IMP_REAL_VALUE_USD'))
   which_volume <- as.symbol(ifelse(exports == T, 'EXP_VOLUME_KG',
                                    'IMP_VOLUME_KG'))
   which_value <- rlang::enquo(which_value)
@@ -965,7 +965,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   average_price <- average_price$PRICE / (total_years * total_countries)
   
   top9 <- summary_spp_data %>%
-    filter(YEAR == 2024) %>%
+    filter(YEAR == 2025) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -1009,8 +1009,8 @@ calculate_hi <- function(species, region, nominal = F) {
     exp_value <- rlang::enquo(exp_value)
     imp_value <- rlang::enquo(imp_value)
   } else {
-    exp_value <- as.symbol('EXP_VALUE_2024USD')
-    imp_value <- as.symbol('IMP_VALUE_2024USD')
+    exp_value <- as.symbol('EXP_REAL_VALUE_USD')
+    imp_value <- as.symbol('IMP_REAL_VALUE_USD')
     exp_value <- rlang::enquo(exp_value)
     imp_value <- rlang::enquo(imp_value)
   }
@@ -1020,13 +1020,13 @@ calculate_hi <- function(species, region, nominal = F) {
     filter_species(species) %>%
     filter_region(region) %>%
     # select only columns of interest
-    select(YEAR, COUNTRY_NAME, EXP_VALUE_2024USD, IMP_VALUE_2024USD,
+    select(YEAR, COUNTRY_NAME, EXP_REAL_VALUE_USD, IMP_REAL_VALUE_USD,
            EXP_VALUE_USD, IMP_VALUE_USD) %>%
     # set export and import NAs to 0 to prevent NA as sum values
-    mutate(EXP_VALUE_2024USD = ifelse(is.na(EXP_VALUE_2024USD) == T,
-                                      0, EXP_VALUE_2024USD),
-           IMP_VALUE_2024USD = ifelse(is.na(IMP_VALUE_2024USD) == T,
-                                      0, IMP_VALUE_2024USD),
+    mutate(EXP_REAL_VALUE_USD = ifelse(is.na(EXP_REAL_VALUE_USD) == T,
+                                      0, EXP_REAL_VALUE_USD),
+           IMP_REAL_VALUE_USD = ifelse(is.na(IMP_REAL_VALUE_USD) == T,
+                                      0, IMP_REAL_VALUE_USD),
            EXP_VALUE_USD = ifelse(is.na(EXP_VALUE_USD) == T,
                                   0, EXP_VALUE_USD),
            IMP_VALUE_USD = ifelse(is.na(IMP_VALUE_USD) == T,
@@ -1148,8 +1148,8 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       ylab <- 'Value (USD)'
       ylab2 <- 'Average Price (Nominal USD)'
     } else {
-      ylab <- 'Value (Real 2024 USD)'
-      ylab2 <- 'Average Price (Real 2024 USD)' 
+      ylab <- 'Value (Real 2025 USD)'
+      ylab2 <- 'Average Price (Real 2025 USD)' 
     }
     
     max_exp <- max(data$EXP_VALUE, na.rm = T)
@@ -1185,7 +1185,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                  y = !!y)) + 
       geom_col(fill = color) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(labels = label,
                          limits = c(0, y_max*1.1),
                          expand = c(0, 0)) +
@@ -1225,7 +1225,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       #            color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
                          expand = c(0, 0),
@@ -1264,7 +1264,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       # geom_point(color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       labs(x = '', 
            y = 'Export / Import',
            title = paste0('Volume Ratio of ', species, region_text)) +
@@ -1292,13 +1292,13 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                stat = 'identity',
                position = 'dodge') +
       labs(x = '',
-           # y = 'Billions (Real 2024 USD)',
-           y = 'Value (Real 2024 USD)',
+           # y = 'Billions (Real 2025 USD)',
+           y = 'Value (Real 2025 USD)',
            fill = '',
            title = paste0('Value Balance of ', species, region_text)) +
       scale_fill_manual(values = balance_colors) +
       coord_axes_inside(labels_inside = T) +
-      scale_x_discrete(limits = factor(2004:2024)) +
+      scale_x_discrete(limits = factor(2004:2025)) +
       scale_y_continuous(labels = label_currency(scale_cut = cut_short_scale())) +
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
@@ -1332,7 +1332,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
   if (nominal == T) {
     ylab <- 'Value (Nominal USD)'
   } else {
-    ylab <- 'Value (Real 2024 USD)'
+    ylab <- 'Value (Real 2025 USD)'
   }
   
   if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
@@ -1389,7 +1389,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
     if (nominal == T) {
       ylab <- 'Value (Nominal USD)'
     } else {
-      ylab <- 'Value (2024 Real USD)'
+      ylab <- 'Value (2025 Real USD)'
     }
     
     label <- label_currency(scale_cut = cut_short_scale())
@@ -1422,7 +1422,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
       if (nominal == T) {
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        ylab <- 'Average Price (Real 2024 USD)'
+        ylab <- 'Average Price (Real 2025 USD)'
       }
       
       label <- label_currency(suffix = '/kg')
@@ -1432,7 +1432,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
       if (nominal == T) {
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        ylab <- 'Average Price (Real 2024 USD)'
+        ylab <- 'Average Price (Real 2025 USD)'
       }
       
       label <- label_currency(suffix = '/lb')
@@ -1535,8 +1535,8 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     }
     
     if (nominal == F) {
-      ylab <- 'Value (Real 2024 USD)'
-      ylab2 <- 'Average Price (Real 2024 USD)'
+      ylab <- 'Value (Real 2025 USD)'
+      ylab2 <- 'Average Price (Real 2025 USD)'
     } else {
       ylab <- 'Value (Nominal USD)'
       ylab2 <- 'Average Price (Nominal USD)'
@@ -1590,7 +1590,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
       #            color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
                          expand = c(0, 0),
@@ -1618,7 +1618,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
                y = COM_VOLUME_T)) +
     geom_col(fill = landings_colors[1]) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                     limits = factor(2004:2024)) +
+                     limits = factor(2004:2025)) +
     scale_y_continuous(labels = label,
                        expand = c(0, 0),
                        limits = c(0, max_volume*1.1)) +
@@ -1765,20 +1765,18 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
     ylab <- ifelse(units == 'METRIC', 'Metric Tons',
                    'Short Tons')
     plot <- 
-      ggplot(data = supply_data %>%
-               # we do not have landings or processing data for 2024 despite
-                # having so for trade data
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY)) +
       geom_col(fill = c(supply_color)) +
       labs(x = '',
            y = ylab,
            title = paste0('Apparent Supply of ', species, region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(expand = c(0, 0),
-                         limits = c(0, max(supply_data$APPARENT_SUPPLY)*1.1)) +
+                         limits = c(0, max(supply_data$APPARENT_SUPPLY)*1.1),
+                         labels = comma) +
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
@@ -1790,8 +1788,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
   
   if (metric == 'RATIO') {
     plot <- 
-      ggplot(data = supply_data %>%
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = APPARENT_SUPPLY_REL_US_PROD,
                  group = SPECIES)) +
@@ -1803,7 +1800,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
            y = 'Ratio',
            title = paste0('Apparent Supply of ', species, 
                           '\nRelative to Domestic Catch', region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
@@ -1816,8 +1813,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
   
   if (metric == 'SHARE') {
     plot <- 
-      ggplot(data = supply_data %>%
-               filter(YEAR < 2024),
+      ggplot(data = supply_data,
              aes(x = factor(YEAR),
                  y = UNEXPORTED_US_PROD_REL_APPARENT_SUPPLY)) +
       geom_col(fill = share_color) +
@@ -1825,7 +1821,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
            y = 'Share of Apparent Supply',
            title = paste0('Unexported Domestic Catch Relative to\nApparent Supply of ', 
                           species, region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent(),
                          expand = c(0, 0),
@@ -1886,7 +1882,7 @@ replace_null <- function(input) {
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
 top5_colors <- c('#C6E6F0', '#5EB6D9', '#0085CA', '#003087', '#002364')
-names(top5_colors) <- levels(factor(levels = c(2020:2024)))
+names(top5_colors) <- levels(factor(levels = c(2021:2025)))
 export_color <- c('#003087')
 import_color <- c('#0085CA')
 trade_price_color <- c('#A6D4EC')
@@ -1967,7 +1963,7 @@ ui <- page_fluid(
     h2('Other Options'),
     uiOutput('filter_region'),
     input_switch('units', 'Imperial Units (lb)'),
-    input_switch('inflation', 'Inflation-Adjusted (Real 2024 USD)', value = T),
+    input_switch('inflation', 'Inflation-Adjusted (Real 2025 USD)', value = T),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
@@ -3696,7 +3692,7 @@ server <- function(input, output, session) {
       species_selection_trade(),
       region = 'NONE',
       output.format = 'FULL',
-      time.frame = c(2020, 2024),
+      time.frame = c(2021, 2025),
       nominal = selected_value())
   })
   
@@ -3707,7 +3703,7 @@ server <- function(input, output, session) {
       species_selection_trade(),
       region_selection(),
       output.format = 'VALUE',
-      time.frame = c(2020, 2024),
+      time.frame = c(2021, 2025),
       nominal = selected_value())
   })
   
@@ -4683,15 +4679,15 @@ server <- function(input, output, session) {
       HTML(paste0(
         tooltip_heading, 
         click_info$data$COUNTRY_NAME[1], "<br>",
-        tooltip_color_icon(top5_colors[1]), tooltip_subheading, "2020</span>: ",
+        tooltip_color_icon(top5_colors[1]), tooltip_subheading, "2021</span>: ",
         dollar(click_info$data$NET_VALUE[1]), "<br>",
-        tooltip_color_icon(top5_colors[2]), tooltip_subheading, "2021</span>: ",
+        tooltip_color_icon(top5_colors[2]), tooltip_subheading, "2022</span>: ",
         dollar(click_info$data$NET_VALUE[2]), "<br>",
-        tooltip_color_icon(top5_colors[3]), tooltip_subheading, "2022</span>: ",
+        tooltip_color_icon(top5_colors[3]), tooltip_subheading, "2023</span>: ",
         dollar(click_info$data$NET_VALUE[3]), "<br>",
-        tooltip_color_icon(top5_colors[4]), tooltip_subheading, "2023</span>: ",
+        tooltip_color_icon(top5_colors[4]), tooltip_subheading, "2024</span>: ",
         dollar(click_info$data$NET_VALUE[4]), "<br>",
-        tooltip_color_icon(top5_colors[5]), tooltip_subheading, "2024</span>: ",
+        tooltip_color_icon(top5_colors[5]), tooltip_subheading, "2025</span>: ",
         dollar(click_info$data$NET_VALUE[5]), "<br>")))
   })
   

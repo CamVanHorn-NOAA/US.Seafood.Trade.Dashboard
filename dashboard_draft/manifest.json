@@ -1,7 +1,7 @@
 {
   "version": 1,
   "locale": "en_US",
-  "platform": "4.6.0",
+  "platform": "4.6.2",
   "metadata": {
     "appmode": "shiny",
     "primary_rmd": null,
@@ -3898,7 +3898,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "170c6f02aa1113546553e4e0bc02cee5"
+      "checksum": "86d96dff4c2b341c2dabe0f73453f92b"
     },
     "dashboard_calc_metrics.html": {
       "checksum": "5f1cbf9c0b489341818daabcc3f6f857"
@@ -4394,6 +4394,15 @@
     },
     "seafood_trade_data_munge_10_15_25.RData": {
       "checksum": "ddcf306e65aaac054ca36b608621b3a1"
+    },
+    "seafood_trade_data_munge_11_05_26.RData": {
+      "checksum": "6e57479c9441e577c36437f3aeb67a37"
+    },
+    "seafood_trade_data_munge_11_10_26.RData": {
+      "checksum": "e9f43c5c8eb33a3028e243674f5c6126"
+    },
+    "seafood_trade_data_munge_11_12_26.RData": {
+      "checksum": "195464b56f575af858412f7ba7219662"
     },
     "seafood_trade_data_munge_11_24_25.RData": {
       "checksum": "95d17ca60ad241ac3f7001529e7ccae7"

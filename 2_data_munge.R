@@ -39,7 +39,7 @@ drive_auth()
 # 
 # # Load the data
 # load(data_file$NAME)
-load('seafood_trade_data_pull_10_07_26.RData')
+load('seafood_trade_data_pull_11_10_26.RData')
 source('region_definitions.R')
 
 ##########################
@@ -66,18 +66,18 @@ exports <- export_pull %>%
               distinct()) %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME) %>%
-  # Calculate standard prices with 2024 index
+  # Calculate standard prices with 2025 index
   # We standardize prices by setting a year as a reference for inflation indexing
-    # Effectively, by setting 2024 as our reference year, we can calculate what
-    # prices from prior years would be in 2024 dollars
+    # Effectively, by setting 2025 as our reference year, we can calculate what
+    # prices from prior years would be in 2025 dollars
     # This is accounts for price fluctuations exclusively due to inflation
-  # To standardize, we set the reference year's index (2024) as the numerator 
+  # To standardize, we set the reference year's index (2025) as the numerator 
     # and a given year's index (e.g., 2020) as the denominator
     # Then multiply this value by the price of the good in the given year to 
-    # determine it's value in real 2024 dollars
+    # determine it's value in real 2025 dollars
     # We calculated the Index value in script 1
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(EXP_VALUE_2024USD = VALUE_USD * INDEX) %>%
+  mutate(EXP_REAL_VALUE_USD = VALUE_USD * INDEX) %>%
   select(-INDEX) %>%
   left_join(conversion_factors %>%
               mutate(HTS_NUMBER = as.character(HTS_NUMBER))) %>%
@@ -102,14 +102,14 @@ exports_products_smry <- exports %>%
   # country name (exported to), customs district (exported from)
 exports_price_smry <- exports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
-         VALUE_USD, EXP_VALUE_2024USD, VOLUME_KG, CONVERTED_VOLUME, 
+         VALUE_USD, EXP_REAL_VALUE_USD, VOLUME_KG, CONVERTED_VOLUME, 
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(EXP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
-         EXP_AVERAGE_2024PRICE_PER_KG = EXP_VALUE_2024USD / VOLUME_KG)
+         EXP_AVERAGE_REAL_PRICE_PER_KG = EXP_REAL_VALUE_USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 exports_smry <- full_join(exports_products_smry, exports_price_smry)
@@ -129,7 +129,7 @@ imports <- import_pull %>%
               distinct()) %>%
   arrange(YEAR, COUNTRY_NAME) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(IMP_VALUE_2024USD = VALUE_USD * INDEX) %>%
+  mutate(IMP_REAL_VALUE_USD = VALUE_USD * INDEX) %>%
   select(-INDEX) %>%
   left_join(conversion_factors %>%
               mutate(HTS_NUMBER = as.character(HTS_NUMBER))) %>%
@@ -149,14 +149,14 @@ imports_products_smry <- imports %>%
 
 imports_price_smry <- imports %>%
   select(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
-         VALUE_USD, VOLUME_KG, CONVERTED_VOLUME, IMP_VALUE_2024USD,
+         VALUE_USD, VOLUME_KG, CONVERTED_VOLUME, IMP_REAL_VALUE_USD,
          SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   group_by(YEAR, CONTINENT, COUNTRY_NAME, US_CUSTOMS_DISTRICT, STATE, GROUP_TS,
            SPECIES_NAME, SPECIES_GROUP, SPECIES_CATEGORY, ECOLOGICAL_CATEGORY) %>%
   summarise(across(where(is.numeric), sum),
             .groups = 'drop') %>%
   mutate(IMP_AVERAGE_PRICE_PER_KG = VALUE_USD / VOLUME_KG,
-         IMP_AVERAGE_2024PRICE_PER_KG = IMP_VALUE_2024USD / VOLUME_KG)
+         IMP_AVERAGE_REAL_PRICE_PER_KG = IMP_REAL_VALUE_USD / VOLUME_KG)
 
 # Now combine to form one summary sheet
 imports_smry <- full_join(imports_products_smry, imports_price_smry)
@@ -203,7 +203,7 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
          REGION = ifelse(is.na(REGION), 'No Region Assigned', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
-  # for every year from 2004 - 2024
+  # for every year from 2004 - 2025
 
 
 # Grabbing confidential data from processed products ---------------------------
@@ -870,7 +870,7 @@ products_marked <- declassified_products %>%
 test <- products_marked %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #0.94%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #0.22%
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
@@ -888,23 +888,23 @@ pp_data <- products_marked %>%
   mutate(DOLLARS = ifelse(is.na(DOLLARS), 0, DOLLARS),
          POUNDS = ifelse(is.na(POUNDS), 0, POUNDS),
          KG = ifelse(is.na(KG), 0, KG),
-         DOLLARS_2024 = DOLLARS * INDEX,
+         REAL_DOLLARS = DOLLARS * INDEX,
          DOLLARS_PER_LB = DOLLARS / POUNDS,
          DOLLARS_PER_KG = DOLLARS / KG,
-         DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
-         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
+         REAL_DOLLARS_PER_LB = REAL_DOLLARS / POUNDS,
+         REAL_DOLLARS_PER_KG = REAL_DOLLARS / KG) %>%
   select(-INDEX) %>%
   # mark confidential records' values as 0
   mutate(CONFIDENTIAL = ifelse(is.na(CONFIDENTIAL), 0, CONFIDENTIAL),
          POUNDS = ifelse(CONFIDENTIAL == 1, 0, POUNDS),
          DOLLARS = ifelse(CONFIDENTIAL == 1, 0, DOLLARS),
          KG = ifelse(CONFIDENTIAL == 1, 0, KG),
-         DOLLARS_2024 = ifelse(CONFIDENTIAL == 1, 0, DOLLARS_2024),
+         REAL_DOLLARS = ifelse(CONFIDENTIAL == 1, 0, REAL_DOLLARS),
          # if pounds = 0 also set any rates to 0 (would be Inf or NaN otherwise)
          DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_PER_LB),
          DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_PER_KG),
-         DOLLARS_2024_PER_LB = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_2024_PER_LB),
-         DOLLARS_2024_PER_KG = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, DOLLARS_2024_PER_KG))
+         REAL_DOLLARS_PER_LB = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, REAL_DOLLARS_PER_LB),
+         REAL_DOLLARS_PER_KG = ifelse(CONFIDENTIAL == 1 | POUNDS == 0, 0, REAL_DOLLARS_PER_KG))
 
 # Commercial Landings ----------------------------------------------------------
 # Data formatting
@@ -916,11 +916,11 @@ com_landings <- landings_pull %>%
   left_join(landings_map %>%
               distinct()) %>%
   left_join(def_index %>% select(YEAR, INDEX)) %>%
-  mutate(DOLLARS_2024 = DOLLARS * INDEX,
+  mutate(REAL_DOLLARS = DOLLARS * INDEX,
          KG = POUNDS * 0.45359237,
          METRIC_TONS = KG / 1000,
-         DOLLARS_2024_PER_LB = DOLLARS_2024 / POUNDS,
-         DOLLARS_2024_PER_KG = DOLLARS_2024 / KG) %>%
+         REAL_DOLLARS_PER_LB = REAL_DOLLARS / POUNDS,
+         REAL_DOLLARS_PER_KG = REAL_DOLLARS / KG) %>%
   select(-INDEX) %>%
   # add regions
   mutate(REGION = ifelse(STATE %in% norpac, 'North Pacific', NA),
@@ -947,6 +947,12 @@ file_name <- paste0('seafood_trade_data_munge_',
 save(list = c('trade_data', 'pp_data', 'com_landings', 'trade_date',
               'landings_date', 'products_date'),
      file = file_name)
+
+# save the file to the dashboard folder
+save(list = c('trade_data', 'pp_data', 'com_landings', 'trade_date',
+              'landings_date', 'products_date'),
+     file = paste0('~/GitHub/US.Seafood.Trade.Dashboard/dashboard_draft/', 
+                   file_name))
 
 # upload to google drive
 drive_upload(file_name,
