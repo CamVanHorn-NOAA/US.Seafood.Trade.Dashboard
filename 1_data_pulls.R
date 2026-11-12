@@ -17,13 +17,13 @@ source('api_pull_fxns.R')
 
 # data pulls -------------------------------------------------------------------
 # these pulls will take a few minutes each
-export_pull <- get_trade(years = c(2004, 2024), 
+export_pull <- get_trade(years = c(2004, 2025), 
                          exports = T)
 
-import_pull <- get_trade(years = c(2004, 2024),
+import_pull <- get_trade(years = c(2004, 2025),
                          imports = T)
 
-landings_pull <- get_landings(years = c(2004, 2024))
+landings_pull <- get_landings(years = c(2004, 2025))
 
 
 #' *connect to the VPN first*
