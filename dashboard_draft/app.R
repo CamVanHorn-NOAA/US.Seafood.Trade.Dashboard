@@ -50,6 +50,11 @@ trade_data <- trade_data %>%
 pp_data <- pp_data %>%
   filter(PRODUCT_FORM != 'NOT FOR HUMAN CONSUMPTION')
 
+# filter out 0's in landings
+com_landings <- com_landings %>%
+  filter(DOLLARS != 0,
+         POUNDS != 0)
+
 # create matrix of all categorization terms available in the data
 categorization_matrix <- bind_rows(trade_data, 
                                    com_landings, # %>%
@@ -748,7 +753,9 @@ summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
               summarize_landings_yr_spp(com_landings, species, region, units = units,
-                                        nominal = nominal)) 
+                                        nominal = nominal)) %>%
+    select(!SPECIES_NAME) %>%
+    replace(is.na(.), 0)
   
   return(combined_data)
 }
