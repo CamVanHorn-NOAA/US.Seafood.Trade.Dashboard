@@ -846,9 +846,9 @@ calculate_mlti <- function(species, region, exports = F, imports = F, nominal = 
   # by the product of the number of years and the number of countries
   average_price <- average_price$PRICE / (total_years * total_countries)
   
-  # step 6: find top 5 trading partners by value during most recent year (2024)
+  # step 6: find top 5 trading partners by value during most recent year (2025)
   top5 <- summary_spp_data %>%
-    filter(YEAR == 2024) %>%
+    filter(YEAR == 2025) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -965,7 +965,7 @@ calculate_mlti_table <- function(species, exports = F, imports = F) {
   average_price <- average_price$PRICE / (total_years * total_countries)
   
   top9 <- summary_spp_data %>%
-    filter(YEAR == 2024) %>%
+    filter(YEAR == 2025) %>%
     group_by(COUNTRY_NAME) %>%
     summarise(across(where(is.numeric), sum),
               .groups = 'drop') %>%
@@ -1148,8 +1148,8 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       ylab <- 'Value (USD)'
       ylab2 <- 'Average Price (Nominal USD)'
     } else {
-      ylab <- 'Value (Real 2024 USD)'
-      ylab2 <- 'Average Price (Real 2024 USD)' 
+      ylab <- 'Value (Real 2025 USD)'
+      ylab2 <- 'Average Price (Real 2025 USD)' 
     }
     
     max_exp <- max(data$EXP_VALUE, na.rm = T)
@@ -1185,7 +1185,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                  y = !!y)) + 
       geom_col(fill = color) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(labels = label,
                          limits = c(0, y_max*1.1),
                          expand = c(0, 0)) +
@@ -1225,7 +1225,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       #            color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
                          expand = c(0, 0),
@@ -1264,7 +1264,7 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
       # geom_point(color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       labs(x = '', 
            y = 'Export / Import',
            title = paste0('Volume Ratio of ', species, region_text)) +
@@ -1292,13 +1292,13 @@ plot_trade <- function(data, region, plot_format, units = NULL, export = F, impo
                stat = 'identity',
                position = 'dodge') +
       labs(x = '',
-           # y = 'Billions (Real 2024 USD)',
-           y = 'Value (Real 2024 USD)',
+           # y = 'Billions (Real 2025 USD)',
+           y = 'Value (Real 2025 USD)',
            fill = '',
            title = paste0('Value Balance of ', species, region_text)) +
       scale_fill_manual(values = balance_colors) +
       coord_axes_inside(labels_inside = T) +
-      scale_x_discrete(limits = factor(2004:2024)) +
+      scale_x_discrete(limits = factor(2004:2025)) +
       scale_y_continuous(labels = label_currency(scale_cut = cut_short_scale())) +
       geom_hline(yintercept = 0, color = 'black') +
       theme_minimal() +
@@ -1332,7 +1332,7 @@ plot_trade_ctry_yr_spp <- function(data, species, region, nominal = F) {
   if (nominal == T) {
     ylab <- 'Value (Nominal USD)'
   } else {
-    ylab <- 'Value (Real 2024 USD)'
+    ylab <- 'Value (Real 2025 USD)'
   }
   
   if (length(region) > 1 | any(c('NONE', 'ALL', 'No Region Assigned') %in% region)) {
@@ -1389,7 +1389,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
     if (nominal == T) {
       ylab <- 'Value (Nominal USD)'
     } else {
-      ylab <- 'Value (2024 Real USD)'
+      ylab <- 'Value (2025 Real USD)'
     }
     
     label <- label_currency(scale_cut = cut_short_scale())
@@ -1422,7 +1422,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
       if (nominal == T) {
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        ylab <- 'Average Price (Real 2024 USD)'
+        ylab <- 'Average Price (Real 2025 USD)'
       }
       
       label <- label_currency(suffix = '/kg')
@@ -1432,7 +1432,7 @@ plot_spp_pp <- function(processed_product_data, region, plot.format, units = NUL
       if (nominal == T) {
         ylab <- 'Average Price (Nominal USD)'
       } else {
-        ylab <- 'Average Price (Real 2024 USD)'
+        ylab <- 'Average Price (Real 2025 USD)'
       }
       
       label <- label_currency(suffix = '/lb')
@@ -1535,8 +1535,8 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
     }
     
     if (nominal == F) {
-      ylab <- 'Value (Real 2024 USD)'
-      ylab2 <- 'Average Price (Real 2024 USD)'
+      ylab <- 'Value (Real 2025 USD)'
+      ylab2 <- 'Average Price (Real 2025 USD)'
     } else {
       ylab <- 'Value (Nominal USD)'
       ylab2 <- 'Average Price (Nominal USD)'
@@ -1590,7 +1590,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
       #            color = 'black',
       #            size = 2) +
       scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                       limits = factor(2004:2024)) +
+                       limits = factor(2004:2025)) +
       scale_y_continuous(name = ylab, 
                          labels = label,
                          expand = c(0, 0),
@@ -1618,7 +1618,7 @@ plot_landings <- function(data, region, plot.format, units = NULL, species, nomi
                y = COM_VOLUME_T)) +
     geom_col(fill = landings_colors[1]) +
     scale_x_discrete(breaks = seq(2006, 2022, by = 4),
-                     limits = factor(2004:2024)) +
+                     limits = factor(2004:2025)) +
     scale_y_continuous(labels = label,
                        expand = c(0, 0),
                        limits = c(0, max_volume*1.1)) +
@@ -1775,7 +1775,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       labs(x = '',
            y = ylab,
            title = paste0('Apparent Supply of ', species, region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(expand = c(0, 0),
                          limits = c(0, max(supply_data$APPARENT_SUPPLY)*1.1)) +
@@ -1803,7 +1803,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
            y = 'Ratio',
            title = paste0('Apparent Supply of ', species, 
                           '\nRelative to Domestic Catch', region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
@@ -1825,7 +1825,7 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
            y = 'Share of Apparent Supply',
            title = paste0('Unexported Domestic Catch Relative to\nApparent Supply of ', 
                           species, region_text)) +
-      scale_x_discrete(limits = factor(c(2004:2023)),
+      scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(labels = label_percent(),
                          expand = c(0, 0),
@@ -1886,7 +1886,7 @@ replace_null <- function(input) {
 balance_colors <- c('#B3EDEF', '#1ECAD3', '#005761')
 names(balance_colors) <- levels(factor(levels = c('Exports', 'Imports', 'Trade Balance')))
 top5_colors <- c('#C6E6F0', '#5EB6D9', '#0085CA', '#003087', '#002364')
-names(top5_colors) <- levels(factor(levels = c(2020:2024)))
+names(top5_colors) <- levels(factor(levels = c(2021:2025)))
 export_color <- c('#003087')
 import_color <- c('#0085CA')
 trade_price_color <- c('#A6D4EC')
@@ -1967,7 +1967,7 @@ ui <- page_fluid(
     h2('Other Options'),
     uiOutput('filter_region'),
     input_switch('units', 'Imperial Units (lb)'),
-    input_switch('inflation', 'Inflation-Adjusted (Real 2024 USD)', value = T),
+    input_switch('inflation', 'Inflation-Adjusted (Real 2025 USD)', value = T),
     uiOutput('trade_unfilter_button'),
     uiOutput('product_unfilter_button'),
     uiOutput('landings_unfilter_button'),
