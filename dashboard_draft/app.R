@@ -4,8 +4,8 @@
 #          cameron.vanhorn@noaa.gov
 
 # A note on the general data formatting:
-  # all 'value' data are calculated in Real 2024 U.S. Dollars (USD) to account
-  # for inflation (see 2_data_munge.R)
+  # all 'real value' data are calculated in Real 2025 U.S. Dollars (USD) to 
+  # account for inflation (see 2_data_munge.R)
 
 #' *IMPORTANT*
 # ALWAYS run the following BEFORE a branch is about to merge back into main for

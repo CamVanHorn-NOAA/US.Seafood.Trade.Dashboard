@@ -66,15 +66,15 @@ exports <- export_pull %>%
               distinct()) %>%
   # arrange by year then country name 
   arrange(YEAR, COUNTRY_NAME) %>%
-  # Calculate standard prices with 2024 index
+  # Calculate standard prices with 2025 index
   # We standardize prices by setting a year as a reference for inflation indexing
-    # Effectively, by setting 2024 as our reference year, we can calculate what
-    # prices from prior years would be in 2024 dollars
+    # Effectively, by setting 2025 as our reference year, we can calculate what
+    # prices from prior years would be in 2025 dollars
     # This is accounts for price fluctuations exclusively due to inflation
-  # To standardize, we set the reference year's index (2024) as the numerator 
+  # To standardize, we set the reference year's index (2025) as the numerator 
     # and a given year's index (e.g., 2020) as the denominator
     # Then multiply this value by the price of the good in the given year to 
-    # determine it's value in real 2024 dollars
+    # determine it's value in real 2025 dollars
     # We calculated the Index value in script 1
   left_join(def_index %>% select(YEAR, INDEX)) %>%
   mutate(EXP_REAL_VALUE_USD = VALUE_USD * INDEX) %>%
@@ -203,7 +203,7 @@ trade_data <- full_join(exports_smry, imports_smry) %>%
          REGION = ifelse(is.na(REGION), 'No Region Assigned', REGION)) 
 # The resulting data frame includes import and export data attached to each
   # US Custom's District and Country of Origin or Export, with species data, 
-  # for every year from 2004 - 2024
+  # for every year from 2004 - 2025
 
 
 # Grabbing confidential data from processed products ---------------------------
@@ -870,7 +870,7 @@ products_marked <- declassified_products %>%
 test <- products_marked %>%
   mutate(POUNDS = ifelse(is.na(POUNDS), 0, POUNDS))
 
-sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #0.94%
+sum(test$POUNDS[which(test$CONFIDENTIAL == 1)]) / sum(test$POUNDS) #0.22%
 
 # store confidential products in separate objects
 confidential_products <- products_marked %>%
