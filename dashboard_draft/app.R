@@ -1778,7 +1778,8 @@ plot_supply_metrics <- function(supply_data, region, metric, units = NULL, speci
       scale_x_discrete(limits = factor(c(2004:2025)),
                        breaks = seq(2006, 2022, by = 4)) +
       scale_y_continuous(expand = c(0, 0),
-                         limits = c(0, max(supply_data$APPARENT_SUPPLY)*1.1)) +
+                         limits = c(0, max(supply_data$APPARENT_SUPPLY)*1.1),
+                         labels = comma) +
       theme_bw() +
       theme(axis.text = element_text(size = axis_value_size),
             axis.title = element_text(size = axis_title_size),
