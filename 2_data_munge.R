@@ -948,6 +948,12 @@ save(list = c('trade_data', 'pp_data', 'com_landings', 'trade_date',
               'landings_date', 'products_date'),
      file = file_name)
 
+# save the file to the dashboard folder
+save(list = c('trade_data', 'pp_data', 'com_landings', 'trade_date',
+              'landings_date', 'products_date'),
+     file = paste0('~/GitHub/US.Seafood.Trade.Dashboard/dashboard_draft/', 
+                   file_name))
+
 # upload to google drive
 drive_upload(file_name,
              # IMPORTANT: change path below to match your personal Drive
