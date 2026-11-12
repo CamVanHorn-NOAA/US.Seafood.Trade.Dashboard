@@ -3692,7 +3692,7 @@ server <- function(input, output, session) {
       species_selection_trade(),
       region = 'NONE',
       output.format = 'FULL',
-      time.frame = c(2020, 2024),
+      time.frame = c(2021, 2025),
       nominal = selected_value())
   })
   
@@ -3703,7 +3703,7 @@ server <- function(input, output, session) {
       species_selection_trade(),
       region_selection(),
       output.format = 'VALUE',
-      time.frame = c(2020, 2024),
+      time.frame = c(2021, 2025),
       nominal = selected_value())
   })
   
@@ -4679,15 +4679,15 @@ server <- function(input, output, session) {
       HTML(paste0(
         tooltip_heading, 
         click_info$data$COUNTRY_NAME[1], "<br>",
-        tooltip_color_icon(top5_colors[1]), tooltip_subheading, "2020</span>: ",
+        tooltip_color_icon(top5_colors[1]), tooltip_subheading, "2021</span>: ",
         dollar(click_info$data$NET_VALUE[1]), "<br>",
-        tooltip_color_icon(top5_colors[2]), tooltip_subheading, "2021</span>: ",
+        tooltip_color_icon(top5_colors[2]), tooltip_subheading, "2022</span>: ",
         dollar(click_info$data$NET_VALUE[2]), "<br>",
-        tooltip_color_icon(top5_colors[3]), tooltip_subheading, "2022</span>: ",
+        tooltip_color_icon(top5_colors[3]), tooltip_subheading, "2023</span>: ",
         dollar(click_info$data$NET_VALUE[3]), "<br>",
-        tooltip_color_icon(top5_colors[4]), tooltip_subheading, "2023</span>: ",
+        tooltip_color_icon(top5_colors[4]), tooltip_subheading, "2024</span>: ",
         dollar(click_info$data$NET_VALUE[4]), "<br>",
-        tooltip_color_icon(top5_colors[5]), tooltip_subheading, "2024</span>: ",
+        tooltip_color_icon(top5_colors[5]), tooltip_subheading, "2025</span>: ",
         dollar(click_info$data$NET_VALUE[5]), "<br>")))
   })
   
