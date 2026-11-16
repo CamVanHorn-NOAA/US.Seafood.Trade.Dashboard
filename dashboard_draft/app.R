@@ -722,6 +722,7 @@ summarize_landings_yr_spp <- function(landings_data, species, region, full_data 
   }
   
   summarized_data <- summarized_data %>%
+    select(!(!!level)) %>%
     mutate(COM_PRICE = COM_VALUE / COM_VOLUME) 
   
   return(summarized_data)
@@ -753,9 +754,7 @@ summarize_yr_spp <- function(species, region, units = NULL,  nominal = F) {
                           summarise(across(where(is.numeric), sum),
                                     .groups = 'drop')),
               summarize_landings_yr_spp(com_landings, species, region, units = units,
-                                        nominal = nominal)) %>%
-    select(!SPECIES_NAME) %>%
-    replace(is.na(.), 0)
+                                        nominal = nominal)) 
   
   return(combined_data)
 }
@@ -1072,6 +1071,7 @@ calculate_supply_metrics <- function(species, region, units = NULL, nominal = F)
   # species is a character vector of a species of interest
   
   data <- summarize_yr_spp(species, region, units = units, nominal = nominal) %>%
+    replace(is.na(.), 0) %>%
     # calculate apparent supply by summing domestic production and imports 
     # and subtracting export volume
     # calculate apparent supply relative to domestic production by dividing
